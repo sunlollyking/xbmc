@@ -129,6 +129,7 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "settings/lib/Setting.h"
+#include "smarthome/SmartHomeServices.h"
 #include "speech/ISpeechRecognition.h"
 #include "storage/MediaManager.h"
 #include "utils/AlarmClock.h"
@@ -1547,6 +1548,8 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
   }
 
   appPlayer->FrameMove();
+
+  CServiceBroker::GetSmartHomeServices().FrameMove();
 
   // this will go away when render systems gets its own thread
   CServiceBroker::GetWinSystem()->DriveRenderLoop();
