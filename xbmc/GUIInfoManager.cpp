@@ -4411,11 +4411,35 @@ constexpr std::array<InfoMap, 7> retroplayer = {{
 ///     @skinning_v24 **[New Infolabel]** \link SmartHome_System_BatteryLoad `SmartHome.System(name).BatteryLoad`\endlink
 ///     <p>
 ///   }
+///   \table_row3{   <b>`SmartHome.HasStation`</b>,
+///                  \anchor SmartHome_HasStation
+///                  _boolean_,
+///     @return **True** if a LEGO train power station has been seen recently.
+///     <p>
+///   }
+///   \table_row3{   <b>`SmartHome.StationSupply`</b>,
+///                  \anchor SmartHome_StationSupply
+///                  _string_,
+///     @return The supply voltage being provided to a LEGO train power station.
+///     <p>
+///   }
+///   \table_row3{   <b>`SmartHome.StationMotor`</b>,
+///                  \anchor SmartHome_StationMotor
+///                  _string_,
+///     @return The voltage being applied to the 9V motors of a LEGO train.
+///     <p>
+///   }
+///   \table_row3{   <b>`SmartHome.StationCurrent`</b>,
+///                  \anchor SmartHome_StationCurrent
+///                  _string_,
+///     @return The current being provided to a LEGO train's 9V motors.
+///     <p>
+///   }
 /// \table_end
 ///
 /// -----------------------------------------------------------------------------
 // clang-format off
-constexpr std::array<InfoMap, 7> smarthome = {{
+constexpr std::array<InfoMap, 11> smarthome = {{
     {"isactive",            SMARTHOME_IS_ACTIVE},
     {"cputemperature",      SMARTHOME_CPU_TEMPERATURE},
     {"cpuutilization",      SMARTHOME_CPU_UTILIZATION},
@@ -4423,6 +4447,10 @@ constexpr std::array<InfoMap, 7> smarthome = {{
     {"ramutilization",      SMARTHOME_RAM_UTILIZATION},
     {"batterycharge",       SMARTHOME_BATTERY_CHARGE},
     {"batteryload",         SMARTHOME_BATTERY_LOAD},
+    {"hasstation",          SMARTHOME_HAS_STATION},
+    {"stationsupply",       SMARTHOME_STATION_SUPPLY},
+    {"stationmotor",        SMARTHOME_STATION_MOTOR},
+    {"stationcurrent",      SMARTHOME_STATION_CURRENT},
 }};
 // clang-format on
 
@@ -11289,6 +11317,14 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       {
         if (prop.Name() == rd.str)
           return rd.val;
+      }
+    }
+    else if (cat.Name() == "smarthome")
+    {
+      for (const auto& i : smarthome)
+      {
+        if (prop.Name() == i.str)
+          return i.val;
       }
     }
   }

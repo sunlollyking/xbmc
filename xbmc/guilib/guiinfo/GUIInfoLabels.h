@@ -546,6 +546,11 @@ constexpr uint32_t SMARTHOME_RAM_UTILIZATION         = 854;
 constexpr uint32_t SMARTHOME_BATTERY_CHARGE          = 855;
 constexpr uint32_t SMARTHOME_BATTERY_LOAD            = 856;
 
+constexpr uint32_t SMARTHOME_HAS_STATION             = 870;
+constexpr uint32_t SMARTHOME_STATION_SUPPLY          = 871;
+constexpr uint32_t SMARTHOME_STATION_MOTOR           = 872;
+constexpr uint32_t SMARTHOME_STATION_CURRENT         = 873;
+
 constexpr int      SLIDESHOW_LABELS_START            = 900;
 constexpr uint32_t SLIDESHOW_FILE_NAME               = SLIDESHOW_LABELS_START;
 constexpr uint32_t SLIDESHOW_FILE_PATH               = SLIDESHOW_LABELS_START + 1;

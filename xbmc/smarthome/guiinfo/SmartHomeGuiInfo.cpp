@@ -12,6 +12,7 @@
 #include "LangInfo.h"
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
+#include "smarthome/guiinfo/IStationHUD.h"
 #include "smarthome/guiinfo/ISystemHealthHUD.h"
 #include "utils/StringUtils.h"
 
@@ -45,8 +46,11 @@ std::string FormatFrequency(double frequencyHz)
 } // namespace
 
 CSmartHomeGuiInfo::CSmartHomeGuiInfo(CGUIInfoManager& infoManager,
-                                     ISystemHealthHUD& systemHealthHud)
-  : m_infoManager(infoManager), m_systemHealthHud(systemHealthHud)
+                                     ISystemHealthHUD& systemHealthHud,
+                                     IStationHUD& stationHud)
+  : m_infoManager(infoManager),
+    m_systemHealthHud(systemHealthHud),
+    m_stationHud(stationHud)
 {
 }
 
@@ -141,6 +145,21 @@ bool CSmartHomeGuiInfo::GetLabel(std::string& value,
       }
       break;
     }
+    case SMARTHOME_STATION_SUPPLY:
+    {
+      value = StringUtils::Format("{:.1f} V", m_stationHud.SupplyVoltage());
+      return true;
+    }
+    case SMARTHOME_STATION_MOTOR:
+    {
+      value = StringUtils::Format("{:.1f} V", m_stationHud.MotorVoltage());
+      return true;
+    }
+    case SMARTHOME_STATION_CURRENT:
+    {
+      value = StringUtils::Format("{:.1f} A", m_stationHud.MotorCurrent());
+      return true;
+    }
     default:
       break;
   }
@@ -171,6 +190,11 @@ bool CSmartHomeGuiInfo::GetBool(bool& value,
         return true;
       }
       break;
+    }
+    case SMARTHOME_HAS_STATION:
+    {
+      value = m_stationHud.IsActive();
+      return true;
     }
     default:
       break;
