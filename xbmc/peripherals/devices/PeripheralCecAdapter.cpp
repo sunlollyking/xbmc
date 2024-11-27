@@ -305,7 +305,10 @@ bool CPeripheralCecAdapter::GetCecKey(CKey& key)
   if (buttonCode <= 0)
     return false;
 
-  key = CKey(buttonCode, holdTime);
+  if (holdTime > HOLD_THRESHOLD_MS)
+    key = CKey(buttonCode | CKey::MODIFIER_LONG, holdTime, CKey::MODIFIER_LONG);
+  else
+    key = CKey(buttonCode, holdTime);
 
   ResetButton();
   return true;

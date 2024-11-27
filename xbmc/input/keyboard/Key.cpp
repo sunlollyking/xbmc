@@ -44,6 +44,14 @@ CKey::CKey(uint32_t buttonCode, unsigned int held)
   m_held = held;
 }
 
+CKey::CKey(uint32_t buttonCode, unsigned int held, uint32_t modifiers)
+{
+  Reset();
+  m_buttonCode = buttonCode;
+  m_held = held;
+  m_modifiers = modifiers;
+}
+
 CKey::CKey(uint32_t keycode,
            uint8_t vkey,
            wchar_t unicode,
@@ -161,7 +169,7 @@ bool CKey::IsAnalogButton() const
 
 bool CKey::IsIRRemote() const
 {
-  if (GetButtonCode() < 256)
+  if ((GetButtonCode() & ~CKey::MODIFIER_LONG) < 256)
     return true;
   return false;
 }
