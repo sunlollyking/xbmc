@@ -545,6 +545,16 @@ constexpr uint32_t SMARTHOME_CPU_FREQUENCY           = 853;
 constexpr uint32_t SMARTHOME_RAM_UTILIZATION         = 854;
 constexpr uint32_t SMARTHOME_BATTERY_CHARGE          = 855;
 constexpr uint32_t SMARTHOME_BATTERY_LOAD            = 856;
+constexpr uint32_t SMARTHOME_FORWARD_SPEED           = 857;
+constexpr uint32_t SMARTHOME_FORWARD_SPEED_STD_DEV   = 858;
+constexpr uint32_t SMARTHOME_ROLL                    = 859;
+constexpr uint32_t SMARTHOME_ROLL_STD_DEV            = 860;
+constexpr uint32_t SMARTHOME_PITCH                   = 861;
+constexpr uint32_t SMARTHOME_PITCH_STD_DEV           = 862;
+constexpr uint32_t SMARTHOME_YAW                     = 863;
+constexpr uint32_t SMARTHOME_YAW_STD_DEV             = 864;
+constexpr uint32_t SMARTHOME_TILT                    = 865;
+constexpr uint32_t SMARTHOME_TILT_STD_DEV            = 866;
 
 constexpr uint32_t SMARTHOME_HAS_STATION             = 870;
 constexpr uint32_t SMARTHOME_STATION_SUPPLY          = 871;
