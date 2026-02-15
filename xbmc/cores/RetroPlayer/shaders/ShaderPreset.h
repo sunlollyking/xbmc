@@ -12,7 +12,6 @@
 #include "cores/RetroPlayer/shaders/ShaderTypes.h"
 #include "utils/Geometry.h"
 
-#include <memory>
 #include <set>
 #include <string>
 #include <vector>

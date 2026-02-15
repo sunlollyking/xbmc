@@ -11,9 +11,6 @@
 #include "ShaderTypes.h"
 #include "cores/RetroPlayer/RetroPlayerTypes.h"
 
-#include <string>
-#include <vector>
-
 namespace KODI::SHADER
 {
 class IShaderTexture;
