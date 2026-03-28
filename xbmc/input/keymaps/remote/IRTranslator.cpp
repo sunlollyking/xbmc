@@ -139,26 +139,6 @@ void CIRTranslator::Clear()
   m_irRemotesMap.clear();
 }
 
-unsigned int CIRTranslator::TranslateButton(const std::string& szDevice,
-                                            const std::string& szButton)
-{
-  // Find the device
-  auto it = m_irRemotesMap.find(szDevice);
-  if (it == m_irRemotesMap.end())
-    return 0;
-
-  // Find the button
-  auto it2 = (*it).second->find(szButton);
-  if (it2 == (*it).second->end())
-    return 0;
-
-  // Convert the button to code
-  if (StringUtils::CompareNoCase((*it2).second, "obc", 3) == 0)
-    return TranslateUniversalRemoteString((*it2).second);
-
-  return TranslateString((*it2).second);
-}
-
 uint32_t CIRTranslator::TranslateString(std::string strButton)
 {
   if (strButton.empty())

@@ -40,8 +40,6 @@ public:
    */
   void Clear();
 
-  unsigned int TranslateButton(const std::string& szDevice, const std::string& szButton);
-
   static uint32_t TranslateString(std::string strButton);
   static uint32_t TranslateUniversalRemoteString(const std::string& szButton);
 
