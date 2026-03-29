@@ -305,10 +305,47 @@ bool CPeripheralCecAdapter::GetCecKey(CKey& key)
   if (buttonCode <= 0)
     return false;
 
-  if (holdTime > HOLD_THRESHOLD_MS)
-    key = CKey(buttonCode | CKey::MODIFIER_LONG, holdTime, CKey::MODIFIER_LONG);
+  const auto now = std::chrono::steady_clock::now();
+
+  if (m_lastButtonCode <= 0)
+  {
+    m_lastButtonCode = buttonCode;
+    m_lastKeyTime = std::chrono::steady_clock::now();
+    m_holdTime = 0;
+  }
+  else if (m_lastButtonCode == buttonCode)
+  {
+    uint64_t timeDiff = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastKeyTime).count());
+    
+    if (timeDiff < 500)
+    {
+      m_holdTime += timeDiff;
+      m_lastKeyTime = now;
+    }
+    else
+    {
+      m_lastButtonCode = 0;
+      m_holdTime = 0;
+    }
+  }
   else
+  {
+    m_lastButtonCode = 0;
+    m_holdTime = 0;
+  }
+
+  if (m_holdTime > HOLD_THRESHOLD_MS)
+  {
+    CLog::Log(LOGDEBUG, "{} - Button Longpress {} - {}ms", __FUNCTION__, buttonCode, static_cast<unsigned int>(m_holdTime));
+    key = CKey(buttonCode | CKey::MODIFIER_LONG, static_cast<unsigned int>(m_holdTime), CKey::MODIFIER_LONG);
+    m_lastButtonCode = 0;
+    m_holdTime = 0;
+  }
+  else if (buttonCode != (11 & CKey::MODIFIER_LONG) || buttonCode != (11))
+  {
+    CLog::Log(LOGDEBUG, "{} - Button Normal {} - {}ms", __FUNCTION__, buttonCode, static_cast<unsigned int>(m_holdTime));
     key = CKey(buttonCode, holdTime);
+  }
 
   ResetButton();
   return true;

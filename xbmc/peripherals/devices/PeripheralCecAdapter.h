@@ -213,6 +213,10 @@ private:
   bool m_bSendInactiveSource;
   bool m_bPowerOffScreensaver;
   bool m_bShutdownOnStandby;
+  
+  std::chrono::time_point<std::chrono::steady_clock> m_lastKeyTime;
+  int32_t m_lastButtonCode = 0;
+  uint64_t m_holdTime;
 };
 
 class CPeripheralCecAdapterUpdateThread : public CThread

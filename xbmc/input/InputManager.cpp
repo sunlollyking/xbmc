@@ -534,11 +534,24 @@ bool CInputManager::OnKey(const CKey& key)
       }
       else
       {
-        if (key.GetButtonCode() != m_LastKey.GetButtonCode() &&
-            (key.GetButtonCode() & CKey::MODIFIER_LONG))
+        if (key.GetButtonCode() != m_LastKey.GetButtonCode())
         {
-          m_LastKey = key; // OnKey is reentrant; need to do this before entering
-          bHandled = HandleKey(key);
+          if (key.GetButtonCode() & CKey::MODIFIER_LONG)
+          {
+            m_LastKey = key; // OnKey is reentrant; need to do this before entering
+            bHandled = HandleKey(key);
+          }
+          else if (key.IsIRRemote())
+          {
+            m_LastKey = key; // OnKey is reentrant; need to do this before entering
+            bHandled = HandleKey(key);
+          }
+        }
+        else
+        {
+//            auto now = std::chrono::steady_clock::now();
+//
+//            auto held = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastKeyTime);
         }
 
         m_LastKey = key;
