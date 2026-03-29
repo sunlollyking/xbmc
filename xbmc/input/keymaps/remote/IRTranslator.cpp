@@ -27,82 +27,7 @@
 using namespace KODI;
 using namespace KEYMAP;
 
-void CIRTranslator::Load(const std::string& irMapName)
-{
-  if (irMapName.empty())
-    return;
-
-  Clear();
-
-  bool success = false;
-
-  std::string irMapPath = URIUtils::AddFileToFolder("special://xbmc/system/", irMapName);
-  if (CFileUtils::Exists(irMapPath))
-    success |= LoadIRMap(irMapPath);
-  else
-    CLog::Log(LOGDEBUG, "CIRTranslator::Load - no system {} found, skipping", irMapName);
-
-  irMapPath =
-      CServiceBroker::GetSettingsComponent()->GetProfileManager()->GetUserDataItem(irMapName);
-  if (CFileUtils::Exists(irMapPath))
-    success |= LoadIRMap(irMapPath);
-  else
-    CLog::Log(LOGDEBUG, "CIRTranslator::Load - no userdata {} found, skipping", irMapName);
-
-  if (!success)
-    CLog::Log(LOGERROR, "CIRTranslator::Load - unable to load remote map {}", irMapName);
-}
-
-bool CIRTranslator::LoadIRMap(const std::string& irMapPath)
-{
-  std::string remoteMapTag = URIUtils::GetFileName(irMapPath);
-  size_t lastindex = remoteMapTag.find_last_of('.');
-  if (lastindex != std::string::npos)
-    remoteMapTag.resize(lastindex);
-  StringUtils::ToLower(remoteMapTag);
-
-  // Load our xml file, and fill up our mapping tables
-  CXBMCTinyXML2 xmlDoc;
-
-  // Load the config file
-  CLog::Log(LOGINFO, "Loading {}", irMapPath);
-  if (!xmlDoc.LoadFile(irMapPath))
-  {
-    CLog::Log(LOGERROR, "{}, Line {}\n{}", irMapPath, xmlDoc.ErrorLineNum(), xmlDoc.ErrorStr());
-    return false;
-  }
-
-  auto* pRoot = xmlDoc.RootElement();
-  if (pRoot == nullptr)
-    return false;
-
-  std::string strValue = pRoot->Value();
-  if (strValue != remoteMapTag)
-  {
-    CLog::Log(LOGERROR, "{} Doesn't contain <{}>", irMapPath, remoteMapTag);
-    return false;
-  }
-
-  // Run through our window groups
-  auto* pRemote = pRoot->FirstChild();
-  while (pRemote != nullptr)
-  {
-    if (pRemote->ToElement())
-    {
-      const char* szRemote = pRemote->Value();
-      if (szRemote != nullptr)
-      {
-        auto* pAttr = pRemote->ToElement()->FirstAttribute();
-        if (pAttr != nullptr)
-          MapRemote(pRemote, pAttr->Value());
-      }
-    }
-    pRemote = pRemote->NextSibling();
-  }
-
-  return true;
-}
-
+/*
 void CIRTranslator::MapRemote(tinyxml2::XMLNode* pRemote, const std::string& szDevice)
 {
   CLog::Log(LOGINFO, "* Adding remote mapping for device '{}'", szDevice);
@@ -139,15 +64,11 @@ void CIRTranslator::Clear()
 {
   m_irRemotesMap.clear();
 }
+*/
 
 uint32_t CIRTranslator::TranslateButton(const tinyxml2::XMLElement* pButton)
 {
   return ApplyModifiersToButton(pButton, TranslateString(pButton->Value()));
-}
-
-uint32_t CIRTranslator::TranslateUniversalRemoteButton(const tinyxml2::XMLElement* pButton)
-{
-  return ApplyModifiersToButton(pButton, TranslateUniversalRemoteString(pButton->Value()));
 }
 
 uint32_t CIRTranslator::TranslateString(std::string strButton)
@@ -296,21 +217,6 @@ uint32_t CIRTranslator::TranslateString(std::string strButton)
     buttonCode = XINPUT_IR_REMOTE_LAST;
   else
     CLog::Log(LOGERROR, "Remote Translator: Can't find button {}", strButton);
-  return buttonCode;
-}
-
-uint32_t CIRTranslator::TranslateUniversalRemoteString(const std::string& szButton)
-{
-  if (szButton.empty() || szButton.length() < 4 || StringUtils::CompareNoCase(szButton, "obc", 3))
-    return 0;
-
-  const char* szCode = szButton.c_str() + 3;
-
-  // Button Code is 255 - OBC (Original Button Code) of the button
-  uint32_t buttonCode = 255 - atol(szCode);
-  if (buttonCode > 255)
-    buttonCode = 0;
-
   return buttonCode;
 }
 
