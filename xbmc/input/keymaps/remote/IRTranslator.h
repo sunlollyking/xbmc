@@ -32,20 +32,28 @@ public:
   CIRTranslator() = default;
 
   /*!
+   * \brief Loads Lircmap.xml/IRSSmap.xml
+   */
+  void Load(const std::string& irMapName);
+
+  /*!
    * \brief Clears the map
    */
   void Clear();
 
   static uint32_t TranslateButton(const tinyxml2::XMLElement* pButton);
+  static uint32_t TranslateUniversalRemoteButton(const tinyxml2::XMLElement* pButton);
   static uint32_t TranslateString(std::string strButton);
+  static uint32_t TranslateUniversalRemoteString(const std::string& szButton);
 
 private:
+  bool LoadIRMap(const std::string& irMapPath);
   void MapRemote(tinyxml2::XMLNode* pRemote, const std::string& szDevice);
   static uint32_t ApplyModifiersToButton(const tinyxml2::XMLElement* pButton, uint32_t iButtonCode);
 
-  //using IRButtonMap = std::map<uint32_t, std::string>;
+  using IRButtonMap = std::map<std::string, std::string>;
 
-  //std::map<std::string, std::shared_ptr<IRButtonMap>> m_irRemotesMap;
+  std::map<std::string, std::shared_ptr<IRButtonMap>> m_irRemotesMap;
 };
 } // namespace KEYMAP
 } // namespace KODI

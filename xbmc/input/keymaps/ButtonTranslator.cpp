@@ -315,6 +315,8 @@ void CButtonTranslator::MapWindowActions(const tinyxml2::XMLNode* pWindow, int w
           buttonCode = CGamepadTranslator::TranslateString(pButton->Value());
         else if (type == "remote")
           buttonCode = CIRTranslator::TranslateButton(pButton);
+        else if (type == "universalremote")
+          buttonCode = CIRTranslator::TranslateUniversalRemoteButton(pButton);
         else if (type == "keyboard")
           buttonCode = CKeyboardTranslator::TranslateButton(pButton);
         else if (type == "mouse")
@@ -382,5 +384,29 @@ void CButtonTranslator::UnregisterMapper(const IKeyMapper* mapper)
       m_buttonMappers.erase(it);
       break;
     }
+  }
+}
+
+uint32_t CButtonTranslator::TranslateString(const std::string& strMap, const std::string& strButton)
+{
+  if (strMap == "KB") // standard keyboard map
+  {
+    return CKeyboardTranslator::TranslateString(strButton);
+  }
+  else if (strMap == "XG") // xbox gamepad map
+  {
+    return CGamepadTranslator::TranslateString(strButton);
+  }
+  else if (strMap == "R1") // xbox remote map
+  {
+    return CIRTranslator::TranslateString(strButton);
+  }
+  else if (strMap == "R2") // xbox universal remote map
+  {
+    return CIRTranslator::TranslateUniversalRemoteString(strButton);
+  }
+  else
+  {
+    return 0;
   }
 }

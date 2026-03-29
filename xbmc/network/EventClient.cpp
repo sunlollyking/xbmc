@@ -56,6 +56,42 @@ struct ButtonStateFinder
 };
 
 /************************************************************************/
+/* CEventButtonState                                                    */
+/************************************************************************/
+void CEventButtonState::Load()
+{
+  if ( m_iKeyCode == 0 )
+  {
+    if ((!m_mapName.empty()) && (!m_buttonName.empty()))
+    {
+      m_iKeyCode = KEYMAP::CButtonTranslator::TranslateString(m_mapName, m_buttonName);
+      if (m_iKeyCode == 0)
+      {
+        Reset();
+        CLog::Log(LOGERROR, "ES: Could not map {} : {} to a key", m_mapName, m_buttonName);
+      }
+    }
+  }
+  else
+  {
+    if (m_mapName.length() > 3 &&
+        (StringUtils::StartsWith(m_mapName, "JS")) )
+    {
+      m_joystickName = m_mapName.substr(2);  // <num>:joyname
+      m_iControllerNumber = (unsigned char)(*(m_joystickName.c_str()))
+        - (unsigned char)'0'; // convert <num> to int
+      m_joystickName = m_joystickName.substr(2); // extract joyname
+    }
+
+    if (m_mapName.length() > 3 &&
+        (StringUtils::StartsWith(m_mapName, "CC")) ) // custom map - CC:<controllerName>
+    {
+      m_customControllerName = m_mapName.substr(3);
+    }
+  }
+}
+
+/************************************************************************/
 /* CEventClient                                                         */
 /************************************************************************/
 bool CEventClient::AddPacket(std::unique_ptr<CEventPacket> packet)
