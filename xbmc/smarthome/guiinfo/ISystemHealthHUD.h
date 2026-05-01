@@ -121,19 +121,9 @@ public:
    * \param systemName The name of the system
    *
    * \return The battery load, in Watts
+   *
    */
   virtual float BatteryLoad(const std::string& systemName) = 0;
-
-  /*!
-   * \brief Get the supply voltage, in Volts
-   *
-   * The system will be subscribed to if not already subscribed.
-   *
-   * \param systemName The name of the system
-   *
-   * \return The supply voltage, in Volts
-   */
-  virtual float SupplyVoltage(const std::string& systemName) = 0;
 };
 } // namespace SMART_HOME
 } // namespace KODI

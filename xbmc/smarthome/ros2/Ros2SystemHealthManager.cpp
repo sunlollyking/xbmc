@@ -121,18 +121,6 @@ float CRos2SystemHealthManager::BatteryLoad(const std::string& systemName)
   return it->second.BatteryLoad();
 }
 
-float CRos2SystemHealthManager::SupplyVoltage(const std::string& systemName)
-{
-  auto it = m_systemHealths.find(systemName);
-  if (it == m_systemHealths.end())
-  {
-    AddSystem(systemName);
-    it = m_systemHealths.find(systemName);
-  }
-
-  return it->second.SupplyVoltage();
-}
-
 void CRos2SystemHealthManager::AddSystem(const std::string& systemName)
 {
   if (!m_node)

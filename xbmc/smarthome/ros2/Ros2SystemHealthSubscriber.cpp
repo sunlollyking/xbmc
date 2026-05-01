@@ -125,13 +125,6 @@ float CRos2SystemHealthSubscriber::BatteryLoad() const
   return m_batteryLoadWatts;
 }
 
-float CRos2SystemHealthSubscriber::SupplyVoltage() const
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-
-  return m_supplyVoltage;
-}
-
 void CRos2SystemHealthSubscriber::OnSystemTelemetry(const SystemTelemetry::SharedPtr msg)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -154,7 +147,6 @@ void CRos2SystemHealthSubscriber::OnUPSStatus(const UPSStatus::SharedPtr msg)
 
   m_batteryCharge = static_cast<unsigned int>(msg->battery_charge);
   m_batteryLoadWatts = msg->load;
-  m_supplyVoltage = msg->supply_voltage;
 }
 
 void CRos2SystemHealthSubscriber::OnMCUMemory(const MCUMemory::SharedPtr msg)

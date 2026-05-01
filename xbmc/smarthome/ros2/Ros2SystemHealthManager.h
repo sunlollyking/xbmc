@@ -47,7 +47,6 @@ public:
   float MemoryUtilization(const std::string& systemName) override;
   unsigned int BatteryCharge(const std::string& systemName) override;
   float BatteryLoad(const std::string& systemName) override;
-  float SupplyVoltage(const std::string& systemName) override;
 
 private:
   // Utility functions
