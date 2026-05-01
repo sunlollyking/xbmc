@@ -49,6 +49,7 @@ public:
   float MemoryUtilization() const;
   unsigned int BatteryCharge() const;
   float BatteryLoad() const;
+  float SupplyVoltage() const;
 
 private:
   // ROS messages
@@ -75,6 +76,7 @@ private:
   float m_memoryUtilization{0.0f};
   unsigned int m_batteryCharge{0};
   float m_batteryLoadWatts{0.0f};
+  float m_supplyVoltage{0.0f};
 
   // Synchronization parameters
   mutable std::mutex m_mutex;
