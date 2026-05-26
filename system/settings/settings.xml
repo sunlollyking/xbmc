@@ -2784,6 +2784,18 @@
           <default>false</default>
           <control type="toggle" />
         </setting>
+        <setting id="gamesachievements.hardcore" type="boolean" label="35281" help="35282">
+          <visible>true</visible>
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamesachievements.hardcoreinfo" type="string" label="35283">
+          <visible>true</visible>
+          <level>0</level>
+          <default></default>
+          <control type="label" />
+        </setting>
       </group>
     </category>
   </section>

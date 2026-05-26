@@ -238,7 +238,8 @@ bool CRetroPlayer::CloseFile(bool reopen /* = false */)
 
   std::unique_lock lock(m_mutex);
 
-  if (m_gameClient && m_gameServices.GameSettings().AutosaveEnabled())
+  if (m_gameClient && m_gameServices.GameSettings().AutosaveEnabled() &&
+      !m_gameServices.GameSettings().GetHardcoreMode())
   {
     std::string savePath = m_playback->CreateSavestate(true);
     if (!savePath.empty())
