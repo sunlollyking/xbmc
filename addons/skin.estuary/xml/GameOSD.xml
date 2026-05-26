@@ -427,7 +427,9 @@
 								<description>Save / Load button</description>
 								<label>$LOCALIZE[35249]</label>
 								<icon>osd/fullscreen/buttons/saves.png</icon>
-								<onclick>ActivateWindow(InGameSaves)</onclick>
+								<label2>$INFO[RetroPlayer.HardcoreMode][Disabled][]</label2>
+								<onclick condition="!RetroPlayer.HardcoreMode">ActivateWindow(InGameSaves)</onclick>
+								<onclick condition="RetroPlayer.HardcoreMode">Notification(RetroAchievements,Save and Load are disabled in Hardcore Mode,6000,DefaultIconInfo.png)</onclick>
 							</item>
 							<item>
 								<description>Disc Manager button</description>

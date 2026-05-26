@@ -374,6 +374,11 @@ bool CGamesGUIInfo::GetBool(bool& value,
 
       return true;
     }
+    case RETROPLAYER_HARDCORE_MODE:
+    {
+      value = CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode();
+      return true;
+    }
     case RETROPLAYER_ACHIEVEMENTS_LOADED:
     {
       value = GameSettings().GetAchievementsLoaded();
