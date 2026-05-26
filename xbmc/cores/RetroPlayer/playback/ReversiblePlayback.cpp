@@ -407,7 +407,7 @@ void CReversiblePlayback::UpdateMemoryStream()
   GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
   if (m_gameClient->SerializeSize() > 0)
-    bRewindEnabled = gameSettings.RewindEnabled();
+    bRewindEnabled = gameSettings.RewindEnabled() && !gameSettings.GetHardcoreMode();
 
   if (bRewindEnabled)
   {

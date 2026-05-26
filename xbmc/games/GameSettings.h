@@ -179,6 +179,7 @@ public:
   }
 
   bool GetAchievementsLoggedIn() const;
+  bool GetHardcoreMode() const;
 
   // Inherited from ISettingCallback
   void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;

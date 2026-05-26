@@ -293,3 +293,10 @@ bool CGameSettings::GetAchievementsLoggedIn() const
   return CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
       SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN);
 }
+
+bool CGameSettings::GetHardcoreMode() const
+{
+  return CServiceBroker::GetSettingsComponent()
+      ->GetSettings()
+      ->GetBool("gamesachievements.hardcore");
+}

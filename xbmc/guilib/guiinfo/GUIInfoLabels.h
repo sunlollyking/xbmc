@@ -365,6 +365,7 @@ constexpr uint32_t RETROPLAYER_ACHIEVEMENTS_LOADED        = 1715;
 constexpr uint32_t RETROPLAYER_ACHIEVEMENTS_LOGGED_IN     = 1721;
 constexpr uint32_t RETROPLAYER_ACHIEVEMENTS_STATUS        = 1722;
 constexpr uint32_t RETROPLAYER_LEADERBOARDS_STATUS        = 1723;
+constexpr uint32_t RETROPLAYER_HARDCORE_MODE              = 1724;
 
 // Per-achievement InfoLabels (index passed via GetData2())
 constexpr uint32_t RETROPLAYER_ACHIEVEMENT_TITLE       = 1716;
