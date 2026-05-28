@@ -1,0 +1,13 @@
+# Target labels
+ rcheevos
+# Source files and their labels
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/rcheevos
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/rcheevos.rule
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/rcheevos-complete.rule
+/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-build.rule
+/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-configure.rule
+/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-download.rule
+/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-install.rule
+/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-mkdir.rule
+/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-patch.rule
+/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-update.rule

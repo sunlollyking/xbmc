@@ -1,0 +1,13 @@
+# Target labels
+ libretro-common
+# Source files and their labels
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/libretro-common
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/libretro-common.rule
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/libretro-common-complete.rule
+/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-build.rule
+/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-configure.rule
+/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-download.rule
+/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-install.rule
+/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-mkdir.rule
+/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-patch.rule
+/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-update.rule

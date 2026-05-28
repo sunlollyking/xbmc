@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/fceumm"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/fceumm.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/fceumm-complete.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-build.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-configure.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-download.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-install.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-mkdir.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-patch.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"fceumm"
+		],
+		"name" : "fceumm"
+	}
+}

@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/rcheevos"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/rcheevos.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/rcheevos-complete.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-build.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-configure.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-download.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-install.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-mkdir.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-patch.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/rcheevos/src/rcheevos-stamp/rcheevos-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"rcheevos"
+		],
+		"name" : "rcheevos"
+	}
+}

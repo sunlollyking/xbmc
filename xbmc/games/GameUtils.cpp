@@ -22,6 +22,8 @@
 #include "games/addons/GameClient.h"
 #include "games/dialogs/GUIDialogSelectGameClient.h"
 #include "games/dialogs/GUIDialogSelectSavestate.h"
+#include "games/GameServices.h"
+#include "games/GameSettings.h"
 #include "games/tags/GameInfoTag.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "utils/StringUtils.h"
@@ -51,8 +53,13 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
     }
     else
     {
-      if (!CGUIDialogSelectSavestate::ShowAndGetSavestate(item.GetPath(), savestatePath))
-        return false;
+      const bool hardcoreMode =
+          CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode();
+      if (!hardcoreMode)
+      {
+        if (!CGUIDialogSelectSavestate::ShowAndGetSavestate(item.GetPath(), savestatePath))
+          return false;
+      }
 
       if (!savestatePath.empty())
       {

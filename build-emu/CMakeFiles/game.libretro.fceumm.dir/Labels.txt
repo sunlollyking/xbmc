@@ -1,0 +1,14 @@
+# Target labels
+ game.libretro.fceumm
+# Source files and their labels
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.fceumm
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.fceumm.rule
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.fceumm-complete.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-build.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-configure.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-download.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-forcebuild.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-install.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-mkdir.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-patch.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-update.rule

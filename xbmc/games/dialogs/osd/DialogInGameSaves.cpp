@@ -27,6 +27,9 @@
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
 #include "settings/GameSettings.h"
+#include "dialogs/GUIDialogKaiToast.h"
+#include "games/GameServices.h"
+#include "games/GameSettings.h"
 #include "settings/MediaSettings.h"
 #include "utils/log.h"
 
@@ -95,8 +98,31 @@ std::string CDialogInGameSaves::GetHeading()
   return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35249); // "Save / Load"
 }
 
+void CDialogInGameSaves::OnInitWindow()
+{
+  if (CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode())
+  {
+    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning,
+                                          "RetroAchievements",
+                                          "Save states are disabled in Hardcore Mode",
+                                          3000, false, 500);
+    Close();
+    return;
+  }
+  CDialogGameVideoSelect::OnInitWindow();
+}
+
 void CDialogInGameSaves::PreInit()
 {
+  if (CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode())
+  {
+    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning,
+                                          "RetroAchievements",
+                                          "Save states are disabled in Hardcore Mode",
+                                          3000, false, 500);
+    Close();
+    return;
+  }
   InitSavedGames();
 }
 

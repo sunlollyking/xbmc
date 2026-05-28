@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.fceumm"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.fceumm.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.fceumm-complete.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-build.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-configure.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-download.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-forcebuild.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-install.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-mkdir.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-patch.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-stamp/game.libretro.fceumm-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"game.libretro.fceumm"
+		],
+		"name" : "game.libretro.fceumm"
+	}
+}

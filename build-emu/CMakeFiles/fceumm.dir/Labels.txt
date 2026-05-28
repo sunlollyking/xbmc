@@ -1,0 +1,13 @@
+# Target labels
+ fceumm
+# Source files and their labels
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/fceumm
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/fceumm.rule
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/fceumm-complete.rule
+/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-build.rule
+/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-configure.rule
+/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-download.rule
+/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-install.rule
+/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-mkdir.rule
+/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-patch.rule
+/home/itsmechrissyd/xbmc/build-emu/build/fceumm/src/fceumm-stamp/fceumm-update.rule

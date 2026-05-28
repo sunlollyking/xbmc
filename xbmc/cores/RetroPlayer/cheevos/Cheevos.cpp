@@ -54,7 +54,13 @@
 
 using namespace KODI;
 using namespace RETRO;
+<<<<<<< HEAD
 using namespace KODI::GAME;
+=======
+// Static achievement title map (populated in LoadData, read in CallbackUrlId)
+std::unordered_map<unsigned, std::pair<std::string, std::string>> CCheevos::s_cheevoTitles;
+std::mutex CCheevos::s_cheevoTitlesMutex;
+>>>>>>> 1eb08945bd (Cheevos: Hardcore mode fixes - rewind toast, toggle notification, skip savestate on launch)
 
 namespace
 {
@@ -445,7 +451,7 @@ bool CCheevos::LoadData()
           achievement[BADGE_LOCKED_URL].asString(),
           std::to_string(achievement[CHEEVO_RARITY].asDouble()),
       };
-      // Store title + badge URL in static map so Callback_URL_ID can reach them
+      // Store title + badge URL in static map so CallbackUrlId can reach them
       const std::string badgeUrl =
           std::string(RA_BADGE_BASE_URL) + achievement[BADGE_NAME].asString() + ".png";
       {
@@ -570,6 +576,7 @@ bool CCheevos::LoadData()
           }
         }
       }
+
     }
   }
   else
@@ -827,7 +834,7 @@ static void QueueAward(const std::string& url)
   }
 }
 
-void CCheevos::Callback_URL_ID(const char* achievementUrl, unsigned int cheevoId)
+void CCheevos::CallbackUrlId(const std::string& achievementUrl, unsigned int cheevoId)
 {
   // If this achievement ID is not in our official map it is unofficial/demoted.
   // The addon runtime activates ALL achievements from patch data regardless of
@@ -836,7 +843,7 @@ void CCheevos::Callback_URL_ID(const char* achievementUrl, unsigned int cheevoId
   auto titleIt = s_cheevoTitles.find(cheevoId);
   if (titleIt == s_cheevoTitles.end())
   {
-    CLog::Log(LOGDEBUG, "CCheevos::Callback_URL_ID -- skipping unofficial achievement {}",
+    CLog::Log(LOGDEBUG, "CCheevos::CallbackUrlId -- skipping unofficial achievement {}",
               cheevoId);
     return;
   }
@@ -884,12 +891,12 @@ void CCheevos::Callback_URL_ID(const char* achievementUrl, unsigned int cheevoId
   std::string res;
   if (curl.Get(awardUrl, res))
   {
-    CLog::Log(LOGINFO, "CCheevos::Callback_URL_ID -- award sent for '{}' ({})", cheevoTitle,
+    CLog::Log(LOGINFO, "CCheevos::CallbackUrlId -- award sent for '{}' ({})", cheevoTitle,
               cheevoId);
   }
   else
   {
-    CLog::Log(LOGWARNING, "CCheevos::Callback_URL_ID -- award failed, queuing for retry: {}",
+    CLog::Log(LOGWARNING, "CCheevos::CallbackUrlId -- award failed, queuing for retry: {}",
               cheevoId);
     QueueAward(awardUrl);
   }
@@ -906,10 +913,11 @@ void CCheevos::Callback_URL_ID(const char* achievementUrl, unsigned int cheevoId
     }
     else
     {
-      // Download in background — badge will be available on next trigger
+      // Download badge in background then show notification with image
       const std::string badgeUrlCopy = badgeUrl;
+      const std::string cheevoTitleCopy = cheevoTitle;
       std::thread(
-          [badgeUrlCopy, localBadge]()
+          [badgeUrlCopy, localBadge, cheevoTitleCopy]()
           {
             XFILE::CDirectory::Create(RA_GAME_ICON_CACHE);
             XFILE::CCurlFile badgeCurl;
@@ -922,23 +930,25 @@ void CCheevos::Callback_URL_ID(const char* achievementUrl, unsigned int cheevoId
               {
                 outFile.Write(badgeData.data(), static_cast<ssize_t>(badgeData.size()));
                 outFile.Close();
-                CLog::Log(LOGINFO, "CCheevos::Callback_URL_ID -- cached badge: {}", localBadge);
+                CLog::Log(LOGINFO, "CCheevos::CallbackUrlId -- cached badge: {}", localBadge);
+                CGUIDialogKaiToast::QueueNotification(localBadge, "Achievement Unlocked!",
+                                                      cheevoTitleCopy, TOAST_DISPLAY_TIME_MS,
+                                                      false, TOAST_MESSAGE_TIME_MS);
+                return;
               }
             }
+            CGUIDialogKaiToast::QueueNotification(
+                CGUIDialogKaiToast::Info, "Achievement Unlocked!",
+                cheevoTitleCopy.empty() ? "Achievement earned!" : cheevoTitleCopy,
+                TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
           })
           .detach();
     }
   }
-  // Show notification with badge icon if available
+  // Show notification with badge icon if badge was already cached
   if (!iconPath.empty())
   {
     CGUIDialogKaiToast::QueueNotification(iconPath, "Achievement Unlocked!", cheevoTitle,
-                                          TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
-  }
-  else
-  {
-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "Achievement Unlocked!",
-                                          cheevoTitle.empty() ? "Achievement earned!" : cheevoTitle,
                                           TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
   }
 
@@ -962,7 +972,7 @@ void CCheevos::Callback_URL_ID(const char* achievementUrl, unsigned int cheevoId
     // Mastery notification — all achievements unlocked
     if (state.totalAchievements > 0 && state.unlockedAchievements >= state.totalAchievements)
     {
-      CLog::Log(LOGINFO, "CCheevos::Callback_URL_ID -- mastery achieved for '{}'", state.gameTitle);
+      CLog::Log(LOGINFO, "CCheevos::CallbackUrlId -- mastery achieved for '{}'", state.gameTitle);
 
       // Use the cached game icon for the mastery notification
       const std::string masteryIcon =
@@ -987,6 +997,7 @@ void CCheevos::Callback_URL_ID(const char* achievementUrl, unsigned int cheevoId
 void CCheevos::CheckTriggeredAchievement()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
   // Callback for triggered achievement URL and ID
   m_gameClient->Cheevos().GetAchievementUrlId(
       [](const std::string& achievementUrl, unsigned int cheevoId)
@@ -998,6 +1009,10 @@ void CCheevos::CheckTriggeredAchievement()
   m_gameClient->Cheevos().GetAchievement_URL_ID([](const char* url, unsigned int id)
                                                 { Callback_URL_ID(url, id); });
 >>>>>>> 14d708071f (Cheevos: Add Hardcore Mode support)
+=======
+  m_gameClient->Cheevos().GetAchievementUrlId([](const std::string& url, unsigned int id)
+                                                { CallbackUrlId(url, id); });
+>>>>>>> 1eb08945bd (Cheevos: Hardcore mode fixes - rewind toast, toggle notification, skip savestate on launch)
 }
 
 // ===========================================================================

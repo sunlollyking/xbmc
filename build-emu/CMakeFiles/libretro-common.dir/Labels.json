@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/libretro-common"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/libretro-common.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/libretro-common-complete.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-build.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-configure.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-download.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-install.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-mkdir.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-patch.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/libretro-common/src/libretro-common-stamp/libretro-common-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"libretro-common"
+		],
+		"name" : "libretro-common"
+	}
+}

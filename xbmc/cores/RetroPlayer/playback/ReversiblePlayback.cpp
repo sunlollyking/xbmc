@@ -21,6 +21,7 @@
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "utils/MathUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -318,6 +319,11 @@ void CReversiblePlayback::FrameEvent()
 
 void CReversiblePlayback::RewindEvent()
 {
+  if (!m_memoryStream)
+  {
+    m_gameClient->RunFrame();
+    return;
+  }
   RewindFrames(1);
 
   m_gameClient->RunFrame();
