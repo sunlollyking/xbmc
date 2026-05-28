@@ -1,0 +1,13 @@
+# Target labels
+ tinyxml
+# Source files and their labels
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/tinyxml
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/tinyxml.rule
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/tinyxml-complete.rule
+/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-build.rule
+/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-configure.rule
+/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-download.rule
+/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-install.rule
+/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-mkdir.rule
+/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-patch.rule
+/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-update.rule

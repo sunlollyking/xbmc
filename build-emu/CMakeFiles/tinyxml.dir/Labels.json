@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/tinyxml"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/tinyxml.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/tinyxml-complete.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-build.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-configure.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-download.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-install.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-mkdir.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-patch.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/build/tinyxml/src/tinyxml-stamp/tinyxml-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"tinyxml"
+		],
+		"name" : "tinyxml"
+	}
+}

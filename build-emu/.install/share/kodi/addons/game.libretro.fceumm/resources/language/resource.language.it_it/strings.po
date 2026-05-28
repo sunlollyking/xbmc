@@ -1,0 +1,30 @@
+# game.libretro.fceumm language file
+# Addon Name: game.libretro.fceumm
+# Addon id: game.libretro.fceumm
+# Addon Provider: libretro
+msgid ""
+msgstr ""
+"Project-Id-Version: game.libretro.fceumm\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: 2021-08-26 21:24i\n"
+"PO-Revision-Date: 2024-12-27 21:58+0000\n"
+"Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
+"Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-game/game-libretro-fceumm/it_it/>\n"
+"Language: it_it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.9.2\n"
+
+msgctxt "Addon Summary"
+msgid "Nintendo - NES / Famicom (FCEUmm)"
+msgstr "Nintendo - NES / Famicom (FCEUmm)"
+
+msgctxt "Addon Description"
+msgid "FCEUmm emulates NES, Famicom, and Famicom Disk System (FDS) platforms.[CR][CR]FCEUmm merges elements from FCEU Ultra, FCEU rerecording, FCEUXD, FCEUXDSP, FCEUXDSP CE, and FCEU-mm into a single branch of FCEU."
+msgstr "FCEUmm emula le piattaforme NES, Famicom e Famicom Disk System (FDS).[CR][CR]FCEUmm unisce elementi di FCEU Ultra, FCEU rerecording, FCEUXD, FCEUXDSP, FCEUXDSP CE e FCEU-mm in un unico ramo di FCEU."
+
+msgctxt "Addon Disclaimer"
+msgid "Icon credit: Anarkhya (anarkhya.deviantart.com)"
+msgstr "Credito icona: Anarkhya (anarkhya.deviantart.com)"

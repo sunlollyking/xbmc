@@ -1,0 +1,10 @@
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/addon-package.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/game.libretro.fceumm.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/package.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/package_source.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/edit_cache.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/rebuild_cache.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/list_install_components.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/install.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/install/local.dir
+/home/itsmechrissyd/xbmc/build-emu/game.libretro.fceumm-prefix/src/game.libretro.fceumm-build/CMakeFiles/install/strip.dir

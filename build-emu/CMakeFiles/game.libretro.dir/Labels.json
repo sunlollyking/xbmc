@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro-complete.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-build.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-configure.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-download.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-forcebuild.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-install.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-mkdir.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-patch.rule"
+		},
+		{
+			"file" : "/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"game.libretro"
+		],
+		"name" : "game.libretro"
+	}
+}
