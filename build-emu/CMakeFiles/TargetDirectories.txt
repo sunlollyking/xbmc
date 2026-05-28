@@ -1,0 +1,11 @@
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/package-addons.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.fceumm.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/fceumm.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/package-game.libretro.fceumm.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/sudo-install.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/supported_addons.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/need-sudo.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/edit_cache.dir
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/rebuild_cache.dir
+/home/itsmechrissyd/xbmc/build-emu/depends/CMakeFiles/edit_cache.dir
+/home/itsmechrissyd/xbmc/build-emu/depends/CMakeFiles/rebuild_cache.dir

@@ -30,6 +30,7 @@ public:
 
   // implementation of CGUIControl via CDialogGameVideoSelect
   bool OnMessage(CGUIMessage& message) override;
+  void OnInitWindow() override;
 
 protected:
   // implementation of CDialogGameVideoSelect

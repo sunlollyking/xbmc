@@ -401,6 +401,12 @@ uint64_t CRetroPlayer::GetTotalTime()
 
 void CRetroPlayer::SetSpeed(float speed)
 {
+  // Block rewind in hardcore mode
+  if (speed < 0.0f && m_gameServices.GameSettings().GetHardcoreMode())
+  {
+    CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Rewind blocked in Hardcore Mode");
+    return;
+  }
   if (m_playback->GetSpeed() != static_cast<double>(speed))
   {
     if (speed == 1.0f)

@@ -402,6 +402,7 @@
   </FullscreenVideo>
   <FullscreenGame>
     <keyboard>
+      <tab>OSD</tab>
       <f>FastForward</f>
       <r>Rewind</r>
       <backspace>OSD</backspace>

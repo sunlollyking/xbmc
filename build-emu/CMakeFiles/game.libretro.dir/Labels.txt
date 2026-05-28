@@ -1,0 +1,14 @@
+# Target labels
+ game.libretro
+# Source files and their labels
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro.rule
+/home/itsmechrissyd/xbmc/build-emu/CMakeFiles/game.libretro-complete.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-build.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-configure.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-download.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-forcebuild.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-install.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-mkdir.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-patch.rule
+/home/itsmechrissyd/xbmc/build-emu/game.libretro-prefix/src/game.libretro-stamp/game.libretro-update.rule

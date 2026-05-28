@@ -11,6 +11,7 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "events/EventLog.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "events/NotificationEvent.h"
 #include "filesystem/CurlFile.h"
 #include "filesystem/File.h"
@@ -73,7 +74,8 @@ CGameSettings::CGameSettings()
   m_settings->RegisterCallback(this, {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME,
                                       SETTING_GAMES_ACHIEVEMENTS_USERNAME,
                                       SETTING_GAMES_ACHIEVEMENTS_PASSWORD,
-                                      SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN});
+                                      SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
+                                      "gamesachievements.hardcore"});
 
   // On startup reset logged-in flag if token is missing
   const std::string token = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
@@ -190,6 +192,21 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
     m_settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN, false);
     m_settings->SetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN, "");
     m_settings->Save();
+  }
+  else if (settingId == "gamesachievements.hardcore")
+  {
+    CLog::Log(LOGDEBUG, "CGameSettings::OnSettingChanged - hardcore toggled");
+    const bool enabled =
+        std::dynamic_pointer_cast<const CSettingBool>(setting)->GetValue();
+    if (enabled)
+      CGUIDialogKaiToast::QueueNotification(
+          CGUIDialogKaiToast::Warning, "RetroAchievements",
+          "Hardcore Mode enabled - save states and rewind disabled", 6000,
+          false, 500);
+    else
+      CGUIDialogKaiToast::QueueNotification(
+          CGUIDialogKaiToast::Info, "RetroAchievements", "Hardcore Mode disabled", 3000,
+          false, 500);
   }
 }
 
