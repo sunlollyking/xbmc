@@ -9,6 +9,7 @@
 #pragma once
 
 #include "RConsoleIDs.h"
+#include "../rcheevos/include/rc_client.h"
 
 #include <atomic>
 #include <mutex>
@@ -63,6 +64,14 @@ private:
   RConsoleID ConsoleID();
 
   GAME::CGameClient* m_gameClient;
+  rc_client_t* m_rcClient{nullptr};
+
+  // rcheevos callbacks
+  static uint32_t RcheevosReadMemory(uint32_t address, uint8_t* buffer,
+                                     uint32_t numBytes, rc_client_t* client);
+  static void RcheevosServerCall(const rc_api_request_t* request,
+                                 rc_client_server_callback_t callback,
+                                 void* callbackData, rc_client_t* client);
   std::string m_userName;
   std::string m_loginToken;
 

@@ -1,3 +1,4 @@
+#include "utils/log.h"
 /*
  *  Copyright (C) 2020-2021 Team Kodi
  *  This file is part of Kodi - https://kodi.tv
@@ -269,4 +270,20 @@ void CGameClientCheevos::RCResetRuntime()
   {
     m_gameClient.LogException("RCResetRuntime()");
   }
+}
+
+bool CGameClientCheevos::GetMemory(unsigned int memoryType, uint8_t** data, size_t* size)
+{
+  *data = nullptr;
+  *size = 0;
+  try
+  {
+    m_struct.toAddon->GetMemory(&m_struct, static_cast<GAME_MEMORY>(memoryType), data, size);
+    return (*data != nullptr && *size > 0);
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: {}: Exception caught in GetMemory()", m_gameClient.ID());
+  }
+  return false;
 }
