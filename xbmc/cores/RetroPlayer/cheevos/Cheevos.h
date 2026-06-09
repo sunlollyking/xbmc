@@ -74,6 +74,10 @@ private:
   static void RcheevosServerCall(const rc_api_request_t* request,
                                  rc_client_server_callback_t callback,
                                  void* callbackData, rc_client_t* client);
+  static void RcheevosLoginCallback(int result, const char* errorMessage,
+                                    rc_client_t* client, void* userData);
+  static void RcheevosGameLoadCallback(int result, const char* errorMessage,
+                                       rc_client_t* client, void* userData);
   std::string m_userName;
   std::string m_loginToken;
 
