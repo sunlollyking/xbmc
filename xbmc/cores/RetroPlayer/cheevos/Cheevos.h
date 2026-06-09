@@ -37,6 +37,7 @@ public:
            const std::string& loginToken);
 
   void ResetRuntime();
+  void DoFrame();
   bool LoadData();
   void EnableRichPresence();
   std::string GetRichPresenceEvaluation();
