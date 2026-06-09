@@ -77,6 +77,7 @@ private:
                                     rc_client_t* client, void* userData);
   static void RcheevosGameLoadCallback(int result, const char* errorMessage,
                                        rc_client_t* client, void* userData);
+  static void RcheevosEventHandler(const rc_client_event_t* event, rc_client_t* client);
   std::string m_userName;
   std::string m_loginToken;
 
