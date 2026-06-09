@@ -58,6 +58,7 @@ using namespace RETRO;
 // Static achievement title map (populated in LoadData, read in CallbackUrlId)
 std::unordered_map<unsigned, std::pair<std::string, std::string>> CCheevos::s_cheevoTitles;
 std::mutex CCheevos::s_cheevoTitlesMutex;
+CCheevos* CCheevos::s_initializingCheevos = nullptr;
 
 namespace
 {
@@ -205,6 +206,7 @@ CCheevos::~CCheevos()
   m_richPresenceRunning = false;
   if (m_richPresenceThread.joinable())
     m_richPresenceThread.join();
+  rc_libretro_memory_destroy(&m_memoryRegions);
   if (m_rcClient != nullptr)
   {
     rc_client_destroy(m_rcClient);
@@ -1060,8 +1062,23 @@ void CCheevos::RcheevosGameLoadCallback(int result,
                                          rc_client_t* client,
                                          void* userData)
 {
+  CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
   if (result == RC_OK)
+  {
     CLog::Log(LOGINFO, "CCheevos: rc_client game loaded successfully");
+    // Initialise memory regions for proper multi-region memory access
+    if (cheevos != nullptr)
+    {
+      rc_libretro_memory_destroy(&cheevos->m_memoryRegions);
+      s_initializingCheevos = cheevos;
+      rc_libretro_memory_init(&cheevos->m_memoryRegions, nullptr,
+                              RcheevosGetCoreMemoryInfo,
+                              static_cast<uint32_t>(cheevos->ConsoleID()));
+      s_initializingCheevos = nullptr;
+      CLog::Log(LOGINFO, "CCheevos: memory regions initialised, total size: {}",
+                cheevos->m_memoryRegions.total_size);
+    }
+  }
   else
     CLog::Log(LOGWARNING, "CCheevos: rc_client game load failed: {}",
               errorMessage ? errorMessage : "unknown error");
@@ -1111,27 +1128,40 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
   }
 }
 
+void CCheevos::RcheevosGetCoreMemoryInfo(uint32_t id, rc_libretro_core_memory_info_t* info)
+{
+  if (s_initializingCheevos == nullptr || s_initializingCheevos->m_gameClient == nullptr)
+    return;
+  uint8_t* data = nullptr;
+  size_t size = 0;
+  if (s_initializingCheevos->m_gameClient->Cheevos().GetMemory(id, &data, &size))
+  {
+    info->data = data;
+    info->size = size;
+  }
+}
+
 uint32_t CCheevos::RcheevosReadMemory(uint32_t address,
                                        uint8_t* buffer,
                                        uint32_t numBytes,
                                        rc_client_t* client)
 {
   CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
-  if (cheevos == nullptr || cheevos->m_gameClient == nullptr)
+  if (cheevos == nullptr)
     return 0;
 
+  // Use rc_libretro memory regions if initialised (proper multi-region mapping)
+  if (cheevos->m_memoryRegions.total_size > 0)
+    return rc_libretro_memory_read(&cheevos->m_memoryRegions, address, buffer, numBytes);
+
+  // Fallback to system RAM
   uint8_t* data = nullptr;
   size_t size = 0;
   if (!cheevos->m_gameClient->Cheevos().GetMemory(GAME_MEMORY_SYSTEM_RAM, &data, &size))
     return 0;
-
-  if (address + numBytes > static_cast<uint32_t>(size))
-  {
-    if (address >= static_cast<uint32_t>(size))
-      return 0;
-    numBytes = static_cast<uint32_t>(size) - address;
-  }
-
+  if (address >= static_cast<uint32_t>(size))
+    return 0;
+  numBytes = std::min(numBytes, static_cast<uint32_t>(size) - address);
   std::memcpy(buffer, data + address, numBytes);
   return numBytes;
 }
