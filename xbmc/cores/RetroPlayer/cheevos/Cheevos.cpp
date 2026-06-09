@@ -1148,10 +1148,15 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
     case RC_CLIENT_EVENT_LEADERBOARD_SUBMITTED:
     {
       const std::string title = event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
+      const std::string iconPath = StringUtils::Format("{}game_{}.png",
+                                                        RA_GAME_ICON_CACHE, cheevos->m_gameId);
       CLog::Log(LOGINFO, "CCheevos: leaderboard submitted: {}", title);
-      CGUIDialogKaiToast::QueueNotification(
-          CGUIDialogKaiToast::Info, title, "Score submitted!",
-          TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      if (XFILE::CFile::Exists(iconPath))
+        CGUIDialogKaiToast::QueueNotification(iconPath, title, "Score submitted!",
+                                              TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      else
+        CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, title, "Score submitted!",
+                                              TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
       break;
     }
     case RC_CLIENT_EVENT_LEADERBOARD_SCOREBOARD:
@@ -1160,10 +1165,15 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
       const std::string title = event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
       const std::string body = StringUtils::Format(
           "Rank #{}/{} - Score: {}", sb->new_rank, sb->num_entries, sb->submitted_score);
+      const std::string iconPath = StringUtils::Format("{}game_{}.png",
+                                                        RA_GAME_ICON_CACHE, cheevos->m_gameId);
       CLog::Log(LOGINFO, "CCheevos: leaderboard scoreboard: {} {}", title, body);
-      CGUIDialogKaiToast::QueueNotification(
-          CGUIDialogKaiToast::Info, title, body,
-          TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      if (XFILE::CFile::Exists(iconPath))
+        CGUIDialogKaiToast::QueueNotification(iconPath, title, body,
+                                              TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      else
+        CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, title, body,
+                                              TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
       break;
     }
     default:
