@@ -187,6 +187,7 @@ CCheevos::CCheevos(GAME::CGameClient* gameClient,
   if (m_rcClient != nullptr)
   {
     rc_client_set_userdata(m_rcClient, this);
+    rc_client_set_event_handler(m_rcClient, RcheevosEventHandler);
     CLog::Log(LOGDEBUG, "CCheevos: rc_client created");
   }
 
@@ -1134,6 +1135,40 @@ void CCheevos::RcheevosGameLoadCallback(int result,
   else
     CLog::Log(LOGWARNING, "CCheevos: rc_client game load failed: {}",
               errorMessage ? errorMessage : "unknown error");
+}
+
+void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t* client)
+{
+  CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
+  if (cheevos == nullptr)
+    return;
+
+  switch (event->type)
+  {
+    case RC_CLIENT_EVENT_LEADERBOARD_SUBMITTED:
+    {
+      const std::string title = event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
+      CLog::Log(LOGINFO, "CCheevos: leaderboard submitted: {}", title);
+      CGUIDialogKaiToast::QueueNotification(
+          CGUIDialogKaiToast::Info, title, "Score submitted!",
+          TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      break;
+    }
+    case RC_CLIENT_EVENT_LEADERBOARD_SCOREBOARD:
+    {
+      const rc_client_leaderboard_scoreboard_t* sb = event->leaderboard_scoreboard;
+      const std::string title = event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
+      const std::string body = StringUtils::Format(
+          "Rank #{}/{} - Score: {}", sb->new_rank, sb->num_entries, sb->submitted_score);
+      CLog::Log(LOGINFO, "CCheevos: leaderboard scoreboard: {} {}", title, body);
+      CGUIDialogKaiToast::QueueNotification(
+          CGUIDialogKaiToast::Info, title, body,
+          TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 uint32_t CCheevos::RcheevosReadMemory(uint32_t address,
