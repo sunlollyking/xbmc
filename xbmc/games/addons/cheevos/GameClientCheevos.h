@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <cstddef>
+
 #include <functional>
 #include <string>
 
@@ -57,6 +60,9 @@ public:
 
   // When the game is reset, the runtime should also be reset
   void RCResetRuntime();
+
+  // Memory access for rcheevos read_memory callback
+  bool GetMemory(unsigned int memoryType, uint8_t** data, size_t* size);
 
 private:
   CGameClient& m_gameClient;

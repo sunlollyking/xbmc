@@ -37,6 +37,7 @@
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/game.h"
 #include "games/addons/cheevos/GameClientCheevos.h"
 #include "messaging/ApplicationMessenger.h"
 #include "settings/Settings.h"
@@ -181,6 +182,14 @@ CCheevos::CCheevos(GAME::CGameClient* gameClient,
     m_userName(userName),
     m_loginToken(loginToken)
 {
+  // Create rcheevos client
+  m_rcClient = rc_client_create(RcheevosReadMemory, RcheevosServerCall);
+  if (m_rcClient != nullptr)
+  {
+    rc_client_set_userdata(m_rcClient, this);
+    CLog::Log(LOGDEBUG, "CCheevos: rc_client created");
+  }
+
   // If we already have a saved token from a previous session,
   // push it to the game client so it's ready when a game loads.
   if (!m_userName.empty() && !m_loginToken.empty())
@@ -199,6 +208,11 @@ CCheevos::~CCheevos()
   m_richPresenceRunning = false;
   if (m_richPresenceThread.joinable())
     m_richPresenceThread.join();
+  if (m_rcClient != nullptr)
+  {
+    rc_client_destroy(m_rcClient);
+    m_rcClient = nullptr;
+  }
   CServiceBroker::GetGameServices().GameSettings().ClearLeaderboardState();
 
   CLog::Log(LOGDEBUG, "CCheevos::~CCheevos -- cleaned up");
@@ -1068,3 +1082,47 @@ RConsoleID CCheevos::ConsoleID()
   const std::string ext = URIUtils::GetExtension(m_gameClient->GetGamePath());
   return ExtensionToConsoleID(ext);
 }
+
+// ===========================================================================
+// rcheevos callbacks
+// ===========================================================================
+
+uint32_t CCheevos::RcheevosReadMemory(uint32_t address,
+                                       uint8_t* buffer,
+                                       uint32_t numBytes,
+                                       rc_client_t* client)
+{
+  CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
+  if (cheevos == nullptr || cheevos->m_gameClient == nullptr)
+    return 0;
+
+  uint8_t* data = nullptr;
+  size_t size = 0;
+  if (!cheevos->m_gameClient->Cheevos().GetMemory(GAME_MEMORY_SYSTEM_RAM, &data, &size))
+    return 0;
+
+  if (address + numBytes > static_cast<uint32_t>(size))
+  {
+    if (address >= static_cast<uint32_t>(size))
+      return 0;
+    numBytes = static_cast<uint32_t>(size) - address;
+  }
+
+  std::memcpy(buffer, data + address, numBytes);
+  return numBytes;
+}
+
+void CCheevos::RcheevosServerCall(const rc_api_request_t* request,
+                                   rc_client_server_callback_t callback,
+                                   void* callbackData,
+                                   rc_client_t* client)
+{
+  // Phase 4: replace with full HTTP implementation using CCurlFile
+  // For now, return empty response so rc_client initializes without crashing
+  rc_api_server_response_t response{};
+  response.body = "";
+  response.body_length = 0;
+  response.http_status_code = 0;
+  callback(&response, callbackData);
+}
+
