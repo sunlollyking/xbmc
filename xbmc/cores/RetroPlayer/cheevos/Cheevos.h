@@ -10,6 +10,7 @@
 
 #include "RConsoleIDs.h"
 #include "../rcheevos/include/rc_client.h"
+#include "../rcheevos/src/rc_libretro.h"
 
 #include <atomic>
 #include <functional>
@@ -67,6 +68,7 @@ private:
 
   GAME::CGameClient* m_gameClient;
   rc_client_t* m_rcClient{nullptr};
+  rc_libretro_memory_regions_t m_memoryRegions{};
 
   // rcheevos callbacks
   static uint32_t RcheevosReadMemory(uint32_t address, uint8_t* buffer,
@@ -79,6 +81,8 @@ private:
   static void RcheevosGameLoadCallback(int result, const char* errorMessage,
                                        rc_client_t* client, void* userData);
   static void RcheevosEventHandler(const rc_client_event_t* event, rc_client_t* client);
+  static void RcheevosGetCoreMemoryInfo(uint32_t id, rc_libretro_core_memory_info_t* info);
+  static CCheevos* s_initializingCheevos;
   std::string m_userName;
   std::string m_loginToken;
 

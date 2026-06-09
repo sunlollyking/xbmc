@@ -55,13 +55,8 @@
 
 using namespace KODI;
 using namespace RETRO;
-<<<<<<< HEAD
 using namespace KODI::GAME;
-=======
-// Static achievement title map (populated in LoadData, read in CallbackUrlId)
-std::unordered_map<unsigned, std::pair<std::string, std::string>> CCheevos::s_cheevoTitles;
-std::mutex CCheevos::s_cheevoTitlesMutex;
->>>>>>> 1eb08945bd (Cheevos: Hardcore mode fixes - rewind toast, toggle notification, skip savestate on launch)
+CCheevos* CCheevos::s_initializingCheevos = nullptr;
 
 namespace
 {
@@ -209,6 +204,7 @@ CCheevos::~CCheevos()
   m_richPresenceRunning = false;
   if (m_richPresenceThread.joinable())
     m_richPresenceThread.join();
+  rc_libretro_memory_destroy(&m_memoryRegions);
   if (m_rcClient != nullptr)
   {
     rc_client_destroy(m_rcClient);
@@ -880,7 +876,6 @@ void CCheevos::CallbackUrlId(const std::string& achievementUrl, unsigned int che
   const std::string cheevoTitle = titleIt->second.first;
   const std::string badgeUrl = titleIt->second.second;
 
-<<<<<<< HEAD
   // Skip notification if already earned in a previous session.
   // LoadData marks earned achievements from the startsession Unlocks list.
   // fceumm fires the callback for already-earned achievements when their
@@ -899,7 +894,7 @@ void CCheevos::CallbackUrlId(const std::string& achievementUrl, unsigned int che
       }
     }
   }
-=======
+
   // The addon builds the award URL — update h= parameter based on hardcore mode
   std::string awardUrl = std::string(achievementUrl);
   const bool hardcoreAward =
@@ -909,7 +904,6 @@ void CCheevos::CallbackUrlId(const std::string& achievementUrl, unsigned int che
     awardUrl.replace(awardUrl.find("&h=0"), 4, hardcoreAward ? "&h=1" : "&h=0");
   else if (awardUrl.find("&h=") == std::string::npos)
     awardUrl += hardcoreAward ? "&h=1" : "&h=0";
->>>>>>> 14d708071f (Cheevos: Add Hardcore Mode support)
 
   // Flush any previously queued awards first
   FlushAwardQueue();
@@ -1025,8 +1019,6 @@ void CCheevos::CallbackUrlId(const std::string& achievementUrl, unsigned int che
 
 void CCheevos::CheckTriggeredAchievement()
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   // Callback for triggered achievement URL and ID
   m_gameClient->Cheevos().GetAchievementUrlId(
       [](const std::string& achievementUrl, unsigned int cheevoId)
@@ -1034,14 +1026,6 @@ void CCheevos::CheckTriggeredAchievement()
     CLog::Log(LOGDEBUG, "CCheevos::CheckTriggeredAchievement -- achievement triggered: id={} url={}", cheevoId, achievementUrl);
     CallbackUrlId(achievementUrl, cheevoId);
   });
-=======
-  m_gameClient->Cheevos().GetAchievement_URL_ID([](const char* url, unsigned int id)
-                                                { Callback_URL_ID(url, id); });
->>>>>>> 14d708071f (Cheevos: Add Hardcore Mode support)
-=======
-  m_gameClient->Cheevos().GetAchievementUrlId([](const std::string& url, unsigned int id)
-                                                { CallbackUrlId(url, id); });
->>>>>>> 1eb08945bd (Cheevos: Hardcore mode fixes - rewind toast, toggle notification, skip savestate on launch)
 }
 
 // ===========================================================================
@@ -1130,8 +1114,23 @@ void CCheevos::RcheevosGameLoadCallback(int result,
                                          rc_client_t* client,
                                          void* userData)
 {
+  CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
   if (result == RC_OK)
+  {
     CLog::Log(LOGINFO, "CCheevos: rc_client game loaded successfully");
+    // Initialise memory regions for proper multi-region memory access
+    if (cheevos != nullptr)
+    {
+      rc_libretro_memory_destroy(&cheevos->m_memoryRegions);
+      s_initializingCheevos = cheevos;
+      rc_libretro_memory_init(&cheevos->m_memoryRegions, nullptr,
+                              RcheevosGetCoreMemoryInfo,
+                              static_cast<uint32_t>(cheevos->ConsoleID()));
+      s_initializingCheevos = nullptr;
+      CLog::Log(LOGINFO, "CCheevos: memory regions initialised, total size: {}",
+                cheevos->m_memoryRegions.total_size);
+    }
+  }
   else
     CLog::Log(LOGWARNING, "CCheevos: rc_client game load failed: {}",
               errorMessage ? errorMessage : "unknown error");
@@ -1181,27 +1180,40 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
   }
 }
 
+void CCheevos::RcheevosGetCoreMemoryInfo(uint32_t id, rc_libretro_core_memory_info_t* info)
+{
+  if (s_initializingCheevos == nullptr || s_initializingCheevos->m_gameClient == nullptr)
+    return;
+  uint8_t* data = nullptr;
+  size_t size = 0;
+  if (s_initializingCheevos->m_gameClient->Cheevos().GetMemory(id, &data, &size))
+  {
+    info->data = data;
+    info->size = size;
+  }
+}
+
 uint32_t CCheevos::RcheevosReadMemory(uint32_t address,
                                        uint8_t* buffer,
                                        uint32_t numBytes,
                                        rc_client_t* client)
 {
   CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
-  if (cheevos == nullptr || cheevos->m_gameClient == nullptr)
+  if (cheevos == nullptr)
     return 0;
 
+  // Use rc_libretro memory regions if initialised (proper multi-region mapping)
+  if (cheevos->m_memoryRegions.total_size > 0)
+    return rc_libretro_memory_read(&cheevos->m_memoryRegions, address, buffer, numBytes);
+
+  // Fallback to system RAM
   uint8_t* data = nullptr;
   size_t size = 0;
   if (!cheevos->m_gameClient->Cheevos().GetMemory(GAME_MEMORY_SYSTEM_RAM, &data, &size))
     return 0;
-
-  if (address + numBytes > static_cast<uint32_t>(size))
-  {
-    if (address >= static_cast<uint32_t>(size))
-      return 0;
-    numBytes = static_cast<uint32_t>(size) - address;
-  }
-
+  if (address >= static_cast<uint32_t>(size))
+    return 0;
+  numBytes = std::min(numBytes, static_cast<uint32_t>(size) - address);
   std::memcpy(buffer, data + address, numBytes);
   return numBytes;
 }
