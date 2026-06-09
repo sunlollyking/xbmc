@@ -283,6 +283,12 @@ bool CCheevos::RCLogin(const std::string& password)
   m_gameClient->Cheevos().SetRetroAchievementsCredentials(m_userName.c_str(), m_loginToken.c_str());
 
   CLog::Log(LOGINFO, "CCheevos::RCLogin -- successfully logged in as '{}'", m_userName);
+  // Authenticate rc_client with the new token
+  if (m_rcClient != nullptr)
+  {
+    rc_client_begin_login_with_token(m_rcClient, m_userName.c_str(), m_loginToken.c_str(),
+                                    RcheevosLoginCallback, nullptr);
+  }
   return true;
 }
 
@@ -323,6 +329,14 @@ bool CCheevos::LoadData()
   }
 
   CLog::Log(LOGDEBUG, "CCheevos::LoadData -- ROM hash: {}", hash);
+
+  // Kick off rc_client game load in parallel — handles leaderboard
+  // trigger detection and score submission
+  if (m_rcClient != nullptr)
+  {
+    rc_client_begin_load_game(m_rcClient, hash.c_str(),
+                              RcheevosGameLoadCallback, nullptr);
+  }
 
   // Step 2: build the game ID lookup URL from the hash
   std::string hashUrl;
@@ -1027,6 +1041,31 @@ void CCheevos::DoFrame()
 // rcheevos callbacks
 // ===========================================================================
 
+void CCheevos::RcheevosLoginCallback(int result,
+                                      const char* errorMessage,
+                                      rc_client_t* client,
+                                      void* userData)
+{
+  if (result == RC_OK)
+    CLog::Log(LOGINFO, "CCheevos: rc_client login successful");
+  else
+    CLog::Log(LOGWARNING, "CCheevos: rc_client login failed: {}",
+              errorMessage ? errorMessage : "unknown error");
+}
+
+
+void CCheevos::RcheevosGameLoadCallback(int result,
+                                         const char* errorMessage,
+                                         rc_client_t* client,
+                                         void* userData)
+{
+  if (result == RC_OK)
+    CLog::Log(LOGINFO, "CCheevos: rc_client game loaded successfully");
+  else
+    CLog::Log(LOGWARNING, "CCheevos: rc_client game load failed: {}",
+              errorMessage ? errorMessage : "unknown error");
+}
+
 uint32_t CCheevos::RcheevosReadMemory(uint32_t address,
                                        uint8_t* buffer,
                                        uint32_t numBytes,
@@ -1057,12 +1096,40 @@ void CCheevos::RcheevosServerCall(const rc_api_request_t* request,
                                    void* callbackData,
                                    rc_client_t* client)
 {
-  // Phase 4: replace with full HTTP implementation using CCurlFile
-  // For now, return empty response so rc_client initializes without crashing
-  rc_api_server_response_t response{};
-  response.body = "";
-  response.body_length = 0;
-  response.http_status_code = 0;
-  callback(&response, callbackData);
+  // Capture everything needed for the async HTTP call
+  const std::string url = request->url ? request->url : "";
+  const std::string postData = request->post_data ? request->post_data : "";
+  const bool isPost = !postData.empty();
+
+  std::thread(
+      [url, postData, isPost, callback, callbackData]()
+      {
+        XFILE::CCurlFile curl;
+        curl.SetRequestHeader("User-Agent", RA_USER_AGENT);
+        curl.SetTimeout(RA_CURL_TIMEOUT_SECS);
+
+        std::string responseBody;
+        bool success = false;
+        if (isPost)
+          success = curl.Post(url, postData, responseBody);
+        else
+          success = curl.Get(url, responseBody);
+
+        rc_api_server_response_t response{};
+        if (success && !responseBody.empty())
+        {
+          response.body = responseBody.c_str();
+          response.body_length = responseBody.size();
+          response.http_status_code = 200;
+        }
+        else
+        {
+          response.body = "";
+          response.body_length = 0;
+          response.http_status_code = 0;
+        }
+        callback(&response, callbackData);
+      })
+      .detach();
 }
 
