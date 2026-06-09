@@ -42,9 +42,6 @@ public:
   void EnableRichPresence();
   std::string GetRichPresenceEvaluation();
 
-  void ActivateAchievement();
-  static void CallbackUrlId(const std::string& achievementUrl, unsigned int cheevoId);
-  void CheckTriggeredAchievement();
 
   /*!
    * \brief Perform the actual HTTP login exchange with RetroAchievements
@@ -93,9 +90,6 @@ private:
   std::string m_gameTitle;
   unsigned int m_gameId{0};
 
-  // Static map so CallbackUrlId can look up titles
-  static std::unordered_map<unsigned, std::pair<std::string, std::string>> s_cheevoTitles;
-  static std::mutex s_cheevoTitlesMutex;
 
   // Rich presence periodic ping
   std::atomic<bool> m_richPresenceRunning{false};
