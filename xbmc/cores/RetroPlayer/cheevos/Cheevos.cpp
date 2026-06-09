@@ -1175,6 +1175,18 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
                                               TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
       break;
     }
+    case RC_CLIENT_EVENT_RESET:
+    {
+      CLog::Log(LOGINFO, "CCheevos: rc_client requested emulator reset (hardcore mode)");
+      CGUIDialogKaiToast::QueueNotification(
+          CGUIDialogKaiToast::Warning, "RetroAchievements",
+          "Hardcore mode enabled — game has been reset",
+          TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      // Reset the game client runtime
+      if (cheevos->m_gameClient != nullptr)
+        cheevos->m_gameClient->Cheevos().RCResetRuntime();
+      break;
+    }
     default:
       break;
   }
