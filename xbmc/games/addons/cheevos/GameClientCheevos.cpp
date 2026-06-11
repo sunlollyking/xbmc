@@ -8,7 +8,6 @@
  */
 
 #include "GameClientCheevos.h"
-
 #include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/game.h"
 #include "cores/RetroPlayer/cheevos/RConsoleIDs.h"
 #include "games/addons/GameClient.h"

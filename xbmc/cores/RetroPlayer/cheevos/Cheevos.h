@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "RConsoleIDs.h"
 #include "../rcheevos/include/rc_client.h"
 #include "../rcheevos/src/rc_libretro.h"
+#include "RConsoleIDs.h"
 
 #include <atomic>
 #include <functional>
@@ -43,7 +43,6 @@ public:
   void EnableRichPresence();
   std::string GetRichPresenceEvaluation();
 
-
   /*!
    * \brief Perform the actual HTTP login exchange with RetroAchievements
    *
@@ -68,18 +67,25 @@ private:
   rc_libretro_memory_regions_t m_memoryRegions{};
 
   // rcheevos callbacks
-  static uint32_t RcheevosReadMemory(uint32_t address, uint8_t* buffer,
-                                     uint32_t numBytes, rc_client_t* client);
+  static uint32_t RcheevosReadMemory(uint32_t address,
+                                     uint8_t* buffer,
+                                     uint32_t numBytes,
+                                     rc_client_t* client);
   static void RcheevosServerCall(const rc_api_request_t* request,
                                  rc_client_server_callback_t callback,
-                                 void* callbackData, rc_client_t* client);
-  static void RcheevosLoginCallback(int result, const char* errorMessage,
-                                    rc_client_t* client, void* userData);
-  static void RcheevosGameLoadCallback(int result, const char* errorMessage,
-                                       rc_client_t* client, void* userData);
+                                 void* callbackData,
+                                 rc_client_t* client);
+  static void RcheevosLoginCallback(int result,
+                                    const char* errorMessage,
+                                    rc_client_t* client,
+                                    void* userData);
+  static void RcheevosGameLoadCallback(int result,
+                                       const char* errorMessage,
+                                       rc_client_t* client,
+                                       void* userData);
   static void RcheevosEventHandler(const rc_client_event_t* event, rc_client_t* client);
   static void RcheevosGetCoreMemoryInfo(uint32_t id, rc_libretro_core_memory_info_t* info);
-  static CCheevos* s_initializingCheevos;
+  static thread_local CCheevos* s_initializingCheevos;
   std::string m_userName;
   std::string m_loginToken;
 
@@ -92,10 +98,6 @@ private:
   unsigned int m_gameId{0};
 
 
-  // Set true when RA flags this emulator as unsupported
-  bool m_unsupportedEmulator{false};
-  // Persistent achievement callback — must outlive game session, so stored as member
-  std::function<void(const std::string&, unsigned int)> m_cheevoCallback;
   // Rich presence periodic ping
   std::atomic<bool> m_richPresenceRunning{false};
   std::thread m_richPresenceThread;

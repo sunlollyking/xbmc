@@ -30,6 +30,7 @@
 #include "FileItemList.h"
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/game.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/CurlFile.h"
 #include "filesystem/Directory.h"
@@ -37,7 +38,7 @@
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
-#include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/game.h"
+#include "games/tags/GameInfoTag.h"
 #include "games/addons/cheevos/GameClientCheevos.h"
 #include "messaging/ApplicationMessenger.h"
 #include "settings/Settings.h"
@@ -56,7 +57,7 @@
 using namespace KODI;
 using namespace RETRO;
 using namespace KODI::GAME;
-CCheevos* CCheevos::s_initializingCheevos = nullptr;
+thread_local CCheevos* CCheevos::s_initializingCheevos = nullptr;
 
 namespace
 {
@@ -80,6 +81,9 @@ constexpr unsigned int TOAST_MESSAGE_TIME_MS = 500;
 // JSON field names
 constexpr auto PATCH_DATA = "PatchData";
 constexpr auto GAME_TITLE = "Title";
+constexpr auto GAME_PUBLISHER = "Publisher";
+constexpr auto GAME_DEVELOPER = "Developer";
+constexpr auto GAME_GENRE = "Genre";
 constexpr auto IMAGE_ICON_URL = "ImageIconURL";
 constexpr auto RA_GAME_ICON_CACHE = "special://profile/cache/retroachievements/icons/";
 constexpr auto RA_AWARD_QUEUE_FILE = "special://profile/cache/retroachievements/pending_awards.txt";
@@ -288,7 +292,7 @@ bool CCheevos::RCLogin(const std::string& password)
   if (m_rcClient != nullptr)
   {
     rc_client_begin_login_with_token(m_rcClient, m_userName.c_str(), m_loginToken.c_str(),
-                                    RcheevosLoginCallback, nullptr);
+                                     RcheevosLoginCallback, nullptr);
   }
   return true;
 }
@@ -326,6 +330,10 @@ bool CCheevos::LoadData()
                                                       m_gameClient->GetGamePath().c_str()))
   {
     CLog::Log(LOGERROR, "CCheevos::LoadData -- hash generation failed");
+    CGUIDialogKaiToast::QueueNotification(
+        CGUIDialogKaiToast::Warning, "RetroAchievements",
+        "This core does not support RetroAchievements",
+        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
     return false;
   }
 
@@ -335,8 +343,7 @@ bool CCheevos::LoadData()
   // trigger detection and score submission
   if (m_rcClient != nullptr)
   {
-    rc_client_begin_load_game(m_rcClient, hash.c_str(),
-                              RcheevosGameLoadCallback, nullptr);
+    rc_client_begin_load_game(m_rcClient, hash.c_str(), RcheevosGameLoadCallback, nullptr);
   }
 
   // Step 2: build the game ID lookup URL from the hash
@@ -494,9 +501,9 @@ bool CCheevos::LoadData()
     info.title = fields[1];
     info.badgeUrl = std::string(RA_BADGE_BASE_URL) + fields[2] + ".png";
     info.description = fields.size() > 3 ? fields[3] : "";
-    info.points         = fields.size() > 4 ? static_cast<unsigned int>(std::stoul(fields[4])) : 0;
+    info.points = fields.size() > 4 ? static_cast<unsigned int>(std::stoul(fields[4])) : 0;
     info.lockedBadgeUrl = fields.size() > 5 ? fields[5] : "";
-    info.rarity      = fields.size() > 6 ? fields[6] : "";
+    info.rarity = fields.size() > 6 ? fields[6] : "";
     info.earned = false;
     achieveState.achievements.push_back(std::move(info));
   }
@@ -521,14 +528,14 @@ bool CCheevos::LoadData()
     }
     CServiceBroker::GetGameServices().GameSettings().SetLeaderboardState(lbState);
     // Notify user if hardcore mode is active
-  if (CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode())
-  {
-    CGUIDialogKaiToast::QueueNotification(
-        CGUIDialogKaiToast::Warning, "RetroAchievements",
-        "Hardcore Mode active — save states and rewind are disabled", 6000, false, 500);
-  }
+    if (CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode())
+    {
+      CGUIDialogKaiToast::QueueNotification(
+          CGUIDialogKaiToast::Warning, "RetroAchievements",
+          "Hardcore Mode active — save states and rewind are disabled", 6000, false, 500);
+    }
 
-  CLog::Log(LOGINFO, "CCheevos::LoadData -- {} leaderboards loaded for game {}",
+    CLog::Log(LOGINFO, "CCheevos::LoadData -- {} leaderboards loaded for game {}",
               lbState.leaderboards.size(), gameId);
   }
 
@@ -550,8 +557,7 @@ bool CCheevos::LoadData()
 
   // Ping RA to register this as an active session.
   // Without this the game won't appear in the user's play history.
-  const bool hardcoreMode =
-      CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode();
+  const bool hardcoreMode = CServiceBroker::GetGameServices().GameSettings().GetHardcoreMode();
   const std::string sessionUrl =
       std::string(RA_BASE_URL) + "?r=startsession" + "&u=" + CURL::Encode(m_userName) +
       "&t=" + CURL::Encode(m_loginToken) + "&g=" + std::to_string(gameId) +
@@ -592,7 +598,6 @@ bool CCheevos::LoadData()
           }
         }
       }
-
     }
   }
   else
@@ -693,7 +698,6 @@ void CCheevos::EnableRichPresence()
   m_richPresenceLoaded = false;
   m_richPresenceScript.clear();
   m_gameId = 0;
-
 }
 
 std::string CCheevos::GetRichPresenceEvaluation()
@@ -705,8 +709,6 @@ std::string CCheevos::GetRichPresenceEvaluation()
   m_gameClient->Cheevos().RCGetRichPresenceEvaluation(evaluation, ConsoleID());
   return evaluation;
 }
-
-
 
 // ---------------------------------------------------------------------------
 // Image cache cleanup
@@ -899,9 +901,9 @@ void CCheevos::DoFrame()
 // ===========================================================================
 
 void CCheevos::RcheevosLoginCallback(int result,
-                                      const char* errorMessage,
-                                      rc_client_t* client,
-                                      void* userData)
+                                     const char* errorMessage,
+                                     rc_client_t* client,
+                                     void* userData)
 {
   if (result == RC_OK)
     CLog::Log(LOGINFO, "CCheevos: rc_client login successful");
@@ -910,11 +912,10 @@ void CCheevos::RcheevosLoginCallback(int result,
               errorMessage ? errorMessage : "unknown error");
 }
 
-
 void CCheevos::RcheevosGameLoadCallback(int result,
-                                         const char* errorMessage,
-                                         rc_client_t* client,
-                                         void* userData)
+                                        const char* errorMessage,
+                                        rc_client_t* client,
+                                        void* userData)
 {
   CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
   if (result == RC_OK)
@@ -925,8 +926,7 @@ void CCheevos::RcheevosGameLoadCallback(int result,
     {
       rc_libretro_memory_destroy(&cheevos->m_memoryRegions);
       s_initializingCheevos = cheevos;
-      rc_libretro_memory_init(&cheevos->m_memoryRegions, nullptr,
-                              RcheevosGetCoreMemoryInfo,
+      rc_libretro_memory_init(&cheevos->m_memoryRegions, nullptr, RcheevosGetCoreMemoryInfo,
                               static_cast<uint32_t>(cheevos->ConsoleID()));
       s_initializingCheevos = nullptr;
       CLog::Log(LOGINFO, "CCheevos: memory regions initialised, total size: {}",
@@ -948,9 +948,10 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
   {
     case RC_CLIENT_EVENT_LEADERBOARD_SUBMITTED:
     {
-      const std::string title = event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
-      const std::string iconPath = StringUtils::Format("{}game_{}.png",
-                                                        RA_GAME_ICON_CACHE, cheevos->m_gameId);
+      const std::string title =
+          event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
+      const std::string iconPath =
+          StringUtils::Format("{}game_{}.png", RA_GAME_ICON_CACHE, cheevos->m_gameId);
       CLog::Log(LOGINFO, "CCheevos: leaderboard submitted: {}", title);
       if (XFILE::CFile::Exists(iconPath))
         CGUIDialogKaiToast::QueueNotification(iconPath, title, "Score submitted!",
@@ -963,15 +964,16 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
     case RC_CLIENT_EVENT_LEADERBOARD_SCOREBOARD:
     {
       const rc_client_leaderboard_scoreboard_t* sb = event->leaderboard_scoreboard;
-      const std::string title = event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
-      const std::string body = StringUtils::Format(
-          "Rank #{}/{} - Score: {}", sb->new_rank, sb->num_entries, sb->submitted_score);
-      const std::string iconPath = StringUtils::Format("{}game_{}.png",
-                                                        RA_GAME_ICON_CACHE, cheevos->m_gameId);
+      const std::string title =
+          event->leaderboard->title ? event->leaderboard->title : "Leaderboard";
+      const std::string body = StringUtils::Format("Rank #{}/{} - Score: {}", sb->new_rank,
+                                                   sb->num_entries, sb->submitted_score);
+      const std::string iconPath =
+          StringUtils::Format("{}game_{}.png", RA_GAME_ICON_CACHE, cheevos->m_gameId);
       CLog::Log(LOGINFO, "CCheevos: leaderboard scoreboard: {} {}", title, body);
       if (XFILE::CFile::Exists(iconPath))
-        CGUIDialogKaiToast::QueueNotification(iconPath, title, body,
-                                              TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+        CGUIDialogKaiToast::QueueNotification(iconPath, title, body, TOAST_DISPLAY_TIME_MS, false,
+                                              TOAST_MESSAGE_TIME_MS);
       else
         CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, title, body,
                                               TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
@@ -995,7 +997,8 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
         if (XFILE::CFile::Exists(localBadge))
         {
           CGUIDialogKaiToast::QueueNotification(localBadge, "Achievement Unlocked!", title,
-                                                TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+                                                TOAST_DISPLAY_TIME_MS, false,
+                                                TOAST_MESSAGE_TIME_MS);
         }
         else
         {
@@ -1015,47 +1018,47 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
                     f.Write(data.data(), data.size());
                     f.Close();
                     CGUIDialogKaiToast::QueueNotification(localBadge, "Achievement Unlocked!",
-                                                          titleCopy, TOAST_DISPLAY_TIME_MS,
-                                                          false, TOAST_MESSAGE_TIME_MS);
+                                                          titleCopy, TOAST_DISPLAY_TIME_MS, false,
+                                                          TOAST_MESSAGE_TIME_MS);
                     return;
                   }
                 }
-                CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
-                                                      "Achievement Unlocked!", titleCopy,
-                                                      TOAST_DISPLAY_TIME_MS, false,
-                                                      TOAST_MESSAGE_TIME_MS);
+                CGUIDialogKaiToast::QueueNotification(
+                    CGUIDialogKaiToast::Info, "Achievement Unlocked!", titleCopy,
+                    TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
               })
               .detach();
         }
       }
       else
       {
-        CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
-                                              "Achievement Unlocked!", title,
-                                              TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+        CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "Achievement Unlocked!",
+                                              title, TOAST_DISPLAY_TIME_MS, false,
+                                              TOAST_MESSAGE_TIME_MS);
       }
       // Show mastery notification
       if (mastered)
       {
         const std::string gameTitle = cheevos->m_gameTitle;
-        const std::string masteryIcon = StringUtils::Format("{}game_{}.png",
-                                                             RA_GAME_ICON_CACHE, cheevos->m_gameId);
+        const std::string masteryIcon =
+            StringUtils::Format("{}game_{}.png", RA_GAME_ICON_CACHE, cheevos->m_gameId);
         if (XFILE::CFile::Exists(masteryIcon))
           CGUIDialogKaiToast::QueueNotification(masteryIcon, "Mastered!", gameTitle,
-                                                TOAST_DISPLAY_TIME_LONG_MS, false, TOAST_MESSAGE_TIME_MS);
+                                                TOAST_DISPLAY_TIME_LONG_MS, false,
+                                                TOAST_MESSAGE_TIME_MS);
         else
           CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "Mastered!", gameTitle,
-                                                TOAST_DISPLAY_TIME_LONG_MS, false, TOAST_MESSAGE_TIME_MS);
+                                                TOAST_DISPLAY_TIME_LONG_MS, false,
+                                                TOAST_MESSAGE_TIME_MS);
       }
       break;
     }
     case RC_CLIENT_EVENT_RESET:
     {
       CLog::Log(LOGINFO, "CCheevos: rc_client requested emulator reset (hardcore mode)");
-      CGUIDialogKaiToast::QueueNotification(
-          CGUIDialogKaiToast::Warning, "RetroAchievements",
-          "Hardcore mode enabled — game has been reset",
-          TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, "RetroAchievements",
+                                            "Hardcore mode enabled — game has been reset",
+                                            TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
       // Reset the game client runtime
       if (cheevos->m_gameClient != nullptr)
         cheevos->m_gameClient->Cheevos().RCResetRuntime();
@@ -1080,9 +1083,9 @@ void CCheevos::RcheevosGetCoreMemoryInfo(uint32_t id, rc_libretro_core_memory_in
 }
 
 uint32_t CCheevos::RcheevosReadMemory(uint32_t address,
-                                       uint8_t* buffer,
-                                       uint32_t numBytes,
-                                       rc_client_t* client)
+                                      uint8_t* buffer,
+                                      uint32_t numBytes,
+                                      rc_client_t* client)
 {
   CCheevos* cheevos = static_cast<CCheevos*>(rc_client_get_userdata(client));
   if (cheevos == nullptr)
@@ -1105,9 +1108,9 @@ uint32_t CCheevos::RcheevosReadMemory(uint32_t address,
 }
 
 void CCheevos::RcheevosServerCall(const rc_api_request_t* request,
-                                   rc_client_server_callback_t callback,
-                                   void* callbackData,
-                                   rc_client_t* client)
+                                  rc_client_server_callback_t callback,
+                                  void* callbackData,
+                                  rc_client_t* client)
 {
   // Capture everything needed for the async HTTP call
   const std::string url = request->url ? request->url : "";
@@ -1145,4 +1148,3 @@ void CCheevos::RcheevosServerCall(const rc_api_request_t* request,
       })
       .detach();
 }
-

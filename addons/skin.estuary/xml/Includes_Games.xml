@@ -961,7 +961,7 @@
 			<include content="DialogBackgroundCommons">
 				<param name="width" value="1200" />
 				<param name="height" value="870" />
-				<param name="header_label" value="$INFO[RetroPlayer.Title] ($INFO[Window.Property(WeightedProgress)])" />
+				<param name="header_label" value="$INFO[RetroPlayer.Title] ($INFO[RetroPlayer.AchievementsUnlocked]/$INFO[RetroPlayer.AchievementsTotal] Unlocked)" />
 				<param name="header_id" value="2" />
 			</include>
 			<!-- Achievement list -->
@@ -1000,7 +1000,7 @@
 					<!-- Rarity -->
 					<control type="label">
 						<left>95</left><top>83</top><width>750</width><height>24</height>
-						<label>$INFO[ListItem.Property(RarityCategory)]</label>
+						<label>$INFO[ListItem.Property(Rarity)]</label>
 						<font>font12</font><align>left</align><textcolor>button_focus</textcolor>
 					</control>
 					<!-- Points -->
@@ -1020,7 +1020,7 @@
 				<focusedlayout width="1148" height="120">
 					<control type="image">
 						<texture colordiffuse="button_focus">lists/focus.png</texture>
-						<visible>Control.HasFocus(3)</visible>
+						<visible>Control.HasFocus(10811)</visible>
 					</control>
 					<!-- Greyscale badge for unearned -->
 					<control type="image">
@@ -1049,7 +1049,11 @@
 					<!-- Rarity -->
 					<control type="label">
 						<left>95</left><top>83</top><width>750</width><height>24</height>
+<<<<<<< HEAD
 						<label>$INFO[ListItem.Property(RarityCategory)]</label>
+=======
+						<label>$INFO[ListItem.Property(Rarity)]</label>
+>>>>>>> a7530606a0 (Cheevos: clang-format, XML indentation, thread_local fix, core support notification)
 						<font>font12</font><align>left</align><textcolor>button_focus</textcolor>
 					</control>
 					<!-- Points -->
@@ -1076,6 +1080,7 @@
 			</control>
 		</control>
 	</include>
+<<<<<<< HEAD
 
 	<include name="GameDialogLeaderboards">
 		<control type="image">
@@ -1516,4 +1521,6 @@
 			</control>
 		</control>
 	</include>
+=======
+>>>>>>> a7530606a0 (Cheevos: clang-format, XML indentation, thread_local fix, core support notification)
 </includes>
