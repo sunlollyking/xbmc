@@ -11,6 +11,7 @@
 #include "RConsoleIDs.h"
 
 #include <atomic>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -78,6 +79,8 @@ private:
   static std::unordered_map<unsigned, std::pair<std::string, std::string>> s_cheevoTitles;
   static std::mutex s_cheevoTitlesMutex;
 
+  // Persistent achievement callback — must outlive game session, so stored as member
+  std::function<void(const std::string&, unsigned int)> m_cheevoCallback;
   // Rich presence periodic ping
   std::atomic<bool> m_richPresenceRunning{false};
   std::thread m_richPresenceThread;

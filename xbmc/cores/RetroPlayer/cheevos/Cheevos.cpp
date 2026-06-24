@@ -57,6 +57,7 @@
 
 using namespace KODI;
 using namespace RETRO;
+using namespace KODI::GAME;
 
 namespace
 {
@@ -387,8 +388,15 @@ bool CCheevos::LoadData()
   }
 
   // Update the file item with metadata from RetroAchievements
+  if (!data.isMember(PATCH_DATA))
+  {
+    CLog::Log(LOGERROR, "CCheevos::LoadData -- patch data missing from RA response for game {}", m_gameId);
+    return false;
+  }
   auto file = std::make_unique<CFileItem>(m_gameClient->GetGamePath(), false);
   const std::string raTitle = data[PATCH_DATA][GAME_TITLE].asString();
+  if (raTitle.empty())
+    CLog::Log(LOGWARNING, "CCheevos::LoadData -- game title missing from RA response for game {}", m_gameId);
   file->SetLabel(raTitle);
   GAME::CGameInfoTag* tag = file->GetGameInfoTag();
   if (tag != nullptr)
@@ -695,7 +703,14 @@ void CCheevos::ActivateAchievement()
   for (const auto& [id, fields] : m_activatedCheevoMap)
     m_gameClient->Cheevos().ActivateAchievement(id, fields[0].c_str());
 
-  CheckTriggeredAchievement();
+  // Register persistent callback once — m_cheevoCallback is a member so its address
+  // remains valid for the entire game session, avoiding the dangling pointer bug
+  m_cheevoCallback = [](const std::string& achievementUrl, unsigned int cheevoId)
+  {
+    CLog::Log(LOGDEBUG, "CCheevos: achievement triggered: id={} url={}", cheevoId, achievementUrl);
+    CallbackUrlId(achievementUrl, cheevoId);
+  };
+  m_gameClient->Cheevos().GetAchievementUrlId(m_cheevoCallback);
 }
 
 // ---------------------------------------------------------------------------
@@ -953,7 +968,10 @@ void CCheevos::CheckTriggeredAchievement()
   // Callback for triggered achievement URL and ID
   m_gameClient->Cheevos().GetAchievementUrlId(
       [](const std::string& achievementUrl, unsigned int cheevoId)
-  { CallbackUrlId(achievementUrl, cheevoId); });
+  {
+    CLog::Log(LOGDEBUG, "CCheevos::CheckTriggeredAchievement -- achievement triggered: id={} url={}", cheevoId, achievementUrl);
+    CallbackUrlId(achievementUrl, cheevoId);
+  });
 }
 
 // ===========================================================================
