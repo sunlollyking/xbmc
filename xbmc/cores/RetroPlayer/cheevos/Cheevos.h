@@ -79,6 +79,8 @@ private:
   static std::unordered_map<unsigned, std::pair<std::string, std::string>> s_cheevoTitles;
   static std::mutex s_cheevoTitlesMutex;
 
+  // Set true when RA flags this emulator as unsupported
+  bool m_unsupportedEmulator{false};
   // Persistent achievement callback — must outlive game session, so stored as member
   std::function<void(const std::string&, unsigned int)> m_cheevoCallback;
   // Rich presence periodic ping

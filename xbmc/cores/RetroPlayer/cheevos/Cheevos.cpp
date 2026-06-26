@@ -465,6 +465,7 @@ bool CCheevos::LoadData()
   CLog::Log(LOGINFO, "CCheevos::LoadData -- {} achievements loaded for game {}",
             m_activatedCheevoMap.size(), gameId);
 
+
   // Update achievement state in GameSettings so GamesGUIInfo InfoLabels can access it
   KODI::GAME::CGameSettings::AchievementState achieveState;
   achieveState.gameTitle = m_gameTitle;
@@ -851,6 +852,25 @@ void CCheevos::CallbackUrlId(const std::string& achievementUrl, unsigned int che
 
   const std::string cheevoTitle = titleIt->second.first;
   const std::string badgeUrl = titleIt->second.second;
+
+  // Skip notification if already earned in a previous session.
+  // LoadData marks earned achievements from the startsession Unlocks list.
+  // fceumm fires the callback for already-earned achievements when their
+  // conditions are met in-game — RA handles duplicate awards gracefully
+  // but we must not show a notification the user has already seen.
+  {
+    const auto state = CServiceBroker::GetGameServices().GameSettings().GetAchievementState();
+    for (const auto& info : state.achievements)
+    {
+      if (info.title == cheevoTitle && info.earned)
+      {
+        CLog::Log(LOGDEBUG,
+                  "CCheevos::CallbackUrlId -- skipping notification for already-earned '{}'",
+                  cheevoTitle);
+        return;
+      }
+    }
+  }
 
   // Flush any previously queued awards first
   FlushAwardQueue();
