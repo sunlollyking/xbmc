@@ -304,14 +304,14 @@ bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
     }
   }
 
-  m_cheevos->ResetRuntime();
-
   return bSuccess;
 }
 
 void CReversiblePlayback::FrameEvent()
 {
   m_gameClient->RunFrame();
+  if (m_cheevos != nullptr)
+    m_cheevos->DoFrame();
 
   AddFrame();
 }
@@ -321,6 +321,8 @@ void CReversiblePlayback::RewindEvent()
   RewindFrames(1);
 
   m_gameClient->RunFrame();
+  if (m_cheevos != nullptr)
+    m_cheevos->DoFrame();
 }
 
 void CReversiblePlayback::EndEvent()
