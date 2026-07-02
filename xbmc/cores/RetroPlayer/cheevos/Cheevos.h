@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <mutex>
 #include <thread>
 
 // rc_client forward declarations — keeps rcheevos headers out of
@@ -84,6 +85,7 @@ private:
 
   std::atomic<bool> m_richPresenceRunning{false};
   std::thread m_richPresenceThread;
+  mutable std::mutex m_credentialsMutex; ///< Guards m_userName/m_loginToken
 
   static thread_local CCheevos* s_initializingCheevos;
 };

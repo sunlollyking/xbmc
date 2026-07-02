@@ -70,16 +70,16 @@ CCheevos::CCheevos(GAME::CGameClient* gameClient,
   rc_client_set_userdata(m_rcClient, this);
   rc_client_set_event_handler(m_rcClient, RcheevosEventHandler);
 
-  // Enable verbose rc_client logging so we can see memory mapping decisions
+  // Enable verbose rc_client logging
   rc_client_enable_logging(m_rcClient, RC_CLIENT_LOG_LEVEL_VERBOSE,
     [](const char* message, const rc_client_t*) {
-      CLog::Log(LOGDEBUG, "rc_client: {}", message);
+      CLog::Log(LOGINFO, "rc_client: {}", message);
     });
 
   // Enable verbose rc_libretro memory mapping logging
   rc_libretro_init_verbose_message_callback(
     [](const char* message) {
-      CLog::Log(LOGDEBUG, "rc_libretro: {}", message);
+      CLog::Log(LOGINFO, "rc_libretro: {}", message);
     });
 
   CLog::Log(LOGDEBUG, "CCheevos: rc_client created");
@@ -132,6 +132,20 @@ void CCheevos::EnableRichPresence()
   CLog::Log(LOGINFO, "CCheevos::EnableRichPresence -- loading \'{}\' ",
             URIUtils::GetFileName(gamePath));
 
+
+  // Pre-initialise memory regions BEFORE rc_client begins loading.
+  // rc_client validates achievement addresses during identify-and-load,
+  // which happens BEFORE RcheevosGameLoadCallback fires. Memory must be
+  // mapped now, or rc_client permanently marks all achievements invalid.
+  delete static_cast<rc_libretro_memory_regions_t*>(m_rcMemoryRegions);
+  auto* preRegions = new rc_libretro_memory_regions_t{};
+  m_rcMemoryRegions = preRegions;
+  s_initializingCheevos = this;
+  rc_libretro_memory_init(preRegions, nullptr, RcheevosGetCoreMemoryInfo, RC_CONSOLE_UNKNOWN);
+  s_initializingCheevos = nullptr;
+  CLog::Log(LOGINFO, "CCheevos::EnableRichPresence -- memory pre-mapped, total_size={}",
+            preRegions->total_size);
+
   rc_client_begin_identify_and_load_game(m_rcClient,
                                           RC_CONSOLE_UNKNOWN,
                                           gamePath.c_str(),
@@ -144,26 +158,6 @@ void CCheevos::DoFrame()
 {
   if (m_rcClient == nullptr)
     return;
-  static uint32_t s_frameCount = 0;
-  if (++s_frameCount % 600 == 0)
-  {
-    CLog::Log(LOGINFO, "CCheevos::DoFrame -- frame {}", s_frameCount);
-    // Test both address 0 and Genesis RAM address 0xFF0000
-    uint8_t buf[8]{};
-    uint32_t read = RcheevosReadMemory(0x0000, buf, 8, m_rcClient);
-    CLog::Log(LOGINFO, "CCheevos::DoFrame -- mem[0x0000] read={} {:02x}{:02x}{:02x}{:02x}",
-              read, buf[0], buf[1], buf[2], buf[3]);
-    read = RcheevosReadMemory(0xFF0000, buf, 8, m_rcClient);
-    CLog::Log(LOGINFO, "CCheevos::DoFrame -- mem[0xFF0000] read={} {:02x}{:02x}{:02x}{:02x}",
-              read, buf[0], buf[1], buf[2], buf[3]);
-    // Log rc_client game summary
-    rc_client_user_game_summary_t summary{};
-    rc_client_get_user_game_summary(m_rcClient, &summary);
-    CLog::Log(LOGINFO, "CCheevos::DoFrame -- unlocked={}/{} unsupported={}",
-              summary.num_unlocked_achievements,
-              summary.num_core_achievements,
-              summary.num_unsupported_achievements);
-  }
   rc_client_do_frame(m_rcClient);
 }
 
@@ -414,6 +408,40 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
   CLog::Log(LOGINFO, "CCheevos: console_id={} game_id={}", consoleId,
             gameInfo ? gameInfo->id : 0u);
 
+  // Re-init memory with the correct console ID so rc_libretro applies the
+  // console-specific address layout (e.g. Genesis 0xFF0000, SNES mirrors).
+  if (consoleId != RC_CONSOLE_UNKNOWN)
+  {
+    auto* regions = static_cast<rc_libretro_memory_regions_t*>(cheevos->m_rcMemoryRegions);
+    if (regions == nullptr)
+    {
+      regions = new rc_libretro_memory_regions_t{};
+      cheevos->m_rcMemoryRegions = regions;
+    }
+    s_initializingCheevos = cheevos;
+    rc_libretro_memory_init(regions, nullptr, RcheevosGetCoreMemoryInfo, consoleId);
+    s_initializingCheevos = nullptr;
+    CLog::Log(LOGINFO, "CCheevos: memory re-mapped for console {}, total_size={}",
+              consoleId, regions->total_size);
+  }
+
+  // Re-init memory with the correct console ID so rc_libretro applies the
+  // console-specific address layout (e.g. Genesis 0xFF0000, SNES mirrors).
+  if (consoleId != RC_CONSOLE_UNKNOWN)
+  {
+    auto* regions = static_cast<rc_libretro_memory_regions_t*>(cheevos->m_rcMemoryRegions);
+    if (regions == nullptr)
+    {
+      regions = new rc_libretro_memory_regions_t{};
+      cheevos->m_rcMemoryRegions = regions;
+    }
+    s_initializingCheevos = cheevos;
+    rc_libretro_memory_init(regions, nullptr, RcheevosGetCoreMemoryInfo, consoleId);
+    s_initializingCheevos = nullptr;
+    CLog::Log(LOGINFO, "CCheevos: memory re-mapped for console {}, total_size={}",
+              consoleId, regions->total_size);
+  }
+
   // Populate memory regions via rc_libretro.
   // rc_libretro_memory_init builds a console-aware address map so rc_client
   // can correctly translate e.g. Genesis 0xFF0000 addresses to the right RAM ptr.
@@ -439,8 +467,9 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
     CLog::Log(LOGINFO, "CCheevos: loaded \'{}\' ({}/{} achievements)",
               gameTitle, summary.num_unlocked_achievements, summary.num_core_achievements);
 
-    const std::string notifMsg = StringUtils::Format(
-        "{} ({}/{})", gameTitle,
+    // Toast format: title on header line, "X/Y Achievements" on body
+    const std::string countMsg = StringUtils::Format(
+        "{} / {} Achievements Unlocked",
         summary.num_unlocked_achievements, summary.num_core_achievements);
 
     const std::string iconPath =
@@ -451,7 +480,9 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
       const std::string iconUrl = StringUtils::Format(
           "https://media.retroachievements.org/Images/{}.png", gameInfo->badge_name);
       const std::string iconPathCopy = iconPath;
-      std::thread([iconUrl, iconPathCopy, notifMsg]()
+      const std::string titleCopy = gameTitle;
+      const std::string countCopy = countMsg;
+      std::thread([iconUrl, iconPathCopy, titleCopy, countCopy]()
       {
         XFILE::CDirectory::Create(RA_GAME_ICON_CACHE);
         XFILE::CCurlFile curl;
@@ -468,14 +499,14 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
         }
         CGUIDialogKaiToast::QueueNotification(
             XFILE::CFile::Exists(iconPathCopy) ? iconPathCopy : "",
-            "RetroAchievements", notifMsg, TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
+            titleCopy, countCopy, TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
       }).detach();
     }
     else
     {
       CGUIDialogKaiToast::QueueNotification(
           XFILE::CFile::Exists(iconPath) ? iconPath : "",
-          "RetroAchievements", notifMsg, TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
+          gameTitle, countMsg, TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
     }
   }
 
@@ -522,6 +553,12 @@ void CCheevos::RichPresencePingThread()
     return;
 
   const uint32_t gameId = gameInfo->id;
+
+  // Snapshot credentials at thread start to avoid races with
+  // RcheevosLoginCallback updating m_userName/m_loginToken concurrently.
+  const std::string userName   = m_userName;
+  const std::string loginToken = m_loginToken;
+
   CLog::Log(LOGINFO, "CCheevos::RichPresencePingThread -- started for game {}", gameId);
 
   while (m_richPresenceRunning)
@@ -536,8 +573,8 @@ void CCheevos::RichPresencePingThread()
 
     const std::string pingUrl =
         std::string(RA_BASE_URL) +
-        "?r=ping&u=" + CURL::Encode(m_userName) +
-        "&t=" + CURL::Encode(m_loginToken) +
+        "?r=ping&u=" + CURL::Encode(userName) +
+        "&t=" + CURL::Encode(loginToken) +
         "&g=" + std::to_string(gameId);
 
     CLog::Log(LOGDEBUG, "CCheevos::RichPresencePingThread -- posting: {}", rpMessage);
