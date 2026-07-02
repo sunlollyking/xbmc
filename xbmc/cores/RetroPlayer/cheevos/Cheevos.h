@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2024 Team Kodi
+ *  Copyright (C) 2020-2024 Team Kodi
  *  This file is part of Kodi - https://kodi.tv
  *
  *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -86,6 +86,9 @@ private:
   std::atomic<bool> m_richPresenceRunning{false};
   std::thread m_richPresenceThread;
   mutable std::mutex m_credentialsMutex; ///< Guards m_userName/m_loginToken
+
+  std::vector<std::thread> m_downloadThreads;
+  std::mutex m_downloadThreadsMutex;
 
   static thread_local CCheevos* s_initializingCheevos;
 };

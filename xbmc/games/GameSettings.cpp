@@ -204,8 +204,7 @@ std::string CGameSettings::LoginToRA(const std::string& username,
   // LoadFile reads the response body even on HTTP 4xx so we get the
   // server's actual error message for wrong passwords (e.g. HTTP 401).
   CURL loginUrl(StringUtils::Format(LOGIN_TO_RETRO_ACHIEVEMENTS_URL_TEMPLATE,
-                                   CURL::Encode(username),
-                                   CURL::Encode(password)));
+                                    CURL::Encode(username), CURL::Encode(password)));
   loginUrl.SetProtocolOption("user-agent", CSysInfo::GetUserAgent());
   loginUrl.SetProtocolOption("failonerror", "false");
 
@@ -268,9 +267,8 @@ bool CGameSettings::IsAccountVerified(const std::string& username, const std::st
   //        that confirms the token is valid. We request a=1 (1 recent achievement)
   //        to minimise the response payload.
   XFILE::CFile request;
-  const CURL verifyUrl(StringUtils::Format(VERIFY_ACCOUNT_URL_TEMPLATE,
-                                          CURL::Encode(username),
-                                          CURL::Encode(token)));
+  const CURL verifyUrl(StringUtils::Format(VERIFY_ACCOUNT_URL_TEMPLATE, CURL::Encode(username),
+                                           CURL::Encode(token)));
 
   CLog::Log(LOGDEBUG, "CGameSettings::IsAccountVerified -- verifying token for '{}'", username);
 

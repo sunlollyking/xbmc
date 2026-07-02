@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2024 Team Kodi
+ *  Copyright (C) 2020-2024 Team Kodi
  *  This file is part of Kodi - https://kodi.tv
  *
  *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -25,16 +25,18 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
-// rcheevos — explicit relative paths so cmake include dirs are not needed
+// rcheevos
 #define RC_CLIENT_SUPPORTS_HASH
+#include "../rcheevos/include/rc_api_runtime.h"
 #include "../rcheevos/include/rc_client.h"
 #include "../rcheevos/src/rc_libretro.h"
-#include "../rcheevos/include/rc_api_runtime.h"
 
 #include <algorithm>
 #include <chrono>
 #include <cstring>
+#include <mutex>
 #include <thread>
+#include <vector>
 
 using namespace KODI;
 using namespace RETRO;
@@ -52,9 +54,12 @@ constexpr unsigned int TOAST_MESSAGE_MS      = 500;
 constexpr int RP_PING_INTERVAL_MS = 120000;
 constexpr const char* SETTING_RA_USERNAME = "gamesachievements.username";
 constexpr const char* SETTING_RA_TOKEN    = "gamesachievements.token";
+constexpr unsigned int PSEUDO_ACH_ID_THRESHOLD = 1000000;
+constexpr unsigned int RP_BUFFER_SIZE          = 512;
+constexpr int RP_SLEEP_INTERVAL_MS             = 100;
 } // namespace
 
-// ─── Constructor / Destructor ─────────────────────────────────────────────────
+// Constructor / Destructor
 
 CCheevos::CCheevos(GAME::CGameClient* gameClient,
                    const std::string& userName,
@@ -73,13 +78,13 @@ CCheevos::CCheevos(GAME::CGameClient* gameClient,
   // Enable verbose rc_client logging
   rc_client_enable_logging(m_rcClient, RC_CLIENT_LOG_LEVEL_VERBOSE,
     [](const char* message, const rc_client_t*) {
-      CLog::Log(LOGINFO, "rc_client: {}", message);
+      CLog::Log(LOGDEBUG, "rc_client: {}", message);
     });
 
   // Enable verbose rc_libretro memory mapping logging
   rc_libretro_init_verbose_message_callback(
     [](const char* message) {
-      CLog::Log(LOGINFO, "rc_libretro: {}", message);
+      CLog::Log(LOGDEBUG, "rc_libretro: {}", message);
     });
 
   CLog::Log(LOGDEBUG, "CCheevos: rc_client created");
@@ -99,6 +104,15 @@ CCheevos::~CCheevos()
   if (m_richPresenceThread.joinable())
     m_richPresenceThread.join();
 
+  // Join background download threads before tearing down
+  {
+    std::lock_guard<std::mutex> lock(m_downloadThreadsMutex);
+    for (auto& t : m_downloadThreads)
+      if (t.joinable())
+        t.join();
+    m_downloadThreads.clear();
+  }
+
   delete static_cast<rc_libretro_memory_regions_t*>(m_rcMemoryRegions);
   m_rcMemoryRegions = nullptr;
 
@@ -110,7 +124,7 @@ CCheevos::~CCheevos()
   CLog::Log(LOGDEBUG, "CCheevos::~CCheevos -- cleaned up");
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+// Public API
 
 void CCheevos::EnableRichPresence()
 {
@@ -121,8 +135,6 @@ void CCheevos::EnableRichPresence()
   if (m_rcClient != nullptr)
     rc_client_unload_game(m_rcClient);
 
-
-
   if (m_rcClient == nullptr)
     return;
 
@@ -132,11 +144,19 @@ void CCheevos::EnableRichPresence()
   CLog::Log(LOGINFO, "CCheevos::EnableRichPresence -- loading \'{}\' ",
             URIUtils::GetFileName(gamePath));
 
-
   // Pre-initialise memory regions BEFORE rc_client begins loading.
   // rc_client validates achievement addresses during identify-and-load,
   // which happens BEFORE RcheevosGameLoadCallback fires. Memory must be
   // mapped now, or rc_client permanently marks all achievements invalid.
+  // Join background download threads before tearing down
+  {
+    std::lock_guard<std::mutex> lock(m_downloadThreadsMutex);
+    for (auto& t : m_downloadThreads)
+      if (t.joinable())
+        t.join();
+    m_downloadThreads.clear();
+  }
+
   delete static_cast<rc_libretro_memory_regions_t*>(m_rcMemoryRegions);
   auto* preRegions = new rc_libretro_memory_regions_t{};
   m_rcMemoryRegions = preRegions;
@@ -165,7 +185,7 @@ std::string CCheevos::GetRichPresenceEvaluation()
 {
   if (m_rcClient == nullptr)
     return {};
-  char buffer[512]{};
+  char buffer[RP_BUFFER_SIZE]{};
   rc_client_get_rich_presence_message(m_rcClient, buffer, sizeof(buffer));
   return buffer;
 }
@@ -187,7 +207,7 @@ bool CCheevos::RCLogin(const std::string& password)
   return true;
 }
 
-// ─── Memory callback ──────────────────────────────────────────────────────────
+// Memory callback
 
 uint32_t CCheevos::RcheevosReadMemory(uint32_t address, uint8_t* buffer,
                                        uint32_t num_bytes, rc_client_t* client)
@@ -203,14 +223,14 @@ uint32_t CCheevos::RcheevosReadMemory(uint32_t address, uint8_t* buffer,
   return rc_libretro_memory_read(regions, address, buffer, num_bytes);
 }
 
-// ─── HTTP server callback ─────────────────────────────────────────────────────
+// HTTP server callback
 
 void CCheevos::RcheevosServerCall(const rc_api_request_t* request,
                                    rc_client_server_callback_t callback,
                                    void* callback_data, rc_client_t* /*client*/)
 {
-  const std::string url      = request->url       ? request->url       : "";
-  const std::string postData = request->post_data  ? request->post_data : "";
+  const std::string url      = (request->url != nullptr)       ? request->url       : "";
+  const std::string postData = (request->post_data != nullptr)  ? request->post_data : "";
 
   std::thread([url, postData, callback, callback_data]()
   {
@@ -247,7 +267,7 @@ void CCheevos::RcheevosServerCall(const rc_api_request_t* request,
   }).detach();
 }
 
-// ─── Event handler ────────────────────────────────────────────────────────────
+// Event handler
 
 void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t* client)
 {
@@ -265,23 +285,18 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
 
       // Filter rc_client pseudo-achievements (server warnings, system notices).
       // Real RA achievements have IDs below 1,000,000 and non-zero points.
-      if (ach->id >= 1000000 || ach->points == 0)
+      if (ach->id >= PSEUDO_ACH_ID_THRESHOLD || ach->points == 0)
       {
         CLog::Log(LOGDEBUG, "CCheevos: ignoring pseudo-achievement id={} '{}'",
-                  ach->id, ach->title ? ach->title : "");
+                  ach->id, ach->title != nullptr ? ach->title : "");
         break;
       }
 
-      const std::string title    = ach->title     ? ach->title     : "Achievement Unlocked!";
-      const std::string badgeUrl = ach->badge_url ? ach->badge_url : "";
+      const std::string title    = (ach->title != nullptr)     ? ach->title     : "Achievement Unlocked!";
+      const std::string badgeUrl = (ach->badge_url != nullptr) ? ach->badge_url : "";
 
       CLog::Log(LOGINFO, "CCheevos: achievement triggered: {} (id={} {}pts)",
                 title, ach->id, ach->points);
-
-      rc_client_user_game_summary_t summary{};
-      rc_client_get_user_game_summary(client, &summary);
-      const bool mastered = (summary.num_core_achievements > 0 &&
-                             summary.num_unlocked_achievements >= summary.num_core_achievements);
 
       const std::string localBadge =
           std::string(RA_GAME_ICON_CACHE) + StringUtils::Format("badge_{}.png", ach->id);
@@ -297,29 +312,36 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
         {
           const std::string urlCopy   = badgeUrl;
           const std::string titleCopy = title;
-          std::thread([urlCopy, localBadge, titleCopy]()
           {
-            XFILE::CDirectory::Create(RA_GAME_ICON_CACHE);
-            XFILE::CCurlFile curl;
-            curl.SetRequestHeader("User-Agent", RA_USER_AGENT);
-            std::string data;
-            if (curl.Get(urlCopy, data) && !data.empty())
+            std::lock_guard<std::mutex> lock(cheevos->m_downloadThreadsMutex);
+            cheevos->m_downloadThreads.emplace_back([urlCopy, localBadge, titleCopy]()
             {
-              XFILE::CFile out;
-              if (out.OpenForWrite(localBadge, true))
+              XFILE::CDirectory::Create(RA_GAME_ICON_CACHE);
+              XFILE::CCurlFile curl;
+              curl.SetRequestHeader("User-Agent", RA_USER_AGENT);
+              std::string data;
+              if (curl.Get(urlCopy, data) && !data.empty())
               {
-                out.Write(data.data(), static_cast<ssize_t>(data.size()));
-                out.Close();
-                CGUIDialogKaiToast::QueueNotification(localBadge,
-                                                      "Achievement Unlocked!", titleCopy,
-                                                      TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
-                return;
+                XFILE::CFile out;
+                if (out.OpenForWrite(localBadge, true))
+                {
+                  const ssize_t written = out.Write(data.data(), static_cast<ssize_t>(data.size()));
+                  out.Close();
+                  if (written == static_cast<ssize_t>(data.size()))
+                  {
+                    CGUIDialogKaiToast::QueueNotification(localBadge,
+                                                          "Achievement Unlocked!", titleCopy,
+                                                          TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
+                    return;
+                  }
+                  CLog::Log(LOGWARNING, "CCheevos: partial write for badge: {}", localBadge);
+                }
               }
-            }
-            CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
-                                                  "Achievement Unlocked!", titleCopy,
-                                                  TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
-          }).detach();
+              CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
+                                                    "Achievement Unlocked!", titleCopy,
+                                                    TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
+            });
+          }
         }
       }
       else
@@ -332,7 +354,7 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
       if (mastered)
       {
         const rc_client_game_t* gi = rc_client_get_game_info(client);
-        const std::string gameTitle = (gi && gi->title) ? gi->title : "";
+        const std::string gameTitle = (gi != nullptr && gi->title != nullptr) ? gi->title : "";
         const std::string masteryIcon =
             StringUtils::Format("{}game_{}.png", RA_GAME_ICON_CACHE, gi ? gi->id : 0u);
         if (XFILE::CFile::Exists(masteryIcon))
@@ -345,13 +367,44 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
       }
       break;
     }
+    case RC_CLIENT_EVENT_GAME_COMPLETED:
+    {
+      const rc_client_game_t* gi = rc_client_get_game_info(client);
+      const std::string gameTitle =
+          (gi != nullptr && gi->title != nullptr) ? gi->title : "";
+      const std::string masteryIcon =
+          StringUtils::Format("{}game_{}.png", RA_GAME_ICON_CACHE,
+                              (gi != nullptr) ? gi->id : 0u);
+      if (XFILE::CFile::Exists(masteryIcon))
+        CGUIDialogKaiToast::QueueNotification(masteryIcon, "Mastered!", gameTitle,
+                                              TOAST_DISPLAY_LONG_MS, false, TOAST_MESSAGE_MS);
+      else
+        CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
+                                              "Mastered!", gameTitle,
+                                              TOAST_DISPLAY_LONG_MS, false, TOAST_MESSAGE_MS);
+      break;
+    }
+    case RC_CLIENT_EVENT_SERVER_ERROR:
+    {
+      CLog::Log(LOGWARNING, "CCheevos: server error from RetroAchievements");
+      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning,
+                                            "RetroAchievements",
+                                            "Server communication error",
+                                            TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
+      break;
+    }
+    case RC_CLIENT_EVENT_DISCONNECTED:
+    {
+      CLog::Log(LOGWARNING, "CCheevos: disconnected from RetroAchievements");
+      break;
+    }
     default:
       CLog::Log(LOGDEBUG, "CCheevos: unhandled rc_client event {}", event->type);
       break;
   }
 }
 
-// ─── Login callback ───────────────────────────────────────────────────────────
+// Login callback
 
 void CCheevos::RcheevosLoginCallback(int result, const char* errorMessage,
                                       rc_client_t* client, void* /*userdata*/)
@@ -361,7 +414,7 @@ void CCheevos::RcheevosLoginCallback(int result, const char* errorMessage,
   if (result != RC_OK)
   {
     CLog::Log(LOGWARNING, "CCheevos: login failed: {}",
-              errorMessage ? errorMessage : "unknown error");
+              errorMessage != nullptr ? errorMessage : "unknown error");
     return;
   }
 
@@ -375,8 +428,11 @@ void CCheevos::RcheevosLoginCallback(int result, const char* errorMessage,
   if (cheevos == nullptr)
     return;
 
-  cheevos->m_loginToken = user->token    ? user->token    : "";
-  cheevos->m_userName   = user->username ? user->username : cheevos->m_userName;
+  {
+    std::lock_guard<std::mutex> lock(cheevos->m_credentialsMutex);
+    cheevos->m_loginToken = (user->token != nullptr)    ? user->token    : "";
+    cheevos->m_userName   = (user->username != nullptr) ? user->username : cheevos->m_userName;
+  }
 
   const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
   if (settings)
@@ -387,7 +443,7 @@ void CCheevos::RcheevosLoginCallback(int result, const char* errorMessage,
   }
 }
 
-// ─── Game load callback ───────────────────────────────────────────────────────
+// Game load callback
 
 void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
                                          rc_client_t* client, void* /*userdata*/)
@@ -399,48 +455,14 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
   if (result != RC_OK)
   {
     CLog::Log(LOGINFO, "CCheevos: game load: {}",
-              errorMessage ? errorMessage : "unknown error");
+              errorMessage != nullptr ? errorMessage : "unknown error");
     return;
   }
 
   const rc_client_game_t* gameInfo = rc_client_get_game_info(client);
-  const uint32_t consoleId = gameInfo ? gameInfo->console_id : RC_CONSOLE_UNKNOWN;
+  const uint32_t consoleId = (gameInfo != nullptr) ? gameInfo->console_id : RC_CONSOLE_UNKNOWN;
   CLog::Log(LOGINFO, "CCheevos: console_id={} game_id={}", consoleId,
-            gameInfo ? gameInfo->id : 0u);
-
-  // Re-init memory with the correct console ID so rc_libretro applies the
-  // console-specific address layout (e.g. Genesis 0xFF0000, SNES mirrors).
-  if (consoleId != RC_CONSOLE_UNKNOWN)
-  {
-    auto* regions = static_cast<rc_libretro_memory_regions_t*>(cheevos->m_rcMemoryRegions);
-    if (regions == nullptr)
-    {
-      regions = new rc_libretro_memory_regions_t{};
-      cheevos->m_rcMemoryRegions = regions;
-    }
-    s_initializingCheevos = cheevos;
-    rc_libretro_memory_init(regions, nullptr, RcheevosGetCoreMemoryInfo, consoleId);
-    s_initializingCheevos = nullptr;
-    CLog::Log(LOGINFO, "CCheevos: memory re-mapped for console {}, total_size={}",
-              consoleId, regions->total_size);
-  }
-
-  // Re-init memory with the correct console ID so rc_libretro applies the
-  // console-specific address layout (e.g. Genesis 0xFF0000, SNES mirrors).
-  if (consoleId != RC_CONSOLE_UNKNOWN)
-  {
-    auto* regions = static_cast<rc_libretro_memory_regions_t*>(cheevos->m_rcMemoryRegions);
-    if (regions == nullptr)
-    {
-      regions = new rc_libretro_memory_regions_t{};
-      cheevos->m_rcMemoryRegions = regions;
-    }
-    s_initializingCheevos = cheevos;
-    rc_libretro_memory_init(regions, nullptr, RcheevosGetCoreMemoryInfo, consoleId);
-    s_initializingCheevos = nullptr;
-    CLog::Log(LOGINFO, "CCheevos: memory re-mapped for console {}, total_size={}",
-              consoleId, regions->total_size);
-  }
+            (gameInfo != nullptr) ? gameInfo->id : 0u);
 
   // Populate memory regions via rc_libretro.
   // rc_libretro_memory_init builds a console-aware address map so rc_client
@@ -460,7 +482,7 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
   // Show game-load notification
   if (gameInfo != nullptr)
   {
-    const std::string gameTitle = gameInfo->title ? gameInfo->title : "";
+    const std::string gameTitle = (gameInfo->title != nullptr) ? gameInfo->title : "";
     rc_client_user_game_summary_t summary{};
     rc_client_get_user_game_summary(client, &summary);
 
@@ -475,32 +497,37 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
     const std::string iconPath =
         StringUtils::Format("{}game_{}.png", RA_GAME_ICON_CACHE, gameInfo->id);
 
-    if (!XFILE::CFile::Exists(iconPath) && gameInfo->badge_name)
+    if (!XFILE::CFile::Exists(iconPath) && gameInfo->badge_name != nullptr)
     {
       const std::string iconUrl = StringUtils::Format(
           "https://media.retroachievements.org/Images/{}.png", gameInfo->badge_name);
       const std::string iconPathCopy = iconPath;
       const std::string titleCopy = gameTitle;
       const std::string countCopy = countMsg;
-      std::thread([iconUrl, iconPathCopy, titleCopy, countCopy]()
       {
-        XFILE::CDirectory::Create(RA_GAME_ICON_CACHE);
-        XFILE::CCurlFile curl;
-        curl.SetRequestHeader("User-Agent", RA_USER_AGENT);
-        std::string data;
-        if (curl.Get(iconUrl, data) && !data.empty())
+        std::lock_guard<std::mutex> lock(cheevos->m_downloadThreadsMutex);
+        cheevos->m_downloadThreads.emplace_back([iconUrl, iconPathCopy, titleCopy, countCopy]()
         {
-          XFILE::CFile out;
-          if (out.OpenForWrite(iconPathCopy, true))
+          XFILE::CDirectory::Create(RA_GAME_ICON_CACHE);
+          XFILE::CCurlFile curl;
+          curl.SetRequestHeader("User-Agent", RA_USER_AGENT);
+          std::string data;
+          if (curl.Get(iconUrl, data) && !data.empty())
           {
-            out.Write(data.data(), static_cast<ssize_t>(data.size()));
-            out.Close();
+            XFILE::CFile out;
+            if (out.OpenForWrite(iconPathCopy, true))
+            {
+              const ssize_t written = out.Write(data.data(), static_cast<ssize_t>(data.size()));
+              out.Close();
+              if (written != static_cast<ssize_t>(data.size()))
+                CLog::Log(LOGWARNING, "CCheevos: partial write for icon: {}", iconPathCopy);
+            }
           }
-        }
-        CGUIDialogKaiToast::QueueNotification(
-            XFILE::CFile::Exists(iconPathCopy) ? iconPathCopy : "",
-            titleCopy, countCopy, TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
-      }).detach();
+          CGUIDialogKaiToast::QueueNotification(
+              XFILE::CFile::Exists(iconPathCopy) ? iconPathCopy : "",
+              titleCopy, countCopy, TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
+        });
+      }
     }
     else
     {
@@ -516,7 +543,7 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
   CLog::Log(LOGINFO, "CCheevos: game session active");
 }
 
-// ─── Memory-info callback ─────────────────────────────────────────────────────
+// Memory-info callback
 
 void CCheevos::RcheevosGetCoreMemoryInfo(uint32_t id,
                                           rc_libretro_core_memory_info_t* info)
@@ -541,7 +568,7 @@ void CCheevos::RcheevosGetCoreMemoryInfo(uint32_t id,
   }
 }
 
-// ─── Rich-presence ping thread ────────────────────────────────────────────────
+// Rich-presence ping thread
 
 void CCheevos::RichPresencePingThread()
 {
@@ -554,17 +581,22 @@ void CCheevos::RichPresencePingThread()
 
   const uint32_t gameId = gameInfo->id;
 
-  // Snapshot credentials at thread start to avoid races with
+  // Snapshot credentials under lock to avoid races with
   // RcheevosLoginCallback updating m_userName/m_loginToken concurrently.
-  const std::string userName   = m_userName;
-  const std::string loginToken = m_loginToken;
+  std::string userName;
+  std::string loginToken;
+  {
+    std::lock_guard<std::mutex> lock(m_credentialsMutex);
+    userName   = m_userName;
+    loginToken = m_loginToken;
+  }
 
   CLog::Log(LOGINFO, "CCheevos::RichPresencePingThread -- started for game {}", gameId);
 
   while (m_richPresenceRunning)
   {
-    for (int i = 0; i < (RP_PING_INTERVAL_MS / 100) && m_richPresenceRunning; ++i)
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    for (int i = 0; i < (RP_PING_INTERVAL_MS / RP_SLEEP_INTERVAL_MS) && m_richPresenceRunning; ++i)
+      std::this_thread::sleep_for(std::chrono::milliseconds(RP_SLEEP_INTERVAL_MS));
 
     if (!m_richPresenceRunning)
       break;
