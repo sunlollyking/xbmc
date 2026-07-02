@@ -308,12 +308,16 @@ void CCheevos::RcheevosEventHandler(const rc_client_event_t* event, rc_client_t*
               XFILE::CFile out;
               if (out.OpenForWrite(localBadge, true))
               {
-                out.Write(data.data(), static_cast<ssize_t>(data.size()));
+                const ssize_t written = out.Write(data.data(), static_cast<ssize_t>(data.size()));
                 out.Close();
-                CGUIDialogKaiToast::QueueNotification(localBadge,
-                                                      "Achievement Unlocked!", titleCopy,
-                                                      TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
-                return;
+                if (written == static_cast<ssize_t>(data.size()))
+                {
+                  CGUIDialogKaiToast::QueueNotification(localBadge,
+                                                        "Achievement Unlocked!", titleCopy,
+                                                        TOAST_DISPLAY_MS, false, TOAST_MESSAGE_MS);
+                  return;
+                }
+                CLog::Log(LOGWARNING, "CCheevos: partial write for badge: {}", localBadge);
               }
             }
             CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
@@ -493,8 +497,10 @@ void CCheevos::RcheevosGameLoadCallback(int result, const char* errorMessage,
           XFILE::CFile out;
           if (out.OpenForWrite(iconPathCopy, true))
           {
-            out.Write(data.data(), static_cast<ssize_t>(data.size()));
+            const ssize_t written = out.Write(data.data(), static_cast<ssize_t>(data.size()));
             out.Close();
+            if (written != static_cast<ssize_t>(data.size()))
+              CLog::Log(LOGWARNING, "CCheevos: partial write for icon: {}", iconPathCopy);
           }
         }
         CGUIDialogKaiToast::QueueNotification(
