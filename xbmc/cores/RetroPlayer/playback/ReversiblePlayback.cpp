@@ -314,9 +314,6 @@ void CReversiblePlayback::FrameEvent()
     m_cheevos->DoFrame();
 
   AddFrame();
-
-  if (m_cheevos)
-    m_cheevos->CheckTriggeredAchievement();
 }
 
 void CReversiblePlayback::RewindEvent()

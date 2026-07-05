@@ -232,7 +232,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
 
       return true;
     }
-    case RETROPLAYER_RICH_PRESENCE:
+    case RETROPLAYER_ACHIEVEMENTS_RICH_PRESENCE:
     {
       value = GameSettings().GetAchievementRichPresence();
       return true;
