@@ -171,12 +171,11 @@ std::string CReversiblePlayback::CreateSavestate(bool autosave,
     std::unique_lock lock(m_savestateMutex);
 
     // Prune any finished autosave threads
-    m_savestateThreads.erase(std::remove_if(m_savestateThreads.begin(), m_savestateThreads.end(),
-                                            [](std::future<void>& task) {
-                                              return task.wait_for(std::chrono::seconds(0)) ==
-                                                     std::future_status::ready;
-                                            }),
-                             m_savestateThreads.end());
+    m_savestateThreads.erase(
+        std::remove_if(
+            m_savestateThreads.begin(), m_savestateThreads.end(), [](std::future<void>& task)
+            { return task.wait_for(std::chrono::seconds(0)) == std::future_status::ready; }),
+        m_savestateThreads.end());
 
     // Save async to not block game loop
     std::future<void> task =
@@ -419,8 +418,21 @@ void CReversiblePlayback::UpdateMemoryStream()
 
     if (!m_memoryStream)
     {
+      const size_t memorySize = m_gameClient->SerializeSize();
+
+      // The rewind buffer holds one serialized state per frame, so its cost is
+      // the state size multiplied by the whole rewind window. Logged because
+      // a large state and a long window together run to gigabytes, which is
+      // otherwise invisible until the process is killed.
+      CLog::Log(LOGINFO,
+                "RetroPlayer[SAVE]: Rewind buffer: {} frames of {} bytes ({:.1f} MB) for {} "
+                "seconds at {:.2f} fps",
+                frameCount, memorySize,
+                static_cast<double>(memorySize) * frameCount / (1024.0 * 1024.0), rewindBufferSec,
+                m_gameLoop.FPS());
+
       m_memoryStream = std::make_unique<CDeltaPairMemoryStream>();
-      m_memoryStream->Init(m_gameClient->SerializeSize(), frameCount);
+      m_memoryStream->Init(memorySize, frameCount);
     }
 
     if (m_memoryStream->MaxFrameCount() != frameCount)
