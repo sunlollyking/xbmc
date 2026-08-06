@@ -35,6 +35,14 @@ public:
    * Any GL state is lost, and must not be deinitialized explicitly.
    */
   virtual void HardwareContextReset() = 0;
+
+  /*!
+   * \brief Called before the HW context is destroyed
+   *
+   * Gives the client a chance to release its GPU resources while its context
+   * is still current.
+   */
+  virtual void HardwareContextDestroy() = 0;
 };
 
 class CGameClientStreamHwFramebuffer : public IGameClientStream
@@ -60,7 +68,8 @@ public:
 private:
   // Private utility functions
   static std::unique_ptr<RETRO::HwFramebufferProperties> TranslateProperties(
-      const game_hw_rendering_properties& hwProperties);
+      const game_hw_rendering_properties& hwProperties,
+      const game_stream_hw_framebuffer_properties& streamProperties);
 
   // Construction parameters
   IHwFramebufferCallback& m_callback;

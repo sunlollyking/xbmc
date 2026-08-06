@@ -27,6 +27,31 @@ class CRenderVideoSettings;
 class CRPBaseRenderer;
 class IRenderBuffer;
 
+/*!
+ * \brief The rendering context a game client asked for
+ *
+ * A rendering-system-agnostic description of the client's request, so the
+ * buffer layer doesn't have to reach into the Game API for it.
+ */
+struct HwContextProperties
+{
+  //! \brief Request a core profile rather than a compatibility profile
+  bool coreProfile{true};
+
+  //! \brief Request an OpenGL ES context rather than desktop OpenGL
+  bool embedded{false};
+
+  //! \brief Minimum context version, or 0 to let the driver decide
+  unsigned int versionMajor{0};
+  unsigned int versionMinor{0};
+
+  //! \brief The core needs a depth attachment on the framebuffer
+  bool depth{false};
+
+  //! \brief The core needs a stencil attachment on the framebuffer
+  bool stencil{false};
+};
+
 class IRenderBufferPool : public std::enable_shared_from_this<IRenderBufferPool>
 {
 public:
@@ -72,11 +97,27 @@ public:
   virtual std::shared_ptr<IRenderBufferPool> GetPtr() { return shared_from_this(); }
 
   /*!
+   * \brief Create the resources tied to the rendering context
+   *
+   * Called on the thread that will render into the pool's buffers, before the
+   * client is told the context is ready. Pools that own a GL context must
+   * create it and make it current here, as a context can only be current on
+   * one thread. Pools with no context of their own need do nothing.
+   *
+   * \param properties The context the client asked for
+   *
+   * \return True if the context is ready, or the pool has none to create
+   */
+  virtual bool CreateContext(const HwContextProperties& properties) { return true; }
+
+  /*!
    * \brief Release resources tied to the rendering context
    *
    * This function is called when the render context is being destroyed.
    * Implementations should free any context-specific resources so that the
    * pool can be safely recreated.
+   *
+   * Must run on the same thread that called CreateContext().
    */
   virtual void DestroyContext() {}
 };

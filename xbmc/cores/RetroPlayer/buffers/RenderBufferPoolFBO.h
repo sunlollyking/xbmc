@@ -45,10 +45,10 @@ public:
   IRenderBuffer* CreateRenderBuffer(void* header = nullptr) override;
   bool ConfigureInternal() override;
 
+  bool CreateContext(const HwContextProperties& properties) override;
   void DestroyContext() override;
 
 protected:
-  bool CreateContext();
 
   // Construction parameters
   CRenderContext& m_context;

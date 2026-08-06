@@ -280,6 +280,19 @@ void CRPRenderManager::Flush()
   m_bFlush = true;
 }
 
+bool CRPRenderManager::CreateContext(const HwContextProperties& properties)
+{
+  bool bSuccess = true;
+
+  for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
+  {
+    if (!bufferPool->CreateContext(properties))
+      bSuccess = false;
+  }
+
+  return bSuccess;
+}
+
 void CRPRenderManager::DestroyContext()
 {
   for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
@@ -291,83 +304,105 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
   if (width == 0 || height == 0)
     return false;
 
-  // The framebuffer and the shared context that owns it are allocated lazily
-  // by the buffer pool, on the game loop thread that will render into them.
-  // All that has to be true here is that the render manager is configured, so
-  // that the rendering thread will build a renderer for the pool on its next
-  // pass through RenderWindow().
-  std::unique_lock lock(m_stateMutex);
+  // Drop the framebuffer from any previous configuration
+  ReleaseHwRenderBuffer();
 
-  return m_state != RENDER_STATE::UNCONFIGURED;
+  // A pool is normally configured when the rendering thread builds a renderer
+  // for it. The client needs its framebuffer before any of that has happened,
+  // so configure the pool that serves hardware streams here instead. The
+  // software pools decline this pixel format and are left untouched.
+  for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
+  {
+    if (!bufferPool->IsConfigured() && !bufferPool->Configure(m_format))
+      continue;
+
+    IRenderBuffer* renderBuffer = bufferPool->GetBuffer(width, height);
+    if (renderBuffer == nullptr)
+      continue;
+
+    if (renderBuffer->GetCurrentFramebuffer() == 0)
+    {
+      renderBuffer->Release();
+      continue;
+    }
+
+    m_hwRenderBuffer = renderBuffer;
+
+    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated {}x{} framebuffer for the game client",
+              width, height);
+
+    return true;
+  }
+
+  CLog::Log(LOGERROR, "RetroPlayer[RENDER]: No buffer pool could provide a {}x{} framebuffer", width,
+            height);
+
+  return false;
+}
+
+void CRPRenderManager::ReleaseHwRenderBuffer()
+{
+  if (m_hwRenderBuffer == nullptr)
+    return;
+
+  {
+    std::unique_lock lock(m_bufferMutex);
+
+    // The renderer may still be holding the framebuffer's buffer
+    for (IRenderBuffer* renderBuffer : m_renderBuffers)
+      renderBuffer->Release();
+    m_renderBuffers.clear();
+  }
+
+  m_hwRenderBuffer->Release();
+  m_hwRenderBuffer = nullptr;
 }
 
 uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned int height)
 {
-  // Release the framebuffer handed out for the previous frame
-  for (IRenderBuffer* buffer : m_pendingBuffers)
-    buffer->Release();
-  m_pendingBuffers.clear();
-
-  if (m_bFlush || m_state != RENDER_STATE::CONFIGURED)
+  if (m_bFlush || m_hwRenderBuffer == nullptr)
     return 0;
 
-  for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
+  // Clients ask for their framebuffer from inside HwContextReset(), before the
+  // rendering thread has built a renderer, so unlike the software path this
+  // deliberately does not wait for a visible renderer. Rendering into a
+  // framebuffer nobody samples yet merely wastes a frame; handing back 0 would
+  // send the drawing to the default framebuffer instead.
+  if (width > m_hwRenderBuffer->GetWidth() || height > m_hwRenderBuffer->GetHeight())
   {
-    // Skip pools that no renderer is drawing from. Until the rendering thread
-    // has built a renderer for the FBO pool there is nothing to sample the
-    // core's output, and handing back a framebuffer would draw into the void.
-    if (!bufferPool->HasVisibleRenderer())
-      continue;
+    CLog::Log(LOGDEBUG,
+              "RetroPlayer[RENDER]: Client wants {}x{}, larger than the {}x{} framebuffer",
+              width, height, m_hwRenderBuffer->GetWidth(), m_hwRenderBuffer->GetHeight());
 
-    IRenderBuffer* renderBuffer = bufferPool->GetBuffer(width, height);
-    if (renderBuffer != nullptr)
-    {
-      const uintptr_t framebuffer = renderBuffer->GetCurrentFramebuffer();
-      if (framebuffer == 0)
-      {
-        renderBuffer->Release();
-        continue;
-      }
-
-      m_pendingBuffers.emplace_back(renderBuffer);
-      return framebuffer;
-    }
+    if (!Create(width, height))
+      return 0;
   }
 
-  return 0;
+  return m_hwRenderBuffer->GetCurrentFramebuffer();
 }
 
 void CRPRenderManager::RenderFrame()
 {
-  if (m_bFlush || m_state != RENDER_STATE::CONFIGURED)
+  if (m_bFlush || m_hwRenderBuffer == nullptr)
     return;
 
-  // The core has finished drawing into the framebuffer handed out by
-  // GetCurrentFramebuffer(). Promote it so the rendering thread samples it.
-  std::vector<IRenderBuffer*> renderBuffers;
-  for (IRenderBuffer* buffer : m_pendingBuffers)
-  {
-    buffer->Acquire();
-    renderBuffers.emplace_back(buffer);
-  }
-
-  if (renderBuffers.empty())
-    return;
+  // The client has finished drawing into its framebuffer. Hand the buffer to
+  // the rendering thread, which samples the texture the framebuffer is backed
+  // by. This is the hardware counterpart of AddFrame().
+  m_hwRenderBuffer->Acquire();
 
   std::unique_lock lock(m_bufferMutex);
 
   for (IRenderBuffer* renderBuffer : m_renderBuffers)
     renderBuffer->Release();
-  m_renderBuffers = std::move(renderBuffers);
+  m_renderBuffers = {m_hwRenderBuffer};
 
-  for (IRenderBuffer* renderBuffer : m_renderBuffers)
-  {
-    renderBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
-    renderBuffer->SetRotation(0);
-    // The core rendered straight into the texture, so there is nothing to
-    // upload; mark it ready so RenderInternal() does not try.
-    renderBuffer->SetLoaded(true);
-  }
+  m_hwRenderBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
+  m_hwRenderBuffer->SetRotation(0);
+
+  // The client rendered straight into the texture, so there is nothing to
+  // upload; mark it ready so RenderInternal() does not try.
+  m_hwRenderBuffer->SetLoaded(true);
 }
 
 void CRPRenderManager::SetSpeed(double speed)
@@ -628,6 +663,12 @@ std::shared_ptr<CRPBaseRenderer> CRPRenderManager::GetRendererForPool(
     CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: buffer pool is not compatible with renderer");
     return renderer;
   }
+
+  // Don't build a renderer for a pool that cannot accept the stream's format.
+  // The pool remembers the refusal, so this costs nothing after the first frame
+  // and keeps the software pools quiet while a hardware stream is playing.
+  if (!bufferPool->IsConfigured() && !bufferPool->Configure(m_format))
+    return renderer;
 
   std::unique_lock<std::mutex> lock{m_oldRenderersMutex};
 

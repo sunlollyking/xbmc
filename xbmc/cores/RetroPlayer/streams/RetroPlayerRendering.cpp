@@ -39,11 +39,37 @@ bool CRetroPlayerRendering::OpenStream(const StreamProperties& properties)
 
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDERING]: Opening rendering stream");
 
-  // game_stream_hw_framebuffer_properties carries no geometry, so the frame
-  // size is unknown until the core asks for a framebuffer. Configuration is
-  // deferred to the first GetStreamBuffer() call, which is handed the size the
-  // core wants to render at.
+  if (m_hwProperties->maxWidth == 0 || m_hwProperties->maxHeight == 0)
+  {
+    CLog::Log(LOGERROR, "RetroPlayer[RENDERING]: Client reported no maximum frame size ({}x{})",
+              m_hwProperties->maxWidth, m_hwProperties->maxHeight);
+    return false;
+  }
+
+  // Create the context the core will render with, and make it current, before
+  // the caller announces the context is ready. Cores build their GL objects in
+  // context_reset(), so there has to be a context current by then, and it has
+  // to be current on this thread -- the game loop thread -- because that is
+  // where the core will run. A GL context can only be current on one thread.
+  if (!m_renderManager.CreateContext(TranslateContextProperties(*m_hwProperties)))
+  {
+    CLog::Log(LOGERROR, "RetroPlayer[RENDERING]: Failed to create rendering context");
+    return false;
+  }
+
   m_bOpen = true;
+
+  // Configure and allocate the framebuffer now, at the largest size the client
+  // says it will render. Clients typically ask for their framebuffer from
+  // inside HwContextReset(), which the caller invokes as soon as this returns,
+  // so it has to exist by then; handing back 0 there would send the client's
+  // drawing to the default framebuffer for the rest of the session.
+  if (!Configure(m_hwProperties->maxWidth, m_hwProperties->maxHeight))
+  {
+    CLog::Log(LOGERROR, "RetroPlayer[RENDERING]: Failed to configure rendering stream");
+    m_bOpen = false;
+    return false;
+  }
 
   return true;
 }
@@ -55,9 +81,10 @@ void CRetroPlayerRendering::CloseStream()
 
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDERING]: Closing rendering stream");
 
-  // Release the shared context and the framebuffer it owns. The pools defer
-  // the actual teardown to the game loop thread, which is the only thread
-  // allowed to touch that context.
+  // Release the framebuffer, then the context that owns it. This runs on the
+  // game loop thread, which is where the context was made current and the only
+  // thread allowed to destroy it.
+  m_renderManager.ReleaseHwRenderBuffer();
   m_renderManager.DestroyContext();
 
   m_width = 0;
@@ -86,6 +113,46 @@ bool CRetroPlayerRendering::GetStreamBuffer(unsigned int width,
   // Returning a framebuffer of 0 would send the core's drawing to the default
   // framebuffer, so report failure instead and let it try again next frame.
   return hwBuffer.framebuffer != 0;
+}
+
+HwContextProperties CRetroPlayerRendering::TranslateContextProperties(
+    const HwFramebufferProperties& properties)
+{
+  HwContextProperties contextProperties;
+
+  switch (properties.contextType)
+  {
+    case GAME_HW_CONTEXT_OPENGL:
+      // Legacy OpenGL. The core expects fixed-function and the compatibility
+      // profile; it will not run against a core profile.
+      contextProperties.coreProfile = false;
+      break;
+    case GAME_HW_CONTEXT_OPENGL_CORE:
+      contextProperties.coreProfile = true;
+      contextProperties.versionMajor = properties.versionMajor;
+      contextProperties.versionMinor = properties.versionMinor;
+      break;
+    case GAME_HW_CONTEXT_OPENGLES2:
+      contextProperties.embedded = true;
+      contextProperties.versionMajor = 2;
+      break;
+    case GAME_HW_CONTEXT_OPENGLES3:
+      contextProperties.embedded = true;
+      contextProperties.versionMajor = 3;
+      break;
+    case GAME_HW_CONTEXT_OPENGLES_VERSION:
+      contextProperties.embedded = true;
+      contextProperties.versionMajor = properties.versionMajor;
+      contextProperties.versionMinor = properties.versionMinor;
+      break;
+    default:
+      break;
+  }
+
+  contextProperties.depth = properties.depth;
+  contextProperties.stencil = properties.stencil;
+
+  return contextProperties;
 }
 
 bool CRetroPlayerRendering::Configure(unsigned int width, unsigned int height)

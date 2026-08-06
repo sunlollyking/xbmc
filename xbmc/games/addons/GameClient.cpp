@@ -686,6 +686,18 @@ void CGameClient::HardwareContextReset()
   }
 }
 
+void CGameClient::HardwareContextDestroy()
+{
+  try
+  {
+    LogError(m_ifc.game->toAddon->HwContextDestroy(m_ifc.game), "HwContextDestroy()");
+  }
+  catch (...)
+  {
+    LogException("HwContextDestroy()");
+  }
+}
+
 bool CGameClient::cb_enable_hardware_rendering(KODI_HANDLE kodiInstance,
                                                const game_hw_rendering_properties* properties)
 {
