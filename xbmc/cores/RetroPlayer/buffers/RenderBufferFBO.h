@@ -37,7 +37,11 @@ class CRenderContext;
 class CRenderBufferFBO : public CBaseRenderBuffer
 {
 public:
-  CRenderBufferFBO(CRenderContext& context, uint32_t fboId);
+  CRenderBufferFBO(CRenderContext& context,
+                   uint32_t fboId,
+                   bool depth,
+                   bool stencil,
+                   bool bottomLeftOrigin);
   ~CRenderBufferFBO() override;
 
   // implementation of IRenderBuffer via CRenderBufferSysMem
@@ -52,15 +56,26 @@ public:
 
   GLuint TextureID() const { return m_tex_id; }
 
+  //! \brief True if the client rendered with OpenGL's bottom-left origin
+  bool BottomLeftOrigin() const { return m_bottomLeftOrigin; }
+
 protected:
   CRenderContext& m_context;
 
 private:
   bool CreateTexture();
+  bool CreateDepthStencil();
   bool CheckFrameBufferStatus();
 
   GLuint m_fbo_id;
-  GLuint m_tex_id;
+  GLuint m_tex_id{0};
+
+  // Depth and stencil live in a renderbuffer rather than a texture: the client
+  // draws into them but nothing samples them afterwards.
+  const bool m_depth;
+  const bool m_stencil;
+  const bool m_bottomLeftOrigin;
+  GLuint m_depth_stencil_id{0};
 };
 } // namespace RETRO
 } // namespace KODI

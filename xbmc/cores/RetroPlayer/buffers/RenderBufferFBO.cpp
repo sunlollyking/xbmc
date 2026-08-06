@@ -30,15 +30,32 @@
 using namespace KODI;
 using namespace RETRO;
 
-CRenderBufferFBO::CRenderBufferFBO(CRenderContext& context, uint32_t fbo_id)
-  : m_context(context), m_fbo_id(fbo_id)
+CRenderBufferFBO::CRenderBufferFBO(CRenderContext& context,
+                                   uint32_t fbo_id,
+                                   bool depth,
+                                   bool stencil,
+                                   bool bottomLeftOrigin)
+  : m_context(context),
+    m_fbo_id(fbo_id),
+    m_depth(depth),
+    m_stencil(stencil),
+    m_bottomLeftOrigin(bottomLeftOrigin)
 {
 }
 
 CRenderBufferFBO::~CRenderBufferFBO()
 {
-  glDeleteTextures(1, &m_tex_id);
-  m_tex_id = 0;
+  if (m_tex_id != 0)
+  {
+    glDeleteTextures(1, &m_tex_id);
+    m_tex_id = 0;
+  }
+
+  if (m_depth_stencil_id != 0)
+  {
+    glDeleteRenderbuffers(1, &m_depth_stencil_id);
+    m_depth_stencil_id = 0;
+  }
 }
 
 bool CRenderBufferFBO::Allocate(AVPixelFormat format, unsigned int width, unsigned int height)
@@ -50,6 +67,31 @@ bool CRenderBufferFBO::Allocate(AVPixelFormat format, unsigned int width, unsign
 
   if (!CreateTexture())
     return false;
+
+  if (!CreateDepthStencil())
+    return false;
+
+  return true;
+}
+
+bool CRenderBufferFBO::CreateDepthStencil()
+{
+  // Stencil without depth is not a valid request and is ignored, per the Game
+  // API contract
+  if (!m_depth)
+    return true;
+
+  glGenRenderbuffers(1, &m_depth_stencil_id);
+  glBindRenderbuffer(GL_RENDERBUFFER, m_depth_stencil_id);
+
+  // A packed 24/8 buffer when both were asked for, depth alone otherwise
+  glRenderbufferStorage(GL_RENDERBUFFER, m_stencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT24,
+                        m_width, m_height);
+
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+  CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Attached {} buffer to the client's framebuffer",
+            m_stencil ? "packed depth/stencil" : "depth");
 
   return true;
 }
@@ -77,6 +119,16 @@ uintptr_t CRenderBufferFBO::GetCurrentFramebuffer()
 
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_tex_id, 0);
 
+  if (m_depth_stencil_id != 0)
+  {
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
+                              m_depth_stencil_id);
+
+    if (m_stencil)
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
+                                m_depth_stencil_id);
+  }
+
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE)
   {
@@ -85,8 +137,6 @@ uintptr_t CRenderBufferFBO::GetCurrentFramebuffer()
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-  CLog::Log(LOGDEBUG, "getting tex_id: {}", m_tex_id);
 
   return m_fbo_id;
 }

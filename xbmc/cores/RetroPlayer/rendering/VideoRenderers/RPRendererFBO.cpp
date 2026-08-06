@@ -241,6 +241,12 @@ void CRPRendererFBO::Render(uint8_t alpha)
   rect.y1 /= renderBuffer->GetHeight();
   rect.y2 /= renderBuffer->GetHeight();
 
+  // A client using top-left origin semantics has written the image the other
+  // way up relative to how the texture is sampled, so flip it here rather than
+  // making every client pay for a flip it does not need.
+  if (!renderBuffer->BottomLeftOrigin())
+    std::swap(rect.y1, rect.y2);
+
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
   glBindTexture(m_textureTarget, renderBuffer->TextureID());

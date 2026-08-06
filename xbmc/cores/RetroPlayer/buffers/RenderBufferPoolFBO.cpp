@@ -25,10 +25,12 @@
 #include "cores/RetroPlayer/rendering/RenderContext.h"
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererFBO.h"
 
+#include "utils/StringUtils.h"
 #include "utils/log.h"
 #include "windowing/WinSystem.h"
 #include "windowing/linux/WinSystemEGL.h"
 
+#include <string>
 #include <vector>
 
 using namespace KODI;
@@ -76,7 +78,9 @@ IRenderBuffer* CRenderBufferPoolFBO::CreateRenderBuffer(void* header /* = nullpt
       return nullptr;
   }
 
-  return new CRenderBufferFBO(m_context, m_fbo_id);
+  return new CRenderBufferFBO(m_context, m_fbo_id, m_contextProperties.depth,
+                              m_contextProperties.stencil,
+                              m_contextProperties.bottomLeftOrigin);
 }
 
 bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
@@ -84,6 +88,9 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
   // Idempotent, so reopening a stream on the same pool is harmless
   if (m_eglContext != EGL_NO_CONTEXT)
     return true;
+
+  // Remembered so buffers can be built with the attachments the client wants
+  m_contextProperties = properties;
 
   auto winSystem =
       dynamic_cast<KODI::WINDOWING::LINUX::CWinSystemEGL*>(CServiceBroker::GetWinSystem());
@@ -123,12 +130,15 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
 #elif defined (HAS_GL)
     EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
 #endif
-    EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+    // The context is only ever made current without a surface, and the client
+    // renders into our framebuffer, whose depth and stencil attachments are
+    // built to its request. Asking for a window surface with a depth buffer
+    // narrows the matching configs for no benefit.
+    EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
     EGL_RED_SIZE,   8,
     EGL_GREEN_SIZE, 8,
     EGL_BLUE_SIZE,  8,
     EGL_ALPHA_SIZE, 8,
-    EGL_DEPTH_SIZE, 16,
     EGL_NONE
   };
 
@@ -172,20 +182,31 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
 
   contextAttribs.push_back(EGL_NONE);
 
+  // Describes what was asked for, so a rejection says which request the driver
+  // could not meet
+  std::string contextName = properties.embedded ? "OpenGL ES"
+                            : properties.coreProfile ? "OpenGL core profile"
+                                                     : "OpenGL compatibility profile";
+  if (properties.versionMajor != 0)
+    contextName += StringUtils::Format(" {}.{}", properties.versionMajor, properties.versionMinor);
+
+  // This is the version and profile check: rather than testing the request
+  // against a hardcoded table, ask the driver for it and let it refuse. A
+  // refusal fails the stream cleanly, while the client can still fall back to
+  // software rendering.
   m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, winSystem->GetEGLContext(),
                                   contextAttribs.data());
   if (m_eglContext == EGL_NO_CONTEXT)
   {
-    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Failed to create {} context, EGL error {:#x}",
-              properties.embedded ? "OpenGL ES"
-                                  : (properties.coreProfile ? "core profile" : "compatibility"),
-              eglGetError());
+    CLog::Log(LOGERROR,
+              "RetroPlayer[RENDER]: Game client asked for a {} context, which this system cannot "
+              "provide (EGL error {:#x})",
+              contextName, eglGetError());
     return false;
   }
 
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Created shared {} context for the game client",
-            properties.embedded ? "OpenGL ES"
-                                : (properties.coreProfile ? "core profile" : "compatibility"));
+            contextName);
 
   if (!eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, m_eglContext))
   {
