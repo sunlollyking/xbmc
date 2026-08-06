@@ -61,45 +61,8 @@ CRenderBufferFBO::~CRenderBufferFBO()
     m_depth_stencil_id = 0;
   }
 
-  std::unique_lock lock(m_fenceMutex);
-  if (m_fence != nullptr)
-  {
-    glDeleteSync(m_fence);
-    m_fence = nullptr;
-  }
 }
 
-void CRenderBufferFBO::SetFence()
-{
-  std::unique_lock lock(m_fenceMutex);
-
-  if (m_fence != nullptr)
-    glDeleteSync(m_fence);
-
-  m_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-
-  // A fence is only guaranteed to become signalled once the commands ahead of
-  // it have been flushed. Without this the rendering context can wait on a
-  // fence sitting unsubmitted in the client's command buffer.
-  glFlush();
-}
-
-void CRenderBufferFBO::WaitFence()
-{
-  // Deliberately does not wait.
-  //
-  // A client keeps the one framebuffer it was given and draws over what the
-  // last frame left, so it cannot be given alternate buffers -- the frames in
-  // between show through. With a single texture, a server-side wait here
-  // serialises the client and the renderer: the client cannot start its next
-  // frame until we have sampled this one, which paces the game loop to the
-  // display and costs most of the frame rate.
-  //
-  // Ordering instead comes from flushing the client's commands when its frame
-  // ends, plus the implicit synchronisation drivers apply to a texture shared
-  // between contexts. This is what other libretro frontends do with a single
-  // framebuffer.
-}
 
 bool CRenderBufferFBO::Allocate(AVPixelFormat format, unsigned int width, unsigned int height)
 {
