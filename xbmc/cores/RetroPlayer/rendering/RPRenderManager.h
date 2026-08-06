@@ -228,6 +228,16 @@ private:
 
   void CheckFlush();
 
+  /*!
+   * \brief True if the game client renders its own frames on the GPU
+   *
+   * Hardware-rendered frames live in a GPU framebuffer and are never read back
+   * to system memory, so anything that works on frame pixels has nothing to
+   * work with. Asking the buffer, rather than the pixel format, keeps a
+   * software stream that hasn't configured itself yet from looking like one.
+   */
+  bool IsHardwareRendering() const { return m_hwBufferPool != nullptr; }
+
   void GetVideoFrame(IRenderBuffer*& readableBuffer, std::vector<uint8_t>& cachedFrame);
   void FreeVideoFrame(IRenderBuffer* readableBuffer, std::vector<uint8_t> cachedFrame);
   void LoadVideoFrameAsync(const std::string& savestatePath);
