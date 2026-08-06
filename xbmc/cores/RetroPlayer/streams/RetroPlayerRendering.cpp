@@ -82,10 +82,9 @@ void CRetroPlayerRendering::CloseStream()
 
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDERING]: Closing rendering stream");
 
-  // Release the framebuffer, then the context that owns it. This runs on the
-  // game loop thread, which is where the context was made current and the only
-  // thread allowed to destroy it.
-  m_renderManager.ReleaseHwRenderBuffer();
+  // Normally a no-op: the game loop tears the context down as it ends, on the
+  // thread the context is current on, and releases the framebuffers with it.
+  // This is the backstop for a stream closed without the game loop running.
   m_renderManager.DestroyContext();
 
   m_width = 0;
