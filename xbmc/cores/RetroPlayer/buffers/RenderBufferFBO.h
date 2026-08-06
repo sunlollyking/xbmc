@@ -38,11 +38,7 @@ class CRenderContext;
 class CRenderBufferFBO : public CBaseRenderBuffer
 {
 public:
-  CRenderBufferFBO(CRenderContext& context,
-                   uint32_t fboId,
-                   bool depth,
-                   bool stencil,
-                   bool bottomLeftOrigin);
+  CRenderBufferFBO(CRenderContext& context, bool depth, bool stencil, bool bottomLeftOrigin);
   ~CRenderBufferFBO() override;
 
   // implementation of IRenderBuffer via CRenderBufferSysMem
@@ -86,7 +82,7 @@ private:
   bool CreateDepthStencil();
   bool CheckFrameBufferStatus();
 
-  GLuint m_fbo_id;
+  GLuint m_fbo_id{0};
   GLuint m_tex_id{0};
 
   // Depth and stencil live in a renderbuffer rather than a texture: the client

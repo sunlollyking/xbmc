@@ -304,7 +304,7 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
   if (width == 0 || height == 0)
     return false;
 
-  // Drop the framebuffer from any previous configuration
+  // Drop the framebuffers from any previous configuration
   ReleaseHwRenderBuffer();
 
   // A pool is normally configured when the rendering thread builds a renderer
@@ -316,20 +316,35 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
     if (!bufferPool->IsConfigured() && !bufferPool->Configure(m_format))
       continue;
 
-    IRenderBuffer* renderBuffer = bufferPool->GetBuffer(width, height);
-    if (renderBuffer == nullptr)
-      continue;
+    // More than one buffer, so the client can draw the next frame into one
+    // while the rendering thread is still sampling the last. Sharing a single
+    // texture makes the driver serialise the two, which throttles the game
+    // loop to the display's refresh rather than letting it run freely.
+    std::vector<IRenderBuffer*> hwBuffers;
 
-    if (renderBuffer->GetCurrentFramebuffer() == 0)
+    for (unsigned int i = 0; i < HW_BUFFER_COUNT; ++i)
     {
-      renderBuffer->Release();
-      continue;
+      IRenderBuffer* renderBuffer = bufferPool->GetBuffer(width, height);
+      if (renderBuffer == nullptr)
+        break;
+
+      if (renderBuffer->GetCurrentFramebuffer() == 0)
+      {
+        renderBuffer->Release();
+        break;
+      }
+
+      hwBuffers.emplace_back(renderBuffer);
     }
 
-    m_hwRenderBuffer = renderBuffer;
+    if (hwBuffers.empty())
+      continue;
 
-    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated {}x{} framebuffer for the game client",
-              width, height);
+    m_hwRenderBuffers = std::move(hwBuffers);
+    m_hwWriteIndex = 0;
+
+    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated {} {}x{} framebuffers for the game client",
+              m_hwRenderBuffers.size(), width, height);
 
     return true;
   }
@@ -342,25 +357,27 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
 
 void CRPRenderManager::ReleaseHwRenderBuffer()
 {
-  if (m_hwRenderBuffer == nullptr)
+  if (m_hwRenderBuffers.empty())
     return;
 
   {
     std::unique_lock lock(m_bufferMutex);
 
-    // The renderer may still be holding the framebuffer's buffer
+    // The renderer may still be holding one of these buffers
     for (IRenderBuffer* renderBuffer : m_renderBuffers)
       renderBuffer->Release();
     m_renderBuffers.clear();
   }
 
-  m_hwRenderBuffer->Release();
-  m_hwRenderBuffer = nullptr;
+  for (IRenderBuffer* renderBuffer : m_hwRenderBuffers)
+    renderBuffer->Release();
+  m_hwRenderBuffers.clear();
+  m_hwWriteIndex = 0;
 }
 
 uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned int height)
 {
-  if (m_bFlush || m_hwRenderBuffer == nullptr)
+  if (m_bFlush || m_hwRenderBuffers.empty())
     return 0;
 
   // Clients ask for their framebuffer from inside HwContextReset(), before the
@@ -368,47 +385,57 @@ uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned i
   // deliberately does not wait for a visible renderer. Rendering into a
   // framebuffer nobody samples yet merely wastes a frame; handing back 0 would
   // send the drawing to the default framebuffer instead.
-  if (width > m_hwRenderBuffer->GetWidth() || height > m_hwRenderBuffer->GetHeight())
+  IRenderBuffer* writeBuffer = m_hwRenderBuffers[m_hwWriteIndex];
+
+  if (width > writeBuffer->GetWidth() || height > writeBuffer->GetHeight())
   {
-    CLog::Log(LOGDEBUG,
-              "RetroPlayer[RENDER]: Client wants {}x{}, larger than the {}x{} framebuffer",
-              width, height, m_hwRenderBuffer->GetWidth(), m_hwRenderBuffer->GetHeight());
+    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Client wants {}x{}, larger than the {}x{} framebuffer",
+              width, height, writeBuffer->GetWidth(), writeBuffer->GetHeight());
 
     if (!Create(width, height))
       return 0;
+
+    writeBuffer = m_hwRenderBuffers[m_hwWriteIndex];
   }
 
-  return m_hwRenderBuffer->GetCurrentFramebuffer();
+  return writeBuffer->GetCurrentFramebuffer();
 }
 
 void CRPRenderManager::RenderFrame()
 {
-  if (m_bFlush || m_hwRenderBuffer == nullptr)
+  if (m_bFlush || m_hwRenderBuffers.empty())
     return;
 
   // The client has finished drawing into its framebuffer. Hand the buffer to
   // the rendering thread, which samples the texture the framebuffer is backed
   // by. This is the hardware counterpart of AddFrame().
+  IRenderBuffer* writeBuffer = m_hwRenderBuffers[m_hwWriteIndex];
 
   // Fence the client's drawing before publishing the buffer. This runs on the
   // client's thread with its context current, which is the only place the
   // fence can be recorded.
-  m_hwRenderBuffer->SetFence();
+  writeBuffer->SetFence();
 
-  m_hwRenderBuffer->Acquire();
+  writeBuffer->Acquire();
 
-  std::unique_lock lock(m_bufferMutex);
+  {
+    std::unique_lock lock(m_bufferMutex);
 
-  for (IRenderBuffer* renderBuffer : m_renderBuffers)
-    renderBuffer->Release();
-  m_renderBuffers = {m_hwRenderBuffer};
+    for (IRenderBuffer* renderBuffer : m_renderBuffers)
+      renderBuffer->Release();
+    m_renderBuffers = {writeBuffer};
 
-  m_hwRenderBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
-  m_hwRenderBuffer->SetRotation(0);
+    writeBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
+    writeBuffer->SetRotation(0);
 
-  // The client rendered straight into the texture, so there is nothing to
-  // upload; mark it ready so RenderInternal() does not try.
-  m_hwRenderBuffer->SetLoaded(true);
+    // The client rendered straight into the texture, so there is nothing to
+    // upload; mark it ready so RenderInternal() does not try.
+    writeBuffer->SetLoaded(true);
+  }
+
+  // Move to the next buffer, so the frame just published stays untouched for
+  // as long as the rendering thread is sampling it
+  m_hwWriteIndex = (m_hwWriteIndex + 1) % m_hwRenderBuffers.size();
 }
 
 void CRPRenderManager::SetSpeed(double speed)
