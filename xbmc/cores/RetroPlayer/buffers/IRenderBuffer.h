@@ -45,21 +45,6 @@ public:
   virtual void ReleaseMemory() {}
   virtual uintptr_t GetCurrentFramebuffer() = 0;
 
-  /*!
-   * \brief Record that the game client has finished drawing this frame
-   *
-   * Called on the client's thread once it reports the frame complete. Only
-   * meaningful for buffers the client renders into directly.
-   */
-  virtual void SetFence() {}
-
-  /*!
-   * \brief Wait for the client's drawing before the buffer is sampled
-   *
-   * Called on the rendering thread before the buffer is used. Pairs with
-   * SetFence(); a no-op for buffers whose contents arrive by other means.
-   */
-  virtual void WaitFence() {}
 
   virtual bool UploadTexture() = 0;
   virtual void BindToUnit(unsigned int unit) {}

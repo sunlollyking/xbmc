@@ -22,7 +22,6 @@
 #include "cores/RetroPlayer/buffers/BaseRenderBuffer.h"
 
 #include <memory>
-#include <mutex>
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -56,23 +55,6 @@ public:
   //! \brief True if the client rendered with OpenGL's bottom-left origin
   bool BottomLeftOrigin() const { return m_bottomLeftOrigin; }
 
-  /*!
-   * \brief Record that the client has finished drawing this frame
-   *
-   * Called on the client's thread, with the client's context current, once it
-   * reports the frame complete.
-   */
-  void SetFence() override;
-
-  /*!
-   * \brief Make the rendering context wait for the client's drawing to land
-   *
-   * Called on the rendering thread, with Kodi's context current, before the
-   * texture is sampled. The two contexts submit work independently, so without
-   * this the GPU is free to sample the texture before the client's commands
-   * have been executed.
-   */
-  void WaitFence() override;
 
 protected:
   CRenderContext& m_context;
@@ -92,10 +74,6 @@ private:
   const bool m_bottomLeftOrigin;
   GLuint m_depth_stencil_id{0};
 
-  // Written on the client's thread and read on the rendering thread. Sync
-  // objects are shared between shared contexts, unlike container objects.
-  GLsync m_fence{nullptr};
-  mutable std::mutex m_fenceMutex;
 };
 } // namespace RETRO
 } // namespace KODI
