@@ -96,7 +96,8 @@ bool CRPRendererFBO::Supports(RENDERFEATURE feature) const
 
 bool CRPRendererFBO::SupportsScalingMethod(SCALINGMETHOD method)
 {
-  return method == SCALINGMETHOD::NEAREST || method == SCALINGMETHOD::LINEAR;
+  return method == SCALINGMETHOD::AUTO || method == SCALINGMETHOD::NEAREST ||
+         method == SCALINGMETHOD::LINEAR;
 }
 
 void CRPRendererFBO::ClearBackBuffer()

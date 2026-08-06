@@ -23,6 +23,7 @@
 #include "RenderBufferFBO.h"
 #include "ServiceBroker.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
+#include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererFBO.h"
 #include "utils/log.h"
 #include "windowing/WinSystem.h"
 #include "windowing/linux/WinSystemEGL.h"
@@ -46,7 +47,15 @@ CRenderBufferPoolFBO::~CRenderBufferPoolFBO()
 
 bool CRenderBufferPoolFBO::IsCompatible(const CRenderVideoSettings& renderSettings) const
 {
-  return true;
+  return CRPRendererFBO::SupportsScalingMethod(renderSettings.GetScalingMethod());
+}
+
+bool CRenderBufferPoolFBO::ConfigureInternal()
+{
+  // This pool only serves hardware-rendered streams, which carry no CPU-side
+  // pixel format. Software streams declare a real format and must be left to
+  // the DMA and sysmem pools.
+  return m_format == AV_PIX_FMT_NONE;
 }
 
 IRenderBuffer* CRenderBufferPoolFBO::CreateRenderBuffer(void* header /* = nullptr */)
