@@ -65,7 +65,8 @@ bool CGameClientStreamHwFramebuffer::GetBuffer(unsigned int width,
   if (m_stream != nullptr)
   {
     RETRO::HwFramebufferBuffer hwFramebufferBuffer;
-    if (m_stream->GetStreamBuffer(0, 0, static_cast<RETRO::StreamBuffer&>(hwFramebufferBuffer)))
+    if (m_stream->GetStreamBuffer(width, height,
+                                  static_cast<RETRO::StreamBuffer&>(hwFramebufferBuffer)))
     {
       buffer.hw_framebuffer.framebuffer = hwFramebufferBuffer.framebuffer;
       return true;

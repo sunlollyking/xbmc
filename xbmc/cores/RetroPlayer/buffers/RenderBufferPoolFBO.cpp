@@ -174,8 +174,16 @@ bool CRenderBufferPoolFBO::CreateFramebuffer()
 
 void CRenderBufferPoolFBO::DestroyContext()
 {
-  CLog::Log(LOGDEBUG, "DestroyContext");
+  // DestroyContext() is broadcast to every pool, including those that never
+  // created a context, so there is usually nothing to do here.
+  if (m_eglContext == EGL_NO_CONTEXT)
+    return;
+
+  CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Destroying shared FBO context");
 
   eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
   eglDestroyContext(m_eglDisplay, m_eglContext);
+
+  m_eglContext = EGL_NO_CONTEXT;
+  m_eglDisplay = EGL_NO_DISPLAY;
 }

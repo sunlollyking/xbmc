@@ -53,12 +53,12 @@ public:
 
   // Public utility functions
   static void LogHwProperties(const game_hw_rendering_properties& hwProperties);
-
-private:
-  // Private utility functions
   static std::string GetContextName(GAME_HW_CONTEXT_TYPE contextType,
                                     unsigned int versionMajor,
                                     unsigned int versionMinor);
+
+private:
+  // Private utility functions
   static std::unique_ptr<RETRO::HwFramebufferProperties> TranslateProperties(
       const game_hw_rendering_properties& hwProperties);
 

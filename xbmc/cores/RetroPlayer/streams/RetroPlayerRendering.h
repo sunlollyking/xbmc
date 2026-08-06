@@ -10,6 +10,7 @@
 #include "IRetroPlayerStream.h"
 #include "RetroPlayerStreamTypes.h"
 
+#include <memory>
 #include <stdint.h>
 
 extern "C"
@@ -88,9 +89,23 @@ public:
   void CloseStream() override;
 
 private:
+  /*!
+   * \brief Configure the render manager for the given frame size
+   *
+   * Deferred until the core asks for a framebuffer, because the hardware
+   * framebuffer stream properties carry no geometry.
+   */
+  bool Configure(unsigned int width, unsigned int height);
+
   // Construction parameters
   CRPRenderManager& m_renderManager;
   CRPProcessInfo& m_processInfo;
+
+  // Stream parameters
+  bool m_bOpen = false;
+  std::unique_ptr<HwFramebufferProperties> m_hwProperties;
+  unsigned int m_width = 0;
+  unsigned int m_height = 0;
 };
 } // namespace RETRO
 } // namespace KODI
