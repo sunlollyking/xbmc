@@ -104,6 +104,8 @@ public:
                 unsigned int orientationDegCW);
   void Flush();
   bool CreateContext(const HwContextProperties& properties);
+  bool BeginClientFrame();
+  void EndClientFrame();
   void DestroyContext();
 
   // Hardware rendering functions

@@ -72,6 +72,16 @@ IRenderBuffer* CRenderBufferPoolFBO::CreateRenderBuffer(void* header /* = nullpt
     return nullptr;
   }
 
+  // Framebuffer objects are not shared between contexts, so a buffer built
+  // outside the client's context would be useless to it. This also keeps the
+  // rendering thread from quietly allocating one in Kodi's context.
+  if (m_clientFrameDepth == 0)
+  {
+    CLog::Log(LOGERROR,
+              "RetroPlayer[RENDER]: Refusing to build a buffer outside the client's context");
+    return nullptr;
+  }
+
   return new CRenderBufferFBO(m_context, m_contextProperties.depth,
                               m_contextProperties.stencil,
                               m_contextProperties.bottomLeftOrigin);
@@ -202,13 +212,73 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Created shared {} context for the game client",
             contextName);
 
+  // Deliberately not made current here. This runs on whichever thread opened
+  // the stream, which for some clients is Kodi's own rendering thread, and a
+  // context binding is per-thread: taking that thread over would cost Kodi the
+  // window surface it presents with. BeginClientFrame() binds it around the
+  // client's work instead, on the thread doing that work.
+  return true;
+}
+
+bool CRenderBufferPoolFBO::BeginClientFrame()
+{
+  if (m_eglContext == EGL_NO_CONTEXT)
+    return false;
+
+  const std::thread::id thisThread = std::this_thread::get_id();
+
+  if (m_clientFrameDepth > 0)
+  {
+    // Nested, which is normal: allocating buffers binds the context too, and
+    // that happens inside the client's frame for some clients.
+    if (m_clientThread != thisThread)
+    {
+      CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Client context is in use by another thread");
+      return false;
+    }
+
+    ++m_clientFrameDepth;
+    return true;
+  }
+
+  m_prevDisplay = eglGetCurrentDisplay();
+  m_prevDraw = eglGetCurrentSurface(EGL_DRAW);
+  m_prevRead = eglGetCurrentSurface(EGL_READ);
+  m_prevContext = eglGetCurrentContext();
+
   if (!eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, m_eglContext))
   {
-    CLog::Log(LOGERROR, "Failed to make context current");
+    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Failed to make the client's context current, EGL "
+                        "error {:#x}", eglGetError());
     return false;
   }
 
+  m_clientThread = thisThread;
+  m_clientFrameDepth = 1;
+
   return true;
+}
+
+void CRenderBufferPoolFBO::EndClientFrame()
+{
+  if (m_clientFrameDepth == 0)
+    return;
+
+  if (--m_clientFrameDepth > 0)
+    return;
+
+  // Give the thread back exactly what it had, so Kodi keeps its surface if this
+  // happened to be its rendering thread
+  if (m_prevContext != EGL_NO_CONTEXT && m_prevDisplay != EGL_NO_DISPLAY)
+    eglMakeCurrent(m_prevDisplay, m_prevDraw, m_prevRead, m_prevContext);
+  else
+    eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+  m_clientThread = std::thread::id();
+  m_prevDisplay = EGL_NO_DISPLAY;
+  m_prevDraw = EGL_NO_SURFACE;
+  m_prevRead = EGL_NO_SURFACE;
+  m_prevContext = EGL_NO_CONTEXT;
 }
 
 void CRenderBufferPoolFBO::DestroyContext()
@@ -220,11 +290,16 @@ void CRenderBufferPoolFBO::DestroyContext()
 
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Destroying shared FBO context");
 
+  // Deleting this context's objects needs it current
+  const bool bBound = BeginClientFrame();
+
   // Buffers own framebuffers and textures belonging to this context, so they
   // have to go while it is still current.
   Flush();
 
-  eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+  if (bBound)
+    EndClientFrame();
+
   eglDestroyContext(m_eglDisplay, m_eglContext);
 
   m_eglContext = EGL_NO_CONTEXT;
