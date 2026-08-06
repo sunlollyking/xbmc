@@ -72,13 +72,7 @@ IRenderBuffer* CRenderBufferPoolFBO::CreateRenderBuffer(void* header /* = nullpt
     return nullptr;
   }
 
-  if (m_fbo_id == 0)
-  {
-    if (!CreateFramebuffer())
-      return nullptr;
-  }
-
-  return new CRenderBufferFBO(m_context, m_fbo_id, m_contextProperties.depth,
+  return new CRenderBufferFBO(m_context, m_contextProperties.depth,
                               m_contextProperties.stencil,
                               m_contextProperties.bottomLeftOrigin);
 }
@@ -217,13 +211,6 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
   return true;
 }
 
-bool CRenderBufferPoolFBO::CreateFramebuffer()
-{
-  glGenFramebuffers(1, &m_fbo_id);
-
-  return true;
-}
-
 void CRenderBufferPoolFBO::DestroyContext()
 {
   // DestroyContext() is broadcast to every pool, including those that never
@@ -233,15 +220,9 @@ void CRenderBufferPoolFBO::DestroyContext()
 
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Destroying shared FBO context");
 
-  // The framebuffer belongs to this context and has to go while it is still
-  // current. Buffers hold the framebuffer's ID, so drop them first.
+  // Buffers own framebuffers and textures belonging to this context, so they
+  // have to go while it is still current.
   Flush();
-
-  if (m_fbo_id != 0)
-  {
-    glDeleteFramebuffers(1, &m_fbo_id);
-    m_fbo_id = 0;
-  }
 
   eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
   eglDestroyContext(m_eglDisplay, m_eglContext);

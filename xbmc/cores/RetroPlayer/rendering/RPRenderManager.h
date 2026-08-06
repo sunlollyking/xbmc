@@ -256,9 +256,12 @@ private:
   mutable std::mutex m_oldRenderersMutex;
   std::vector<IRenderBuffer*> m_pendingBuffers; // Only access from game thread
 
-  // The framebuffer a hardware-rendering client draws into. Held for the life
-  // of the stream, as the client keeps the framebuffer ID it was given.
-  IRenderBuffer* m_hwRenderBuffer{nullptr};
+  // The framebuffers a hardware-rendering client draws into, held for the life
+  // of the stream. The client is handed each in turn, so the frame being
+  // sampled is never the one being drawn.
+  static const unsigned int HW_BUFFER_COUNT = 2;
+  std::vector<IRenderBuffer*> m_hwRenderBuffers;
+  size_t m_hwWriteIndex{0};
   std::vector<IRenderBuffer*> m_renderBuffers;
   std::map<AVPixelFormat, std::map<AVPixelFormat, SwsContext*>> m_scalers; // From -> to -> context
   std::vector<uint8_t> m_cachedFrame;

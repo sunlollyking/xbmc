@@ -60,9 +60,6 @@ protected:
   EGLContext m_eglContext = EGL_NO_CONTEXT;
 
 private:
-  bool CreateFramebuffer();
-
-  GLuint m_fbo_id{0};
 };
 } // namespace RETRO
 } // namespace KODI

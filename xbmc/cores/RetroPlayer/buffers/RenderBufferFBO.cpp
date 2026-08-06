@@ -31,12 +31,10 @@ using namespace KODI;
 using namespace RETRO;
 
 CRenderBufferFBO::CRenderBufferFBO(CRenderContext& context,
-                                   uint32_t fbo_id,
                                    bool depth,
                                    bool stencil,
                                    bool bottomLeftOrigin)
   : m_context(context),
-    m_fbo_id(fbo_id),
     m_depth(depth),
     m_stencil(stencil),
     m_bottomLeftOrigin(bottomLeftOrigin)
@@ -45,6 +43,12 @@ CRenderBufferFBO::CRenderBufferFBO(CRenderContext& context,
 
 CRenderBufferFBO::~CRenderBufferFBO()
 {
+  if (m_fbo_id != 0)
+  {
+    glDeleteFramebuffers(1, &m_fbo_id);
+    m_fbo_id = 0;
+  }
+
   if (m_tex_id != 0)
   {
     glDeleteTextures(1, &m_tex_id);
@@ -106,6 +110,33 @@ bool CRenderBufferFBO::Allocate(AVPixelFormat format, unsigned int width, unsign
   if (!CreateDepthStencil())
     return false;
 
+  // Each buffer owns its framebuffer, so its attachments are made once here
+  // rather than rebuilt and revalidated on every frame, and several buffers
+  // can be in flight without fighting over one framebuffer's attachments.
+  glGenFramebuffers(1, &m_fbo_id);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_fbo_id);
+
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_tex_id, 0);
+
+  if (m_depth_stencil_id != 0)
+  {
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
+                              m_depth_stencil_id);
+
+    if (m_stencil)
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
+                                m_depth_stencil_id);
+  }
+
+  const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  if (status != GL_FRAMEBUFFER_COMPLETE)
+  {
+    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Framebuffer is incomplete, status {:#x}", status);
+    return false;
+  }
+
   return true;
 }
 
@@ -150,28 +181,7 @@ bool CRenderBufferFBO::CreateTexture()
 
 uintptr_t CRenderBufferFBO::GetCurrentFramebuffer()
 {
-  glBindFramebuffer(GL_FRAMEBUFFER, m_fbo_id);
-
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_tex_id, 0);
-
-  if (m_depth_stencil_id != 0)
-  {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
-                              m_depth_stencil_id);
-
-    if (m_stencil)
-      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
-                                m_depth_stencil_id);
-  }
-
-  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-  if (status != GL_FRAMEBUFFER_COMPLETE)
-  {
-    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: fbo error - status: {}", status);
-    return 0;
-  }
-
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+  // Attachments were made and validated in Allocate(). This is called for every
+  // frame the client renders, so it must stay free of driver round trips.
   return m_fbo_id;
 }
