@@ -11,24 +11,16 @@ set(HEADERS BaseRenderBuffer.h
 )
 
 if(TARGET ${APP_NAME_LC}::OpenGl)
-  list(APPEND SOURCES RenderBufferFBO.cpp
-                      RenderBufferOpenGL.cpp
-                      RenderBufferPoolFBO.cpp
+  list(APPEND SOURCES RenderBufferOpenGL.cpp
                       RenderBufferPoolOpenGL.cpp)
-  list(APPEND HEADERS RenderBufferFBO.h
-                      RenderBufferOpenGL.h
-                      RenderBufferPoolFBO.h
+  list(APPEND HEADERS RenderBufferOpenGL.h
                       RenderBufferPoolOpenGL.h)
 endif()
 
 if(TARGET ${APP_NAME_LC}::OpenGLES)
-  list(APPEND SOURCES RenderBufferFBO.cpp
-                      RenderBufferOpenGLES.cpp
-                      RenderBufferPoolFBO.cpp
+  list(APPEND SOURCES RenderBufferOpenGLES.cpp
                       RenderBufferPoolOpenGLES.cpp)
-  list(APPEND HEADERS RenderBufferFBO.h
-                      RenderBufferOpenGLES.h
-                      RenderBufferPoolFBO.h
+  list(APPEND HEADERS RenderBufferOpenGLES.h
                       RenderBufferPoolOpenGLES.h)
 endif()
 
@@ -37,6 +29,15 @@ if(("gbm" IN_LIST CORE_PLATFORM_NAME_LC OR "wayland" IN_LIST CORE_PLATFORM_NAME_
                       RenderBufferPoolDMA.cpp)
   list(APPEND HEADERS RenderBufferDMA.h
                       RenderBufferPoolDMA.h)
+
+  # The FBO pool creates a shared EGL context off the windowing system, so it
+  # requires EGL in addition to desktop GL. GLES is out of scope for now.
+  if(TARGET ${APP_NAME_LC}::OpenGl)
+    list(APPEND SOURCES RenderBufferFBO.cpp
+                        RenderBufferPoolFBO.cpp)
+    list(APPEND HEADERS RenderBufferFBO.h
+                        RenderBufferPoolFBO.h)
+  endif()
 endif()
 
 core_add_library(rp-buffers)
