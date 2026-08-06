@@ -295,6 +295,13 @@ bool CRPRenderManager::CreateContext(const HwContextProperties& properties)
 
 void CRPRenderManager::DestroyContext()
 {
+  // The framebuffers and textures belong to the context being torn down, so
+  // they have to go first, on this thread, while it is still current. The game
+  // loop arrives here through IGameLoopCallback::EndEvent as it ends, which is
+  // the only place that holds -- the stream is closed later, from whichever
+  // thread stopped the player, where deleting them is undefined and hangs.
+  ReleaseHwRenderBuffer();
+
   for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
     bufferPool->DestroyContext();
 }
