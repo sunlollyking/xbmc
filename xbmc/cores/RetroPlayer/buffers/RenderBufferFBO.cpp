@@ -86,15 +86,19 @@ void CRenderBufferFBO::SetFence()
 
 void CRenderBufferFBO::WaitFence()
 {
-  std::unique_lock lock(m_fenceMutex);
-
-  if (m_fence == nullptr)
-    return;
-
-  // Server-side wait: this orders the GPU's work without stalling the
-  // rendering thread, which is what keeps the game loop and the rendering
-  // thread independent.
-  glWaitSync(m_fence, 0, GL_TIMEOUT_IGNORED);
+  // Deliberately does not wait.
+  //
+  // A client keeps the one framebuffer it was given and draws over what the
+  // last frame left, so it cannot be given alternate buffers -- the frames in
+  // between show through. With a single texture, a server-side wait here
+  // serialises the client and the renderer: the client cannot start its next
+  // frame until we have sampled this one, which paces the game loop to the
+  // display and costs most of the frame rate.
+  //
+  // Ordering instead comes from flushing the client's commands when its frame
+  // ends, plus the implicit synchronisation drivers apply to a texture shared
+  // between contexts. This is what other libretro frontends do with a single
+  // framebuffer.
 }
 
 bool CRenderBufferFBO::Allocate(AVPixelFormat format, unsigned int width, unsigned int height)
