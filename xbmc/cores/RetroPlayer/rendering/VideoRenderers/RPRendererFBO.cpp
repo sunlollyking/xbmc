@@ -249,6 +249,11 @@ void CRPRendererFBO::Render(uint8_t alpha)
 
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
+  // The client drew this frame on its own context. Order our sampling after
+  // its work, or the GPU is free to read the texture while it is still being
+  // written, which shows up as tearing or a half-drawn frame.
+  renderBuffer->WaitFence();
+
   glBindTexture(m_textureTarget, renderBuffer->TextureID());
 
   CRect viewport;

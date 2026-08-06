@@ -56,6 +56,41 @@ CRenderBufferFBO::~CRenderBufferFBO()
     glDeleteRenderbuffers(1, &m_depth_stencil_id);
     m_depth_stencil_id = 0;
   }
+
+  std::unique_lock lock(m_fenceMutex);
+  if (m_fence != nullptr)
+  {
+    glDeleteSync(m_fence);
+    m_fence = nullptr;
+  }
+}
+
+void CRenderBufferFBO::SetFence()
+{
+  std::unique_lock lock(m_fenceMutex);
+
+  if (m_fence != nullptr)
+    glDeleteSync(m_fence);
+
+  m_fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+
+  // A fence is only guaranteed to become signalled once the commands ahead of
+  // it have been flushed. Without this the rendering context can wait on a
+  // fence sitting unsubmitted in the client's command buffer.
+  glFlush();
+}
+
+void CRenderBufferFBO::WaitFence()
+{
+  std::unique_lock lock(m_fenceMutex);
+
+  if (m_fence == nullptr)
+    return;
+
+  // Server-side wait: this orders the GPU's work without stalling the
+  // rendering thread, which is what keeps the game loop and the rendering
+  // thread independent.
+  glWaitSync(m_fence, 0, GL_TIMEOUT_IGNORED);
 }
 
 bool CRenderBufferFBO::Allocate(AVPixelFormat format, unsigned int width, unsigned int height)
