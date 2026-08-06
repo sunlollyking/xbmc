@@ -401,6 +401,9 @@ bool CGameClient::LoadGameInfo()
   bool bSuccess = false;
   try
   {
+    // A hardware-rendering client builds its GPU resources off the back of
+    // this call, once it has geometry to size them by, so it needs its context
+    CClientFrameScope hwScope(Streams());
     bSuccess =
         LogError(m_ifc.game->toAddon->GetGameTiming(m_ifc.game, &timingInfo), "GetGameTiming()");
   }
@@ -429,6 +432,9 @@ bool CGameClient::LoadGameInfo()
   size_t serializeSize;
   try
   {
+    // Some clients serialize their video state along with the rest, so this
+    // reaches into GPU resources and needs the client's context
+    CClientFrameScope hwScope(Streams());
     serializeSize = m_ifc.game->toAddon->SerializeSize(m_ifc.game);
   }
   catch (...)
@@ -614,6 +620,7 @@ bool CGameClient::Serialize(uint8_t* data, size_t size)
   {
     try
     {
+      CClientFrameScope hwScope(Streams());
       bSuccess = LogError(m_ifc.game->toAddon->Serialize(m_ifc.game, data, size), "Serialize()");
     }
     catch (...)
@@ -641,6 +648,7 @@ bool CGameClient::Deserialize(const uint8_t* data, size_t size)
 
     try
     {
+      CClientFrameScope hwScope(Streams());
       bSuccess =
           LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
     }
@@ -658,6 +666,7 @@ bool CGameClient::Deserialize(const uint8_t* data, size_t size)
 
     std::unique_lock lock(m_critSection);
 
+    CClientFrameScope hwScope(Streams());
     bSuccess = LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
   }
 
