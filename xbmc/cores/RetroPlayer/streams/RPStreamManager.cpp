@@ -13,6 +13,7 @@
 #include "RetroPlayerRendering.h"
 #include "RetroPlayerVideo.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
+#include "cores/RetroPlayer/rendering/RPRenderManager.h"
 
 using namespace KODI;
 using namespace RETRO;
@@ -65,6 +66,16 @@ void CRPStreamManager::CloseStream(StreamPtr stream)
 
     stream->CloseStream();
   }
+}
+
+void CRPStreamManager::BeginClientFrame()
+{
+  m_renderManager.BeginClientFrame();
+}
+
+void CRPStreamManager::EndClientFrame()
+{
+  m_renderManager.EndClientFrame();
 }
 
 HwProcedureAddress CRPStreamManager::GetHwProcedureAddress(const char* symbol)

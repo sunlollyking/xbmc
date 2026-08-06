@@ -280,6 +280,27 @@ void CRPRenderManager::Flush()
   m_bFlush = true;
 }
 
+bool CRPRenderManager::BeginClientFrame()
+{
+  bool bSuccess = true;
+
+  // Broadcast, because this can be called before a pool has been chosen -- a
+  // client may build its resources while its stream is still being opened.
+  for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
+  {
+    if (!bufferPool->BeginClientFrame())
+      bSuccess = false;
+  }
+
+  return bSuccess;
+}
+
+void CRPRenderManager::EndClientFrame()
+{
+  for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
+    bufferPool->EndClientFrame();
+}
+
 bool CRPRenderManager::CreateContext(const HwContextProperties& properties)
 {
   bool bSuccess = true;
@@ -289,6 +310,13 @@ bool CRPRenderManager::CreateContext(const HwContextProperties& properties)
     if (!bufferPool->CreateContext(properties))
       bSuccess = false;
   }
+
+  // The client is always inside a bracketed call when its stream opens, but
+  // that bracket ran before this context existed and so bound nothing. Join it
+  // now, and the matching EndClientFrame will release the thread when the call
+  // the client is in returns.
+  if (bSuccess)
+    BeginClientFrame();
 
   return bSuccess;
 }
@@ -313,6 +341,10 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
 
   // Drop the framebuffers from any previous configuration
   ReleaseHwRenderBuffer();
+
+  // Buffers are built in the client's context, which nests harmlessly inside
+  // the client's frame when the stream is opened from one
+  BeginClientFrame();
 
   // A pool is normally configured when the rendering thread builds a renderer
   // for it. The client needs its framebuffer before any of that has happened,
@@ -353,8 +385,12 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
     CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated {} {}x{} framebuffers for the game client",
               m_hwRenderBuffers.size(), width, height);
 
+    EndClientFrame();
+
     return true;
   }
+
+  EndClientFrame();
 
   CLog::Log(LOGERROR, "RetroPlayer[RENDER]: No buffer pool could provide a {}x{} framebuffer", width,
             height);

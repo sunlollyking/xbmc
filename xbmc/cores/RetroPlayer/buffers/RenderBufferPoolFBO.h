@@ -21,6 +21,8 @@
 
 #include "cores/RetroPlayer/buffers/BaseRenderBufferPool.h"
 
+#include <thread>
+
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
@@ -46,6 +48,8 @@ public:
   bool ConfigureInternal() override;
 
   bool CreateContext(const HwContextProperties& properties) override;
+  bool BeginClientFrame() override;
+  void EndClientFrame() override;
   void DestroyContext() override;
 
 protected:
@@ -55,6 +59,16 @@ protected:
 
   // Configuration parameters
   HwContextProperties m_contextProperties;
+
+  // A context is current on one thread at a time, and the thread a client
+  // renders on is whichever one it happens to use. Track who holds it, and what
+  // they had before, so it can be handed back.
+  unsigned int m_clientFrameDepth{0};
+  std::thread::id m_clientThread;
+  EGLDisplay m_prevDisplay{EGL_NO_DISPLAY};
+  EGLSurface m_prevDraw{EGL_NO_SURFACE};
+  EGLSurface m_prevRead{EGL_NO_SURFACE};
+  EGLContext m_prevContext{EGL_NO_CONTEXT};
   EGLDisplay m_eglDisplay = EGL_NO_DISPLAY;
   EGLConfig m_eglConfig;
   EGLContext m_eglContext = EGL_NO_CONTEXT;

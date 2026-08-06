@@ -119,6 +119,23 @@ public:
   virtual bool CreateContext(const HwContextProperties& properties) { return true; }
 
   /*!
+   * \brief Make the client's rendering context current on this thread
+   *
+   * Bracket every call into a hardware-rendering client with this and
+   * EndClientFrame(). Which thread the client renders on is its own business:
+   * some open their stream from the game loop, others during load on Kodi's
+   * rendering thread. A context binding is per-thread, so implementations must
+   * restore whatever the thread had, or Kodi loses the surface it presents
+   * with. Calls nest.
+   */
+  virtual bool BeginClientFrame() { return true; }
+
+  /*!
+   * \brief Give this thread back the binding it had before BeginClientFrame()
+   */
+  virtual void EndClientFrame() {}
+
+  /*!
    * \brief Release resources tied to the rendering context
    *
    * This function is called when the render context is being destroyed.

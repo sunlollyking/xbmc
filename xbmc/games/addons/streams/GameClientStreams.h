@@ -45,6 +45,20 @@ public:
   // HW rendering functions
   bool EnableHardwareRendering(const game_hw_rendering_properties& properties);
   game_proc_address_t GetHwProcedureAddress(const char* sym);
+  /*!
+   * \brief Make a hardware-rendering client's context current on this thread
+   *
+   * Every call into the client has to be bracketed with this and
+   * EndClientFrame(), because a client may make rendering calls anywhere
+   * inside one. Does nothing unless the client negotiated hardware rendering.
+   */
+  void BeginClientFrame();
+
+  /*!
+   * \brief Give this thread back the binding it had
+   */
+  void EndClientFrame();
+
   bool HardwareRenderingAttempted() const
   {
     return m_hwProperties.context_type != GAME_HW_CONTEXT_NONE;

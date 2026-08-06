@@ -63,6 +63,31 @@ namespace
 {
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 
+/*!
+ * \brief Holds a hardware-rendering client's context current for a call into it
+ *
+ * A client may make rendering calls anywhere inside a call, so its context has
+ * to be current for the whole of it, on whichever thread the call runs on. It
+ * must not be left current afterwards: that thread is often Kodi's own
+ * rendering thread, which needs its binding back to present.
+ */
+class CClientFrameScope
+{
+public:
+  explicit CClientFrameScope(KODI::GAME::CGameClientStreams& streams) : m_streams(streams)
+  {
+    m_streams.BeginClientFrame();
+  }
+
+  ~CClientFrameScope() { m_streams.EndClientFrame(); }
+
+  CClientFrameScope(const CClientFrameScope&) = delete;
+  CClientFrameScope& operator=(const CClientFrameScope&) = delete;
+
+private:
+  KODI::GAME::CGameClientStreams& m_streams;
+};
+
 /*
  * \brief Convert to lower case and canonicalize with a leading "."
  */
@@ -252,7 +277,10 @@ bool CGameClient::OpenFile(const CFileItem& file,
 
   try
   {
-    LogError(error = m_ifc.game->toAddon->LoadGame(m_ifc.game, path.c_str()), "LoadGame()");
+    {
+      CClientFrameScope hwScope(Streams());
+      LogError(error = m_ifc.game->toAddon->LoadGame(m_ifc.game, path.c_str()), "LoadGame()");
+      }
   }
   catch (...)
   {
@@ -294,7 +322,10 @@ bool CGameClient::OpenStandalone(RETRO::IStreamManager& streamManager, IGameInpu
 
   try
   {
-    LogError(error = m_ifc.game->toAddon->LoadStandalone(m_ifc.game), "LoadStandalone()");
+    {
+      CClientFrameScope hwScope(Streams());
+      LogError(error = m_ifc.game->toAddon->LoadStandalone(m_ifc.game), "LoadStandalone()");
+      }
   }
   catch (...)
   {
@@ -488,7 +519,10 @@ void CGameClient::Reset()
   {
     try
     {
+      {
+      CClientFrameScope hwScope(Streams());
       LogError(m_ifc.game->toAddon->Reset(m_ifc.game), "Reset()");
+      }
     }
     catch (...)
     {
@@ -519,7 +553,10 @@ void CGameClient::CloseFile()
 
     try
     {
+      {
+      CClientFrameScope hwScope(Streams());
       LogError(m_ifc.game->toAddon->UnloadGame(m_ifc.game), "UnloadGame()");
+      }
     }
     catch (...)
     {
@@ -548,7 +585,10 @@ void CGameClient::RunFrame()
   {
     try
     {
+      {
+      CClientFrameScope hwScope(Streams());
       LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()");
+      }
       m_hasFrameRun = true;
     }
     catch (...)
@@ -665,7 +705,10 @@ void CGameClient::HardwareContextReset()
 {
   try
   {
-    LogError(m_ifc.game->toAddon->HwContextReset(m_ifc.game), "HwContextReset()");
+    {
+      CClientFrameScope hwScope(Streams());
+      LogError(m_ifc.game->toAddon->HwContextReset(m_ifc.game), "HwContextReset()");
+      }
   }
   catch (...)
   {
@@ -677,7 +720,10 @@ void CGameClient::HardwareContextDestroy()
 {
   try
   {
-    LogError(m_ifc.game->toAddon->HwContextDestroy(m_ifc.game), "HwContextDestroy()");
+    {
+      CClientFrameScope hwScope(Streams());
+      LogError(m_ifc.game->toAddon->HwContextDestroy(m_ifc.game), "HwContextDestroy()");
+      }
   }
   catch (...)
   {

@@ -123,6 +123,24 @@ bool CGameClientStreams::EnableHardwareRendering(const game_hw_rendering_propert
   return true;
 }
 
+void CGameClientStreams::BeginClientFrame()
+{
+  if (m_hwProperties.context_type == GAME_HW_CONTEXT_NONE)
+    return;
+
+  if (m_streamManager != nullptr)
+    m_streamManager->BeginClientFrame();
+}
+
+void CGameClientStreams::EndClientFrame()
+{
+  if (m_hwProperties.context_type == GAME_HW_CONTEXT_NONE)
+    return;
+
+  if (m_streamManager != nullptr)
+    m_streamManager->EndClientFrame();
+}
+
 game_proc_address_t CGameClientStreams::GetHwProcedureAddress(const char* symbol)
 {
   if (m_streamManager != nullptr)

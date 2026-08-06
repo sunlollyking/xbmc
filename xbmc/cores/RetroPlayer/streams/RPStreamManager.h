@@ -30,6 +30,8 @@ public:
   StreamPtr CreateStream(StreamType streamType) override;
   void CloseStream(StreamPtr stream) override;
   HwProcedureAddress GetHwProcedureAddress(const char* symbol) override;
+  void BeginClientFrame() override;
+  void EndClientFrame() override;
 
 private:
   // Construction parameters

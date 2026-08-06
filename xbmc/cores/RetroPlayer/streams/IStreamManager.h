@@ -45,6 +45,20 @@ public:
    * \return A function pointer for the specified symbol
    */
   virtual HwProcedureAddress GetHwProcedureAddress(const char* symbol) = 0;
+
+  /*!
+   * \brief Make a hardware-rendering client's context current on this thread
+   *
+   * Goes through the manager rather than a stream, because a client builds its
+   * resources while its stream is still being opened, before there is a stream
+   * to ask.
+   */
+  virtual void BeginClientFrame() {}
+
+  /*!
+   * \brief Give this thread back the binding it had
+   */
+  virtual void EndClientFrame() {}
 };
 
 } // namespace RETRO
