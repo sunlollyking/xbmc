@@ -76,16 +76,20 @@ class CClientFrameScope
 public:
   explicit CClientFrameScope(KODI::GAME::CGameClientStreams& streams) : m_streams(streams)
   {
-    m_streams.BeginClientFrame();
+    m_bBound = m_streams.BeginClientFrame();
   }
 
   ~CClientFrameScope() { m_streams.EndClientFrame(); }
+
+  //! \brief True if the client's context is current, or it needs none
+  bool IsBound() const { return m_bBound; }
 
   CClientFrameScope(const CClientFrameScope&) = delete;
   CClientFrameScope& operator=(const CClientFrameScope&) = delete;
 
 private:
   KODI::GAME::CGameClientStreams& m_streams;
+  bool m_bBound{false};
 };
 
 /*

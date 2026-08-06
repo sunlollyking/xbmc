@@ -53,7 +53,7 @@ public:
    * resources while its stream is still being opened, before there is a stream
    * to ask.
    */
-  virtual void BeginClientFrame() {}
+  virtual bool BeginClientFrame() { return true; }
 
   /*!
    * \brief Give this thread back the binding it had
