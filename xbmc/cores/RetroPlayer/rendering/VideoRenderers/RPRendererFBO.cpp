@@ -56,6 +56,7 @@ CRPRendererFBO::~CRPRendererFBO()
 
 void CRPRendererFBO::RenderInternal(bool clear, uint8_t alpha)
 {
+
   if (clear)
   {
     if (alpha == 255)
@@ -78,6 +79,8 @@ void CRPRendererFBO::RenderInternal(bool clear, uint8_t alpha)
 
   glEnable(GL_BLEND);
   glFlush();
+
+  m_context.ApplyStateBlock();
 }
 
 void CRPRendererFBO::FlushInternal()

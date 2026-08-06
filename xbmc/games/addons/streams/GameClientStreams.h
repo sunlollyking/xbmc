@@ -52,7 +52,7 @@ public:
    * EndClientFrame(), because a client may make rendering calls anywhere
    * inside one. Does nothing unless the client negotiated hardware rendering.
    */
-  void BeginClientFrame();
+  bool BeginClientFrame();
 
   /*!
    * \brief Give this thread back the binding it had

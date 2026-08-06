@@ -68,9 +68,9 @@ void CRPStreamManager::CloseStream(StreamPtr stream)
   }
 }
 
-void CRPStreamManager::BeginClientFrame()
+bool CRPStreamManager::BeginClientFrame()
 {
-  m_renderManager.BeginClientFrame();
+  return m_renderManager.BeginClientFrame();
 }
 
 void CRPStreamManager::EndClientFrame()

@@ -123,13 +123,16 @@ bool CGameClientStreams::EnableHardwareRendering(const game_hw_rendering_propert
   return true;
 }
 
-void CGameClientStreams::BeginClientFrame()
+bool CGameClientStreams::BeginClientFrame()
 {
+  // Nothing to bind for a software client, which is not a failure
   if (m_hwProperties.context_type == GAME_HW_CONTEXT_NONE)
-    return;
+    return true;
 
-  if (m_streamManager != nullptr)
-    m_streamManager->BeginClientFrame();
+  if (m_streamManager == nullptr)
+    return false;
+
+  return m_streamManager->BeginClientFrame();
 }
 
 void CGameClientStreams::EndClientFrame()
