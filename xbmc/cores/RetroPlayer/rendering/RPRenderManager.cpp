@@ -288,22 +288,49 @@ void CRPRenderManager::DestroyContext()
 
 bool CRPRenderManager::Create(unsigned int width, unsigned int height)
 {
-  //! @todo
-  return false;
+  if (width == 0 || height == 0)
+    return false;
+
+  // The framebuffer and the shared context that owns it are allocated lazily
+  // by the buffer pool, on the game loop thread that will render into them.
+  // All that has to be true here is that the render manager is configured, so
+  // that the rendering thread will build a renderer for the pool on its next
+  // pass through RenderWindow().
+  std::unique_lock lock(m_stateMutex);
+
+  return m_state != RENDER_STATE::UNCONFIGURED;
 }
 
 uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned int height)
 {
+  // Release the framebuffer handed out for the previous frame
+  for (IRenderBuffer* buffer : m_pendingBuffers)
+    buffer->Release();
+  m_pendingBuffers.clear();
+
+  if (m_bFlush || m_state != RENDER_STATE::CONFIGURED)
+    return 0;
+
   for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
   {
+    // Skip pools that no renderer is drawing from. Until the rendering thread
+    // has built a renderer for the FBO pool there is nothing to sample the
+    // core's output, and handing back a framebuffer would draw into the void.
     if (!bufferPool->HasVisibleRenderer())
       continue;
 
     IRenderBuffer* renderBuffer = bufferPool->GetBuffer(width, height);
     if (renderBuffer != nullptr)
     {
+      const uintptr_t framebuffer = renderBuffer->GetCurrentFramebuffer();
+      if (framebuffer == 0)
+      {
+        renderBuffer->Release();
+        continue;
+      }
+
       m_pendingBuffers.emplace_back(renderBuffer);
-      return renderBuffer->GetCurrentFramebuffer();
+      return framebuffer;
     }
   }
 
@@ -312,7 +339,35 @@ uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned i
 
 void CRPRenderManager::RenderFrame()
 {
-  //! @todo
+  if (m_bFlush || m_state != RENDER_STATE::CONFIGURED)
+    return;
+
+  // The core has finished drawing into the framebuffer handed out by
+  // GetCurrentFramebuffer(). Promote it so the rendering thread samples it.
+  std::vector<IRenderBuffer*> renderBuffers;
+  for (IRenderBuffer* buffer : m_pendingBuffers)
+  {
+    buffer->Acquire();
+    renderBuffers.emplace_back(buffer);
+  }
+
+  if (renderBuffers.empty())
+    return;
+
+  std::unique_lock lock(m_bufferMutex);
+
+  for (IRenderBuffer* renderBuffer : m_renderBuffers)
+    renderBuffer->Release();
+  m_renderBuffers = std::move(renderBuffers);
+
+  for (IRenderBuffer* renderBuffer : m_renderBuffers)
+  {
+    renderBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
+    renderBuffer->SetRotation(0);
+    // The core rendered straight into the texture, so there is nothing to
+    // upload; mark it ready so RenderInternal() does not try.
+    renderBuffer->SetLoaded(true);
+  }
 }
 
 void CRPRenderManager::SetSpeed(double speed)

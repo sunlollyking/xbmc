@@ -97,12 +97,30 @@ bool CGameClientStreams::EnableHardwareRendering(const game_hw_rendering_propert
   // Log hardware rendering properties for debugging
   CGameClientStreamHwFramebuffer::LogHwProperties(properties);
 
+  // Only OpenGL and OpenGL ES contexts are implemented. Reject anything else
+  // here, while the core can still fall back to software rendering, rather
+  // than letting it get as far as context_reset() and fail there.
+  switch (properties.context_type)
+  {
+    case GAME_HW_CONTEXT_OPENGL:
+    case GAME_HW_CONTEXT_OPENGL_CORE:
+    case GAME_HW_CONTEXT_OPENGLES2:
+    case GAME_HW_CONTEXT_OPENGLES3:
+    case GAME_HW_CONTEXT_OPENGLES_VERSION:
+      break;
+    default:
+    {
+      CLog::Log(LOGERROR, "GAME: Hardware rendering context not supported: {}",
+                CGameClientStreamHwFramebuffer::GetContextName(
+                    properties.context_type, properties.version_major, properties.version_minor));
+      return false;
+    }
+  }
+
   // Store hardware rendering properties
   m_hwProperties = properties;
 
-  //! @todo Finish OpenGL support
-  CLog::Log(LOGERROR, "Hardware rendering not implemented");
-  return false;
+  return true;
 }
 
 game_proc_address_t CGameClientStreams::GetHwProcedureAddress(const char* symbol)
