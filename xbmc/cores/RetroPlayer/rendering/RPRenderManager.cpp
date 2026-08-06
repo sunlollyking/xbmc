@@ -389,6 +389,12 @@ void CRPRenderManager::RenderFrame()
   // The client has finished drawing into its framebuffer. Hand the buffer to
   // the rendering thread, which samples the texture the framebuffer is backed
   // by. This is the hardware counterpart of AddFrame().
+
+  // Fence the client's drawing before publishing the buffer. This runs on the
+  // client's thread with its context current, which is the only place the
+  // fence can be recorded.
+  m_hwRenderBuffer->SetFence();
+
   m_hwRenderBuffer->Acquire();
 
   std::unique_lock lock(m_bufferMutex);
