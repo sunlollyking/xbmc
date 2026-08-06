@@ -969,6 +969,10 @@ CRenderVideoSettings CRPRenderManager::GetEffectiveSettings(
 
 void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath)
 {
+  // A hardware-rendered savestate carries no thumbnail
+  if (IsHardwareRendering())
+    return;
+
   // Get a suitable render buffer for capturing the video data, or use the
   // cached frame if a readable buffer can't be found
   IRenderBuffer* renderBuffer = nullptr;
@@ -1006,6 +1010,7 @@ void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath)
   if (sourceFormat == AV_PIX_FMT_NONE)
   {
     CLog::Log(LOGERROR, "Failed to get a video frame for savestate thumbnail");
+    FreeVideoFrame(renderBuffer, std::move(cachedFrame));
     return;
   }
 
@@ -1043,6 +1048,12 @@ void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath)
 
 void CRPRenderManager::CacheVideoFrame(const std::string& savestatePath)
 {
+  // The game client renders into these buffers itself, and there is only ever
+  // one. Holding a reference to it for a savestate would starve the client of
+  // the framebuffer it is drawing the next frame into.
+  if (IsHardwareRendering())
+    return;
+
   std::unique_lock lock(m_bufferMutex);
 
   // Get the render buffers for this savestate path
@@ -1062,6 +1073,11 @@ void CRPRenderManager::CacheVideoFrame(const std::string& savestatePath)
 
 void CRPRenderManager::SaveVideoFrame(const std::string& savestatePath, ISavestate& savestate)
 {
+  // A hardware-rendered savestate carries the game's state but no video frame,
+  // so it restores without a preview of the moment it was taken
+  if (IsHardwareRendering())
+    return;
+
   // Get a suitable render buffer for capturing the video data, or use the
   // cached frame if a readable buffer can't be found
   IRenderBuffer* readableBuffer = nullptr;
@@ -1198,6 +1214,11 @@ void CRPRenderManager::LoadVideoFrameAsync(const std::string& savestatePath)
 
 void CRPRenderManager::LoadVideoFrameSync(const std::string& savestatePath)
 {
+  // Savestates taken while the client renders on the GPU hold no video frame,
+  // and the only buffer to load one into is the one the client is drawing to
+  if (IsHardwareRendering())
+    return;
+
   if (!XFILE::CFile::Exists(savestatePath))
   {
     CLog::Log(LOGERROR, "Failed to load savestate: doesn't exist at path {}",
