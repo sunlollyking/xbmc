@@ -346,6 +346,11 @@ void CRPRendererFBO::Render(uint8_t alpha)
 
   m_context.DisableGUIShader();
 
+  // Leave no trace in Kodi's context. The texture sampled here belongs to the
+  // game client and is destroyed with the client's context, so leaving it bound
+  // hands the GUI a dangling binding to draw with once the game stops.
+  glBindTexture(m_textureTarget, 0);
+
   glMatrixModview.PopLoad();
   glMatrixProject.PopLoad();
 

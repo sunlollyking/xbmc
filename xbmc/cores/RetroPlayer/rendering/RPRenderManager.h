@@ -259,9 +259,14 @@ private:
   std::vector<IRenderBuffer*> m_pendingBuffers; // Only access from game thread
 
   // The framebuffers a hardware-rendering client draws into, held for the life
-  // of the stream. The client is handed each in turn, so the frame being
-  // sampled is never the one being drawn.
-  static const unsigned int HW_BUFFER_COUNT = 2;
+  // of the stream.
+  //
+  // One, deliberately. Clients treat the framebuffer they are given as theirs
+  // for the whole session and many do not clear it, drawing over what the last
+  // frame left behind. Handing them alternate buffers gives each only every
+  // other frame's drawing, and the frames in between show through. The frame
+  // being sampled is kept coherent with a fence instead.
+  static const unsigned int HW_BUFFER_COUNT = 1;
   std::vector<IRenderBuffer*> m_hwRenderBuffers;
   size_t m_hwWriteIndex{0};
   std::vector<IRenderBuffer*> m_renderBuffers;
