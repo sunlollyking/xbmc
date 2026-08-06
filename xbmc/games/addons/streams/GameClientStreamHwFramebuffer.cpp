@@ -35,13 +35,15 @@ bool CGameClientStreamHwFramebuffer::OpenStream(RETRO::IRetroPlayerStream* strea
   }
 
   std::unique_ptr<RETRO::HwFramebufferProperties> hwProperties =
-      TranslateProperties(*m_hwProperties);
+      TranslateProperties(*m_hwProperties, properties.hw_framebuffer);
 
   if (stream->OpenStream(*hwProperties))
-  {
     m_stream = stream;
-    m_callback.HardwareContextReset();
-  }
+
+  // Deliberately no HardwareContextReset() here. Clients ask for their
+  // framebuffer from inside context_reset, and the stream handle does not
+  // exist until this call returns, so the request would fail. The client is
+  // told the context is ready once the stream is open.
 
   return m_stream != nullptr;
 }
@@ -50,6 +52,10 @@ void CGameClientStreamHwFramebuffer::CloseStream()
 {
   if (m_stream != nullptr)
   {
+    // Let the client release its GPU resources while its context is still
+    // current, then tear the context down.
+    m_callback.HardwareContextDestroy();
+
     m_stream->CloseStream();
     m_stream = nullptr;
   }
@@ -139,10 +145,12 @@ std::string CGameClientStreamHwFramebuffer::GetContextName(GAME_HW_CONTEXT_TYPE 
 }
 
 std::unique_ptr<RETRO::HwFramebufferProperties> CGameClientStreamHwFramebuffer::TranslateProperties(
-    const game_hw_rendering_properties& hwProperties)
+    const game_hw_rendering_properties& hwProperties,
+    const game_stream_hw_framebuffer_properties& streamProperties)
 {
   return std::make_unique<RETRO::HwFramebufferProperties>(
       hwProperties.context_type, hwProperties.depth, hwProperties.stencil,
       hwProperties.bottom_left_origin, hwProperties.version_major, hwProperties.version_minor,
-      hwProperties.cache_context, hwProperties.debug_context);
+      hwProperties.cache_context, hwProperties.debug_context, streamProperties.max_width,
+      streamProperties.max_height);
 }

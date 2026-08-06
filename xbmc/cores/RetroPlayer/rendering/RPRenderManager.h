@@ -10,6 +10,7 @@
 
 #include "IRenderManager.h"
 #include "RenderVideoSettings.h"
+#include "cores/RetroPlayer/buffers/IRenderBufferPool.h"
 #include "cores/RetroPlayer/guibridge/IRenderCallback.h"
 #include "threads/CriticalSection.h"
 
@@ -102,6 +103,7 @@ public:
                 float displayAspectRatio,
                 unsigned int orientationDegCW);
   void Flush();
+  bool CreateContext(const HwContextProperties& properties);
   void DestroyContext();
 
   // Hardware rendering functions
@@ -111,6 +113,11 @@ public:
   bool Create(unsigned int width, unsigned int height);
   uintptr_t GetCurrentFramebuffer(unsigned int width, unsigned int height);
   void RenderFrame();
+
+  /*!
+   * \brief Release the framebuffer the game client renders into
+   */
+  void ReleaseHwRenderBuffer();
 
   // Functions called from the player
   void SetSpeed(double speed);
@@ -248,6 +255,10 @@ private:
   std::set<std::shared_ptr<CRPBaseRenderer>> m_oldRenderers;
   mutable std::mutex m_oldRenderersMutex;
   std::vector<IRenderBuffer*> m_pendingBuffers; // Only access from game thread
+
+  // The framebuffer a hardware-rendering client draws into. Held for the life
+  // of the stream, as the client keeps the framebuffer ID it was given.
+  IRenderBuffer* m_hwRenderBuffer{nullptr};
   std::vector<IRenderBuffer*> m_renderBuffers;
   std::map<AVPixelFormat, std::map<AVPixelFormat, SwsContext*>> m_scalers; // From -> to -> context
   std::vector<uint8_t> m_cachedFrame;

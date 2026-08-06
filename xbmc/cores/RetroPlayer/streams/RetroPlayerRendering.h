@@ -9,6 +9,7 @@
 
 #include "IRetroPlayerStream.h"
 #include "RetroPlayerStreamTypes.h"
+#include "cores/RetroPlayer/buffers/IRenderBufferPool.h"
 
 #include <memory>
 #include <stdint.h>
@@ -37,7 +38,9 @@ struct HwFramebufferProperties : public StreamProperties
                           unsigned int versionMajor,
                           unsigned int versionMinor,
                           bool cacheContext,
-                          bool debugContext)
+                          bool debugContext,
+                          unsigned int maxWidth,
+                          unsigned int maxHeight)
     : contextType(contextType),
       depth(depth),
       stencil(stencil),
@@ -45,7 +48,9 @@ struct HwFramebufferProperties : public StreamProperties
       versionMajor(versionMajor),
       versionMinor(versionMinor),
       cacheContext(cacheContext),
-      debugContext(debugContext)
+      debugContext(debugContext),
+      maxWidth(maxWidth),
+      maxHeight(maxHeight)
   {
   }
 
@@ -57,6 +62,8 @@ struct HwFramebufferProperties : public StreamProperties
   unsigned int versionMinor;
   bool cacheContext;
   bool debugContext;
+  unsigned int maxWidth;
+  unsigned int maxHeight;
 };
 
 struct HwFramebufferBuffer : public StreamBuffer
@@ -96,6 +103,12 @@ private:
    * framebuffer stream properties carry no geometry.
    */
   bool Configure(unsigned int width, unsigned int height);
+
+  /*!
+   * \brief Translate the client's request into a rendering-system-agnostic form
+   */
+  static HwContextProperties TranslateContextProperties(
+      const HwFramebufferProperties& properties);
 
   // Construction parameters
   CRPRenderManager& m_renderManager;

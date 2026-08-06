@@ -179,6 +179,7 @@ public:
 
   // Implementation of IHwFramebufferCallback
   void HardwareContextReset() override;
+  void HardwareContextDestroy() override;
 
   /*!
    * @brief To get the interface table used between addon and kodi

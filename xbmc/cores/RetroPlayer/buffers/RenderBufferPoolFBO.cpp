@@ -24,9 +24,12 @@
 #include "ServiceBroker.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererFBO.h"
+
 #include "utils/log.h"
 #include "windowing/WinSystem.h"
 #include "windowing/linux/WinSystemEGL.h"
+
+#include <vector>
 
 using namespace KODI;
 using namespace RETRO;
@@ -37,12 +40,13 @@ CRenderBufferPoolFBO::CRenderBufferPoolFBO(CRenderContext& context) : m_context(
 
 CRenderBufferPoolFBO::~CRenderBufferPoolFBO()
 {
-  glDeleteFramebuffers(1, &m_fbo_id);
-  m_fbo_id = 0;
-
-  //! @todo: this needs to be done from the gameloop thread
-  // eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-  // eglDestroyContext(m_eglDisplay, m_eglContext);
+  // The context is torn down by DestroyContext(), which the stream calls on the
+  // game loop thread while the context is still current. By the time the pool
+  // is destroyed there is normally nothing left to do, and nothing that can be
+  // done: this runs on whichever thread drops the last reference, where the
+  // context is not current and deleting its objects would be undefined.
+  if (m_eglContext != EGL_NO_CONTEXT)
+    CLog::Log(LOGWARNING, "RetroPlayer[RENDER]: FBO context outlived its stream, leaking it");
 }
 
 bool CRenderBufferPoolFBO::IsCompatible(const CRenderVideoSettings& renderSettings) const
@@ -62,8 +66,8 @@ IRenderBuffer* CRenderBufferPoolFBO::CreateRenderBuffer(void* header /* = nullpt
 {
   if (m_eglContext == EGL_NO_CONTEXT)
   {
-    if (!CreateContext())
-      return nullptr;
+    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: No shared context; the stream must create one first");
+    return nullptr;
   }
 
   if (m_fbo_id == 0)
@@ -75,10 +79,19 @@ IRenderBuffer* CRenderBufferPoolFBO::CreateRenderBuffer(void* header /* = nullpt
   return new CRenderBufferFBO(m_context, m_fbo_id);
 }
 
-bool CRenderBufferPoolFBO::CreateContext()
+bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
 {
+  // Idempotent, so reopening a stream on the same pool is harmless
+  if (m_eglContext != EGL_NO_CONTEXT)
+    return true;
+
   auto winSystem =
       dynamic_cast<KODI::WINDOWING::LINUX::CWinSystemEGL*>(CServiceBroker::GetWinSystem());
+  if (winSystem == nullptr)
+  {
+    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Window system does not use EGL");
+    return false;
+  }
 
   m_eglDisplay = winSystem->GetEGLDisplay();
 
@@ -132,29 +145,47 @@ bool CRenderBufferPoolFBO::CreateContext()
     return false;
   }
 
-#if defined (HAS_GLES)
-  const EGLint context_attribs[] = {
-    EGL_CONTEXT_CLIENT_VERSION, 2,
-    EGL_NONE
-  };
-#elif defined (HAS_GL)
-  const EGLint context_attribs[] = {
-    EGL_CONTEXT_MAJOR_VERSION_KHR, 3,
-    EGL_CONTEXT_MINOR_VERSION_KHR, 2,
-    EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR,
-    EGL_NONE
-  };
-#endif
-
   // clang-format on
 
-  m_eglContext =
-      eglCreateContext(m_eglDisplay, m_eglConfig, winSystem->GetEGLContext(), context_attribs);
+  // Honour the context the core asked for. A core written against legacy
+  // OpenGL will not run in a core profile - its shaders and fixed-function
+  // calls are simply absent there - so requesting the wrong profile leaves the
+  // core unable to build its resources, with no obvious symptom beyond a core
+  // that never draws.
+  std::vector<EGLint> contextAttribs;
+
+  if (properties.versionMajor != 0)
+  {
+    contextAttribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
+    contextAttribs.push_back(static_cast<EGLint>(properties.versionMajor));
+    contextAttribs.push_back(EGL_CONTEXT_MINOR_VERSION_KHR);
+    contextAttribs.push_back(static_cast<EGLint>(properties.versionMinor));
+  }
+
+  if (!properties.embedded)
+  {
+    contextAttribs.push_back(EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR);
+    contextAttribs.push_back(properties.coreProfile
+                                 ? EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR
+                                 : EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR);
+  }
+
+  contextAttribs.push_back(EGL_NONE);
+
+  m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, winSystem->GetEGLContext(),
+                                  contextAttribs.data());
   if (m_eglContext == EGL_NO_CONTEXT)
   {
-    CLog::Log(LOGERROR, "failed to create EGL context");
+    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Failed to create {} context, EGL error {:#x}",
+              properties.embedded ? "OpenGL ES"
+                                  : (properties.coreProfile ? "core profile" : "compatibility"),
+              eglGetError());
     return false;
   }
+
+  CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Created shared {} context for the game client",
+            properties.embedded ? "OpenGL ES"
+                                : (properties.coreProfile ? "core profile" : "compatibility"));
 
   if (!eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, m_eglContext))
   {
@@ -180,6 +211,16 @@ void CRenderBufferPoolFBO::DestroyContext()
     return;
 
   CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Destroying shared FBO context");
+
+  // The framebuffer belongs to this context and has to go while it is still
+  // current. Buffers hold the framebuffer's ID, so drop them first.
+  Flush();
+
+  if (m_fbo_id != 0)
+  {
+    glDeleteFramebuffers(1, &m_fbo_id);
+    m_fbo_id = 0;
+  }
 
   eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
   eglDestroyContext(m_eglDisplay, m_eglContext);
