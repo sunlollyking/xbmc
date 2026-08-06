@@ -54,6 +54,7 @@ protected:
   CRenderContext& m_context;
 
   // Configuration parameters
+  HwContextProperties m_contextProperties;
   EGLDisplay m_eglDisplay = EGL_NO_DISPLAY;
   EGLConfig m_eglConfig;
   EGLContext m_eglContext = EGL_NO_CONTEXT;

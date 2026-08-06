@@ -46,6 +46,7 @@ bool CRetroPlayerRendering::OpenStream(const StreamProperties& properties)
     return false;
   }
 
+
   // Create the context the core will render with, and make it current, before
   // the caller announces the context is ready. Cores build their GL objects in
   // context_reset(), so there has to be a context current by then, and it has
@@ -151,6 +152,7 @@ HwContextProperties CRetroPlayerRendering::TranslateContextProperties(
 
   contextProperties.depth = properties.depth;
   contextProperties.stencil = properties.stencil;
+  contextProperties.bottomLeftOrigin = properties.bottomLeftOrigin;
 
   return contextProperties;
 }

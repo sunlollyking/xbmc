@@ -50,6 +50,14 @@ struct HwContextProperties
 
   //! \brief The core needs a stencil attachment on the framebuffer
   bool stencil{false};
+
+  /*!
+   * \brief The client renders with OpenGL's bottom-left origin
+   *
+   * When false the client uses top-left origin semantics and the image has to
+   * be flipped vertically as it is sampled.
+   */
+  bool bottomLeftOrigin{true};
 };
 
 class IRenderBufferPool : public std::enable_shared_from_this<IRenderBufferPool>
