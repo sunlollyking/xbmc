@@ -11,6 +11,7 @@
 #include "RenderContext.h"
 #include "RenderSettings.h"
 #include "RenderTranslator.h"
+#include "ServiceBroker.h"
 #include "URL.h"
 #include "cores/RetroPlayer/buffers/IRenderBuffer.h"
 #include "cores/RetroPlayer/buffers/IRenderBufferPool.h"
@@ -25,6 +26,8 @@
 #include "cores/RetroPlayer/savestates/SavestateDatabase.h"
 #include "cores/RetroPlayer/streams/RetroPlayerVideo.h"
 #include "filesystem/File.h"
+#include "games/GameServices.h"
+#include "games/GameSettings.h"
 #include "pictures/Picture.h"
 #include "threads/SingleLock.h"
 #include "utils/ColorUtils.h"
@@ -707,9 +710,17 @@ std::shared_ptr<CRPBaseRenderer> CRPRenderManager::GetRendererForSettings(
   CRenderSettings effectiveRenderSettings;
   effectiveRenderSettings.VideoSettings() = GetEffectiveSettings(renderSettings);
 
+  // A pool that shares its memory with the GPU saves copying every frame, but
+  // the two can fall out of step and tear rows out of the picture. This is the
+  // way past that until they are kept in step properly.
+  const bool skipShared = CServiceBroker::GetGameServices().GameSettings().OpenGLEnabled();
+
   // Check renderers in order of buffer pools
   for (IRenderBufferPool* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
   {
+    if (skipShared && bufferPool->SharesMemoryWithGpu())
+      continue;
+
     renderer = GetRendererForPool(bufferPool, effectiveRenderSettings);
     if (renderer)
       break;
