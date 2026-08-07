@@ -9,6 +9,8 @@
 #include "GameClientStreams.h"
 
 #include "GameClientStreamAudio.h"
+#include "ServiceBroker.h"
+#include "rendering/RenderSystem.h"
 #include "GameClientStreamHwFramebuffer.h"
 #include "GameClientStreamSwFramebuffer.h"
 #include "GameClientStreamVideo.h"
@@ -20,6 +22,7 @@
 #include "utils/log.h"
 
 #include <memory>
+#include <tuple>
 
 using namespace KODI;
 using namespace GAME;
@@ -94,13 +97,42 @@ bool CGameClientStreams::EnableHardwareRendering(const game_hw_rendering_propert
   if (properties.context_type == GAME_HW_CONTEXT_NONE)
     return false;
 
+  const std::string wanted = CGameClientStreamHwFramebuffer::GetContextName(
+      properties.context_type, properties.version_major, properties.version_minor);
+
   // Refuse before the client commits to rendering this way. It asks this long
   // before the frontend would try to build it a context, and a client told yes
   // wires itself up to callbacks it will then call regardless.
   if (m_streamManager == nullptr || !m_streamManager->HasHardwareRendering())
   {
-    CLog::Log(LOGERROR, "GAME: Hardware rendering is not available on this display stack");
+    CLog::Log(LOGERROR, "GAME: {} is not available on this display stack", wanted);
+    m_hwRefusedWanted = wanted;
+    m_hwRefusedAvailable.clear();
     return false;
+  }
+
+  // A client that needs a newer graphics driver than this one has cannot run,
+  // and it is worth saying so plainly rather than failing later on a context
+  // that could not be created.
+  if (properties.version_major != 0)
+  {
+    unsigned int availableMajor = 0;
+    unsigned int availableMinor = 0;
+    if (CRenderSystemBase* renderSystem = CServiceBroker::GetRenderSystem())
+      renderSystem->GetRenderVersion(availableMajor, availableMinor);
+
+    if (availableMajor != 0 &&
+        std::tie(availableMajor, availableMinor) <
+            std::tie(properties.version_major, properties.version_minor))
+    {
+      const std::string available = CGameClientStreamHwFramebuffer::GetContextName(
+          properties.context_type, availableMajor, availableMinor);
+
+      CLog::Log(LOGERROR, "GAME: Client needs {}, but this system provides {}", wanted, available);
+      m_hwRefusedWanted = wanted;
+      m_hwRefusedAvailable = available;
+      return false;
+    }
   }
 
   // Log hardware rendering properties for debugging

@@ -61,8 +61,24 @@ public:
 
   bool HardwareRenderingAttempted() const
   {
-    return m_hwProperties.context_type != GAME_HW_CONTEXT_NONE;
+    return m_hwProperties.context_type != GAME_HW_CONTEXT_NONE || !m_hwRefusedWanted.empty();
   }
+
+  /*!
+   * \brief What the client asked to render with, if that had to be refused
+   *
+   * Empty unless hardware rendering was turned down. Named for the user, e.g.
+   * "OpenGL 4.3".
+   */
+  const std::string& HardwareRenderingRefusedWanted() const { return m_hwRefusedWanted; }
+
+  /*!
+   * \brief What this system can render with, if it is the reason for a refusal
+   *
+   * Empty when the display could not provide hardware rendering at all, as
+   * opposed to providing too old a version of it.
+   */
+  const std::string& HardwareRenderingRefusedAvailable() const { return m_hwRefusedAvailable; }
 
 private:
   // Utility functions
@@ -79,6 +95,10 @@ private:
 
   // Hardware rendering parameters
   game_hw_rendering_properties m_hwProperties{};
+
+  // Why hardware rendering was refused, for the message the user sees
+  std::string m_hwRefusedWanted;
+  std::string m_hwRefusedAvailable;
 };
 
 } // namespace GAME
