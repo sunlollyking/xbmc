@@ -155,6 +155,15 @@ public:
    *         unavailable
    */
   virtual HwProcedureAddress GetHwProcedureAddress(const char* symbol) { return nullptr; }
+
+  /*!
+   * \brief Whether a client can be given a framebuffer to render into
+   *
+   * Asked while a client is still negotiating, so that one which cannot be
+   * given hardware rendering is told now, and can fall back to software, rather
+   * than wiring itself up to callbacks that will never work.
+   */
+  virtual bool HasHardwareRendering() const { return false; }
   ///}
 
   /// @name Player video info

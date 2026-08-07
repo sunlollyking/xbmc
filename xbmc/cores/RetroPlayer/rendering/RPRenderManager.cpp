@@ -405,8 +405,16 @@ void CRPRenderManager::ReleaseHwRenderBuffer()
 
 uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned int height)
 {
+  // Handing back 0 points the client at the default framebuffer, which has no
+  // attachments in the context it renders with. A client that asks every frame
+  // loses that frame; one that caches the answer for the frame, as Dolphin
+  // does, draws the whole frame into nothing. Worth knowing it happened.
   if (m_bFlush || m_hwRenderBuffer == nullptr)
+  {
+    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: No framebuffer to give the client ({})",
+              m_bFlush ? "flushing" : "no render buffer");
     return 0;
+  }
 
   // Clients ask for their framebuffer from inside HwContextReset(), before the
   // rendering thread has built a renderer, so unlike the software path this
@@ -419,7 +427,11 @@ uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned i
               width, height, m_hwRenderBuffer->GetWidth(), m_hwRenderBuffer->GetHeight());
 
     if (!Create(width, height))
+    {
+      CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Failed to grow the client's framebuffer to {}x{}",
+                width, height);
       return 0;
+    }
   }
 
   return m_hwRenderBuffer->GetCurrentFramebuffer();

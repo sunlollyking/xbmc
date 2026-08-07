@@ -94,6 +94,15 @@ bool CGameClientStreams::EnableHardwareRendering(const game_hw_rendering_propert
   if (properties.context_type == GAME_HW_CONTEXT_NONE)
     return false;
 
+  // Refuse before the client commits to rendering this way. It asks this long
+  // before the frontend would try to build it a context, and a client told yes
+  // wires itself up to callbacks it will then call regardless.
+  if (m_streamManager == nullptr || !m_streamManager->HasHardwareRendering())
+  {
+    CLog::Log(LOGERROR, "GAME: Hardware rendering is not available on this display stack");
+    return false;
+  }
+
   // Log hardware rendering properties for debugging
   CGameClientStreamHwFramebuffer::LogHwProperties(properties);
 
