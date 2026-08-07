@@ -21,7 +21,6 @@ public:
 
   // Implementation of CRPProcessInfo
   HwProcedureAddress GetHwProcedureAddress(const char* symbol) override;
-  bool HasHardwareRendering() const override;
 };
 } // namespace RETRO
 } // namespace KODI
