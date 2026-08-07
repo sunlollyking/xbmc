@@ -71,6 +71,11 @@ bool CRenderBufferFBO::Allocate(AVPixelFormat format, unsigned int width, unsign
   m_width = width;
   m_height = height;
 
+  // The texture stays this size for the buffer's life, while the reported width
+  // and height follow whatever the client draws into it each frame
+  m_textureWidth = width;
+  m_textureHeight = height;
+
   if (!CreateTexture())
     return false;
 

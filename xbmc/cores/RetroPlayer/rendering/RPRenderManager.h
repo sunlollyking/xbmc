@@ -111,7 +111,7 @@ public:
   // Hardware rendering functions
   bool Create(unsigned int width, unsigned int height);
   uintptr_t GetCurrentFramebuffer(unsigned int width, unsigned int height);
-  void RenderFrame();
+  void RenderFrame(unsigned int width, unsigned int height);
 
   /*!
    * \brief Release the framebuffer the game client renders into

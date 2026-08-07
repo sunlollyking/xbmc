@@ -202,9 +202,7 @@ bool CRetroPlayerRendering::Configure(unsigned int width, unsigned int height)
 
 void CRetroPlayerRendering::AddStreamData(const StreamPacket& packet)
 {
-  // This is left here in case anything gets added to the api in the future
-  [[maybe_unused]] const HwFramebufferPacket& hwPacket =
-      static_cast<const HwFramebufferPacket&>(packet);
+  const HwFramebufferPacket& hwPacket = static_cast<const HwFramebufferPacket&>(packet);
 
-  m_renderManager.RenderFrame();
+  m_renderManager.RenderFrame(hwPacket.width, hwPacket.height);
 }

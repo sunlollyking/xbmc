@@ -54,6 +54,19 @@ public:
   AVPixelFormat GetFormat() const { return m_format; }
   unsigned int GetWidth() const { return m_width; }
   unsigned int GetHeight() const { return m_height; }
+
+  /*!
+   * \brief Set the size of the frame this buffer is holding
+   *
+   * A buffer usually holds a frame of the size it was allocated at, but one the
+   * client renders into itself is allocated at the largest frame it will ever
+   * draw and holds a smaller one most of the time.
+   */
+  void SetSize(unsigned int width, unsigned int height)
+  {
+    m_width = width;
+    m_height = height;
+  }
   bool IsLoaded() const { return m_bLoaded; }
   void SetLoaded(bool bLoaded) { m_bLoaded = bLoaded; }
   bool IsRendered() const { return m_bRendered; }

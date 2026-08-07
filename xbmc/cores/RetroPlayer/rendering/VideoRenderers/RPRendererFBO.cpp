@@ -239,10 +239,14 @@ void CRPRendererFBO::Render(uint8_t alpha)
 
   CRect rect = m_sourceRect;
 
-  rect.x1 /= renderBuffer->GetWidth();
-  rect.x2 /= renderBuffer->GetWidth();
-  rect.y1 /= renderBuffer->GetHeight();
-  rect.y2 /= renderBuffer->GetHeight();
+  // The source rect covers the frame the client drew, which is usually a corner
+  // of a larger texture, so it is the texture that these are measured against.
+  // Dividing by the frame size instead would stretch that corner over the whole
+  // image, showing the unwritten remainder of the framebuffer with it.
+  rect.x1 /= renderBuffer->TextureWidth();
+  rect.x2 /= renderBuffer->TextureWidth();
+  rect.y1 /= renderBuffer->TextureHeight();
+  rect.y2 /= renderBuffer->TextureHeight();
 
   // A client using top-left origin semantics has written the image the other
   // way up relative to how the texture is sampled, so flip it here rather than

@@ -91,7 +91,8 @@ void CGameClientStreamHwFramebuffer::AddData(const game_stream_packet& packet)
   {
     const game_stream_hw_framebuffer_packet& hwFramebuffer = packet.hw_framebuffer;
 
-    RETRO::HwFramebufferPacket hwFramebufferPacket{hwFramebuffer.framebuffer};
+    RETRO::HwFramebufferPacket hwFramebufferPacket{hwFramebuffer.framebuffer, hwFramebuffer.width,
+                                                   hwFramebuffer.height};
     m_stream->AddStreamData(static_cast<const RETRO::StreamPacket&>(hwFramebufferPacket));
   }
 }
