@@ -105,6 +105,24 @@ public:
   virtual std::shared_ptr<IRenderBufferPool> GetPtr() { return shared_from_this(); }
 
   /*!
+   * \brief Whether this pool can give a client a framebuffer to render into
+   *
+   * False for every pool that holds frames a client has drawn elsewhere. Only
+   * a pool that owns a rendering context can answer otherwise, and a build
+   * without one has no pool that does.
+   */
+  virtual bool SupportsHardwareRendering() const { return false; }
+
+  /*!
+   * \brief Whether the GPU reads the memory a frame was written into directly
+   *
+   * Such a pool saves copying every frame, but the CPU writing a frame and the
+   * GPU reading it have to be kept in step, and where they are not the picture
+   * shows torn rows.
+   */
+  virtual bool SharesMemoryWithGpu() const { return false; }
+
+  /*!
    * \brief Create the resources tied to the rendering context
    *
    * Called on the thread that will render into the pool's buffers, before the
@@ -116,15 +134,6 @@ public:
    *
    * \return True if the context is ready, or the pool has none to create
    */
-  /*!
-   * \brief Whether this pool can give a client a framebuffer to render into
-   *
-   * False for every pool that holds frames a client has drawn elsewhere. Only
-   * a pool that owns a rendering context can answer otherwise, and a build
-   * without one has no pool that does.
-   */
-  virtual bool SupportsHardwareRendering() const { return false; }
-
   virtual bool CreateContext(const HwContextProperties& properties) { return true; }
 
   /*!

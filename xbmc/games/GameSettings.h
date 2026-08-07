@@ -37,6 +37,16 @@ public:
   void ToggleGames();
   bool AutosaveEnabled();
   bool RewindEnabled();
+
+  /*!
+   * \brief Whether to draw game frames with OpenGL rather than sharing memory
+   *        with the GPU
+   *
+   * Sharing memory avoids copying each frame, but the two can fall out of step
+   * and leave torn rows in the picture. This is the way out of that until they
+   * are kept in step properly.
+   */
+  bool OpenGLEnabled();
   unsigned int MaxRewindTimeSec();
   std::string GetRAUsername() const;
   std::string GetRAToken() const;

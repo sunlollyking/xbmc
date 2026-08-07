@@ -19419,7 +19419,19 @@ msgctxt "#35282"
 msgid "This game renders with {0:s}, which isn't available on this display. It can't be played."
 msgstr ""
 
-#empty strings from id 35283 to 35504
+#. Label of a setting to draw games with OpenGL. In "Settings -> Games -> General"
+#: system/settings/settings.xml
+msgctxt "#35283"
+msgid "Enable OpenGL"
+msgstr ""
+
+#. Help text for the setting above
+#: system/settings/settings.xml
+msgctxt "#35284"
+msgid "Draw games with OpenGL instead of the usual way. Turn this on if a game shows flickering lines or speckled patches that shouldn't be there. The usual way can be faster on less powerful devices, so leave this off unless you see those problems."
+msgstr ""
+
+#empty strings from id 35285 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp

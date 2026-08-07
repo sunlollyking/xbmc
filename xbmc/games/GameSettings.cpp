@@ -35,6 +35,7 @@ const std::string SETTING_GAMES_ENABLE = "gamesgeneral.enable";
 const std::string SETTING_GAMES_SHOW_OSD_HELP = "gamesgeneral.showosdhelp";
 const std::string SETTING_GAMES_ENABLEAUTOSAVE = "gamesgeneral.enableautosave";
 const std::string SETTING_GAMES_ENABLEREWIND = "gamesgeneral.enablerewind";
+const std::string SETTING_GAMES_ENABLEOPENGL = "gamesgeneral.enableopengl";
 const std::string SETTING_GAMES_REWINDTIME = "gamesgeneral.rewindtime";
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
@@ -121,6 +122,11 @@ bool CGameSettings::AutosaveEnabled()
 bool CGameSettings::RewindEnabled()
 {
   return m_settings->GetBool(SETTING_GAMES_ENABLEREWIND);
+}
+
+bool CGameSettings::OpenGLEnabled()
+{
+  return m_settings->GetBool(SETTING_GAMES_ENABLEOPENGL);
 }
 
 unsigned int CGameSettings::MaxRewindTimeSec()
