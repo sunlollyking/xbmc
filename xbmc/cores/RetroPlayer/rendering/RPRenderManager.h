@@ -274,6 +274,7 @@ private:
   // every other frame's drawing, and the frames in between show through.
   IRenderBuffer* m_hwRenderBuffer{nullptr};
   IRenderBufferPool* m_hwBufferPool{nullptr};
+  uintptr_t m_loggedFramebuffer{0};
   std::vector<IRenderBuffer*> m_renderBuffers;
   std::map<AVPixelFormat, std::map<AVPixelFormat, SwsContext*>> m_scalers; // From -> to -> context
   std::vector<uint8_t> m_cachedFrame;

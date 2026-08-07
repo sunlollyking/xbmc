@@ -434,7 +434,18 @@ uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned i
     }
   }
 
-  return m_hwRenderBuffer->GetCurrentFramebuffer();
+  const uintptr_t framebuffer = m_hwRenderBuffer->GetCurrentFramebuffer();
+
+  // Clients cache this and render against it for the rest of the session, so
+  // it is worth seeing once what they were given
+  if (framebuffer != m_loggedFramebuffer)
+  {
+    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Client is rendering into framebuffer {} ({}x{})",
+              framebuffer, width, height);
+    m_loggedFramebuffer = framebuffer;
+  }
+
+  return framebuffer;
 }
 
 void CRPRenderManager::RenderFrame(unsigned int width, unsigned int height)
