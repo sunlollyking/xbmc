@@ -429,30 +429,19 @@ bool CGameClient::LoadGameInfo()
     return false;
   }
 
-  size_t serializeSize;
-  try
-  {
-    // Some clients serialize their video state along with the rest, so this
-    // reaches into GPU resources and needs the client's context
-    CClientFrameScope hwScope(Streams());
-    serializeSize = m_ifc.game->toAddon->SerializeSize(m_ifc.game);
-  }
-  catch (...)
-  {
-    LogException("SerializeSize()");
-    return false;
-  }
+  // Deliberately does not ask the client how large a savestate is. A client
+  // serializes the machine it emulates, and some clients build that machine
+  // while booting the game, so there is nothing to measure until a frame has
+  // run. Nothing needs the answer this early: it is asked for on first use.
 
   CLog::Log(LOGINFO, "GAME: ---------------------------------------");
   CLog::Log(LOGINFO, "GAME: Game loop:      {}", bRequiresGameLoop ? "true" : "false");
   CLog::Log(LOGINFO, "GAME: FPS:            {:f}", timingInfo.fps);
   CLog::Log(LOGINFO, "GAME: Sample Rate:    {:f}", timingInfo.sample_rate);
   CLog::Log(LOGINFO, "GAME: Region:         {}", CGameClientTranslator::TranslateRegion(region));
-  CLog::Log(LOGINFO, "GAME: Savestate size: {}", serializeSize);
   CLog::Log(LOGINFO, "GAME: ---------------------------------------");
 
   m_bRequiresGameLoop = bRequiresGameLoop;
-  m_serializeSize = serializeSize;
   m_framerate = timingInfo.fps;
   m_samplerate = timingInfo.sample_rate;
   m_region = region;
@@ -554,6 +543,7 @@ void CGameClient::CloseFile()
     m_hasFrameRun = false;
     m_gamePath.clear();
     m_serializeSize = 0;
+    m_serializeSizeKnown = false;
     m_input = nullptr;
 
     Input().Stop();
@@ -606,6 +596,37 @@ void CGameClient::RunFrame()
       LogException("RunFrame()");
     }
   }
+}
+
+size_t CGameClient::SerializeSize() const
+{
+  // Ask the client the first time anything needs the answer, rather than while
+  // loading the game. A client that builds the machine it serializes during the
+  // game's boot cannot answer before it has run -- Dolphin walks its video and
+  // hardware state to measure a savestate, and neither exists yet. Waiting for
+  // a frame costs nothing, because savestates and rewind cannot happen before
+  // one either.
+  if (!m_serializeSizeKnown && m_bIsPlaying && m_hasFrameRun)
+  {
+    std::unique_lock lock(m_critSection);
+
+    try
+    {
+      // Some clients serialize their video state along with the rest, so this
+      // reaches into GPU resources and needs the client's context
+      CClientFrameScope hwScope(const_cast<CGameClient*>(this)->Streams());
+      m_serializeSize = m_ifc.game->toAddon->SerializeSize(m_ifc.game);
+      m_serializeSizeKnown = true;
+
+      CLog::Log(LOGINFO, "GAME: Savestate size: {}", m_serializeSize);
+    }
+    catch (...)
+    {
+      const_cast<CGameClient*>(this)->LogException("SerializeSize()");
+    }
+  }
+
+  return m_serializeSize;
 }
 
 bool CGameClient::Serialize(uint8_t* data, size_t size)

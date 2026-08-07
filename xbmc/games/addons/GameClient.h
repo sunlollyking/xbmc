@@ -167,13 +167,13 @@ public:
   // Playback control
   bool RequiresGameLoop() const { return m_bRequiresGameLoop; }
   bool IsPlaying() const { return m_bIsPlaying; }
-  size_t GetSerializeSize() const { return m_serializeSize; }
+  size_t GetSerializeSize() const { return SerializeSize(); }
   double GetFrameRate() const { return m_framerate; }
   double GetSampleRate() const { return m_samplerate; }
   void RunFrame();
 
   // Access memory
-  size_t SerializeSize() const { return m_serializeSize; }
+  size_t SerializeSize() const;
   bool Serialize(uint8_t* data, size_t size);
   bool Deserialize(const uint8_t* data, size_t size);
 
@@ -264,7 +264,8 @@ private:
   std::atomic_bool m_hasFrameRun{false};
   std::string m_gamePath;
   bool m_bRequiresGameLoop = false;
-  size_t m_serializeSize = 0;
+  mutable size_t m_serializeSize = 0;
+  mutable bool m_serializeSizeKnown = false;
   IGameInputCallback* m_input = nullptr; // The input callback passed to OpenFile()
   double m_framerate = 0.0; // Video frame rate (fps)
   double m_samplerate = 0.0; // Audio sample rate (Hz)
@@ -273,7 +274,7 @@ private:
   // In-game saves
   std::unique_ptr<CGameClientInGameSaves> m_inGameSaves;
 
-  CCriticalSection m_critSection;
+  mutable CCriticalSection m_critSection;
 };
 
 } // namespace GAME
