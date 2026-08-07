@@ -116,6 +116,15 @@ public:
    *
    * \return True if the context is ready, or the pool has none to create
    */
+  /*!
+   * \brief Whether this pool can give a client a framebuffer to render into
+   *
+   * False for every pool that holds frames a client has drawn elsewhere. Only
+   * a pool that owns a rendering context can answer otherwise, and a build
+   * without one has no pool that does.
+   */
+  virtual bool SupportsHardwareRendering() const { return false; }
+
   virtual bool CreateContext(const HwContextProperties& properties) { return true; }
 
   /*!

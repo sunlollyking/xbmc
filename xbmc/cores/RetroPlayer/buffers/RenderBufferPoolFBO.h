@@ -34,6 +34,21 @@ namespace RETRO
 {
 class CRenderContext;
 
+/*!
+ * \brief Framebuffers for game clients that render on the GPU themselves
+ *
+ * The pool owns an OpenGL context shared with the one the window system draws
+ * with, and hands the client a framebuffer to render each frame into. Kodi then
+ * draws the texture that framebuffer is backed by, so the frame never leaves
+ * the GPU.
+ *
+ * \note Desktop OpenGL only. A client that renders with OpenGL ES is not
+ *       supported: this pool is built only where both desktop GL and EGL are
+ *       available, and a build without it has no pool that reports
+ *       SupportsHardwareRendering(), so such clients are told during
+ *       negotiation that hardware rendering is unavailable and can fall back to
+ *       software rather than failing later.
+ */
 class CRenderBufferPoolFBO : public CBaseRenderBufferPool
 {
 public:
@@ -47,6 +62,7 @@ public:
   IRenderBuffer* CreateRenderBuffer(void* header = nullptr) override;
   bool ConfigureInternal() override;
 
+  bool SupportsHardwareRendering() const override { return true; }
   bool CreateContext(const HwContextProperties& properties) override;
   bool BeginClientFrame() override;
   void EndClientFrame() override;
