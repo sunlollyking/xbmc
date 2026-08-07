@@ -52,6 +52,16 @@ public:
 
   GLuint TextureID() const { return m_tex_id; }
 
+  /*!
+   * \brief Size of the texture backing this buffer
+   *
+   * The buffer reports the size of the frame the client drew, which is usually
+   * smaller than the texture holding it, so these are what texture coordinates
+   * have to be measured against.
+   */
+  unsigned int TextureWidth() const { return m_textureWidth; }
+  unsigned int TextureHeight() const { return m_textureHeight; }
+
   //! \brief True if the client rendered with OpenGL's bottom-left origin
   bool BottomLeftOrigin() const { return m_bottomLeftOrigin; }
 
@@ -66,6 +76,8 @@ private:
 
   GLuint m_fbo_id{0};
   GLuint m_tex_id{0};
+  unsigned int m_textureWidth{0};
+  unsigned int m_textureHeight{0};
 
   // Depth and stencil live in a renderbuffer rather than a texture: the client
   // draws into them but nothing samples them afterwards.

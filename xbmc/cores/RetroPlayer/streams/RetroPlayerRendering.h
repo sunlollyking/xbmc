@@ -77,9 +77,16 @@ struct HwFramebufferBuffer : public StreamBuffer
 struct HwFramebufferPacket : public StreamPacket
 {
   HwFramebufferPacket() = default;
-  HwFramebufferPacket(uintptr_t framebuffer) : framebuffer(framebuffer) {}
+  HwFramebufferPacket(uintptr_t framebuffer, unsigned int width, unsigned int height)
+    : framebuffer(framebuffer), width(width), height(height)
+  {
+  }
 
   uintptr_t framebuffer{};
+
+  //! \brief Size of the image the client drew, which the framebuffer may exceed
+  unsigned int width{};
+  unsigned int height{};
 };
 
 class CRetroPlayerRendering : public IRetroPlayerStream

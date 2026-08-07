@@ -437,7 +437,7 @@ uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned i
   return m_hwRenderBuffer->GetCurrentFramebuffer();
 }
 
-void CRPRenderManager::RenderFrame()
+void CRPRenderManager::RenderFrame(unsigned int width, unsigned int height)
 {
   if (m_bFlush || m_hwRenderBuffer == nullptr)
     return;
@@ -452,6 +452,13 @@ void CRPRenderManager::RenderFrame()
   for (IRenderBuffer* renderBuffer : m_renderBuffers)
     renderBuffer->Release();
   m_renderBuffers = {m_hwRenderBuffer};
+
+  // Report what the client actually drew, not the size of the framebuffer it
+  // drew into. The renderer works out the image's shape and position on screen
+  // from this, and would otherwise show the whole framebuffer, image and unused
+  // remainder alike.
+  if (width > 0 && height > 0)
+    m_hwRenderBuffer->SetSize(width, height);
 
   m_hwRenderBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
   m_hwRenderBuffer->SetRotation(0);

@@ -431,6 +431,14 @@ extern "C"
   {
     /// @brief
     uintptr_t framebuffer;
+
+    /// @brief Size of the image the client just drew
+    ///
+    /// The framebuffer is allocated at the largest size the client said it
+    /// would ever need, and a frame usually fills only part of it. Without
+    /// these the rest of the framebuffer is shown along with the image.
+    unsigned int width;
+    unsigned int height;
   } ATTR_PACKED game_stream_hw_framebuffer_packet;
   //----------------------------------------------------------------------------
 
