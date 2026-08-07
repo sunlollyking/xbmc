@@ -459,9 +459,30 @@ void CGameClient::NotifyError(GAME_ERROR error)
   // Check if hardware rendering was attempted
   if (Streams().HardwareRenderingAttempted())
   {
-    // Failed to play game
-    // This game requires OpenGL support for 3D rendering. OpenGL support is still under development.
-    MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35271});
+    const std::string& wanted = Streams().HardwareRenderingRefusedWanted();
+    const std::string& available = Streams().HardwareRenderingRefusedAvailable();
+
+    if (!wanted.empty() && !available.empty())
+    {
+      // Failed to play game
+      // This game renders with {0:s}, but this system only provides {1:s}. ...
+      MESSAGING::HELPERS::ShowOKDialogText(
+          CVariant{35210},
+          CVariant{StringUtils::Format(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35281), wanted, available)});
+    }
+    else if (!wanted.empty())
+    {
+      // Failed to play game
+      // This game renders with {0:s}, which isn't available on this display. ...
+      MESSAGING::HELPERS::ShowOKDialogText(
+          CVariant{35210}, CVariant{StringUtils::Format(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35282), wanted)});
+    }
+    else
+    {
+      // Failed to play game
+      // This game requires OpenGL support for 3D rendering. OpenGL support is still under development.
+      MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35271});
+    }
   }
   else if (!missingResource.empty())
   {
