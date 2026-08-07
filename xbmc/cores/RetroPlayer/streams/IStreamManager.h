@@ -47,6 +47,11 @@ public:
   virtual HwProcedureAddress GetHwProcedureAddress(const char* symbol) = 0;
 
   /*!
+   * \brief Whether a client can be given a framebuffer to render into
+   */
+  virtual bool HasHardwareRendering() const = 0;
+
+  /*!
    * \brief Make a hardware-rendering client's context current on this thread
    *
    * Goes through the manager rather than a stream, because a client builds its

@@ -82,3 +82,8 @@ HwProcedureAddress CRPStreamManager::GetHwProcedureAddress(const char* symbol)
 {
   return m_processInfo.GetHwProcedureAddress(symbol);
 }
+
+bool CRPStreamManager::HasHardwareRendering() const
+{
+  return m_processInfo.HasHardwareRendering();
+}

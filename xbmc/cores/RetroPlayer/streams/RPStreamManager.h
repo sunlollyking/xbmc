@@ -30,6 +30,7 @@ public:
   StreamPtr CreateStream(StreamType streamType) override;
   void CloseStream(StreamPtr stream) override;
   HwProcedureAddress GetHwProcedureAddress(const char* symbol) override;
+  bool HasHardwareRendering() const override;
   bool BeginClientFrame() override;
   void EndClientFrame() override;
 

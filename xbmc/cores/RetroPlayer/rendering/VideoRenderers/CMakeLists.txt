@@ -25,16 +25,19 @@ if(("gbm" IN_LIST CORE_PLATFORM_NAME_LC OR "wayland" IN_LIST CORE_PLATFORM_NAME_
   if(TARGET ${APP_NAME_LC}::OpenGl)
     list(APPEND SOURCES RPRendererDMAOpenGL.cpp)
     list(APPEND HEADERS RPRendererDMAOpenGL.h)
-
-    # Pairs with the FBO buffer pool, which needs a shared EGL context.
-    list(APPEND SOURCES RPRendererFBO.cpp)
-    list(APPEND HEADERS RPRendererFBO.h)
   endif()
 
   if(TARGET ${APP_NAME_LC}::OpenGLES)
     list(APPEND SOURCES RPRendererDMAOpenGLES.cpp)
     list(APPEND HEADERS RPRendererDMAOpenGLES.h)
   endif()
+endif()
+
+# Pairs with the FBO buffer pool, which needs a shared EGL context but nothing
+# from DMA and no particular windowing system
+if(TARGET ${APP_NAME_LC}::OpenGl AND TARGET ${APP_NAME_LC}::EGL)
+  list(APPEND SOURCES RPRendererFBO.cpp)
+  list(APPEND HEADERS RPRendererFBO.h)
 endif()
 
 core_add_library(rp-videorenderers)
