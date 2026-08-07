@@ -120,20 +120,13 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
 
 // clang-format off
 
-//! @todo: improve this
-#if defined (HAS_GLES)
-  eglBindAPI(EGL_OPENGL_ES_API);
-#elif defined (HAS_GL)
+  // This pool is built only for desktop OpenGL, so there is no OpenGL ES case
+  // to pick between here
   eglBindAPI(EGL_OPENGL_API);
-#endif
 
   EGLint attribs[] =
   {
-#if defined (HAS_GLES)
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#elif defined (HAS_GL)
     EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-#endif
     // The context is only ever made current without a surface, and the client
     // renders into our framebuffer, whose depth and stencil attachments are
     // built to its request. Asking for a window surface with a depth buffer
