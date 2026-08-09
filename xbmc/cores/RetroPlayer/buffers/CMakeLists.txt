@@ -33,8 +33,9 @@ endif()
 
 # The FBO pool creates a shared EGL context off the windowing system, so it
 # requires EGL in addition to desktop GL -- but nothing from DMA, and no
-# particular windowing system. GLES is out of scope for now.
-if(TARGET ${APP_NAME_LC}::OpenGl AND TARGET ${APP_NAME_LC}::EGL)
+# particular windowing system. Desktop GL and GLES are both served: the pool
+# asks EGL for whichever this build renders with.
+if((TARGET ${APP_NAME_LC}::OpenGl OR TARGET ${APP_NAME_LC}::OpenGLES) AND TARGET ${APP_NAME_LC}::EGL)
   list(APPEND SOURCES RenderBufferFBO.cpp
                       RenderBufferPoolFBO.cpp)
   list(APPEND HEADERS RenderBufferFBO.h

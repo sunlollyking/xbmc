@@ -120,13 +120,23 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
 
 // clang-format off
 
-  // This pool is built only for desktop OpenGL, so there is no OpenGL ES case
-  // to pick between here
+  // Ask EGL for whichever API this build renders with. The pool, the buffers
+  // and the renderer are common to both; only the context differs.
+#if defined(HAS_GLES)
+  eglBindAPI(EGL_OPENGL_ES_API);
+#else
   eglBindAPI(EGL_OPENGL_API);
+#endif
 
   EGLint attribs[] =
   {
+#if defined(HAS_GLES)
+    // ES3 rather than ES2: the framebuffer objects, the depth and stencil
+    // attachments and the sampling this pool relies on are all core in ES3.
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+#else
     EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+#endif
     // The context is only ever made current without a surface, and the client
     // renders into our framebuffer, whose depth and stencil attachments are
     // built to its request. Asking for a window surface with a depth buffer
