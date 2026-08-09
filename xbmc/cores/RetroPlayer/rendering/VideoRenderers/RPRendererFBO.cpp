@@ -254,6 +254,24 @@ void CRPRendererFBO::Render(uint8_t alpha)
   if (!renderBuffer->BottomLeftOrigin())
     std::swap(rect.y1, rect.y2);
 
+  // Logged once per stream: what the client said it drew, against the texture
+  // it drew into and the rect that is sampled from it. A client that reports a
+  // frame smaller than it really drew shows only part of its image, and there
+  // is otherwise nothing in the log to tell that apart from a client that drew
+  // only part of its framebuffer.
+  if (!m_bLoggedGeometry)
+  {
+    m_bLoggedGeometry = true;
+    CLog::Log(LOGINFO,
+              "RetroPlayer[RENDER]: FBO geometry: frame {}x{}, texture {}x{}, source rect "
+              "({:.1f},{:.1f})-({:.1f},{:.1f}), sampling ({:.3f},{:.3f})-({:.3f},{:.3f}), "
+              "bottom-left origin {}",
+              renderBuffer->GetWidth(), renderBuffer->GetHeight(), renderBuffer->TextureWidth(),
+              renderBuffer->TextureHeight(), m_sourceRect.x1, m_sourceRect.y1, m_sourceRect.x2,
+              m_sourceRect.y2, rect.x1, rect.y1, rect.x2, rect.y2,
+              renderBuffer->BottomLeftOrigin() ? "yes" : "no");
+  }
+
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
   glBindTexture(m_textureTarget, renderBuffer->TextureID());

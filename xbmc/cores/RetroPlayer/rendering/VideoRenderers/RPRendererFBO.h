@@ -73,6 +73,9 @@ protected:
 
   GLenum m_textureTarget = GL_TEXTURE_2D;
   float m_clearColour = 0.0f;
+
+  //! \brief Set once the frame and texture geometry has been logged
+  bool m_bLoggedGeometry = false;
 };
 } // namespace RETRO
 } // namespace KODI
