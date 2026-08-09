@@ -19523,16 +19523,16 @@ msgctxt "#35299"
 msgid "This game renders with {0:s}, which isn't available on this display. It can't be played."
 msgstr ""
 
-#. Label of a setting to draw games with OpenGL. In "Settings -> Games -> General"
+#. Label of a setting that works around speckled or flickering video in games. In "Settings -> Games -> General"
 #: system/settings/settings.xml
 msgctxt "#35300"
-msgid "Enable OpenGL"
+msgid "Fix speckled or flickering picture"
 msgstr ""
 
 #. Help text for the setting above
 #: system/settings/settings.xml
 msgctxt "#35301"
-msgid "Draw games with OpenGL instead of the usual way. Turn this on if a game shows flickering lines or speckled patches that shouldn't be there. The usual way can be faster on less powerful devices, so leave this off unless you see those problems."
+msgid "Turn this on if games show flickering lines or speckled patches that shouldn't be there. Each frame is copied to the graphics card instead of being shared with it, which uses a little more power, so leave this off unless you see those problems."
 msgstr ""
 
 #empty strings from id 35302 to 35504
