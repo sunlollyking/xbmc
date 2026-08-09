@@ -127,11 +127,14 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
   EGLint attribs[] =
   {
     EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-    // The context is only ever made current without a surface, and the client
-    // renders into our framebuffer, whose depth and stencil attachments are
-    // built to its request. Asking for a window surface with a depth buffer
-    // narrows the matching configs for no benefit.
-    EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+    // The context is only ever made current without a surface, so the surface
+    // type is a formality -- but eglChooseConfig defaults it to EGL_WINDOW_BIT
+    // and matches on it either way, so it has to name something the platform
+    // really offers. Window is the one every platform Kodi runs on provides.
+    // Pbuffer is not: on GBM, configs come from the GBM formats and advertise
+    // window only, so asking for a pbuffer matches nothing at all and every
+    // hardware core fails to get a context.
+    EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
     EGL_RED_SIZE,   8,
     EGL_GREEN_SIZE, 8,
     EGL_BLUE_SIZE,  8,
