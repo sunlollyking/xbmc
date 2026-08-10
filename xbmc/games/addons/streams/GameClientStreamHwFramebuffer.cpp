@@ -48,13 +48,25 @@ bool CGameClientStreamHwFramebuffer::OpenStream(RETRO::IRetroPlayerStream* strea
   return m_stream != nullptr;
 }
 
+void CGameClientStreamHwFramebuffer::DestroyHwContext()
+{
+  if (m_stream == nullptr || m_hwContextDestroyed)
+    return;
+
+  m_hwContextDestroyed = true;
+
+  // Let the client release its GPU resources while its context is still
+  // current. The context itself outlives this call, so a client that rebuilds
+  // something on the way out still has one to do it in.
+  m_callback.HardwareContextDestroy();
+}
+
 void CGameClientStreamHwFramebuffer::CloseStream()
 {
   if (m_stream != nullptr)
   {
-    // Let the client release its GPU resources while its context is still
-    // current, then tear the context down.
-    m_callback.HardwareContextDestroy();
+    // Normally already done, from before the game was unloaded
+    DestroyHwContext();
 
     m_stream->CloseStream();
     m_stream = nullptr;
