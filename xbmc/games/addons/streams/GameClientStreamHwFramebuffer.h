@@ -59,6 +59,15 @@ public:
   bool GetBuffer(unsigned int width, unsigned int height, game_stream_buffer& buffer) override;
   void AddData(const game_stream_packet& packet) override;
 
+  /*!
+   * \brief Tell the client its context is going away, at most once
+   *
+   * Separate from CloseStream() so the client can be told while the game is
+   * still loaded, which is the only order some clients survive. Calling it
+   * again, including from CloseStream(), does nothing.
+   */
+  void DestroyHwContext();
+
   // Public utility functions
   static void LogHwProperties(const game_hw_rendering_properties& hwProperties);
   static std::string GetContextName(GAME_HW_CONTEXT_TYPE contextType,
@@ -76,6 +85,9 @@ private:
 
   // Stream parameters
   RETRO::IRetroPlayerStream* m_stream{nullptr};
+
+  //! \brief Set once the client has been told its context is going away
+  bool m_hwContextDestroyed{false};
 
   // Hardware rendering parameters
   const std::unique_ptr<const game_hw_rendering_properties> m_hwProperties;

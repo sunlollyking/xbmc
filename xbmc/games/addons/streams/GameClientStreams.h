@@ -59,6 +59,16 @@ public:
    */
   void EndClientFrame();
 
+  /*!
+   * \brief Tell a hardware-rendering client its context is going away
+   *
+   * Called before the game is unloaded, while the client's context is still
+   * current: a client that is told afterwards has already dismantled the state
+   * its context_destroy goes on to use. Does nothing if there is no hardware
+   * rendering client, and nothing on a second call.
+   */
+  void DestroyHwContext();
+
   bool HardwareRenderingAttempted() const
   {
     return m_hwProperties.context_type != GAME_HW_CONTEXT_NONE || !m_hwRefusedWanted.empty();

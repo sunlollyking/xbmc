@@ -208,6 +208,18 @@ void CGameClientStreams::EndClientFrame()
     m_streamManager->EndClientFrame();
 }
 
+void CGameClientStreams::DestroyHwContext()
+{
+  if (m_hwProperties.context_type == GAME_HW_CONTEXT_NONE)
+    return;
+
+  for (const auto& [stream, retroStream] : m_streams)
+  {
+    if (auto* hwStream = dynamic_cast<CGameClientStreamHwFramebuffer*>(stream))
+      hwStream->DestroyHwContext();
+  }
+}
+
 game_proc_address_t CGameClientStreams::GetHwProcedureAddress(const char* symbol)
 {
   if (m_streamManager != nullptr)
