@@ -576,6 +576,15 @@ void CGameClient::CloseFile()
     {
       {
       CClientFrameScope hwScope(Streams());
+
+      // Tell a hardware-rendering client its context is going before the game
+      // is unloaded, rather than when the stream closes underneath the unload.
+      // Both happen inside this scope, so the context stays current for the
+      // client's cleanup and for whatever unloading the game does after it --
+      // but a client told only afterwards has already dismantled the state its
+      // context_destroy then walks, and YabaSanshiro segfaults exactly there.
+      Streams().DestroyHwContext();
+
       LogError(m_ifc.game->toAddon->UnloadGame(m_ifc.game), "UnloadGame()");
       }
     }
