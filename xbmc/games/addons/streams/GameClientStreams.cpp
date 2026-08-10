@@ -111,6 +111,29 @@ bool CGameClientStreams::EnableHardwareRendering(const game_hw_rendering_propert
     return false;
   }
 
+  // Having hardware rendering at all says nothing about which graphics API it
+  // speaks: the pool behind it builds OpenGL contexts on a desktop GL build and
+  // OpenGL ES contexts on an ES one, and nothing here builds a Vulkan device.
+  // Refuse an API this build cannot serve rather than letting the request reach
+  // the version check below, which would compare the running OpenGL version
+  // against a Vulkan one and report whatever nonsense that produced.
+#if defined(HAS_GLES)
+  const bool supported = properties.context_type == GAME_HW_CONTEXT_OPENGLES2 ||
+                         properties.context_type == GAME_HW_CONTEXT_OPENGLES3 ||
+                         properties.context_type == GAME_HW_CONTEXT_OPENGLES_VERSION;
+#else
+  const bool supported = properties.context_type == GAME_HW_CONTEXT_OPENGL ||
+                         properties.context_type == GAME_HW_CONTEXT_OPENGL_CORE;
+#endif
+
+  if (!supported)
+  {
+    CLog::Log(LOGERROR, "GAME: Client asked for {}, which this build does not provide", wanted);
+    m_hwRefusedWanted = wanted;
+    m_hwRefusedAvailable.clear();
+    return false;
+  }
+
   // A client that needs a newer graphics driver than this one has cannot run,
   // and it is worth saying so plainly rather than failing later on a context
   // that could not be created.
