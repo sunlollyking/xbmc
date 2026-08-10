@@ -274,6 +274,15 @@ private:
   // every other frame's drawing, and the frames in between show through.
   IRenderBuffer* m_hwRenderBuffer{nullptr};
   IRenderBufferPool* m_hwBufferPool{nullptr};
+
+  //! \brief Size the client's framebuffer was allocated at
+  //!
+  //! Kept apart from the buffer's own width and height, which are set to the
+  //! size of each frame the client draws so the renderer knows what part of the
+  //! framebuffer to sample. Asking the buffer how large it is would then give
+  //! the last frame's size, not the space available.
+  unsigned int m_hwBufferWidth{0};
+  unsigned int m_hwBufferHeight{0};
   uintptr_t m_loggedFramebuffer{0};
   std::vector<IRenderBuffer*> m_renderBuffers;
   std::map<AVPixelFormat, std::map<AVPixelFormat, SwsContext*>> m_scalers; // From -> to -> context
