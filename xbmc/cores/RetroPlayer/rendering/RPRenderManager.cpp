@@ -370,6 +370,8 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
 
     m_hwRenderBuffer = renderBuffer;
     m_hwBufferPool = bufferPool;
+    m_hwBufferWidth = width;
+    m_hwBufferHeight = height;
 
     CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated a {}x{} framebuffer for the game client",
               width, height);
@@ -404,6 +406,8 @@ void CRPRenderManager::ReleaseHwRenderBuffer()
   m_hwRenderBuffer->Release();
   m_hwRenderBuffer = nullptr;
   m_hwBufferPool = nullptr;
+  m_hwBufferWidth = 0;
+  m_hwBufferHeight = 0;
 }
 
 uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned int height)
@@ -424,10 +428,15 @@ uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned i
   // deliberately does not wait for a visible renderer. Rendering into a
   // framebuffer nobody samples yet merely wastes a frame; handing back 0 would
   // send the drawing to the default framebuffer instead.
-  if (width > m_hwRenderBuffer->GetWidth() || height > m_hwRenderBuffer->GetHeight())
+  // Measured against the size the framebuffer was allocated at, not the size of
+  // the last frame drawn into it. Those are the same until a client presents a
+  // frame smaller than its framebuffer, after which asking the buffer would say
+  // the space had shrunk to that frame -- and rebuild the framebuffer, every
+  // frame, while the client kept drawing into the one it had cached.
+  if (width > m_hwBufferWidth || height > m_hwBufferHeight)
   {
     CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Client wants {}x{}, larger than the {}x{} framebuffer",
-              width, height, m_hwRenderBuffer->GetWidth(), m_hwRenderBuffer->GetHeight());
+              width, height, m_hwBufferWidth, m_hwBufferHeight);
 
     if (!Create(width, height))
     {
