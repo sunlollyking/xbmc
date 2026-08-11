@@ -460,7 +460,20 @@ void CRPRendererFBO::Render(uint8_t alpha)
       glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, filter);
       glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, filter);
 
-      if (m_shaderPreset->RenderUpdate(sourceTexture, *target))
+      // The chain sets the viewport and scissor to the size of what it is
+      // writing into and leaves them there, so everything drawn afterwards --
+      // the frame itself, and with it the rotation, zoom and pixel ratio that
+      // position it -- would be measured against the wrong rectangle. Put them
+      // back before drawing anything to the screen.
+      CRect viewPort;
+      m_context.GetViewPort(viewPort);
+
+      const bool bRendered = m_shaderPreset->RenderUpdate(sourceTexture, *target);
+
+      m_context.SetViewPort(viewPort);
+      m_context.SetScissors(viewPort);
+
+      if (bRendered)
       {
         drawTexture = target->GetTextureID();
         bShaded = true;
