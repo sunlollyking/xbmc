@@ -15,6 +15,7 @@
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
 
 #include <atomic>
+#include <chrono>
 #include <stdint.h>
 #include <vector>
 
@@ -74,8 +75,44 @@ protected:
   GLenum m_textureTarget = GL_TEXTURE_2D;
   float m_clearColour = 0.0f;
 
-  //! \brief Set once the frame and texture geometry has been logged
+  /*!
+   * \brief The geometry a frame was drawn with, as far as logging cares
+   *
+   * Compared exactly rather than with a tolerance: every field is copied or
+   * derived the same way each frame, so any difference at all is a real change
+   * and worth seeing.
+   */
+  struct FrameGeometry
+  {
+    unsigned int frameWidth{0};
+    unsigned int frameHeight{0};
+    unsigned int textureWidth{0};
+    unsigned int textureHeight{0};
+    CRect sourceRect;
+    CRect samplingRect;
+    bool bottomLeftOrigin{false};
+
+    bool operator==(const FrameGeometry& rhs) const
+    {
+      return frameWidth == rhs.frameWidth && frameHeight == rhs.frameHeight &&
+             textureWidth == rhs.textureWidth && textureHeight == rhs.textureHeight &&
+             sourceRect == rhs.sourceRect && samplingRect == rhs.samplingRect &&
+             bottomLeftOrigin == rhs.bottomLeftOrigin;
+    }
+    bool operator!=(const FrameGeometry& rhs) const { return !(*this == rhs); }
+  };
+
+  //! \brief The geometry reported by the last line written to the log
+  FrameGeometry m_loggedGeometry;
+
+  //! \brief Set once anything has been logged, so the first frame always is
   bool m_bLoggedGeometry = false;
+
+  //! \brief Changes seen since the last line was written
+  unsigned int m_geometryChanges = 0;
+
+  //! \brief When the last line was written, to keep a churning geometry quiet
+  std::chrono::steady_clock::time_point m_lastGeometryLog;
 };
 } // namespace RETRO
 } // namespace KODI

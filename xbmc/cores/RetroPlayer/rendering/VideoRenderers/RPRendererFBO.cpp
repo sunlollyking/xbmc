@@ -259,17 +259,46 @@ void CRPRendererFBO::Render(uint8_t alpha)
   // frame smaller than it really drew shows only part of its image, and there
   // is otherwise nothing in the log to tell that apart from a client that drew
   // only part of its framebuffer.
-  if (!m_bLoggedGeometry)
+  // Logged whenever it changes rather than once, because a geometry that keeps
+  // changing looks the same in a one-shot log as one that never does, and the
+  // difference is the whole question when a picture flickers. A geometry that
+  // changes every frame would drown the log, so lines are kept to one a second
+  // and carry the number of changes they stand for.
+  const FrameGeometry geometry{renderBuffer->GetWidth(),
+                               renderBuffer->GetHeight(),
+                               renderBuffer->TextureWidth(),
+                               renderBuffer->TextureHeight(),
+                               m_sourceRect,
+                               rect,
+                               renderBuffer->BottomLeftOrigin()};
+
+  if (!m_bLoggedGeometry || geometry != m_loggedGeometry)
   {
-    m_bLoggedGeometry = true;
-    CLog::Log(LOGINFO,
-              "RetroPlayer[RENDER]: FBO geometry: frame {}x{}, texture {}x{}, source rect "
-              "({:.1f},{:.1f})-({:.1f},{:.1f}), sampling ({:.3f},{:.3f})-({:.3f},{:.3f}), "
-              "bottom-left origin {}",
-              renderBuffer->GetWidth(), renderBuffer->GetHeight(), renderBuffer->TextureWidth(),
-              renderBuffer->TextureHeight(), m_sourceRect.x1, m_sourceRect.y1, m_sourceRect.x2,
-              m_sourceRect.y2, rect.x1, rect.y1, rect.x2, rect.y2,
-              renderBuffer->BottomLeftOrigin() ? "yes" : "no");
+    ++m_geometryChanges;
+
+    const auto now = std::chrono::steady_clock::now();
+    const bool bQuietEnough =
+        !m_bLoggedGeometry ||
+        (now - m_lastGeometryLog) >= std::chrono::seconds(1);
+
+    if (bQuietEnough)
+    {
+      CLog::Log(LOGINFO,
+                "RetroPlayer[RENDER]: FBO geometry: frame {}x{}, texture {}x{}, source rect "
+                "({:.1f},{:.1f})-({:.1f},{:.1f}), sampling ({:.3f},{:.3f})-({:.3f},{:.3f}), "
+                "bottom-left origin {} ({} change(s))",
+                geometry.frameWidth, geometry.frameHeight, geometry.textureWidth,
+                geometry.textureHeight, geometry.sourceRect.x1, geometry.sourceRect.y1,
+                geometry.sourceRect.x2, geometry.sourceRect.y2, geometry.samplingRect.x1,
+                geometry.samplingRect.y1, geometry.samplingRect.x2, geometry.samplingRect.y2,
+                geometry.bottomLeftOrigin ? "yes" : "no", m_geometryChanges);
+
+      m_bLoggedGeometry = true;
+      m_lastGeometryLog = now;
+      m_geometryChanges = 0;
+    }
+
+    m_loggedGeometry = geometry;
   }
 
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
