@@ -465,13 +465,24 @@ void CRPRendererFBO::Render(uint8_t alpha)
       // the frame itself, and with it the rotation, zoom and pixel ratio that
       // position it -- would be measured against the wrong rectangle. Put them
       // back before drawing anything to the screen.
-      CRect viewPort;
-      m_context.GetViewPort(viewPort);
+      // Saved and restored as raw GL state rather than through the render
+      // context. The chain sets the viewport with glViewport() directly, so the
+      // context's own copy is stale while it runs; putting it back through
+      // SetViewPort() would write that stale value into the context and flip it
+      // on the way, since the context keeps top-left coordinates and GL keeps
+      // bottom-left. Worse, ManageRenderArea() sizes the shader target by
+      // reading the context's viewport, so writing to it here feeds the wrong
+      // scale back into the next frame -- which is what left CRT presets with a
+      // colour cast and no scanlines.
+      GLint viewPort[4] = {};
+      GLint scissorBox[4] = {};
+      glGetIntegerv(GL_VIEWPORT, viewPort);
+      glGetIntegerv(GL_SCISSOR_BOX, scissorBox);
 
       const bool bRendered = m_shaderPreset->RenderUpdate(sourceTexture, *target);
 
-      m_context.SetViewPort(viewPort);
-      m_context.SetScissors(viewPort);
+      glViewport(viewPort[0], viewPort[1], viewPort[2], viewPort[3]);
+      glScissor(scissorBox[0], scissorBox[1], scissorBox[2], scissorBox[3]);
 
       if (bRendered)
       {
