@@ -12,11 +12,21 @@
 #include "cores/RetroPlayer/buffers/RenderBufferPoolFBO.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
 #include "cores/RetroPlayer/rendering/RenderVideoSettings.h"
+#if defined(HAS_GLES)
+#include "cores/RetroPlayer/shaders/gles/ShaderPresetGLES.h"
+#include "cores/RetroPlayer/shaders/gles/ShaderTextureGLES.h"
+#include "cores/RetroPlayer/shaders/gles/ShaderTextureGLESRef.h"
+#else
+#include "cores/RetroPlayer/shaders/gl/ShaderPresetGL.h"
+#include "cores/RetroPlayer/shaders/gl/ShaderTextureGL.h"
+#include "cores/RetroPlayer/shaders/gl/ShaderTextureGLRef.h"
+#endif
 #include "rendering/MatrixGL.h"
 #include "utils/GLUtils.h"
 #include "utils/log.h"
 
 #include <cstring>
+#include <memory>
 #include <stddef.h>
 
 using namespace KODI;
@@ -48,10 +58,104 @@ CRPRendererFBO::CRPRendererFBO(const CRenderSettings& renderSettings,
                                std::shared_ptr<IRenderBufferPool> bufferPool)
   : CRPBaseRenderer(renderSettings, context, std::move(bufferPool))
 {
+  // Without this the video filter settings have nothing behind them and are
+  // silently ignored, which is what every hardware-rendered game got before.
+#if defined(HAS_GLES)
+  m_shaderPreset = std::make_unique<SHADER::CShaderPresetGLES>(m_context);
+#else
+  m_shaderPreset = std::make_unique<SHADER::CShaderPresetGL>(m_context);
+#endif
 }
 
 CRPRendererFBO::~CRPRendererFBO()
 {
+  DestroyShaderResources();
+}
+
+void CRPRendererFBO::DestroyShaderResources()
+{
+  if (m_shaderCopyFbo != 0)
+  {
+    glDeleteFramebuffers(1, &m_shaderCopyFbo);
+    m_shaderCopyFbo = 0;
+  }
+
+  if (m_shaderSourceTexture != 0)
+  {
+    glDeleteTextures(1, &m_shaderSourceTexture);
+    m_shaderSourceTexture = 0;
+  }
+
+  m_shaderSourceWidth = 0;
+  m_shaderSourceHeight = 0;
+
+  m_shaderTargetTexture.reset();
+  m_shaderTargetWidth = 0.0f;
+  m_shaderTargetHeight = 0.0f;
+}
+
+bool CRPRendererFBO::CopyFrameForShaders(CRenderBufferFBO* renderBuffer)
+{
+  const unsigned int frameWidth = renderBuffer->GetWidth();
+  const unsigned int frameHeight = renderBuffer->GetHeight();
+
+  if (frameWidth == 0 || frameHeight == 0)
+    return false;
+
+  // Rebuilt only when the frame changes size, which for most clients is never
+  if (m_shaderSourceTexture == 0 || m_shaderSourceWidth != frameWidth ||
+      m_shaderSourceHeight != frameHeight)
+  {
+    if (m_shaderSourceTexture != 0)
+      glDeleteTextures(1, &m_shaderSourceTexture);
+
+    glGenTextures(1, &m_shaderSourceTexture);
+    glBindTexture(m_textureTarget, m_shaderSourceTexture);
+    glTexImage2D(m_textureTarget, 0, GL_RGBA, frameWidth, frameHeight, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(m_textureTarget, 0);
+
+    m_shaderSourceWidth = frameWidth;
+    m_shaderSourceHeight = frameHeight;
+
+    if (m_shaderCopyFbo == 0)
+      glGenFramebuffers(1, &m_shaderCopyFbo);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_shaderCopyFbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_textureTarget,
+                           m_shaderSourceTexture, 0);
+
+    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+      CLog::Log(LOGERROR,
+                "RetroPlayer[RENDER]: Can't shade a {}x{} frame, its copy is incomplete ({:#x})",
+                frameWidth, frameHeight, status);
+      DestroyShaderResources();
+      return false;
+    }
+  }
+
+  // The client drew into a corner of its framebuffer, so only that corner is
+  // copied. Its origin follows the client's convention, the same one the
+  // direct path flips for when sampling.
+  const GLint srcY0 = renderBuffer->BottomLeftOrigin() ? 0 : frameHeight;
+  const GLint srcY1 = renderBuffer->BottomLeftOrigin() ? frameHeight : 0;
+
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, renderBuffer->GetCurrentFramebuffer());
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_shaderCopyFbo);
+  glBlitFramebuffer(0, srcY0, frameWidth, srcY1, 0, 0, frameWidth, frameHeight,
+                    GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+  return true;
 }
 
 void CRPRendererFBO::RenderInternal(bool clear, uint8_t alpha)
@@ -303,7 +407,81 @@ void CRPRendererFBO::Render(uint8_t alpha)
 
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
-  glBindTexture(m_textureTarget, renderBuffer->TextureID());
+  // Run the video filter, if one is set. The chain reads a texture holding just
+  // the client's frame and writes one the size of the destination, which is
+  // then drawn in place of the client's own texture. Any failure along the way
+  // turns the preset off and leaves the direct path below to draw the frame as
+  // it always did, so a filter that cannot run costs the picture nothing.
+  GLuint drawTexture = renderBuffer->TextureID();
+  bool bShaded = false;
+
+  Updateshaders();
+
+  if (m_bUseShaderPreset && !m_shaderPreset->GetPasses().empty())
+  {
+    if (m_shaderTargetTexture && (m_shaderTargetWidth != m_fullDestWidth ||
+                                  m_shaderTargetHeight != m_fullDestHeight))
+    {
+      m_shaderTargetTexture.reset();
+    }
+
+    if (!m_shaderTargetTexture && m_fullDestWidth > 0.0f && m_fullDestHeight > 0.0f)
+    {
+#if defined(HAS_GLES)
+      auto targetTexture = std::make_shared<SHADER::CShaderTextureGLES>(
+          static_cast<unsigned int>(m_fullDestWidth), static_cast<unsigned int>(m_fullDestHeight),
+          GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA, false);
+#else
+      auto targetTexture = std::make_shared<SHADER::CShaderTextureGL>(
+          static_cast<unsigned int>(m_fullDestWidth), static_cast<unsigned int>(m_fullDestHeight),
+          GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA, false);
+#endif
+      targetTexture->CreateTexture();
+      m_shaderTargetTexture = std::move(targetTexture);
+      m_shaderTargetWidth = m_fullDestWidth;
+      m_shaderTargetHeight = m_fullDestHeight;
+    }
+
+    if (m_shaderTargetTexture && CopyFrameForShaders(renderBuffer))
+    {
+#if defined(HAS_GLES)
+      SHADER::CShaderTextureGLESRef sourceTexture(m_shaderSourceWidth, m_shaderSourceHeight,
+                                                  m_shaderSourceTexture);
+      auto* target = static_cast<SHADER::CShaderTextureGLES*>(m_shaderTargetTexture.get());
+#else
+      SHADER::CShaderTextureGLRef sourceTexture(m_shaderSourceWidth, m_shaderSourceHeight,
+                                                m_shaderSourceTexture);
+      auto* target = static_cast<SHADER::CShaderTextureGL*>(m_shaderTargetTexture.get());
+#endif
+      const GLint filter =
+          m_shaderPreset->GetPasses().front().filterType == SHADER::FilterType::LINEAR ? GL_LINEAR
+                                                                                      : GL_NEAREST;
+      glBindTexture(m_textureTarget, m_shaderSourceTexture);
+      glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, filter);
+      glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, filter);
+
+      if (m_shaderPreset->RenderUpdate(sourceTexture, *target))
+      {
+        drawTexture = target->GetTextureID();
+        bShaded = true;
+      }
+      else
+      {
+        CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Video filter failed, drawing the frame unfiltered");
+        m_bShadersNeedUpdate = false;
+        m_bUseShaderPreset = false;
+        DestroyShaderResources();
+      }
+    }
+  }
+
+  // The shader chain wrote a texture that is exactly the destination, already
+  // the right way up, so the sub-rect and flip the client's own texture needs
+  // do not apply to it.
+  if (bShaded)
+    rect = CRect(0.0f, 0.0f, 1.0f, 1.0f);
+
+  glBindTexture(m_textureTarget, drawTexture);
 
   CRect viewport;
   m_context.GetViewPort(viewport);

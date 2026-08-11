@@ -16,6 +16,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <stdint.h>
 #include <vector>
 
@@ -23,8 +24,15 @@
 
 namespace KODI
 {
+namespace SHADER
+{
+class IShaderTexture;
+}
+
 namespace RETRO
 {
+class CRenderBufferFBO;
+
 class CRendererFactoryFBO : public IRendererFactory
 {
 public:
@@ -72,6 +80,28 @@ protected:
 
   virtual void Render(uint8_t alpha);
 
+  /*!
+   * \brief Copy the frame the client drew into a texture of its own size
+   *
+   * The client draws into a corner of a framebuffer allocated at the largest
+   * size it said it would ever need, so the frame is a sub-rect of a larger
+   * texture. Shader presets sample their source over its whole extent and take
+   * their scaling from its dimensions, so handing one the client's texture
+   * would run the chain over the unwritten remainder as well.
+   *
+   * Blitting the sub-rect into a tightly sized texture gives the chain what it
+   * expects. It costs one copy per frame, on a path where the client has
+   * already done its drawing on the GPU.
+   *
+   * \param renderBuffer The buffer holding the client's framebuffer
+   *
+   * \return True if the frame is in m_shaderSourceTexture and can be shaded
+   */
+  bool CopyFrameForShaders(CRenderBufferFBO* renderBuffer);
+
+  //! \brief Release the textures and framebuffer used to feed the shader chain
+  void DestroyShaderResources();
+
   GLenum m_textureTarget = GL_TEXTURE_2D;
   float m_clearColour = 0.0f;
 
@@ -113,6 +143,23 @@ protected:
 
   //! \brief When the last line was written, to keep a churning geometry quiet
   std::chrono::steady_clock::time_point m_lastGeometryLog;
+
+  //! \brief Framebuffer used to blit the client's frame into a tight texture
+  GLuint m_shaderCopyFbo{0};
+
+  //! \brief The client's frame at its own size, as the shader chain wants it
+  GLuint m_shaderSourceTexture{0};
+
+  //! \brief The size m_shaderSourceTexture was created at
+  unsigned int m_shaderSourceWidth{0};
+  unsigned int m_shaderSourceHeight{0};
+
+  //! \brief Where the shader chain writes, and what is finally drawn
+  std::shared_ptr<SHADER::IShaderTexture> m_shaderTargetTexture;
+
+  //! \brief The size m_shaderTargetTexture was created at
+  float m_shaderTargetWidth{0.0f};
+  float m_shaderTargetHeight{0.0f};
 };
 } // namespace RETRO
 } // namespace KODI
