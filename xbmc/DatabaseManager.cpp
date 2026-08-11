@@ -18,6 +18,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/log.h"
 #include "video/VideoDatabase.h"
+#include "games/GameClientDatabase.h"
 #include "view/ViewDatabase.h"
 
 #include <algorithm>
@@ -79,6 +80,8 @@ bool CDatabaseManager::InitializeInternal()
   // NOTE: Order here is important. In particular, CTextureDatabase has to be updated
   //       before CVideoDatabase.
   if (CViewDatabase db; !UpdateDatabase(db))
+    return false;
+  if (KODI::GAME::CGameClientDatabase db; !UpdateDatabase(db))
     return false;
   if (CTextureDatabase db; !UpdateDatabase(db))
     return false;
