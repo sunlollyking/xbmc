@@ -27,11 +27,15 @@ using namespace RETRO;
 
 const double MAX_DELAY = 0.3; // seconds
 
-// How long a single packet may wait for a full sink before it is given up on.
-// Long enough to ride out a sink that is merely full, short enough that a sink
-// which has stopped draining costs the game loop one frame rather than hanging
-// it.
+// How long a single packet may wait before it is given up on. Long enough to
+// ride out a sink that is merely busy, short enough that a sink which has
+// stopped draining costs the game loop one frame rather than hanging it.
 constexpr auto MAX_WAIT = std::chrono::milliseconds(100);
+
+// How much audio to keep queued ahead of the speakers. The client is held to
+// the speed this backlog drains at, so it wants to be small enough to pace
+// tightly and large enough to absorb an uneven producer.
+const double TARGET_DELAY = 0.1; // seconds
 
 CRetroPlayerAudio::CRetroPlayerAudio(CRPProcessInfo& processInfo) : m_processInfo(processInfo)
 {
@@ -138,22 +142,10 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
                   delaySecs * 1000);
       }
 
-      // Feed the sink until it has taken everything, waiting while it is full.
-      //
-      // The waiting is the point. A client that renders faster than real time
-      // is slowed here to the speed its own sound plays at, which is how
-      // libretro clients expect a frontend to pace them -- several have no
-      // other throttle at all. Taking whatever the sink offered and returning
-      // immediately let such a client run flat out, produce audio faster than
-      // it could be played, and have the excess thrown away: Dreamcast games
-      // ran at about twice speed with the audio delay climbing until it was
-      // flushed, over and over.
-      //
-      // Bounded, so a stream that stops draining costs the game loop a frame
-      // rather than hanging it.
       const std::chrono::steady_clock::time_point giveUpAt =
           std::chrono::steady_clock::now() + MAX_WAIT;
 
+      // Feed the sink until it has taken everything, waiting if it is full.
       unsigned int framesWritten = 0;
       while (framesWritten < frameCount)
       {
@@ -168,6 +160,39 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
           CLog::Log(LOGDEBUG,
                     "RetroPlayer[AUDIO]: Sink took {} of {} frames before the wait ran out",
                     framesWritten, frameCount);
+          break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+
+      // Then hold the client to the speed its own sound plays at.
+      //
+      // This is the throttle, and it has to watch the delay rather than the
+      // sink. AudioEngine buffers generously and takes a whole packet the
+      // moment it is offered, so a client rendering faster than real time is
+      // never blocked by a full sink -- it just runs flat out while the backlog
+      // grows until it is flushed. That is exactly what Dreamcast games did:
+      // roughly twice speed, with the delay climbing past 600 ms and being
+      // flushed over a hundred times a session.
+      //
+      // Libretro clients expect the frontend to pace them through audio;
+      // several have no other throttle. Waiting here for the queue to drain to
+      // TARGET_DELAY is what supplies that.
+      //
+      // Bounded by the same deadline, so a stream that has stopped draining
+      // costs the game loop a frame rather than hanging it.
+      while (m_pAudioStream->GetDelay() > TARGET_DELAY)
+      {
+        if (std::chrono::steady_clock::now() >= giveUpAt)
+        {
+          // Hitting this every packet would mean the sink never drains below
+          // the target -- the target is under AudioEngine's own floor and is
+          // throttling the client far harder than intended. Logged so that
+          // shows up as a flood rather than as an unexplained slow game.
+          CLog::Log(LOGDEBUG,
+                    "RetroPlayer[AUDIO]: Delay still {:0.2f} ms after waiting, giving up",
+                    m_pAudioStream->GetDelay() * 1000);
           break;
         }
 
