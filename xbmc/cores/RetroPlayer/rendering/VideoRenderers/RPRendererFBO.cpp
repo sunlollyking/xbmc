@@ -145,8 +145,12 @@ bool CRPRendererFBO::CopyFrameForShaders(CRenderBufferFBO* renderBuffer)
   // The client drew into a corner of its framebuffer, so only that corner is
   // copied. Its origin follows the client's convention, the same one the
   // direct path flips for when sampling.
-  const GLint srcY0 = renderBuffer->BottomLeftOrigin() ? 0 : frameHeight;
-  const GLint srcY1 = renderBuffer->BottomLeftOrigin() ? frameHeight : 0;
+  // Flip a bottom-up client while copying, so the chain is always handed a
+  // texture the conventional way up. Passing the flip on to the end instead
+  // would leave the filters themselves running upside down, which matters for
+  // any of them that is not symmetrical: scanlines, curvature, borders.
+  const GLint srcY0 = renderBuffer->BottomLeftOrigin() ? frameHeight : 0;
+  const GLint srcY1 = renderBuffer->BottomLeftOrigin() ? 0 : frameHeight;
 
   glBindFramebuffer(GL_READ_FRAMEBUFFER, renderBuffer->GetCurrentFramebuffer());
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_shaderCopyFbo);
