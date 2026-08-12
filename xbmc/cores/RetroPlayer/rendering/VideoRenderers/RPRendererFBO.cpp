@@ -352,10 +352,16 @@ void CRPRendererFBO::Render(uint8_t alpha)
   rect.y1 /= renderBuffer->TextureHeight();
   rect.y2 /= renderBuffer->TextureHeight();
 
-  // A client using top-left origin semantics has written the image the other
-  // way up relative to how the texture is sampled, so flip it here rather than
-  // making every client pay for a flip it does not need.
-  if (!renderBuffer->BottomLeftOrigin())
+  // The quad is placed in Kodi's screen coordinates, which grow downwards, while
+  // a client rendering with OpenGL's convention has written its framebuffer from
+  // the bottom up. Flip the texture for those clients so the image is sampled
+  // the way round it was drawn.
+  //
+  // This tests the origin the opposite way to how it reads: while this renderer
+  // set up its own Ortho2D with y growing upwards, the quad itself was already
+  // inverted and it was the top-left origin clients that needed correcting. Now
+  // that the render context's matrices place the quad, that inversion is gone.
+  if (renderBuffer->BottomLeftOrigin())
     std::swap(rect.y1, rect.y2);
 
   // Logged once per stream: what the client said it drew, against the texture
