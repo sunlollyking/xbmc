@@ -423,6 +423,12 @@ void CRPRendererFBO::Render(uint8_t alpha)
   // then drawn in place of the client's own texture. Any failure along the way
   // turns the preset off and leaves the direct path below to draw the frame as
   // it always did, so a filter that cannot run costs the picture nothing.
+  // Order our reads after the client's writes. Without this the client's last
+  // draw calls may not have landed, and what is missing is whatever it drew
+  // last -- typically the HUD.
+  if (auto* fboPool = dynamic_cast<CRenderBufferPoolFBO*>(GetBufferPool()))
+    fboPool->WaitForClientFrame();
+
   GLuint drawTexture = renderBuffer->TextureID();
   bool bShaded = false;
 

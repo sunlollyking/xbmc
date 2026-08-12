@@ -21,6 +21,7 @@
 
 #include "cores/RetroPlayer/buffers/BaseRenderBufferPool.h"
 
+#include <mutex>
 #include <thread>
 
 #include <EGL/egl.h>
@@ -68,6 +69,14 @@ public:
   void EndClientFrame() override;
   void DestroyContext() override;
 
+  /*!
+   * \brief Make the client's drawing visible to whoever samples it next
+   *
+   * Sharing a texture between two contexts does not synchronise access to it.
+   * Called on the thread that is about to sample, before it does.
+   */
+  void WaitForClientFrame();
+
 protected:
 
   // Construction parameters
@@ -80,6 +89,10 @@ protected:
   // renders on is whichever one it happens to use. Track who holds it, and what
   // they had before, so it can be handed back.
   unsigned int m_clientFrameDepth{0};
+
+  //! \brief Signalled when the client's last frame has been issued
+  GLsync m_clientFence{nullptr};
+  std::mutex m_fenceMutex;
   std::thread::id m_clientThread;
   EGLDisplay m_prevDisplay{EGL_NO_DISPLAY};
   EGLSurface m_prevDraw{EGL_NO_SURFACE};

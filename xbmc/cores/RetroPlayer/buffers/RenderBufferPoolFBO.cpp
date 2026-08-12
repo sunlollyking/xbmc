@@ -313,6 +313,30 @@ void CRenderBufferPoolFBO::EndClientFrame()
   if (--m_clientFrameDepth > 0)
     return;
 
+  // Fence the client's drawing before letting go of its context.
+  //
+  // The client renders into the framebuffer on its own thread with its own
+  // context, and Kodi samples the resulting texture from the rendering thread.
+  // Sharing an object between two contexts does not synchronise access to it:
+  // without a fence, Kodi is free to sample a texture whose writes have not
+  // landed, and it will draw whatever was there. What goes missing is the last
+  // thing the client drew, which in most games is the HUD.
+  //
+  // A fence rather than glFinish, so the ordering is imposed on the GPU and the
+  // game loop is not stalled waiting for it to drain.
+  {
+    std::unique_lock<std::mutex> lock{m_fenceMutex};
+
+    if (m_clientFence != nullptr)
+      glDeleteSync(m_clientFence);
+
+    m_clientFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+
+    // The fence is only guaranteed to be reachable from another context once
+    // the commands before it have been flushed to the driver
+    glFlush();
+  }
+
   // Give the thread back exactly what it had, so Kodi keeps its surface if this
   // happened to be its rendering thread
   if (m_prevContext != EGL_NO_CONTEXT && m_prevDisplay != EGL_NO_DISPLAY)
@@ -325,6 +349,18 @@ void CRenderBufferPoolFBO::EndClientFrame()
   m_prevDraw = EGL_NO_SURFACE;
   m_prevRead = EGL_NO_SURFACE;
   m_prevContext = EGL_NO_CONTEXT;
+}
+
+void CRenderBufferPoolFBO::WaitForClientFrame()
+{
+  std::unique_lock<std::mutex> lock{m_fenceMutex};
+
+  if (m_clientFence == nullptr)
+    return;
+
+  // Order this context's reads after the client's writes. The wait is on the
+  // GPU, so this returns immediately and costs the caller nothing.
+  glWaitSync(m_clientFence, 0, GL_TIMEOUT_IGNORED);
 }
 
 void CRenderBufferPoolFBO::DestroyContext()
