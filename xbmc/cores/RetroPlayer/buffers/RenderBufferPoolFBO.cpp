@@ -31,6 +31,7 @@
 #include "windowing/linux/WinSystemEGL.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace KODI;
@@ -172,40 +173,79 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
   // calls are simply absent there - so requesting the wrong profile leaves the
   // core unable to build its resources, with no obvious symptom beyond a core
   // that never draws.
-  std::vector<EGLint> contextAttribs;
-
+  // The version asked for is a minimum, not an exact match. A client asking for
+  // OpenGL ES 3 means "3.0 or better", the same as it does everywhere else in
+  // libretro, and pinning it to exactly 3.0 costs it everything added since:
+  // compute shaders and shader storage buffers arrived in 3.1, and a core that
+  // uses them resolves those entry points to NULL on a 3.0 context and calls
+  // them anyway. Try the later versions first and fall back to what was asked.
+  //
+  // ES only. Its minor versions are additive, so a higher one can only offer
+  // more, whereas desktop GL versions interact with the profile requested
+  // below and are left exactly as the client asked for them.
+  std::vector<std::pair<unsigned int, unsigned int>> versions;
   if (properties.versionMajor != 0)
   {
-    contextAttribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
-    contextAttribs.push_back(static_cast<EGLint>(properties.versionMajor));
-    contextAttribs.push_back(EGL_CONTEXT_MINOR_VERSION_KHR);
-    contextAttribs.push_back(static_cast<EGLint>(properties.versionMinor));
+    if (properties.embedded && properties.versionMajor == 3)
+    {
+      for (unsigned int minor = 2; minor > properties.versionMinor; --minor)
+        versions.emplace_back(3, minor);
+    }
+    versions.emplace_back(properties.versionMajor, properties.versionMinor);
   }
-
-  if (!properties.embedded)
+  else
   {
-    contextAttribs.push_back(EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR);
-    contextAttribs.push_back(properties.coreProfile
-                                 ? EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR
-                                 : EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR);
+    // Nothing asked for, so let the driver decide
+    versions.emplace_back(0, 0);
   }
 
-  contextAttribs.push_back(EGL_NONE);
-
-  // Describes what was asked for, so a rejection says which request the driver
-  // could not meet
-  std::string contextName = properties.embedded ? "OpenGL ES"
-                            : properties.coreProfile ? "OpenGL core profile"
-                                                     : "OpenGL compatibility profile";
-  if (properties.versionMajor != 0)
-    contextName += StringUtils::Format(" {}.{}", properties.versionMajor, properties.versionMinor);
+  const std::string apiName = properties.embedded ? "OpenGL ES"
+                              : properties.coreProfile ? "OpenGL core profile"
+                                                       : "OpenGL compatibility profile";
 
   // This is the version and profile check: rather than testing the request
   // against a hardcoded table, ask the driver for it and let it refuse. A
   // refusal fails the stream cleanly, while the client can still fall back to
   // software rendering.
-  m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, winSystem->GetEGLContext(),
-                                  contextAttribs.data());
+  std::string contextName;
+  for (const auto& [major, minor] : versions)
+  {
+    std::vector<EGLint> contextAttribs;
+
+    if (major != 0)
+    {
+      contextAttribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
+      contextAttribs.push_back(static_cast<EGLint>(major));
+      contextAttribs.push_back(EGL_CONTEXT_MINOR_VERSION_KHR);
+      contextAttribs.push_back(static_cast<EGLint>(minor));
+    }
+
+    if (!properties.embedded)
+    {
+      contextAttribs.push_back(EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR);
+      contextAttribs.push_back(properties.coreProfile
+                                   ? EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR
+                                   : EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR);
+    }
+
+    contextAttribs.push_back(EGL_NONE);
+
+    // Describes what was asked for, so a rejection says which request the
+    // driver could not meet
+    contextName = apiName;
+    if (major != 0)
+      contextName += StringUtils::Format(" {}.{}", major, minor);
+
+    m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, winSystem->GetEGLContext(),
+                                    contextAttribs.data());
+    if (m_eglContext != EGL_NO_CONTEXT)
+    {
+      CLog::Log(LOGINFO, "RetroPlayer[RENDER]: Created a {} context for the game client",
+                contextName);
+      break;
+    }
+  }
+
   if (m_eglContext == EGL_NO_CONTEXT)
   {
     CLog::Log(LOGERROR,
