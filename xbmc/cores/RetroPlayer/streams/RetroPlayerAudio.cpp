@@ -18,6 +18,8 @@
 #include "utils/log.h"
 
 #include <chrono>
+#include <thread>
+
 #include <cmath>
 
 using namespace KODI;
@@ -27,6 +29,11 @@ const double MAX_DELAY = 0.3; // seconds
 
 // How long to stay quiet between log lines.
 const std::chrono::seconds DROP_LOG_INTERVAL{10};
+// How long a single packet may wait for a full sink before it is given up on.
+// Long enough to ride out a sink that is merely full, short enough that a sink
+// which has stopped draining costs the game loop one frame rather than hanging
+// it.
+constexpr auto MAX_WAIT = std::chrono::milliseconds(100);
 
 CRetroPlayerAudio::CRetroPlayerAudio(CRPProcessInfo& processInfo) : m_processInfo(processInfo)
 {
@@ -122,7 +129,11 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
 
       const unsigned int frameCount = static_cast<unsigned int>(audioPacket.size / frameSize);
 
-      if (delaySecs > MAX_DELAY)
+      // Only when the delay is far past what waiting below should ever allow,
+      // which means something other than a full sink is wrong -- a device that
+      // stopped draining, or a client that raced ahead while the stream was
+      // unable to take anything.
+      if (delaySecs > MAX_DELAY * 2.0)
       {
         m_pAudioStream->Flush();
         CLog::Log(LOGDEBUG, "RetroPlayer[AUDIO]: Audio delay ({:0.2f} ms) is too high - flushing",
@@ -151,6 +162,40 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
           m_lastDropLog = now;
           m_dropEvents = 0;
         }
+      // Feed the sink until it has taken everything, waiting while it is full.
+      //
+      // The waiting is the point. A client that renders faster than real time
+      // is slowed here to the speed its own sound plays at, which is how
+      // libretro clients expect a frontend to pace them -- several have no
+      // other throttle at all. Taking whatever the sink offered and returning
+      // immediately let such a client run flat out, produce audio faster than
+      // it could be played, and have the excess thrown away: Dreamcast games
+      // ran at about twice speed with the audio delay climbing until it was
+      // flushed, over and over.
+      //
+      // Bounded, so a stream that stops draining costs the game loop a frame
+      // rather than hanging it.
+      const std::chrono::steady_clock::time_point giveUpAt =
+          std::chrono::steady_clock::now() + MAX_WAIT;
+
+      unsigned int framesWritten = 0;
+      while (framesWritten < frameCount)
+      {
+        framesWritten += m_pAudioStream->AddData(&audioPacket.data, framesWritten,
+                                                 frameCount - framesWritten, nullptr);
+
+        if (framesWritten >= frameCount)
+          break;
+
+        if (std::chrono::steady_clock::now() >= giveUpAt)
+        {
+          CLog::Log(LOGDEBUG,
+                    "RetroPlayer[AUDIO]: Sink took {} of {} frames before the wait ran out",
+                    framesWritten, frameCount);
+          break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
     }
   }
