@@ -522,20 +522,17 @@ void CRPRendererFBO::Render(uint8_t alpha)
 
   glBindTexture(m_textureTarget, drawTexture);
 
-  CRect viewport;
-  m_context.GetViewPort(viewport);
-
-  glMatrixModview.Push();
-  glMatrixModview->LoadIdentity();
-  glMatrixModview.Load();
-
-  glMatrixProject.Push();
-  glMatrixProject->LoadIdentity();
-  glMatrixProject->Ortho2D(0, viewport.x2, 0, viewport.y2);
-  glMatrixProject.Load();
-
-  glViewport(0, 0, viewport.x2, viewport.y2);
-  glScissor(0, 0, viewport.x2, viewport.y2);
+  // The vertices below are in screen coordinates, taken from m_rotatedDestCoords,
+  // and the GUI shader transforms them with the render context's own matrices.
+  // Those matrices are what place and size the picture -- they carry the view
+  // mode, zoom, pixel ratio and, for a game rendered into a GUI control, the
+  // control's rectangle. Replacing them here with an identity modelview and an
+  // Ortho2D spanning the whole viewport discarded all of it, which is why
+  // scaling did nothing and the video filter previews drew in the wrong place.
+  // Forcing the viewport to (0, 0, x2, y2) compounded it: those are the right
+  // and bottom coordinates of the viewport rather than its size, so anything
+  // not anchored at the origin was stretched. The renderer this one is modelled
+  // on touches none of this state.
 
   GLint filter = GL_NEAREST;
   if (GetRenderSettings().VideoSettings().GetScalingMethod() == SCALINGMETHOD::LINEAR)
@@ -616,9 +613,4 @@ void CRPRendererFBO::Render(uint8_t alpha)
   // game client and is destroyed with the client's context, so leaving it bound
   // hands the GUI a dangling binding to draw with once the game stops.
   glBindTexture(m_textureTarget, 0);
-
-  glMatrixModview.PopLoad();
-  glMatrixProject.PopLoad();
-
-  m_context.SetViewPort(viewport);
 }
