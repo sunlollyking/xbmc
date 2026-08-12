@@ -417,6 +417,21 @@ void CRPRendererFBO::Render(uint8_t alpha)
 
   Updateshaders();
 
+  // Say why the filter is not running. Without this the silent cases -- no
+  // preset reaching these render settings, or a preset that loaded with no
+  // passes -- look identical to a filter that ran and did nothing.
+  {
+    const std::string& presetPath = m_renderSettings.VideoSettings().GetShaderPreset();
+    const size_t passCount = m_shaderPreset ? m_shaderPreset->GetPasses().size() : 0;
+    if (presetPath != m_lastLoggedPreset || m_bUseShaderPreset != m_bLastLoggedUsePreset)
+    {
+      CLog::Log(LOGINFO, "RetroPlayer[RENDER]: Video filter is \"{}\", in use {}, {} passes",
+                presetPath.empty() ? "<none>" : presetPath, m_bUseShaderPreset, passCount);
+      m_lastLoggedPreset = presetPath;
+      m_bLastLoggedUsePreset = m_bUseShaderPreset;
+    }
+  }
+
   if (m_bUseShaderPreset && !m_shaderPreset->GetPasses().empty())
   {
     if (m_shaderTargetTexture && (m_shaderTargetWidth != m_fullDestWidth ||

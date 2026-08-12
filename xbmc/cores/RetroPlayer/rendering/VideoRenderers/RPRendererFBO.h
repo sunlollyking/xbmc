@@ -17,6 +17,7 @@
 #include <atomic>
 #include <chrono>
 #include <memory>
+#include <string>
 #include <stdint.h>
 #include <vector>
 
@@ -155,6 +156,10 @@ protected:
   unsigned int m_shaderSourceHeight{0};
 
   //! \brief Where the shader chain writes, and what is finally drawn
+  //! \brief Last reported filter state, so the log carries changes not frames
+  std::string m_lastLoggedPreset{"\0"};
+  bool m_bLastLoggedUsePreset{false};
+
   std::shared_ptr<SHADER::IShaderTexture> m_shaderTargetTexture;
 
   //! \brief The size m_shaderTargetTexture was created at
