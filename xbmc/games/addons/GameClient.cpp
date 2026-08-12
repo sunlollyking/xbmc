@@ -426,6 +426,19 @@ bool CGameClient::LoadGameInfo()
     return false;
   }
 
+  // These two numbers decide how fast the game runs and whether it can be
+  // heard, and until now nothing recorded them. A client declaring no frame
+  // rate leaves the loop with nothing to pace against, so it runs as fast as
+  // the machine allows; one declaring no sample rate gets no audio stream, so
+  // it plays silently. Both look like emulator faults from the outside.
+  CLog::Log(LOGINFO, "GameClient: {} declares {:.3f} fps, {:.0f} Hz audio", ID(),
+            timingInfo.fps, timingInfo.sample_rate);
+
+  if (timingInfo.fps <= 0.0)
+    CLog::Log(LOGERROR, "GameClient: {} declared no frame rate, the game will not be paced", ID());
+  if (timingInfo.sample_rate <= 0.0)
+    CLog::Log(LOGERROR, "GameClient: {} declared no sample rate, the game will be silent", ID());
+
   GAME_REGION region;
   try
   {
