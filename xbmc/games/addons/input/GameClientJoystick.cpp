@@ -215,5 +215,27 @@ bool CGameClientJoystick::SetRumble(const std::string& feature, float magnitude)
   if (InputReceiver())
     bHandled = InputReceiver()->SetRumbleState(feature, magnitude);
 
+  // Report the first motor event, and the first that fails, once each. A game
+  // asking for rumble and not producing any is otherwise entirely silent: the
+  // request is well-formed the whole way down and simply stops, either because
+  // no receiver was attached to this handler or because the peripheral's button
+  // map has no motor of that name for the connected device.
+  if (!m_bLoggedRumble || (!bHandled && !m_bLoggedRumbleFailure))
+  {
+    if (bHandled)
+    {
+      CLog::Log(LOGDEBUG, "GAME: Rumble \"{}\" at {:0.2f} accepted by the peripheral", feature,
+                magnitude);
+      m_bLoggedRumble = true;
+    }
+    else
+    {
+      CLog::Log(LOGWARNING, "GAME: Rumble \"{}\" went nowhere ({})", feature,
+                InputReceiver() ? "the peripheral would not take it"
+                                : "no input receiver is attached to this handler");
+      m_bLoggedRumbleFailure = true;
+    }
+  }
+
   return bHandled;
 }
