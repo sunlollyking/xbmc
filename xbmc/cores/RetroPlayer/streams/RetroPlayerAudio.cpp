@@ -17,6 +17,7 @@
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <chrono>
 #include <thread>
 
@@ -32,10 +33,12 @@ const double MAX_DELAY = 0.3; // seconds
 // stopped draining costs the game loop one frame rather than hanging it.
 constexpr auto MAX_WAIT = std::chrono::milliseconds(100);
 
-// How much audio to keep queued ahead of the speakers. The client is held to
-// the speed this backlog drains at, so it wants to be small enough to pace
-// tightly and large enough to absorb an uneven producer.
-const double TARGET_DELAY = 0.1; // seconds
+// How much audio to keep queued ahead of the speakers. This has to sit above
+// AudioEngine's own buffering floor, or the delay can never reach it and every
+// packet burns the full wait: at 0.1 the floor turned out to be around 0.2 and
+// games ran at about half a frame per second. MAX_DELAY is Kodi's own idea of
+// too much latency, and is comfortably above the floor.
+const double TARGET_DELAY = MAX_DELAY; // seconds
 
 CRetroPlayerAudio::CRetroPlayerAudio(CRPProcessInfo& processInfo) : m_processInfo(processInfo)
 {
@@ -182,21 +185,25 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       //
       // Bounded by the same deadline, so a stream that has stopped draining
       // costs the game loop a frame rather than hanging it.
-      while (m_pAudioStream->GetDelay() > TARGET_DELAY)
+      // Never wait longer than the audio just handed over would take to play.
+      // That bound is what makes this safe: however wrong the target turns out
+      // to be for a given sink, the client can only ever be held to real time,
+      // never slower. Waiting a fixed 100 ms instead, with a target below the
+      // sink's floor, cost every packet the full wait and ran games at about
+      // half a frame per second.
+      const unsigned int sampleRate = m_pAudioStream->GetSampleRate();
+      if (sampleRate > 0)
       {
-        if (std::chrono::steady_clock::now() >= giveUpAt)
-        {
-          // Hitting this every packet would mean the sink never drains below
-          // the target -- the target is under AudioEngine's own floor and is
-          // throttling the client far harder than intended. Logged so that
-          // shows up as a flood rather than as an unexplained slow game.
-          CLog::Log(LOGDEBUG,
-                    "RetroPlayer[AUDIO]: Delay still {:0.2f} ms after waiting, giving up",
-                    m_pAudioStream->GetDelay() * 1000);
-          break;
-        }
+        const std::chrono::steady_clock::time_point throttleUntil =
+            std::min(giveUpAt, std::chrono::steady_clock::now() +
+                                   std::chrono::microseconds(static_cast<long long>(
+                                       1000000.0 * frameCount / sampleRate)));
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        while (m_pAudioStream->GetDelay() > TARGET_DELAY &&
+               std::chrono::steady_clock::now() < throttleUntil)
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
       }
     }
   }
