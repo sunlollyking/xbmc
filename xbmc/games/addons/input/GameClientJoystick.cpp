@@ -212,8 +212,14 @@ bool CGameClientJoystick::SetRumble(const std::string& feature, float magnitude)
 {
   bool bHandled = false;
 
-  if (InputReceiver())
-    bHandled = InputReceiver()->SetRumbleState(feature, magnitude);
+  // Ask the port, not this handler. CPortInput is what registers with the
+  // peripheral, so it is the one the peripheral attaches its receiver to; this
+  // class sits behind it and is never given one. Reading it here has meant that
+  // every motor event a game produced was dropped, for every core.
+  JOYSTICK::IInputReceiver* receiver = m_portInput ? m_portInput->InputReceiver() : nullptr;
+
+  if (receiver != nullptr)
+    bHandled = receiver->SetRumbleState(feature, magnitude);
 
   // Report the first motor event, and the first that fails, once each. A game
   // asking for rumble and not producing any is otherwise entirely silent: the
@@ -231,7 +237,7 @@ bool CGameClientJoystick::SetRumble(const std::string& feature, float magnitude)
     else
     {
       CLog::Log(LOGWARNING, "GAME: Rumble \"{}\" went nowhere ({})", feature,
-                InputReceiver() ? "the peripheral would not take it"
+                receiver ? "the peripheral would not take it"
                                 : "no input receiver is attached to this handler");
       m_bLoggedRumbleFailure = true;
     }
