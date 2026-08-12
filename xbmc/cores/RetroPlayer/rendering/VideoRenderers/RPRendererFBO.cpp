@@ -25,6 +25,7 @@
 #include "utils/GLUtils.h"
 #include "utils/log.h"
 
+#include <cmath>
 #include <cstring>
 #include <memory>
 #include <stddef.h>
@@ -444,27 +445,39 @@ void CRPRendererFBO::Render(uint8_t alpha)
 
   if (m_bUseShaderPreset && !m_shaderPreset->GetPasses().empty())
   {
-    if (m_shaderTargetTexture && (m_shaderTargetWidth != m_fullDestWidth ||
-                                  m_shaderTargetHeight != m_fullDestHeight))
+    // Size the chain's target to what is actually being drawn, not to
+    // m_fullDestWidth/Height. Those describe the picture at fullscreen, so a
+    // game drawn into a GUI control -- every preview in the video filter dialog
+    // -- had its filter rendered at 1440x1080 and then scaled down into a
+    // thumbnail. Anything whose effect lives at the pixel level does not
+    // survive that: scanlines and dot matrices vanish while overlays come
+    // through, which is exactly the split seen in practice.
+    const float destWidth = std::hypot(m_rotatedDestCoords[1].x - m_rotatedDestCoords[0].x,
+                                       m_rotatedDestCoords[1].y - m_rotatedDestCoords[0].y);
+    const float destHeight = std::hypot(m_rotatedDestCoords[2].x - m_rotatedDestCoords[1].x,
+                                        m_rotatedDestCoords[2].y - m_rotatedDestCoords[1].y);
+
+    if (m_shaderTargetTexture &&
+        (m_shaderTargetWidth != destWidth || m_shaderTargetHeight != destHeight))
     {
       m_shaderTargetTexture.reset();
     }
 
-    if (!m_shaderTargetTexture && m_fullDestWidth > 0.0f && m_fullDestHeight > 0.0f)
+    if (!m_shaderTargetTexture && destWidth > 0.0f && destHeight > 0.0f)
     {
 #if defined(HAS_GLES)
       auto targetTexture = std::make_shared<SHADER::CShaderTextureGLES>(
-          static_cast<unsigned int>(m_fullDestWidth), static_cast<unsigned int>(m_fullDestHeight),
+          static_cast<unsigned int>(destWidth), static_cast<unsigned int>(destHeight),
           GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA, false);
 #else
       auto targetTexture = std::make_shared<SHADER::CShaderTextureGL>(
-          static_cast<unsigned int>(m_fullDestWidth), static_cast<unsigned int>(m_fullDestHeight),
+          static_cast<unsigned int>(destWidth), static_cast<unsigned int>(destHeight),
           GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA, false);
 #endif
       targetTexture->CreateTexture();
       m_shaderTargetTexture = std::move(targetTexture);
-      m_shaderTargetWidth = m_fullDestWidth;
-      m_shaderTargetHeight = m_fullDestHeight;
+      m_shaderTargetWidth = destWidth;
+      m_shaderTargetHeight = destHeight;
     }
 
     if (m_shaderTargetTexture && CopyFrameForShaders(renderBuffer))
