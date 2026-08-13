@@ -273,6 +273,9 @@ private:
   // the last frame left behind. Handing them alternate buffers gives each only
   // every other frame's drawing, and the frames in between show through.
   IRenderBuffer* m_hwRenderBuffer{nullptr};
+
+  //! \brief The framebuffer the client is not currently drawing into
+  IRenderBuffer* m_hwBackBuffer{nullptr};
   IRenderBufferPool* m_hwBufferPool{nullptr};
 
   //! \brief Size the client's framebuffer was allocated at

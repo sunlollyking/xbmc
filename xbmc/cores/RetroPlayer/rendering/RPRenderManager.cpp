@@ -368,13 +368,33 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
     if (renderBuffer == nullptr)
       continue;
 
+    // Take a second framebuffer to alternate with. The client draws into one
+    // while the rendering thread samples the other, so the two never touch the
+    // same texture at once. With a single framebuffer the client begins the
+    // next frame in the one Kodi is still reading, and what is caught half
+    // drawn is whatever the client drew last -- in most games the HUD.
+    IRenderBuffer* backBuffer = bufferPool->GetBuffer(width, height);
+    if (backBuffer != nullptr && backBuffer->GetCurrentFramebuffer() == 0)
+    {
+      backBuffer->Release();
+      backBuffer = nullptr;
+    }
+
     m_hwRenderBuffer = renderBuffer;
+    m_hwBackBuffer = backBuffer;
     m_hwBufferPool = bufferPool;
     m_hwBufferWidth = width;
     m_hwBufferHeight = height;
 
-    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated a {}x{} framebuffer for the game client",
-              width, height);
+    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated {} {}x{} framebuffer{} for the game client",
+              backBuffer != nullptr ? "two" : "one", width, height,
+              backBuffer != nullptr ? "s" : "");
+
+    if (backBuffer == nullptr)
+    {
+      CLog::Log(LOGWARNING, "RetroPlayer[RENDER]: Only one framebuffer available, the client will "
+                            "draw into the one being sampled");
+    }
 
     EndClientFrame();
 
@@ -405,6 +425,13 @@ void CRPRenderManager::ReleaseHwRenderBuffer()
 
   m_hwRenderBuffer->Release();
   m_hwRenderBuffer = nullptr;
+
+  if (m_hwBackBuffer != nullptr)
+  {
+    m_hwBackBuffer->Release();
+    m_hwBackBuffer = nullptr;
+  }
+
   m_hwBufferPool = nullptr;
   m_hwBufferWidth = 0;
   m_hwBufferHeight = 0;
@@ -489,6 +516,12 @@ void CRPRenderManager::RenderFrame(unsigned int width, unsigned int height)
   // The client rendered straight into the texture, so there is nothing to
   // upload; mark it ready so RenderInternal() does not try.
   m_hwRenderBuffer->SetLoaded(true);
+
+  // Hand the client the other framebuffer for its next frame. The one just
+  // published stays with the rendering thread until it has finished sampling
+  // it, which is what the reference taken above keeps alive.
+  if (m_hwBackBuffer != nullptr)
+    std::swap(m_hwRenderBuffer, m_hwBackBuffer);
 }
 
 void CRPRenderManager::SetSpeed(double speed)
