@@ -368,13 +368,35 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
     if (renderBuffer == nullptr)
       continue;
 
-    m_hwRenderBuffer = renderBuffer;
+    m_hwRenderBuffers.emplace_back(renderBuffer);
+
+    // Take a few more to rotate through. The client must never draw into the
+    // framebuffer the rendering thread is sampling, and the thread can hold one
+    // across more than a single client frame, so one spare is not always
+    // enough. Any that cannot be had leaves a smaller rotation, which still
+    // works -- GetCurrentFramebuffer only ever hands out a free one.
+    while (m_hwRenderBuffers.size() < HW_BUFFER_COUNT)
+    {
+      IRenderBuffer* spare = bufferPool->GetBuffer(width, height);
+      if (spare == nullptr)
+        break;
+
+      if (spare->GetCurrentFramebuffer() == 0)
+      {
+        spare->Release();
+        break;
+      }
+
+      m_hwRenderBuffers.emplace_back(spare);
+    }
+
+    m_hwRenderBuffer = m_hwRenderBuffers.front();
     m_hwBufferPool = bufferPool;
     m_hwBufferWidth = width;
     m_hwBufferHeight = height;
 
-    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated a {}x{} framebuffer for the game client",
-              width, height);
+    CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated {} {}x{} framebuffers for the game client",
+              m_hwRenderBuffers.size(), width, height);
 
     EndClientFrame();
 
@@ -403,7 +425,10 @@ void CRPRenderManager::ReleaseHwRenderBuffer()
     m_renderBuffers.clear();
   }
 
-  m_hwRenderBuffer->Release();
+  for (IRenderBuffer* renderBuffer : m_hwRenderBuffers)
+    renderBuffer->Release();
+  m_hwRenderBuffers.clear();
+
   m_hwRenderBuffer = nullptr;
   m_hwBufferPool = nullptr;
   m_hwBufferWidth = 0;
@@ -489,6 +514,43 @@ void CRPRenderManager::RenderFrame(unsigned int width, unsigned int height)
   // The client rendered straight into the texture, so there is nothing to
   // upload; mark it ready so RenderInternal() does not try.
   m_hwRenderBuffer->SetLoaded(true);
+
+  // Move the client on to a framebuffer nobody is reading.
+  //
+  // The one just published is now held by the rendering thread as well as by
+  // us, and stays held until the thread has finished sampling it -- which can
+  // span more than one client frame. Letting the client draw into a buffer
+  // still being read is what tears the picture, and alternating blindly
+  // between two makes it worse rather than better: instead of a half-updated
+  // version of the same frame, the reader sees two different frames.
+  //
+  // So pick one nothing else holds. A buffer we alone hold has a count of one.
+  // If they are all busy the client keeps the one it has, which is the old
+  // behaviour and no worse than it was.
+  IRenderBuffer* freeBuffer = nullptr;
+  for (IRenderBuffer* candidate : m_hwRenderBuffers)
+  {
+    if (candidate != m_hwRenderBuffer && candidate->RefCount() == 1)
+    {
+      freeBuffer = candidate;
+      break;
+    }
+  }
+
+  if (freeBuffer != nullptr)
+  {
+    m_hwRenderBuffer = freeBuffer;
+  }
+  else if (!m_bLoggedNoFreeBuffer)
+  {
+    // Every framebuffer is still held, so the client has to keep the one it
+    // has and the picture can tear again. Said once, because if this appears
+    // the rotation is too small rather than the approach being wrong.
+    CLog::Log(LOGDEBUG,
+              "RetroPlayer[RENDER]: All {} framebuffers are in use, reusing the current one",
+              m_hwRenderBuffers.size());
+    m_bLoggedNoFreeBuffer = true;
+  }
 }
 
 void CRPRenderManager::SetSpeed(double speed)

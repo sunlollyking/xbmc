@@ -27,6 +27,7 @@ public:
   void Acquire() override;
   void Acquire(std::shared_ptr<IRenderBufferPool> pool) override;
   void Release() override;
+  int RefCount() const override { return m_refCount; }
   IRenderBufferPool* GetPool() override { return m_pool.get(); }
   DataAccess GetMemoryAccess() const override;
   DataAlignment GetMemoryAlignment() const override;
