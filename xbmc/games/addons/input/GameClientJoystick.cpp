@@ -217,7 +217,12 @@ bool CGameClientJoystick::SetRumble(const std::string& feature, float magnitude)
   // request is well-formed the whole way down and simply stops, either because
   // no receiver was attached to this handler or because the peripheral's button
   // map has no motor of that name for the connected device.
-  if (!m_bLoggedRumble || (!bHandled && !m_bLoggedRumbleFailure))
+  // Only a non-zero magnitude says anything: a game stopping a motor it never
+  // started is accepted just as readily, and reporting that as success is what
+  // made an unconnected chain look connected.
+  const bool bMeaningful = (magnitude > 0.0f);
+
+  if ((bMeaningful && !m_bLoggedRumble) || (!bHandled && !m_bLoggedRumbleFailure))
   {
     if (bHandled)
     {
