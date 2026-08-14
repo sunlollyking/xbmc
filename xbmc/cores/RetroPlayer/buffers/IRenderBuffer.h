@@ -33,15 +33,6 @@ public:
   virtual void Acquire() = 0;
   virtual void Acquire(std::shared_ptr<IRenderBufferPool> pool) = 0;
   virtual void Release() = 0;
-
-  /*!
-   * \brief How many holders this buffer has
-   *
-   * A caller that holds a reference itself can use this to tell whether anyone
-   * else is still using the buffer -- the rendering thread, typically -- before
-   * handing it out to be written into again.
-   */
-  virtual int RefCount() const = 0;
   virtual IRenderBufferPool* GetPool() = 0;
   virtual DataAccess GetMemoryAccess() const = 0;
   virtual DataAlignment GetMemoryAlignment() const = 0;

@@ -272,17 +272,7 @@ private:
   // theirs for the whole session and many do not clear it, drawing over what
   // the last frame left behind. Handing them alternate buffers gives each only
   // every other frame's drawing, and the frames in between show through.
-  //! \brief How many framebuffers to rotate the client through
-  static const unsigned int HW_BUFFER_COUNT = 3;
-
-  //! \brief The framebuffer the client is drawing into
   IRenderBuffer* m_hwRenderBuffer{nullptr};
-
-  //! \brief Every framebuffer allocated for the client, including the above
-  std::vector<IRenderBuffer*> m_hwRenderBuffers;
-
-  //! \brief Reported once if the rotation ever runs out of free framebuffers
-  bool m_bLoggedNoFreeBuffer{false};
   IRenderBufferPool* m_hwBufferPool{nullptr};
 
   //! \brief Size the client's framebuffer was allocated at
