@@ -363,6 +363,62 @@ void CRenderBufferPoolFBO::WaitForClientFrame()
   glWaitSync(m_clientFence, 0, GL_TIMEOUT_IGNORED);
 }
 
+IRenderBuffer* CRenderBufferPoolFBO::CaptureClientFrame(IRenderBuffer* clientBuffer,
+                                                        unsigned int width,
+                                                        unsigned int height)
+{
+  if (clientBuffer == nullptr || width == 0 || height == 0)
+    return nullptr;
+
+  const uintptr_t srcFramebuffer = clientBuffer->GetCurrentFramebuffer();
+  if (srcFramebuffer == 0)
+    return nullptr;
+
+  IRenderBuffer*& target = m_captureBuffers[m_captureIndex];
+
+  // Taken once and kept. Asking the pool each frame would hand the client's own
+  // buffer back out again as soon as the rendering thread released it.
+  if (target == nullptr)
+  {
+    target = GetBuffer(width, height);
+
+    if (target != nullptr && target->GetCurrentFramebuffer() == 0)
+    {
+      target->Release();
+      target = nullptr;
+    }
+
+    if (target == nullptr)
+    {
+      if (!m_bLoggedCaptureFailure)
+      {
+        CLog::Log(LOGWARNING, "RetroPlayer[RENDER]: No buffer to copy the client's frame into, the "
+                              "rendering thread will sample the one being drawn into");
+        m_bLoggedCaptureFailure = true;
+      }
+      return nullptr;
+    }
+  }
+
+  const uintptr_t dstFramebuffer = target->GetCurrentFramebuffer();
+
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(srcFramebuffer));
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, static_cast<GLuint>(dstFramebuffer));
+
+  // Straight copy: the frame is oriented and sized as the client left it, and
+  // the renderer applies the same conventions to the copy as to the original.
+  glBlitFramebuffer(0, 0, static_cast<GLint>(width), static_cast<GLint>(height), 0, 0,
+                    static_cast<GLint>(width), static_cast<GLint>(height), GL_COLOR_BUFFER_BIT,
+                    GL_NEAREST);
+
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+  m_captureIndex = (m_captureIndex + 1) % 2;
+
+  return target;
+}
+
 void CRenderBufferPoolFBO::DestroyContext()
 {
   // DestroyContext() is broadcast to every pool, including those that never
@@ -374,6 +430,18 @@ void CRenderBufferPoolFBO::DestroyContext()
 
   // Deleting this context's objects needs it current
   const bool bBound = BeginClientFrame();
+
+  // Held for the life of the stream, so they have to be given back before the
+  // pool is flushed or their framebuffers outlive the context that owns them.
+  for (IRenderBuffer*& captureBuffer : m_captureBuffers)
+  {
+    if (captureBuffer != nullptr)
+    {
+      captureBuffer->Release();
+      captureBuffer = nullptr;
+    }
+  }
+  m_captureIndex = 0;
 
   // Buffers own framebuffers and textures belonging to this context, so they
   // have to go while it is still current.

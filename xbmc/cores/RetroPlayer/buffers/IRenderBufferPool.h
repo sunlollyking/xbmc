@@ -154,6 +154,28 @@ public:
   virtual void EndClientFrame() {}
 
   /*!
+   * \brief Take a copy of the frame a hardware-rendering client has just drawn
+   *
+   * A client draws into the same surface every frame, and clients cache it
+   * rather than asking for it again, so it cannot be swapped out from under
+   * them. Publishing that surface directly means the rendering thread samples
+   * it while the next frame is being drawn into it, and what comes out missing
+   * is whatever the game draws last.
+   *
+   * Called on the client's thread, between its frames, so the copy is of a
+   * whole frame. Pools that do not render in hardware have nothing to copy.
+   *
+   * \return The buffer holding the copy, or nullptr to publish the client's
+   *         own buffer as before
+   */
+  virtual IRenderBuffer* CaptureClientFrame(IRenderBuffer* clientBuffer,
+                                            unsigned int width,
+                                            unsigned int height)
+  {
+    return nullptr;
+  }
+
+  /*!
    * \brief Release resources tied to the rendering context
    *
    * This function is called when the render context is being destroyed.

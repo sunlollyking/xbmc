@@ -77,6 +77,26 @@ public:
    */
   void WaitForClientFrame();
 
+  /*!
+   * \brief Take a copy of the frame the client has just finished
+   *
+   * The client draws into one framebuffer for the whole session, and clients
+   * cache it rather than asking for it again, so it cannot be swapped out from
+   * under them. Sampling that framebuffer directly means sampling it while the
+   * next frame is being drawn into it, and what is caught missing is whatever
+   * the game draws last -- in most titles the HUD and the moving objects.
+   *
+   * Called on the client's thread, between its frames, where the frame is
+   * whole. The copy is what gets published, so the rendering thread never
+   * samples a surface the client is drawing into.
+   *
+   * \return The buffer holding the copy, or nullptr if one could not be taken,
+   *         in which case the caller should publish the client's own buffer
+   */
+  IRenderBuffer* CaptureClientFrame(IRenderBuffer* clientBuffer,
+                                    unsigned int width,
+                                    unsigned int height) override;
+
 protected:
 
   // Construction parameters
@@ -89,6 +109,14 @@ protected:
   // renders on is whichever one it happens to use. Track who holds it, and what
   // they had before, so it can be handed back.
   unsigned int m_clientFrameDepth{0};
+
+  // Copies of the client's finished frames, used in turn: the rendering thread
+  // may still be sampling the one published last frame while this one is being
+  // written. Owned by the pool for the life of the stream so they are never
+  // handed to the client.
+  IRenderBuffer* m_captureBuffers[2]{nullptr, nullptr};
+  unsigned int m_captureIndex{0};
+  bool m_bLoggedCaptureFailure{false};
 
   //! \brief Signalled when the client's last frame has been issued
   GLsync m_clientFence{nullptr};

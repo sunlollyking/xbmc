@@ -465,30 +465,44 @@ void CRPRenderManager::RenderFrame(unsigned int width, unsigned int height)
   if (m_bFlush || m_hwRenderBuffer == nullptr)
     return;
 
-  // The client has finished drawing into its framebuffer. Hand the buffer to
-  // the rendering thread, which samples the texture the framebuffer is backed
-  // by. This is the hardware counterpart of AddFrame().
-  m_hwRenderBuffer->Acquire();
+  // The client has finished drawing into its framebuffer. Publish a copy of it
+  // rather than the framebuffer itself: the client keeps drawing into the same
+  // one every frame, so publishing it directly has the rendering thread sample
+  // a frame while the next is being drawn into it. What that leaves missing is
+  // whatever the game draws last, which is why the sky stayed put while cars
+  // and HUD flickered. Taken here, on the client's thread and between its
+  // frames, the copy is of a whole frame.
+  IRenderBuffer* publishBuffer = nullptr;
+
+  if (m_hwBufferPool != nullptr)
+    publishBuffer = m_hwBufferPool->CaptureClientFrame(m_hwRenderBuffer, width, height);
+
+  // A pool that cannot spare a buffer publishes the client's own, which is what
+  // this did before and is still better than dropping the frame.
+  if (publishBuffer == nullptr)
+    publishBuffer = m_hwRenderBuffer;
+
+  publishBuffer->Acquire();
 
   std::unique_lock lock(m_bufferMutex);
 
   for (IRenderBuffer* renderBuffer : m_renderBuffers)
     renderBuffer->Release();
-  m_renderBuffers = {m_hwRenderBuffer};
+  m_renderBuffers = {publishBuffer};
 
   // Report what the client actually drew, not the size of the framebuffer it
   // drew into. The renderer works out the image's shape and position on screen
   // from this, and would otherwise show the whole framebuffer, image and unused
   // remainder alike.
   if (width > 0 && height > 0)
-    m_hwRenderBuffer->SetSize(width, height);
+    publishBuffer->SetSize(width, height);
 
-  m_hwRenderBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
-  m_hwRenderBuffer->SetRotation(0);
+  publishBuffer->SetDisplayAspectRatio(m_nominalDisplayAspectRatio);
+  publishBuffer->SetRotation(0);
 
   // The client rendered straight into the texture, so there is nothing to
   // upload; mark it ready so RenderInternal() does not try.
-  m_hwRenderBuffer->SetLoaded(true);
+  publishBuffer->SetLoaded(true);
 }
 
 void CRPRenderManager::SetSpeed(double speed)
