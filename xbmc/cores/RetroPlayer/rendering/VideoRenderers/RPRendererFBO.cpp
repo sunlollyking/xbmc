@@ -70,6 +70,14 @@ CRPRendererFBO::CRPRendererFBO(const CRenderSettings& renderSettings,
 
 CRPRendererFBO::~CRPRendererFBO()
 {
+#if !defined(HAS_GLES)
+  if (m_vao != 0)
+  {
+    glDeleteVertexArrays(1, &m_vao);
+    m_vao = 0;
+  }
+#endif
+
   DestroyShaderResources();
 }
 
@@ -322,6 +330,16 @@ void CRPRendererFBO::DrawBlackBars()
     count += 6;
   }
 
+#if !defined(HAS_GLES)
+  // A core profile has no default vertex array object, so drawing without one
+  // bound is GL_INVALID_OPERATION and nothing reaches the screen. GLES permits
+  // the default object, which is why this renderer worked there and showed a
+  // black picture on desktop GL. Created once and reused.
+  if (m_vao == 0)
+    glGenVertexArrays(1, &m_vao);
+  glBindVertexArray(m_vao);
+#endif
+
   GLuint vertexVBO;
   glGenBuffers(1, &vertexVBO);
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
@@ -335,6 +353,10 @@ void CRPRendererFBO::DrawBlackBars()
   glDisableVertexAttribArray(posLoc);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glDeleteBuffers(1, &vertexVBO);
+
+#if !defined(HAS_GLES)
+  glBindVertexArray(0);
+#endif
 
   m_context.DisableGUIShader();
 }
@@ -549,6 +571,11 @@ void CRPRendererFBO::Render(uint8_t alpha)
   if (bShaded)
     rect = CRect(0.0f, 0.0f, 1.0f, 1.0f);
 
+  // Unit 0, because that is where the GUI shader samples from. Binding without
+  // selecting it leaves the texture on whichever unit something else last made
+  // active, and the shader then reads a unit this renderer never wrote to. Both
+  // the software renderers this one is modelled on select it explicitly.
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(m_textureTarget, drawTexture);
 
   // The vertices below are in screen coordinates, taken from m_rotatedDestCoords,
@@ -584,6 +611,7 @@ void CRPRendererFBO::Render(uint8_t alpha)
   GLint vertLoc = m_context.GUIShaderGetPos();
   GLint loc = m_context.GUIShaderGetCoord0();
   GLint uniColLoc = m_context.GUIShaderGetUniCol();
+  GLint depthLoc = m_context.GUIShaderGetDepth();
 
   // Setup color values
   colour[0] = UTILS::GL::GetChannelFromARGB(UTILS::GL::ColorChannel::R, color);
@@ -605,6 +633,16 @@ void CRPRendererFBO::Render(uint8_t alpha)
   vertex[1].u1 = vertex[2].u1 = rect.x2;
   vertex[2].v1 = vertex[3].v1 = rect.y2;
 
+#if !defined(HAS_GLES)
+  // As in DrawBlackBars: a core profile has no default vertex array object, and
+  // the draw below is the one that puts the game on the screen. Without this the
+  // client's frame arrives complete and is then thrown away by an errored
+  // glDrawElements, which is what a desktop GL build showed as a black picture.
+  if (m_vao == 0)
+    glGenVertexArrays(1, &m_vao);
+  glBindVertexArray(m_vao);
+#endif
+
   GLuint vertexVBO;
   glGenBuffers(1, &vertexVBO);
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
@@ -623,8 +661,14 @@ void CRPRendererFBO::Render(uint8_t alpha)
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte) * 4, idx, GL_STATIC_DRAW);
 
+  // The GUI shader positions the quad in depth from this. Leaving it unset
+  // draws at whatever the uniform happened to hold, which both software
+  // renderers avoid by setting it explicitly every frame.
+  glUniform1f(depthLoc, -1.0f);
+
   glUniform4f(uniColLoc, (colour[0] / 255.0f), (colour[1] / 255.0f), (colour[2] / 255.0f),
               (colour[3] / 255.0f));
+
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 
   glDisableVertexAttribArray(vertLoc);
@@ -634,6 +678,10 @@ void CRPRendererFBO::Render(uint8_t alpha)
   glDeleteBuffers(1, &vertexVBO);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+#if !defined(HAS_GLES)
+  glBindVertexArray(0);
+#endif
   glDeleteBuffers(1, &indexVBO);
 
   m_context.DisableGUIShader();
@@ -642,4 +690,5 @@ void CRPRendererFBO::Render(uint8_t alpha)
   // game client and is destroyed with the client's context, so leaving it bound
   // hands the GUI a dangling binding to draw with once the game stops.
   glBindTexture(m_textureTarget, 0);
+
 }

@@ -160,6 +160,11 @@ protected:
   std::string m_lastLoggedPreset{"\0"};
   bool m_bLastLoggedUsePreset{false};
 
+#if !defined(HAS_GLES)
+  //! \brief Vertex array object, which a GL core profile requires to draw
+  GLuint m_vao{0};
+#endif
+
   std::shared_ptr<SHADER::IShaderTexture> m_shaderTargetTexture;
 
   //! \brief The size m_shaderTargetTexture was created at
