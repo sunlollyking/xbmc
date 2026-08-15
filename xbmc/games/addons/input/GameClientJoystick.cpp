@@ -231,7 +231,7 @@ bool CGameClientJoystick::SetRumble(const std::string& feature, float magnitude)
   // made an unconnected chain look connected.
   const bool bMeaningful = (magnitude > 0.0f);
 
-  if ((bMeaningful && !m_bLoggedRumble) || (!bHandled && !m_bLoggedRumbleFailure))
+  if (bMeaningful && !(bHandled ? m_bLoggedRumble : m_bLoggedRumbleFailure))
   {
     if (bHandled)
     {
@@ -239,11 +239,20 @@ bool CGameClientJoystick::SetRumble(const std::string& feature, float magnitude)
                 magnitude);
       m_bLoggedRumble = true;
     }
+    else if (receiver != nullptr)
+    {
+      // The chain is connected and the request was still turned down, which
+      // means the button map has no motor of that name for this device
+      CLog::Log(LOGWARNING, "GAME: Rumble \"{}\" went nowhere, the peripheral would not take it",
+                feature);
+      m_bLoggedRumbleFailure = true;
+    }
     else
     {
-      CLog::Log(LOGWARNING, "GAME: Rumble \"{}\" went nowhere ({})", feature,
-                receiver ? "the peripheral would not take it"
-                                : "no input receiver is attached to this handler");
+      // Ports are wired up after the client starts, so a game that asks this
+      // early is told no and asks again once there is somewhere to send it.
+      // Reporting that as a warning described a broken chain that then worked.
+      CLog::Log(LOGDEBUG, "GAME: Rumble \"{}\" arrived before the port had a receiver", feature);
       m_bLoggedRumbleFailure = true;
     }
   }
