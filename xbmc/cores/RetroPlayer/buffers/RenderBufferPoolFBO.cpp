@@ -240,7 +240,14 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
                                     contextAttribs.data());
     if (m_eglContext != EGL_NO_CONTEXT)
     {
-      CLog::Log(LOGINFO, "RetroPlayer[RENDER]: Created a {} context for the game client",
+      // "Sharing Kodi's objects" rather than "shared", because libretro uses
+      // that word for something else: a client asking, through
+      // RETRO_ENVIRONMENT_SET_HW_SHARED_CONTEXT, to create further contexts of
+      // its own. Kodi does not offer that, and a client that wanted it says so
+      // in the log right next to this line.
+      CLog::Log(LOGINFO,
+                "RetroPlayer[RENDER]: Created a {} context for the game client, sharing Kodi's "
+                "objects",
                 contextName);
       break;
     }
@@ -254,9 +261,6 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
               contextName, eglGetError());
     return false;
   }
-
-  CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Created shared {} context for the game client",
-            contextName);
 
   // Deliberately not made current here. This runs on whichever thread opened
   // the stream, which for some clients is Kodi's own rendering thread, and a
@@ -309,6 +313,26 @@ void CRenderBufferPoolFBO::EndClientFrame()
 {
   if (m_clientFrameDepth == 0)
     return;
+
+  // The mirror of the check BeginClientFrame makes. That refuses to take the
+  // context on a thread while another thread holds it, and returns false
+  // without nesting -- but callers pair a Begin with an End regardless of what
+  // Begin answered, so the refused call used to arrive here and decrement all
+  // the same. The depth then reached zero a level early and the context was
+  // released out from under the thread that really held it.
+  //
+  // On Kodi's rendering thread that is expensive: releasing the client's
+  // surfaceless context there leaves the thread with no default framebuffer, so
+  // the next clear has nothing to write to and the driver rejects it. The
+  // stream opens across two threads, which is where the mismatch comes from,
+  // and the picture recovers on the following frame -- so it shows up as a
+  // single incomplete-framebuffer error just after a game starts.
+  if (m_clientThread != std::this_thread::get_id())
+  {
+    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: A thread that does not hold the client's context "
+                        "tried to end its frame; ignoring");
+    return;
+  }
 
   if (--m_clientFrameDepth > 0)
     return;
