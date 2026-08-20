@@ -157,7 +157,7 @@ std::vector<CMediaSource>* CMediaSourceSettings::GetSources(std::string_view typ
     return &m_videoSources;
   else if (type == "pictures")
     return &m_pictureSources;
-  else if (type == "games")
+  else if (type == "games" || type == "game")
     return &m_gameSources;
 
   return nullptr;
