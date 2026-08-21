@@ -91,6 +91,32 @@ unsigned int CAchievementRuntime::SetAchievementProgress(
   return applied;
 }
 
+void CAchievementRuntime::SetChallenge(const AchievementChallenge& challenge, bool active)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  auto it = std::find_if(m_state.challenges.begin(), m_state.challenges.end(),
+                         [&challenge](const AchievementChallenge& existing)
+                         { return existing.id == challenge.id; });
+
+  if (active)
+  {
+    // The runtime can re-announce an attempt that is already showing
+    if (it == m_state.challenges.end())
+      m_state.challenges.emplace_back(challenge);
+  }
+  else if (it != m_state.challenges.end())
+  {
+    m_state.challenges.erase(it);
+  }
+}
+
+std::vector<AchievementChallenge> CAchievementRuntime::GetChallenges() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_state.challenges;
+}
+
 std::string CAchievementRuntime::GetRichPresence() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);

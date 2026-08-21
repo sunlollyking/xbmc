@@ -237,6 +237,11 @@ private:
                                             unsigned int count);
   static void cb_rc_on_server_error(KODI_HANDLE kodiInstance, const char* message, const char* api);
   static void cb_rc_on_connection_changed(KODI_HANDLE kodiInstance, bool connected);
+  static void cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+                                           const game_rc_achievement_challenge* data,
+                                           bool show);
+  static void cb_rc_on_subset_completed(KODI_HANDLE kodiInstance, const char* title);
+  static void cb_rc_on_reset(KODI_HANDLE kodiInstance);
   //@}
 
   /*!

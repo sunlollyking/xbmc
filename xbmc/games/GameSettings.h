@@ -44,6 +44,21 @@ public:
   bool GetAchievementsLoggedIn() const;
 
   /*!
+   * \brief Whether achievements are earned in hardcore mode
+   *
+   * Hardcore doubles the points awarded, and requires the player to go without
+   * rewind, save state loading, cheats and slow motion. RetroAchievements does
+   * not allow a session started in casual mode to continue into hardcore, so
+   * turning this on mid-game resets it.
+   */
+  bool GetAchievementsHardcore() const;
+
+  /*!
+   * \brief Whether achievements already earned can be triggered again
+   */
+  bool GetAchievementsEncore() const;
+
+  /*!
    * \brief Record whether the player is logged in to RetroAchievements
    *
    * Called when the game add-on reports the outcome of a login attempt, so

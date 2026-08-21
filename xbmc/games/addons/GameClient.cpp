@@ -188,6 +188,9 @@ bool CGameClient::Initialize(void)
   m_ifc.game->toKodi->RCOnAchievementProgress = cb_rc_on_achievement_progress;
   m_ifc.game->toKodi->RCOnServerError = cb_rc_on_server_error;
   m_ifc.game->toKodi->RCOnConnectionChanged = cb_rc_on_connection_changed;
+  m_ifc.game->toKodi->RCOnChallengeIndicator = cb_rc_on_challenge_indicator;
+  m_ifc.game->toKodi->RCOnSubsetCompleted = cb_rc_on_subset_completed;
+  m_ifc.game->toKodi->RCOnReset = cb_rc_on_reset;
 
   memset(m_ifc.game->toAddon, 0, sizeof(KodiToAddonFuncTable_Game));
 
@@ -888,6 +891,35 @@ void CGameClient::cb_rc_on_connection_changed(KODI_HANDLE kodiInstance, bool con
     return;
 
   gameClient->Cheevos().OnConnectionChanged(connected);
+}
+
+void CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+                                               const game_rc_achievement_challenge* data,
+                                               bool show)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnChallengeIndicator(*data, show);
+}
+
+void CGameClient::cb_rc_on_subset_completed(KODI_HANDLE kodiInstance, const char* title)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr)
+    return;
+
+  gameClient->Cheevos().OnSubsetCompleted(title != nullptr ? title : "");
+}
+
+void CGameClient::cb_rc_on_reset(KODI_HANDLE kodiInstance)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr)
+    return;
+
+  gameClient->Cheevos().OnReset();
 }
 
 std::pair<std::string, std::string> CGameClient::ParseLibretroName(const std::string& addonName)

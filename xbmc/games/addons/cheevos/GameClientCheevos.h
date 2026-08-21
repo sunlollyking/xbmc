@@ -12,6 +12,7 @@
 #include <string>
 
 struct AddonInstance_Game;
+struct game_rc_achievement_challenge;
 struct game_rc_achievement_progress;
 struct game_rc_achievement_triggered;
 struct game_rc_game_loaded;
@@ -77,6 +78,9 @@ public:
   void OnAchievementProgress(const game_rc_achievement_progress* progress, unsigned int count);
   void OnServerError(const std::string& message, const std::string& api);
   void OnConnectionChanged(bool connected);
+  void OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show);
+  void OnSubsetCompleted(const std::string& title);
+  void OnReset();
   //@}
 
 private:

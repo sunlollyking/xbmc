@@ -1296,6 +1296,26 @@ extern "C"
   //----------------------------------------------------------------------------
 
   //============================================================================
+  /// @brief **Payload of @ref AddonToKodiFuncTable_Game::RCOnChallengeIndicator**
+  ///
+  /// Sent while an achievement's trigger is primed - the player is inside an
+  /// attempt at it. Shown so they know the attempt is live, and hidden when it
+  /// ends, whether or not it was earned.
+  ///
+  typedef struct game_rc_achievement_challenge
+  {
+    /// @brief Unique RetroAchievements ID of the achievement
+    unsigned int id;
+
+    /// @brief Title of the achievement, or `NULL` if unknown
+    const char* title;
+
+    /// @brief URL of the achievement's badge, or `NULL`
+    const char* badge_url;
+  } ATTR_PACKED game_rc_achievement_challenge;
+  //----------------------------------------------------------------------------
+
+  //============================================================================
   /// @brief **Progress towards a single measured achievement**
   ///
   /// Only achievements whose trigger counts something ("Defeat 50 enemies")
@@ -1430,6 +1450,25 @@ extern "C"
                                     unsigned int count);
     void (*RCOnServerError)(KODI_HANDLE kodiInstance, const char* message, const char* api);
     void (*RCOnConnectionChanged)(KODI_HANDLE kodiInstance, bool connected);
+
+    /*
+     * RetroAchievements events, added in Game API 7.2.0.
+     *
+     * Appended as before, so add-ons built against an older header keep
+     * working.
+     */
+    void (*RCOnChallengeIndicator)(KODI_HANDLE kodiInstance,
+                                   const struct game_rc_achievement_challenge* data,
+                                   bool show);
+    void (*RCOnSubsetCompleted)(KODI_HANDLE kodiInstance, const char* title);
+
+    /*!
+     * @brief The achievement runtime is asking for the game to be reset
+     *
+     * Raised when hardcore mode is turned on, because RetroAchievements does
+     * not allow a session started in casual mode to continue into hardcore.
+     */
+    void (*RCOnReset)(KODI_HANDLE kodiInstance);
   } AddonToKodiFuncTable_Game;
 
   /*!
@@ -1500,6 +1539,27 @@ extern "C"
      void(__cdecl*)(const void*, const char*, unsigned int),
      const void*);
     GAME_ERROR(__cdecl* RCResetRuntime)(const AddonInstance_Game*);
+
+    /*
+     * RetroAchievements mode control, added in Game API 7.2.0.
+     */
+
+    /*!
+     * @brief Turn hardcore mode on or off
+     *
+     * The frontend is responsible for enforcing the restrictions that come
+     * with hardcore; this only tells the achievement runtime which mode to
+     * award unlocks in.
+     */
+    GAME_ERROR(__cdecl* RCSetHardcoreEnabled)(const AddonInstance_Game*, bool);
+
+    /*!
+     * @brief Turn encore mode on or off
+     *
+     * Encore mode re-activates achievements the player has already earned, so
+     * they can be triggered again on a replay.
+     */
+    GAME_ERROR(__cdecl* RCSetEncoreModeEnabled)(const AddonInstance_Game*, bool);
     bool(__cdecl* GetEjectState)(const AddonInstance_Game*);
     GAME_ERROR(__cdecl* SetEjectState)(const AddonInstance_Game*, bool);
     unsigned int(__cdecl* GetImageIndex)(const AddonInstance_Game*);

@@ -1108,6 +1108,32 @@ public:
   virtual GAME_ERROR RCResetRuntime() { return GAME_ERROR_NOT_IMPLEMENTED; }
 
   //============================================================================
+  /// @brief Turn hardcore mode on or off in the achievement runtime
+  ///
+  /// The frontend enforces the restrictions that hardcore requires; this only
+  /// tells the runtime which mode to award unlocks in.
+  ///
+  /// @param[in] enabled True to enable hardcore mode
+  /// @return The add-on error status
+  ///
+  /// @note Added in Game API 7.2.0
+  ///
+  virtual GAME_ERROR RCSetHardcoreEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
+
+  //============================================================================
+  /// @brief Turn encore mode on or off in the achievement runtime
+  ///
+  /// Encore mode re-activates achievements the player has already earned so
+  /// they can be triggered again on a replay.
+  ///
+  /// @param[in] enabled True to enable encore mode
+  /// @return The add-on error status
+  ///
+  /// @note Added in Game API 7.2.0
+  ///
+  virtual GAME_ERROR RCSetEncoreModeEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
+
+  //============================================================================
   /// @brief **Callback to Kodi Function**\n
   /// Notify Kodi that a game has been identified by the achievement runtime
   ///
@@ -1240,6 +1266,52 @@ public:
   {
     m_instanceData->toKodi->RCOnConnectionChanged(m_instanceData->toKodi->kodiInstance, connected);
   }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Show or hide the indicator for an achievement the player is attempting
+  ///
+  /// @param[in] data The achievement being attempted
+  /// @param[in] show True to show the indicator, false to hide it
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.2.0
+  ///
+  void KodiRCOnChallengeIndicator(const game_rc_achievement_challenge& data, bool show)
+  {
+    m_instanceData->toKodi->RCOnChallengeIndicator(m_instanceData->toKodi->kodiInstance, &data,
+                                                   show);
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Notify Kodi that every achievement of a subset has been earned
+  ///
+  /// @param[in] title The title of the completed subset
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.2.0
+  ///
+  void KodiRCOnSubsetCompleted(const std::string& title)
+  {
+    m_instanceData->toKodi->RCOnSubsetCompleted(m_instanceData->toKodi->kodiInstance,
+                                                title.c_str());
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Ask the frontend to reset the game
+  ///
+  /// Raised when hardcore mode is enabled, because a session started in casual
+  /// mode may not continue into hardcore.
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.2.0
+  ///
+  void KodiRCOnReset() { m_instanceData->toKodi->RCOnReset(m_instanceData->toKodi->kodiInstance); }
 
   //----------------------------------------------------------------------------
 
@@ -1441,6 +1513,8 @@ private:
     instance->game->toAddon->ActivateAchievement = ADDON_ActivateAchievement;
     instance->game->toAddon->GetCheevoUrlId = ADDON_GetCheevoUrlId;
     instance->game->toAddon->RCResetRuntime = ADDON_RCResetRuntime;
+    instance->game->toAddon->RCSetHardcoreEnabled = ADDON_RCSetHardcoreEnabled;
+    instance->game->toAddon->RCSetEncoreModeEnabled = ADDON_RCSetEncoreModeEnabled;
 
     instance->game->toAddon->GetEjectState = ADDON_GetEjectState;
     instance->game->toAddon->SetEjectState = ADDON_SetEjectState;
@@ -1833,6 +1907,20 @@ private:
 
     return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
         ->GetCheevoUrlId(cppCallback);
+  }
+
+  inline static GAME_ERROR ADDON_RCSetHardcoreEnabled(const AddonInstance_Game* instance,
+                                                     bool enabled)
+  {
+    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
+        ->RCSetHardcoreEnabled(enabled);
+  }
+
+  inline static GAME_ERROR ADDON_RCSetEncoreModeEnabled(const AddonInstance_Game* instance,
+                                                        bool enabled)
+  {
+    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
+        ->RCSetEncoreModeEnabled(enabled);
   }
 
   inline static GAME_ERROR ADDON_RCResetRuntime(const AddonInstance_Game* instance)

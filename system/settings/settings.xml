@@ -2813,6 +2813,16 @@
           </constraints>
           <control type="edit" format="string"/>
         </setting>
+        <setting id="gamesachievements.hardcore" type="boolean" label="35298" help="35299">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamesachievements.encore" type="boolean" label="35300" help="35301">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
         <setting id="gamesachievements.loggedin" type="boolean" label="35268" help="35269">
           <visible>true</visible>
           <level>0</level>
