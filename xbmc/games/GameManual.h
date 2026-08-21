@@ -80,6 +80,24 @@ public:
   static std::vector<std::string> BuildManualPaths(const std::string& gamePath);
 
   /*!
+   * \brief Where a manual fetched for a game should be written
+   *
+   * The "manuals" folder beside the game, which is one of the places the
+   * lookup already searches, so a fetched manual is found the same way one
+   * put there by hand would be.
+   *
+   * A games folder is often read only - a share mounted for playing, or a
+   * disc - so the caller is told whether it can be written to and can fall
+   * back to somewhere in the profile.
+   *
+   * \param gamePath The game's path
+   * \param[out] writable Whether the folder can be created and written to
+   *
+   * \return The path to write to, or empty if none can be derived
+   */
+  static std::string GetDownloadPath(const std::string& gamePath, bool& writable);
+
+  /*!
    * \brief Reduce a name so that two spellings of the same title compare equal
    *
    * Lowercases, and drops parenthesised and bracketed tags along with the
