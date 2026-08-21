@@ -32,6 +32,8 @@
 #include "utils/Variant.h"
 #include "utils/log.h"
 
+#include <vector>
+
 using namespace KODI::GUILIB::GUIINFO;
 using namespace KODI::GAME;
 using namespace KODI::RETRO;
@@ -238,6 +240,23 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
       value = AchievementRuntime().GetRichPresence();
       return true;
     }
+    case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE:
+    case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE:
+    {
+      // Only the first attempt is surfaced. More than one at a time is rare,
+      // and a corner indicator has room for one.
+      const std::vector<AchievementChallenge> challenges = AchievementRuntime().GetChallenges();
+      if (challenges.empty())
+      {
+        value.clear();
+        return true;
+      }
+
+      value = (info.GetInfo() == RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE)
+                  ? challenges.front().title
+                  : challenges.front().badgeUrl;
+      return true;
+    }
     case RETROPLAYER_ACHIEVEMENTS_PROGRESS:
     {
       const CAchievementRuntime& runtime = AchievementRuntime();
@@ -276,6 +295,11 @@ bool CGamesGUIInfo::GetBool(bool& value,
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // RETROPLAYER_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    case RETROPLAYER_ACHIEVEMENTS_HARDCORE:
+    {
+      value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+      return true;
+    }
     case RETROPLAYER_SUPPORTS_EJECT:
     {
       const auto& components = CServiceBroker::GetAppComponents();
