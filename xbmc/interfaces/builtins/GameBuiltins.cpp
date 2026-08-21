@@ -69,6 +69,18 @@ int ShowGameManual(const std::vector<std::string>& params)
   {
     CLog::Log(LOGDEBUG, "ShowGameManual: no manual beside \"{}\"", item.GetDynPath());
 
+    const std::string gamePath = item.GetDynPath();
+
+    // Nothing local, so offer to go looking. The dialog reports for itself
+    // when there is no add-on installed that could search, which is a better
+    // answer than a notification saying only that nothing was found.
+    if (!gamePath.empty())
+    {
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_DIALOG_GAME_MANUALS,
+                                                                 gamePath);
+      return 0;
+    }
+
     // "Manual", "No manual found for {0:s}"
     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, strings.Get(35310),
                                           StringUtils::Format(strings.Get(35311), gameName));

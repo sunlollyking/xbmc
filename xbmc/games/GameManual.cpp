@@ -204,6 +204,28 @@ std::string CGameManual::GetManualPath(const std::string& gamePath)
   return {};
 }
 
+std::string CGameManual::GetDownloadPath(const std::string& gamePath, bool& writable)
+{
+  writable = false;
+
+  if (!CanHaveManual(gamePath))
+    return {};
+
+  const std::string stem = GetGameStem(gamePath);
+  if (stem.empty())
+    return {};
+
+  const std::string folder =
+      URIUtils::AddFileToFolder(URIUtils::GetDirectory(gamePath), MANUAL_SUBFOLDER);
+
+  // Whether the folder can be made is the question, not whether it is there:
+  // the first manual fetched for a source has to create it
+  if (XFILE::CDirectory::Exists(folder) || XFILE::CDirectory::Create(folder))
+    writable = true;
+
+  return URIUtils::AddFileToFolder(folder, stem + ".pdf");
+}
+
 std::string CGameManual::GetManualPath(const CFileItem& item)
 {
   return GetManualPath(item.GetDynPath());

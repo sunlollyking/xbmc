@@ -19471,7 +19471,55 @@ msgctxt "#35316"
 msgid "Zoom {0:d}%"
 msgstr ""
 
-#empty strings from id 35317 to 35504
+#. Heading of the dialog that finds a manual for a game
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35317"
+msgid "Find a manual"
+msgstr ""
+
+#. Footer hint in the find-a-manual dialog
+#: addons/skin.estuary/xml/DialogGameManuals.xml
+msgctxt "#35318"
+msgid "Choose a manual to download it"
+msgstr ""
+
+#. Label for which add-on is being asked for manuals
+#: addons/skin.estuary/xml/DialogGameManuals.xml
+msgctxt "#35319"
+msgid "Provider"
+msgstr ""
+
+#. Shown when no add-on that can provide manuals is installed
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35320"
+msgid "No add-on is installed that can find manuals"
+msgstr ""
+
+#. Shown while a manual provider is being asked
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35321"
+msgid "Searching…"
+msgstr ""
+
+#. Shown when a provider has nothing for this game
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35322"
+msgid "No manual was found for this game"
+msgstr ""
+
+#. Shown while a chosen manual is being fetched
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35323"
+msgid "Downloading…"
+msgstr ""
+
+#. Shown when a manual was found but could not be fetched
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35324"
+msgid "The manual could not be downloaded"
+msgstr ""
+
+#empty strings from id 35325 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp

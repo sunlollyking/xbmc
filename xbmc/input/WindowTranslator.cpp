@@ -177,6 +177,7 @@ const CWindowTranslator::WindowMapByName CWindowTranslator::WindowMappingByName 
     {"gameagents", WINDOW_DIALOG_GAME_AGENTS},
     {"gamediscmanager", WINDOW_DIALOG_GAME_DISC_MANAGER},
     {"gamemanual", WINDOW_GAME_MANUAL},
+    {"gamemanuals", WINDOW_DIALOG_GAME_MANUALS},
     {"dialogselectvideo", WINDOW_DIALOG_SELECT_VIDEO_STREAM},
     {"dialogselectaudio", WINDOW_DIALOG_SELECT_AUDIO_STREAM},
     {"dialogselectsubtitle", WINDOW_DIALOG_SELECT_SUBTITLE_STREAM},
