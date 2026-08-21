@@ -162,6 +162,7 @@
 #include "games/dialogs/osd/DialogInGameSaves.h"
 #include "games/ports/windows/GUIPortWindow.h"
 #include "games/windows/GUIWindowGames.h"
+#include "games/manual/GUIDialogGameManuals.h"
 #include "games/manual/GUIWindowGameManual.h"
 
 using namespace KODI;
@@ -361,8 +362,8 @@ void CGUIWindowManager::CreateWindows()
   Add(new GAME::CDialogGameAchievements);
   Add(new GAME::CDialogGameIndicators);
   Add(new GAME::CDialogGameCheats);
-#if defined(HAVE_POPPLER)
   Add(new GAME::CGUIWindowGameManual);
+  Add(new GAME::CGUIDialogGameManuals);
   Add(new RETRO::CGameWindowFullScreen);
 }
 
