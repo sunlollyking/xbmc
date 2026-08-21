@@ -141,8 +141,14 @@ void CGUIWindowGameManual::UpdateProperties()
   SetProperty(PROPERTY_PAGE_LABEL,
               StringUtils::Format(strings.Get(35314), m_page + 1, m_pageCount));
 
+  // The extension is dropped literally rather than with RemoveExtension(),
+  // which only strips extensions Kodi has been told about by an add-on and so
+  // would leave ".pdf" on the end of every manual's title
   std::string title = URIUtils::GetFileName(m_manualPath);
-  URIUtils::RemoveExtension(title);
+  const size_t extension = title.find_last_of('.');
+  if (extension != std::string::npos)
+    title.erase(extension);
+
   SetProperty(PROPERTY_TITLE, title);
 }
 
