@@ -19556,7 +19556,19 @@ msgctxt "#35313"
 msgid "Unable to open manual for {0:s}"
 msgstr ""
 
-#empty strings from id 35314 to 35504
+#. Page position in the manual viewer. {0:d} is the page, {1:d} the page count
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35314"
+msgid "Page {0:d} of {1:d}"
+msgstr ""
+
+#. Notification shown when a manual has been opened but a page will not render
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35315"
+msgid "This page could not be displayed"
+msgstr ""
+
+#empty strings from id 35316 to 35504
 
 #. Shown when a game needs the graphics card directly but the display can't provide it
 #: xbmc/games/addons/GameClient.cpp
