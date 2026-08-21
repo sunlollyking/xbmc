@@ -291,6 +291,19 @@ bool CGameSettings::GetAchievementsHardcore() const
       SETTING_GAMES_ACHIEVEMENTS_HARDCORE);
 }
 
+void CGameSettings::SetAchievementsHardcore(bool hardcore)
+{
+  const auto settingsComponent = CServiceBroker::GetSettingsComponent();
+  if (!settingsComponent)
+    return;
+
+  const auto settings = settingsComponent->GetSettings();
+  if (!settings)
+    return;
+
+  settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE, hardcore);
+}
+
 bool CGameSettings::GetAchievementsEncore() const
 {
   return CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(

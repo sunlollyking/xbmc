@@ -19567,7 +19567,25 @@ msgctxt "#35304"
 msgid "Subset completed"
 msgstr ""
 
-#empty strings from id 35305 to 35504
+#. Name of the save state feature, used when hardcore mode blocks it
+#: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
+msgctxt "#35305"
+msgid "Loading save states"
+msgstr ""
+
+#. Name of the rewind feature, used when hardcore mode blocks it
+#: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
+msgctxt "#35306"
+msgid "Rewind"
+msgstr ""
+
+#. Name of the slow motion feature, used when hardcore mode blocks it
+#: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
+msgctxt "#35307"
+msgid "Slow motion"
+msgstr ""
+
+#empty strings from id 35308 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp

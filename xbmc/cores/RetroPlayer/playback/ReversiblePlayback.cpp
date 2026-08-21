@@ -17,11 +17,15 @@
 #include "cores/RetroPlayer/savestates/ISavestate.h"
 #include "cores/RetroPlayer/savestates/SavestateDatabase.h"
 #include "cores/RetroPlayer/streams/memory/DeltaPairMemoryStream.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/File.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "resources/LocalizeStrings.h"
+#include "resources/ResourcesComponent.h"
 #include "utils/MathUtils.h"
+#include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -33,6 +37,38 @@ using namespace KODI;
 using namespace RETRO;
 
 #define REWIND_FACTOR 0.25 // Rewind at 25% of gameplay speed
+
+namespace
+{
+constexpr unsigned int TOAST_DISPLAY_TIME_MS = 5000;
+
+/*!
+ * \brief Whether hardcore mode is currently blocking gameplay assistance
+ *
+ * RetroAchievements requires save state loading, rewind, slow motion and
+ * cheats to be unavailable while hardcore is on. Saving states is still
+ * allowed, and so is fast forward.
+ */
+bool HardcoreRestrictionsApply()
+{
+  return CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+}
+
+/*!
+ * \brief Tell the player why something they asked for didn't happen
+ *
+ * Silently ignoring the request would read as a broken control.
+ */
+void NotifyBlockedByHardcore(uint32_t featureStringId)
+{
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+
+  // "{0:s} is not available in hardcore mode"
+  CGUIDialogKaiToast::QueueNotification(
+      CGUIDialogKaiToast::Info, strings.Get(35264),
+      StringUtils::Format(strings.Get(35302), strings.Get(featureStringId)), TOAST_DISPLAY_TIME_MS);
+}
+} // namespace
 
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
                                          CRPRenderManager& renderManager,
@@ -110,6 +146,27 @@ double CReversiblePlayback::GetSpeed() const
 
 void CReversiblePlayback::SetSpeed(double speedFactor)
 {
+  if (HardcoreRestrictionsApply())
+  {
+    // Rewind runs the game backwards, so it arrives here as a negative speed
+    if (speedFactor < 0.0)
+    {
+      CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Refusing to rewind in hardcore mode");
+      NotifyBlockedByHardcore(35306); // "Rewind"
+      m_gameLoop.SetSpeed(1.0);
+      return;
+    }
+
+    // Slow motion is blocked, fast forward is not. Pausing (0.0) is fine.
+    if (speedFactor > 0.0 && speedFactor < 1.0)
+    {
+      CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Refusing to slow down in hardcore mode");
+      NotifyBlockedByHardcore(35307); // "Slow motion"
+      m_gameLoop.SetSpeed(1.0);
+      return;
+    }
+  }
+
   if (speedFactor >= 0.0)
     m_gameLoop.SetSpeed(speedFactor);
   else
@@ -171,12 +228,11 @@ std::string CReversiblePlayback::CreateSavestate(bool autosave,
     std::unique_lock lock(m_savestateMutex);
 
     // Prune any finished autosave threads
-    m_savestateThreads.erase(std::remove_if(m_savestateThreads.begin(), m_savestateThreads.end(),
-                                            [](std::future<void>& task) {
-                                              return task.wait_for(std::chrono::seconds(0)) ==
-                                                     std::future_status::ready;
-                                            }),
-                             m_savestateThreads.end());
+    m_savestateThreads.erase(
+        std::remove_if(
+            m_savestateThreads.begin(), m_savestateThreads.end(), [](std::future<void>& task)
+            { return task.wait_for(std::chrono::seconds(0)) == std::future_status::ready; }),
+        m_savestateThreads.end());
 
     // Save async to not block game loop
     std::future<void> task =
@@ -266,6 +322,15 @@ void CReversiblePlayback::CommitSavestate(bool autosave,
 
 bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
 {
+  // Loading a save state is always blocked in hardcore; creating one is not,
+  // so that players can still keep a state for later
+  if (HardcoreRestrictionsApply())
+  {
+    CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Refusing to load a savestate in hardcore mode");
+    NotifyBlockedByHardcore(35305); // "Loading save states"
+    return false;
+  }
+
   const size_t memorySize = m_gameClient->SerializeSize();
 
   // Game client must support serialization
@@ -406,7 +471,10 @@ void CReversiblePlayback::UpdateMemoryStream()
 
   GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
-  if (m_gameClient->SerializeSize() > 0)
+  // Hardcore forbids rewind, so the buffer isn't just unused - it shouldn't be
+  // allocated at all. It costs the savestate size for every frame of the
+  // rewind window, which runs to gigabytes on consoles with large states.
+  if (m_gameClient->SerializeSize() > 0 && !HardcoreRestrictionsApply())
     bRewindEnabled = gameSettings.RewindEnabled();
 
   if (bRewindEnabled)

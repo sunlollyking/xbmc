@@ -54,6 +54,14 @@ public:
   bool GetAchievementsHardcore() const;
 
   /*!
+   * \brief Turn hardcore mode on or off
+   *
+   * Used to drop back to casual when a session resumes from a save state,
+   * which RetroAchievements requires.
+   */
+  void SetAchievementsHardcore(bool hardcore);
+
+  /*!
    * \brief Whether achievements already earned can be triggered again
    */
   bool GetAchievementsEncore() const;
