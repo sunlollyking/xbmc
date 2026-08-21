@@ -160,9 +160,7 @@
 #include "games/dialogs/osd/DialogInGameSaves.h"
 #include "games/ports/windows/GUIPortWindow.h"
 #include "games/windows/GUIWindowGames.h"
-#if defined(HAVE_POPPLER)
 #include "games/manual/GUIWindowGameManual.h"
-#endif
 
 using namespace KODI;
 using namespace PVR;
@@ -359,9 +357,7 @@ void CGUIWindowManager::CreateWindows()
   Add(new GAME::CGUIAgentWindow);
   Add(new GAME::CDialogGameDiscManager);
   Add(new GAME::CDialogGameAchievements);
-#if defined(HAVE_POPPLER)
   Add(new GAME::CGUIWindowGameManual);
-#endif
   Add(new RETRO::CGameWindowFullScreen);
 }
 
