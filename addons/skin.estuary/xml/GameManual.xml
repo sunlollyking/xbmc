@@ -27,9 +27,9 @@
 				<texture background="true">$INFO[Window.Property(Manual.Image)]</texture>
 			</control>
 
-			<!-- Shown while the page is being rendered. The image control draws
-			     nothing until its texture is ready, so without this a page turn
-			     on a slow machine looks like the viewer has stopped. -->
+			<!-- Shown while the document is being read. Opening happens on a
+			     background job, so without this a manual on a network share
+			     would show an empty window for as long as the read took. -->
 			<control type="label">
 				<left>60</left>
 				<top>40</top>
@@ -39,8 +39,19 @@
 				<aligny>center</aligny>
 				<font>font13</font>
 				<textcolor>grey</textcolor>
-				<label>$LOCALIZE[1040]</label>
-				<visible>String.IsEmpty(Window.Property(Manual.Image))</visible>
+				<label>$INFO[Window.Property(Manual.Status)]</label>
+				<visible>!String.IsEmpty(Window.Property(Manual.Status))</visible>
+			</control>
+
+			<!-- A zoomed page fills the screen and passes under the labels, so
+			     they are given something to sit on rather than being read
+			     against whatever happens to be on the paper -->
+			<control type="image">
+				<left>0</left>
+				<top>960</top>
+				<width>100%</width>
+				<height>120</height>
+				<texture colordiffuse="dd000000">colors/white.png</texture>
 			</control>
 
 			<control type="label">
@@ -53,6 +64,20 @@
 				<font>font12</font>
 				<textcolor>white</textcolor>
 				<label>$INFO[Window.Property(Manual.Title)]</label>
+			</control>
+
+			<!-- Only says anything while zoomed in, since a page shown whole is
+			     the normal case and needs no announcement -->
+			<control type="label">
+				<left>760</left>
+				<top>1000</top>
+				<width>400</width>
+				<height>40</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font12</font>
+				<textcolor>grey</textcolor>
+				<label>$INFO[Window.Property(Manual.ZoomLabel)]</label>
 			</control>
 
 			<control type="label">
