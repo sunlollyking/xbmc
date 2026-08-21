@@ -87,7 +87,7 @@
 				<control type="group" id="2000">
 					<top>80</top>
 					<control type="list" id="1103">
-						<height>560</height>
+						<height>640</height>
 						<orientation>vertical</orientation>
 						<itemlayout condition="!Control.IsVisible(2200)" width="700" height="80">
 							<control type="image">
@@ -258,6 +258,12 @@
 								<onclick>PlayerControl(Reset)</onclick>
 							</item>
 							<item>
+								<description>Manual button</description>
+								<label>$LOCALIZE[35310]</label>
+								<icon>osd/fullscreen/buttons/information.png</icon>
+								<onclick>ShowGameManual</onclick>
+							</item>
+							<item>
 								<description>Stop button</description>
 								<label>$LOCALIZE[35222]</label>
 								<label2>$FEATURE[select,game.controller.snes] + $FEATURE[start,game.controller.default]</label2>
@@ -299,7 +305,7 @@
 				<control type="group" id="2000">
 					<top>80</top>
 					<control type="list" id="1103">
-						<height>640</height>
+						<height>720</height>
 						<orientation>vertical</orientation>
 						<itemlayout condition="!Control.IsVisible(2200)" width="700" height="80">
 							<control type="image">
@@ -474,6 +480,12 @@
 								<label>$LOCALIZE[13007]</label>
 								<icon>osd/fullscreen/buttons/reset.png</icon>
 								<onclick>PlayerControl(Reset)</onclick>
+							</item>
+							<item>
+								<description>Manual button</description>
+								<label>$LOCALIZE[35310]</label>
+								<icon>osd/fullscreen/buttons/information.png</icon>
+								<onclick>ShowGameManual</onclick>
 							</item>
 							<item>
 								<description>Stop button</description>

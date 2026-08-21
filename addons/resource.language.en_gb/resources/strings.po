@@ -19551,7 +19551,27 @@ msgctxt "#35301"
 msgid "This game renders with {0:s}, which isn't available on this display. It can't be played."
 msgstr ""
 
-#empty strings from id 35302 to 35319
+#empty strings from id 35302 to 35309
+
+#. Label of the Manual action in the game OSD, and heading of its notifications
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35310"
+msgid "Manual"
+msgstr ""
+
+#. Notification shown when a game has no manual beside it. {0:s} is the game
+#: xbmc/interfaces/builtins/GameBuiltins.cpp
+msgctxt "#35311"
+msgid "No manual found for {0:s}"
+msgstr ""
+
+#. Notification shown when a manual is found but cannot be opened. {0:s} is the game
+#: xbmc/interfaces/builtins/GameBuiltins.cpp
+msgctxt "#35312"
+msgid "Unable to open manual for {0:s}"
+msgstr ""
+
+#empty strings from id 35313 to 35319
 
 #. Label of the setting that points at the folder holding cheat files
 msgctxt "#35320"
