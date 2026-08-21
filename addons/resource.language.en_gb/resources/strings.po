@@ -19583,7 +19583,19 @@ msgctxt "#35314"
 msgid "This page could not be displayed"
 msgstr ""
 
-#empty strings from id 35315 to 35319
+#. Shown in the manual viewer while the document is being opened
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35315"
+msgid "Opening manual…"
+msgstr ""
+
+#. Zoom level in the manual viewer. {0:d} is a percentage
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35316"
+msgid "Zoom {0:d}%"
+msgstr ""
+
+#empty strings from id 35317 to 35319
 
 #. Label of the setting that points at the folder holding cheat files
 msgctxt "#35320"
