@@ -132,6 +132,7 @@ dependent_option(ENABLE_INTERNAL_LIBMICROHTTPD  "Enable internal libmicrohttpd?"
 dependent_option(ENABLE_INTERNAL_LZO2 "Enable internal lzo2?")
 dependent_option(ENABLE_INTERNAL_NFS "Enable internal libnfs?")
 dependent_option(ENABLE_INTERNAL_PCRE2 "Enable internal pcre2?")
+dependent_option(ENABLE_INTERNAL_POPPLER "Enable internal poppler?")
 dependent_option(ENABLE_INTERNAL_MARIADBCLIENT "Enable internal mariadb-c-connector?")
 dependent_option(ENABLE_INTERNAL_NLOHMANNJSON "Enable internal nlohmannjson?")
 dependent_option(ENABLE_INTERNAL_UDFREAD "Enable internal libudfread?")
@@ -283,6 +284,7 @@ set(optional_deps Alsa>=1.0.27
                   NFS>=3.0.0
                   Pipewire>=0.3.50
                   Plist
+                  Poppler>=22.0.0
                   PulseAudio>=11.0.0
                   Python
                   SmbClient
