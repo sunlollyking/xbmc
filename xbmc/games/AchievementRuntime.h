@@ -16,6 +16,20 @@ namespace KODI::GAME
 {
 
 /*!
+ * \brief An achievement the player is currently attempting
+ *
+ * RetroAchievements calls these "challenge indicators". They appear while an
+ * achievement's trigger is primed and disappear when the attempt ends, whether
+ * or not it was earned.
+ */
+struct AchievementChallenge
+{
+  unsigned int id{0};
+  std::string title;
+  std::string badgeUrl;
+};
+
+/*!
  * \brief Progress towards a single measured achievement
  */
 struct AchievementProgress
@@ -73,6 +87,13 @@ struct AchievementState
   unsigned int unlockedAchievements{0};
   std::string richPresence;
   std::vector<AchievementInfo> achievements;
+
+  /*!
+   * \brief Achievements the player is currently attempting
+   *
+   * Usually empty, and rarely more than one or two at a time.
+   */
+  std::vector<AchievementChallenge> challenges;
   bool loaded{false};
 };
 
@@ -124,6 +145,19 @@ public:
    * arriving after the game changed can't corrupt the new game's list.
    */
   unsigned int SetAchievementProgress(const std::vector<AchievementProgress>& progress);
+
+  /*!
+   * \brief Add or remove an achievement from the list being attempted
+   *
+   * \param challenge The achievement
+   * \param active True while the attempt is live, false once it has ended
+   */
+  void SetChallenge(const AchievementChallenge& challenge, bool active);
+
+  /*!
+   * \brief Get the achievements currently being attempted
+   */
+  std::vector<AchievementChallenge> GetChallenges() const;
 
   /*!
    * \name Targeted accessors for the progress info label
