@@ -19550,11 +19550,7 @@ msgctxt "#35312"
 msgid "No manual found for {0:s}"
 msgstr ""
 
-#. Notification shown when a manual is found but cannot be opened. {0:s} is the game
-#: xbmc/interfaces/builtins/GameBuiltins.cpp
-msgctxt "#35313"
-msgid "Unable to open manual for {0:s}"
-msgstr ""
+#empty string with id 35313
 
 #. Page position in the manual viewer. {0:d} is the page, {1:d} the page count
 #: xbmc/games/manual/GUIWindowGameManual.cpp

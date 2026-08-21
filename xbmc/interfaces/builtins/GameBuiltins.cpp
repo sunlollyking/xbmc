@@ -77,16 +77,7 @@ int ShowGameManual(const std::vector<std::string>& params)
 
   CLog::Log(LOGINFO, "ShowGameManual: found manual \"{}\"", manualPath);
 
-#if defined(HAVE_POPPLER)
   CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAME_MANUAL, manualPath);
-#else
-  // A manual is there, but this build has no renderer to show it with
-  CLog::Log(LOGINFO, "ShowGameManual: built without PDF support");
-
-  // "Manual", "Unable to open manual for {0:s}"
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, strings.Get(35311),
-                                        StringUtils::Format(strings.Get(35313), gameName));
-#endif
 
   return 0;
 }
