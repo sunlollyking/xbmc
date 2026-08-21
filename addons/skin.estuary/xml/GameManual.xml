@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<defaultcontrol always="true">9000</defaultcontrol>
+	<controls>
+		<!-- The page is read against a plain dark background rather than the game,
+		     which would show through and make the scanned paper hard to read -->
+		<control type="image">
+			<left>0</left>
+			<top>0</top>
+			<width>100%</width>
+			<height>100%</height>
+			<texture colordiffuse="black">colors/white.png</texture>
+		</control>
+
+		<control type="group">
+			<animation effect="fade" time="200">WindowOpen</animation>
+			<animation effect="fade" time="200">WindowClose</animation>
+
+			<!-- The page. keepaspectratio so a portrait page and a double page
+			     spread are both shown whole, letterboxed into the same space. -->
+			<control type="image" id="9000">
+				<left>60</left>
+				<top>40</top>
+				<width>1800</width>
+				<height>940</height>
+				<aspectratio>keep</aspectratio>
+				<texture background="true">$INFO[Window.Property(Manual.Image)]</texture>
+			</control>
+
+			<!-- Shown while the page is being rendered. The image control draws
+			     nothing until its texture is ready, so without this a page turn
+			     on a slow machine looks like the viewer has stopped. -->
+			<control type="label">
+				<left>60</left>
+				<top>40</top>
+				<width>1800</width>
+				<height>940</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font13</font>
+				<textcolor>grey</textcolor>
+				<label>$LOCALIZE[1040]</label>
+				<visible>String.IsEmpty(Window.Property(Manual.Image))</visible>
+			</control>
+
+			<control type="label">
+				<left>60</left>
+				<top>1000</top>
+				<width>900</width>
+				<height>40</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>font12</font>
+				<textcolor>white</textcolor>
+				<label>$INFO[Window.Property(Manual.Title)]</label>
+			</control>
+
+			<control type="label">
+				<left>960</left>
+				<top>1000</top>
+				<width>900</width>
+				<height>40</height>
+				<align>right</align>
+				<aligny>center</aligny>
+				<font>font12</font>
+				<textcolor>grey</textcolor>
+				<label>$INFO[Window.Property(Manual.PageLabel)]</label>
+			</control>
+		</control>
+	</controls>
+</window>
