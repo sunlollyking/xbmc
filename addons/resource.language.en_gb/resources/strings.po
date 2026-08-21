@@ -19571,7 +19571,19 @@ msgctxt "#35312"
 msgid "Unable to open manual for {0:s}"
 msgstr ""
 
-#empty strings from id 35313 to 35319
+#. Page position in the manual viewer. {0:d} is the page, {1:d} the page count
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35313"
+msgid "Page {0:d} of {1:d}"
+msgstr ""
+
+#. Notification shown when a manual has been opened but a page will not render
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35314"
+msgid "This page could not be displayed"
+msgstr ""
+
+#empty strings from id 35315 to 35319
 
 #. Label of the setting that points at the folder holding cheat files
 msgctxt "#35320"

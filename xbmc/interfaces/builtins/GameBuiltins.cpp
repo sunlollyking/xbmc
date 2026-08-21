@@ -14,6 +14,9 @@
 #include "dialogs/GUIDialogKaiToast.h"
 #include "games/GameManual.h"
 #include "games/tags/GameInfoTag.h"
+#include "guilib/GUIComponent.h"
+#include "guilib/GUIWindowManager.h"
+#include "guilib/WindowIDs.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
 #include "utils/StringUtils.h"
@@ -74,10 +77,16 @@ int ShowGameManual(const std::vector<std::string>& params)
 
   CLog::Log(LOGINFO, "ShowGameManual: found manual \"{}\"", manualPath);
 
-  //! @todo Open the manual in the viewer once it exists. Until then the lookup
-  //! is reported, so that a library can be checked without a renderer.
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, strings.Get(35310),
-                                        URIUtils::GetFileName(manualPath));
+#if defined(HAVE_POPPLER)
+  CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAME_MANUAL, manualPath);
+#else
+  // A manual is there, but this build has no renderer to show it with
+  CLog::Log(LOGINFO, "ShowGameManual: built without PDF support");
+
+  // "Manual", "Unable to open manual for {0:s}"
+  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, strings.Get(35310),
+                                        StringUtils::Format(strings.Get(35312), gameName));
+#endif
 
   return 0;
 }
