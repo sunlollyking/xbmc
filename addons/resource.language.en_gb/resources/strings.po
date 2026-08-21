@@ -19568,7 +19568,19 @@ msgctxt "#35315"
 msgid "This page could not be displayed"
 msgstr ""
 
-#empty strings from id 35316 to 35504
+#. Shown in the manual viewer while the document is being opened
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35316"
+msgid "Opening manual…"
+msgstr ""
+
+#. Zoom level in the manual viewer. {0:d} is a percentage
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35317"
+msgid "Zoom {0:d}%"
+msgstr ""
+
+#empty strings from id 35318 to 35504
 
 #. Shown when a game needs the graphics card directly but the display can't provide it
 #: xbmc/games/addons/GameClient.cpp
