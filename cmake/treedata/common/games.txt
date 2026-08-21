@@ -16,6 +16,7 @@ xbmc/games/controllers/windows     games/controllers/windows
 xbmc/games/dialogs                 games/dialogs
 xbmc/games/dialogs/disc            games/dialogs/disc
 xbmc/games/dialogs/osd             games/dialogs/osd
+xbmc/games/manual                  games/manual
 xbmc/games/ports                   games/ports
 xbmc/games/ports/guicontrols       games/ports/guicontrols
 xbmc/games/ports/input             games/ports/input
