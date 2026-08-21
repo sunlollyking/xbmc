@@ -19527,7 +19527,6 @@ msgctxt "#35297"
 msgid "Pending unlocks have been submitted."
 msgstr ""
 
-#empty strings from id 35298 to 35504
 #. Error message shown when trying to load a compressed savestate in an unsupported version of Kodi
 #: xbmc/games/dialogs/osd/DialogInGameSaves.cpp
 msgctxt "#35298"
@@ -19546,7 +19545,49 @@ msgctxt "#35300"
 msgid "This game renders with {0:s}, which isn't available on this display. It can't be played."
 msgstr ""
 
-#empty strings from id 35301 to 35504
+#. Label of the setting that enables RetroAchievements hardcore mode
+#: system/settings/settings.xml
+msgctxt "#35301"
+msgid "Hardcore mode"
+msgstr ""
+
+#. Help text for the hardcore mode setting
+#: system/settings/settings.xml
+msgctxt "#35302"
+msgid "Earn achievements worth double points, with rewind, save state loading, cheats and slow motion disabled. Turning this on restarts the game."
+msgstr ""
+
+#. Label of the setting that enables RetroAchievements encore mode
+#: system/settings/settings.xml
+msgctxt "#35303"
+msgid "Encore mode"
+msgstr ""
+
+#. Help text for the encore mode setting
+#: system/settings/settings.xml
+msgctxt "#35304"
+msgid "Allow achievements you have already earned to be triggered again when replaying a game."
+msgstr ""
+
+#. Notification shown when hardcore mode blocks a feature, {0:s} is the feature
+#: xbmc/games/GameSettings.cpp
+msgctxt "#35305"
+msgid "{0:s} is not available in hardcore mode"
+msgstr ""
+
+#. Notification shown when hardcore mode is turned off during play
+#: xbmc/games/GameSettings.cpp
+msgctxt "#35306"
+msgid "Hardcore mode disabled. Achievements will be earned in casual mode."
+msgstr ""
+
+#. Notification shown when all achievements of a subset are earned, {0:s} is the subset
+#: xbmc/games/addons/cheevos/GameClientCheevos.cpp
+msgctxt "#35307"
+msgid "Subset completed"
+msgstr ""
+
+#empty strings from id 35308 to 35504
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
 msgctxt "#35505"

@@ -519,6 +519,38 @@ void CGameClientCheevos::OnConnectionChanged(bool connected)
       Localize(connected ? 35297 : 35296), TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 
+void CGameClientCheevos::OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show)
+{
+  // Published to the runtime rather than raised as a notification: this fires
+  // and clears repeatedly during play, so it belongs in an on-screen indicator
+  // the skin can show and hide, not in the notification queue
+  AchievementChallenge challenge;
+  challenge.id = data.id;
+  challenge.title = SafeString(data.title);
+  challenge.badgeUrl = SafeString(data.badge_url);
+
+  CServiceBroker::GetGameServices().AchievementRuntime().SetChallenge(challenge, show);
+}
+
+void CGameClientCheevos::OnSubsetCompleted(const std::string& title)
+{
+  CLog::Log(LOGINFO, "CGameClientCheevos: completed subset \"{}\"", title);
+
+  // "Subset completed"
+  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35307), title,
+                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+}
+
+void CGameClientCheevos::OnReset()
+{
+  // RetroAchievements does not allow a session started in casual mode to
+  // continue into hardcore, so the runtime asks for a reset when hardcore is
+  // switched on. Honouring it is a hardcore compliance requirement.
+  CLog::Log(LOGINFO, "CGameClientCheevos: achievement runtime requested a game reset");
+
+  m_gameClient.Reset();
+}
+
 void CGameClientCheevos::OnRichPresenceUpdated(const std::string& evaluation)
 {
   CServiceBroker::GetGameServices().AchievementRuntime().SetRichPresence(evaluation);
