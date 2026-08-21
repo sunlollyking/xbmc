@@ -73,5 +73,51 @@
 				<font>font13</font>
 			</control>
 		</control>
+		<control type="group">
+			<description>
+				RetroAchievements challenge indicator. Shown while the player is
+				inside an attempt at an achievement, so they know the attempt is
+				live without opening the achievements dialog. Sits top-right,
+				clear of the OSD and of any subtitles.
+			</description>
+			<visible>!String.IsEmpty(RetroPlayer.AchievementsChallengeTitle)</visible>
+			<animation effect="fade" time="200">VisibleChange</animation>
+			<right>40</right>
+			<top>40</top>
+			<width>420</width>
+			<height>72</height>
+			<control type="image">
+				<description>Backdrop, so the indicator stays readable over any game</description>
+				<left>0</left>
+				<top>0</top>
+				<width>420</width>
+				<height>72</height>
+				<texture border="10" colordiffuse="BB000000">dialogs/dialog-bg-nobo.png</texture>
+			</control>
+			<control type="image">
+				<description>Achievement badge</description>
+				<left>10</left>
+				<top>10</top>
+				<width>52</width>
+				<height>52</height>
+				<texture background="true">$INFO[RetroPlayer.AchievementsChallengeBadge]</texture>
+				<aspectratio>keep</aspectratio>
+			</control>
+			<control type="label">
+				<description>Achievement being attempted</description>
+				<left>72</left>
+				<top>10</top>
+				<width>338</width>
+				<height>52</height>
+				<label>$INFO[RetroPlayer.AchievementsChallengeTitle]</label>
+				<font>font12</font>
+				<align>left</align>
+				<aligny>center</aligny>
+				<textcolor>white</textcolor>
+				<shadowcolor>black</shadowcolor>
+				<scroll>true</scroll>
+				<scrollsuffix>   </scrollsuffix>
+			</control>
+		</control>
 	</controls>
 </window>
