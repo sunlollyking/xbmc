@@ -19538,6 +19538,25 @@ msgstr ""
 msgctxt "#35299"
 msgid "This game renders with {0:s}, but this system only provides {1:s}. It can't be played on this hardware."
 msgstr ""
+#. Label of the Manual action in the game OSD, and heading of its notifications
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35311"
+msgid "Manual"
+msgstr ""
+
+#. Notification shown when a game has no manual beside it. {0:s} is the game
+#: xbmc/interfaces/builtins/GameBuiltins.cpp
+msgctxt "#35312"
+msgid "No manual found for {0:s}"
+msgstr ""
+
+#. Notification shown when a manual is found but cannot be opened. {0:s} is the game
+#: xbmc/interfaces/builtins/GameBuiltins.cpp
+msgctxt "#35313"
+msgid "Unable to open manual for {0:s}"
+msgstr ""
+
+#empty strings from id 35314 to 35504
 
 #. Shown when a game needs the graphics card directly but the display can't provide it
 #: xbmc/games/addons/GameClient.cpp
