@@ -19431,7 +19431,27 @@ msgctxt "#35298"
 msgid "This savestate is compressed and can't be loaded by this version of Kodi."
 msgstr ""
 
-#empty strings from id 35299 to 35504
+#empty strings from id 35299 to 35309
+
+#. Label of the Manual action in the game OSD, and heading of its notifications
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35310"
+msgid "Manual"
+msgstr ""
+
+#. Notification shown when a game has no manual beside it. {0:s} is the game
+#: xbmc/interfaces/builtins/GameBuiltins.cpp
+msgctxt "#35311"
+msgid "No manual found for {0:s}"
+msgstr ""
+
+#. Notification shown when a manual is found but cannot be opened. {0:s} is the game
+#: xbmc/interfaces/builtins/GameBuiltins.cpp
+msgctxt "#35312"
+msgid "Unable to open manual for {0:s}"
+msgstr ""
+
+#empty strings from id 35313 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
