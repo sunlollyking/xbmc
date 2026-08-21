@@ -1,9 +1,11 @@
 set(SOURCES ArchiveManualPages.cpp
+            GUIDialogGameManuals.cpp
             GUIWindowGameManual.cpp
             ManualPages.cpp
             ManualPosition.cpp)
 
 set(HEADERS ArchiveManualPages.h
+            GUIDialogGameManuals.h
             GUIWindowGameManual.h
             ManualPages.h
             ManualPosition.h)

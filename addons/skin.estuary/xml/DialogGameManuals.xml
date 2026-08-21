@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window type="dialog">
+	<defaultcontrol always="true">110</defaultcontrol>
+	<include>Animation_DialogPopupOpenClose</include>
+	<controls>
+		<control type="group">
+			<centerleft>50%</centerleft>
+			<centertop>50%</centertop>
+			<width>1000</width>
+			<height>620</height>
+
+			<include content="DialogBackgroundCommons">
+				<param name="width" value="1000" />
+				<param name="height" value="620" />
+				<param name="header_label" value="$LOCALIZE[35318]" />
+				<param name="header_id" value="100" />
+			</include>
+
+			<!-- Which game this is about. The dialog is reached from the OSD of
+			     a running game, so saying so avoids any doubt. -->
+			<control type="label">
+				<left>40</left>
+				<top>100</top>
+				<width>920</width>
+				<height>40</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font13</font>
+				<textcolor>white</textcolor>
+				<label>$INFO[Window.Property(Manuals.Game)]</label>
+			</control>
+
+			<!-- Which add-on is answering. Shown rather than made selectable,
+			     because with one provider installed there is nothing to pick. -->
+			<control type="label">
+				<left>40</left>
+				<top>144</top>
+				<width>920</width>
+				<height>34</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font12</font>
+				<textcolor>grey</textcolor>
+				<label>[COLOR grey]$LOCALIZE[35320][/COLOR]  $INFO[Window.Property(Manuals.Provider)]</label>
+				<visible>!String.IsEmpty(Window.Property(Manuals.Provider))</visible>
+			</control>
+
+			<!-- The providers themselves, kept off screen. The dialog needs the
+			     control to bind them to; switching between them is only useful
+			     once more than one exists. -->
+			<control type="list" id="120">
+				<left>40</left>
+				<top>144</top>
+				<width>920</width>
+				<height>1</height>
+				<visible>false</visible>
+				<itemlayout height="1" width="920"/>
+				<focusedlayout height="1" width="920"/>
+			</control>
+
+			<control type="label">
+				<left>40</left>
+				<top>200</top>
+				<width>920</width>
+				<height>340</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font13</font>
+				<textcolor>grey</textcolor>
+				<label>$INFO[Window.Property(Manuals.Status)]</label>
+				<visible>!String.IsEmpty(Window.Property(Manuals.Status))</visible>
+			</control>
+
+			<control type="list" id="110">
+				<left>40</left>
+				<top>200</top>
+				<width>920</width>
+				<height>340</height>
+				<onup>110</onup>
+				<ondown>110</ondown>
+				<visible>String.IsEmpty(Window.Property(Manuals.Status))</visible>
+				<scrolltime tween="sine" easing="out">200</scrolltime>
+
+				<itemlayout height="64" width="920">
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<width>920</width>
+						<height>60</height>
+						<texture colordiffuse="22FFFFFF">colors/white.png</texture>
+					</control>
+					<control type="label">
+						<left>24</left>
+						<top>2</top>
+						<width>740</width>
+						<height>60</height>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>white</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>780</left>
+						<top>2</top>
+						<width>116</width>
+						<height>60</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>grey</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+				</itemlayout>
+
+				<focusedlayout height="64" width="920">
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<width>920</width>
+						<height>60</height>
+						<texture colordiffuse="button_focus">colors/white.png</texture>
+					</control>
+					<control type="label">
+						<left>24</left>
+						<top>2</top>
+						<width>740</width>
+						<height>60</height>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>black</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>780</left>
+						<top>2</top>
+						<width>116</width>
+						<height>60</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>black</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<control type="label">
+				<left>40</left>
+				<top>552</top>
+				<width>920</width>
+				<height>40</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font10</font>
+				<textcolor>grey</textcolor>
+				<label>$LOCALIZE[35319]</label>
+				<visible>String.IsEmpty(Window.Property(Manuals.Status))</visible>
+			</control>
+		</control>
+	</controls>
+</window>
