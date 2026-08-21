@@ -18,6 +18,7 @@
 #include "filesystem/CurlFile.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
+#include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
 #include "games/addons/cheevos/GameClientCheevos.h"
 #include "games/tags/GameInfoTag.h"
@@ -245,6 +246,13 @@ bool CCheevos::RCLogin(const std::string& password)
 
   // Push credentials to the game addon layer
   m_gameClient->Cheevos().SetRetroAchievementsCredentials(m_userName.c_str(), m_loginToken.c_str());
+
+  // Push the modes at the same time. The achievement runtime is recreated per
+  // game, so it has to be told these on every load rather than only when the
+  // settings change.
+  const GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+  m_gameClient->Cheevos().SetHardcoreEnabled(gameSettings.GetAchievementsHardcore());
+  m_gameClient->Cheevos().SetEncoreModeEnabled(gameSettings.GetAchievementsEncore());
 
   CLog::Log(LOGINFO, "CCheevos::RCLogin -- successfully logged in as '{}'", m_userName);
   return true;

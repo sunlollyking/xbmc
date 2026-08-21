@@ -519,6 +519,32 @@ void CGameClientCheevos::OnConnectionChanged(bool connected)
       Localize(connected ? 35297 : 35296), TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 
+void CGameClientCheevos::SetHardcoreEnabled(bool enabled)
+{
+  try
+  {
+    m_gameClient.LogError(m_struct.toAddon->RCSetHardcoreEnabled(&m_struct, enabled),
+                          "RCSetHardcoreEnabled()");
+  }
+  catch (...)
+  {
+    m_gameClient.LogException("RCSetHardcoreEnabled()");
+  }
+}
+
+void CGameClientCheevos::SetEncoreModeEnabled(bool enabled)
+{
+  try
+  {
+    m_gameClient.LogError(m_struct.toAddon->RCSetEncoreModeEnabled(&m_struct, enabled),
+                          "RCSetEncoreModeEnabled()");
+  }
+  catch (...)
+  {
+    m_gameClient.LogException("RCSetEncoreModeEnabled()");
+  }
+}
+
 void CGameClientCheevos::OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show)
 {
   // Published to the runtime rather than raised as a notification: this fires

@@ -83,6 +83,14 @@ public:
   void OnReset();
   //@}
 
+  /*!
+   * \name Mode control, pushed into the achievement runtime
+   */
+  //@{
+  void SetHardcoreEnabled(bool enabled);
+  void SetEncoreModeEnabled(bool enabled);
+  //@}
+
 private:
   CGameClient& m_gameClient;
   AddonInstance_Game& m_struct;
