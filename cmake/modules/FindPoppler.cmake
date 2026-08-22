@@ -112,6 +112,40 @@ if(NOT TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
 
   if(${${CMAKE_FIND_PACKAGE_NAME}_SEARCH_NAME}_FOUND)
     if(TARGET PkgConfig::${${CMAKE_FIND_PACKAGE_NAME}_SEARCH_NAME} AND NOT TARGET ${${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_BUILD_NAME})
+      # poppler-cpp is a thin frontend over libpoppler, and a static build
+      # leaves the two as separate archives. poppler-cpp.pc declares no
+      # Libs.private, so linking what it names alone leaves every core symbol
+      # undefined - the core library and the things it needs are added here.
+      find_library(POPPLER_CORE_LIBRARY NAMES poppler
+                   HINTS ${${${CMAKE_FIND_PACKAGE_NAME}_SEARCH_NAME}_LIBRARY_DIRS}
+                   NO_CACHE
+                   ${SEARCH_QUIET})
+
+      if(POPPLER_CORE_LIBRARY)
+        set(_poppler_extra_libs ${POPPLER_CORE_LIBRARY})
+
+        if(PKG_CONFIG_FOUND)
+          foreach(_poppler_dep freetype2 fontconfig libjpeg libpng zlib lcms2)
+            string(TOUPPER ${_poppler_dep} _poppler_dep_prefix)
+            set(_poppler_dep_prefix PC_POPPLERSYS_${_poppler_dep_prefix})
+
+            pkg_check_modules(${_poppler_dep_prefix} ${_poppler_dep} ${SEARCH_QUIET})
+
+            if(${_poppler_dep_prefix}_FOUND)
+              list(APPEND _poppler_extra_libs ${${_poppler_dep_prefix}_LDFLAGS})
+            endif()
+
+            unset(_poppler_dep_prefix)
+          endforeach()
+          unset(_poppler_dep)
+        endif()
+
+        set_property(TARGET PkgConfig::${${CMAKE_FIND_PACKAGE_NAME}_SEARCH_NAME}
+                     APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${_poppler_extra_libs})
+
+        unset(_poppler_extra_libs)
+      endif()
+
       add_library(${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME} ALIAS PkgConfig::${${CMAKE_FIND_PACKAGE_NAME}_SEARCH_NAME})
       add_library(LIBRARY::${CMAKE_FIND_PACKAGE_NAME} ALIAS PkgConfig::${${CMAKE_FIND_PACKAGE_NAME}_SEARCH_NAME})
     elseif(TARGET ${${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_BUILD_NAME})
