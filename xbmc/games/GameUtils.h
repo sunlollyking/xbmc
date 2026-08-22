@@ -63,6 +63,14 @@ public:
   static bool ChooseAndSetDefaultGameClient(const CFileItem& item);
 
   /*!
+   * \brief Ask which video filter a game or folder should be drawn with, and
+   *        remember the answer
+   *
+   * \return True if the choice was stored
+   */
+  static bool ChooseAndSetDefaultVideoFilter(const CFileItem& item);
+
+  /*!
    * \brief Check if the file extension is supported by an add-on in
    *        a local or remote repository
    *

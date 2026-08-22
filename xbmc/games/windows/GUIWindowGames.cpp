@@ -181,6 +181,7 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
       if (item->IsFolder() || CanPlay(*item))
       {
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_EMULATOR, 35510); // "Default emulator"
+        buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35326); // "Default video filter"
       }
 
       if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
@@ -216,6 +217,9 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         return true;
       case CONTEXT_BUTTON_SET_DEFAULT_EMULATOR:
         CGameUtils::ChooseAndSetDefaultGameClient(*item);
+        return true;
+      case CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER:
+        CGameUtils::ChooseAndSetDefaultVideoFilter(*item);
         return true;
       case CONTEXT_BUTTON_INFO:
         CGUIDialogAddonInfo::ShowForItem(item);
@@ -268,7 +272,8 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
 
       // Check if file folder contains games or subfolders
       if (std::ranges::any_of(fileFolderItems,
-                              [](const CFileItemPtr& fileFolderItem) {
+                              [](const CFileItemPtr& fileFolderItem)
+                              {
                                 return fileFolderItem->IsFolder() ||
                                        CGameUtils::HasGameExtension(fileFolderItem->GetPath());
                               }))

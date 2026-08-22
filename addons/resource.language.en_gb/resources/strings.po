@@ -19625,7 +19625,6 @@ msgctxt "#35325"
 msgid "The manual could not be downloaded"
 msgstr ""
 
-#empty strings from id 35326 to 35504
 
 #. Shown when a game needs the graphics card directly but the display can't provide it
 #: xbmc/games/addons/GameClient.cpp
@@ -19693,7 +19692,13 @@ msgctxt "#35310"
 msgid "Slow motion"
 msgstr ""
 
-#empty strings from id 35326 to 35504
+#. Label of the context menu item that sets the video filter for a game or folder
+#: xbmc/games/windows/GUIWindowGames.cpp
+msgctxt "#35326"
+msgid "Default video filter"
+msgstr ""
+
+#empty strings from id 35327 to 35504
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
 msgctxt "#35505"
