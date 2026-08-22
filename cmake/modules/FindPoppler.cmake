@@ -66,12 +66,13 @@ if(NOT TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
     #   libjpeg              decoding the scans inside a PDF, which are usually JPEG
     #   libpng/zlib          decoding the other images, and the compressed streams
     #   lcms2                colour management
-    find_package(FreeType REQUIRED ${SEARCH_QUIET})
-    list(APPEND ${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_LINK_LIBRARIES ${APP_NAME_LC}::FreeType)
-
-    find_package(PkgConfig ${SEARCH_QUIET})
+    #
+    # Asked for through pkg-config rather than find_package(): calling
+    # find_package() from inside a find module resets CMAKE_FIND_PACKAGE_NAME,
+    # which the shared build macros read, and that corrupts the configure of
+    # whatever runs afterwards.
     if(PKG_CONFIG_FOUND)
-      foreach(_poppler_dep fontconfig libjpeg libpng zlib lcms2)
+      foreach(_poppler_dep freetype2 fontconfig libjpeg libpng zlib lcms2)
         # A distinct prefix per module: pkg_check_modules caches its results
         # against the prefix, so reusing one silently keeps the first answer
         string(TOUPPER ${_poppler_dep} _poppler_dep_prefix)
@@ -88,6 +89,7 @@ if(NOT TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
       endforeach()
       unset(_poppler_dep)
     endif()
+
   endmacro()
 
   set(${CMAKE_FIND_PACKAGE_NAME}_MODULE_LC poppler)
