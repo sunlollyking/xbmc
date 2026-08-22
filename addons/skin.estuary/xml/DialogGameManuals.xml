@@ -9,39 +9,195 @@
 			<centerleft>50%</centerleft>
 			<centertop>50%</centertop>
 			<width>1000</width>
-			<height>620</height>
+			<height>680</height>
 
 			<include content="DialogBackgroundCommons">
 				<param name="width" value="1000" />
-				<param name="height" value="620" />
+				<param name="height" value="680" />
 				<param name="header_label" value="$LOCALIZE[35318]" />
 				<param name="header_id" value="100" />
 			</include>
 
-			<!-- Which game this is about. The dialog is reached from the OSD of
-			     a running game, so saying so avoids any doubt. -->
+			<!-- Searching, or nothing found. Takes the whole content area,
+			     because until there is a result there is nothing to describe. -->
 			<control type="label">
-				<left>40</left>
-				<top>100</top>
-				<width>920</width>
-				<height>40</height>
+				<left>60</left>
+				<top>110</top>
+				<width>880</width>
+				<height>420</height>
 				<align>center</align>
 				<aligny>center</aligny>
 				<font>font13</font>
-				<textcolor>white</textcolor>
-				<label>$INFO[Window.Property(Manuals.Game)]</label>
+				<textcolor>grey</textcolor>
+				<label>$INFO[Window.Property(Manuals.Status)]</label>
+				<visible>!String.IsEmpty(Window.Property(Manuals.Status))</visible>
 			</control>
 
-			<!-- Which add-on is answering. Shown rather than made selectable,
+			<!-- What the catalogue holds. There is normally one answer, and the
+			     question is not which of them to take but whether this is the
+			     right game and worth the download - so it is described rather
+			     than listed. -->
+			<control type="group">
+				<visible>String.IsEmpty(Window.Property(Manuals.Status))</visible>
+
+				<control type="image">
+					<left>50</left>
+					<top>118</top>
+					<width>240</width>
+					<height>330</height>
+					<aspectratio align="center" aligny="top">keep</aspectratio>
+					<texture fallback="DefaultAddonGame.png">$INFO[Container(110).ListItem.Art(poster)]</texture>
+				</control>
+
+				<control type="label">
+					<left>324</left>
+					<top>114</top>
+					<width>620</width>
+					<height>48</height>
+					<aligny>center</aligny>
+					<font>font30</font>
+					<textcolor>white</textcolor>
+					<scroll>true</scroll>
+					<label>$INFO[Container(110).ListItem.Label]</label>
+				</control>
+
+				<!-- Which machine, as a tagline under the title. Everything else
+				     is a labelled field below, because a player deciding whether
+				     to fetch this needs to read the values, not decode a line of
+				     text with separators in it. -->
+				<control type="label">
+					<left>324</left>
+					<top>166</top>
+					<width>620</width>
+					<height>32</height>
+					<aligny>center</aligny>
+					<font>font12</font>
+					<textcolor>blue</textcolor>
+					<label>$INFO[Container(110).ListItem.Property(manual.system)]</label>
+				</control>
+
+				<!-- A grouplist so that a field the catalogue has nothing for
+				     closes up rather than leaving a labelled blank -->
+				<control type="grouplist">
+					<left>324</left>
+					<top>212</top>
+					<width>620</width>
+					<height>236</height>
+					<itemgap>4</itemgap>
+					<orientation>vertical</orientation>
+
+					<include content="GameManualDetail">
+						<param name="label" value="$LOCALIZE[20026]" />
+						<param name="property" value="manual.region" />
+					</include>
+					<include content="GameManualDetail">
+						<param name="label" value="$LOCALIZE[562]" />
+						<param name="property" value="manual.year" />
+					</include>
+					<include content="GameManualDetail">
+						<param name="label" value="$LOCALIZE[35327]" />
+						<param name="property" value="manual.publisher" />
+					</include>
+					<include content="GameManualDetail">
+						<param name="label" value="$LOCALIZE[35328]" />
+						<param name="property" value="manual.developer" />
+					</include>
+					<include content="GameManualDetail">
+						<param name="label" value="$LOCALIZE[515]" />
+						<param name="property" value="manual.genre" />
+					</include>
+					<include content="GameManualDetail">
+						<param name="label" value="$LOCALIZE[21802]" />
+						<param name="property" value="manual.size" />
+					</include>
+				</control>
+			</control>
+
+			<control type="list" id="110">
+				<left>50</left>
+				<top>498</top>
+				<width>900</width>
+				<height>128</height>
+				<onup>110</onup>
+				<ondown>110</ondown>
+				<visible>String.IsEmpty(Window.Property(Manuals.Status))</visible>
+				<scrolltime tween="sine" easing="out">200</scrolltime>
+
+				<itemlayout height="64" width="900">
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<width>900</width>
+						<height>60</height>
+						<texture colordiffuse="22FFFFFF">colors/white.png</texture>
+					</control>
+					<control type="label">
+						<left>24</left>
+						<top>2</top>
+						<width>700</width>
+						<height>60</height>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>white</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>748</left>
+						<top>2</top>
+						<width>128</width>
+						<height>60</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>grey</textcolor>
+						<label>$INFO[ListItem.Property(manual.size)]</label>
+					</control>
+				</itemlayout>
+
+				<!-- The focused row says what pressing it does, since the panel
+				     above has already said what the manual is -->
+				<focusedlayout height="64" width="900">
+					<control type="image">
+						<left>0</left>
+						<top>2</top>
+						<width>900</width>
+						<height>60</height>
+						<texture colordiffuse="button_focus">colors/white.png</texture>
+					</control>
+					<control type="label">
+						<left>24</left>
+						<top>2</top>
+						<width>700</width>
+						<height>60</height>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>black</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>748</left>
+						<top>2</top>
+						<width>128</width>
+						<height>60</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>font12</font>
+						<textcolor>black</textcolor>
+						<label>$LOCALIZE[33003]</label>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<!-- Which add-on answered. Shown rather than made selectable,
 			     because with one provider installed there is nothing to pick. -->
 			<control type="label">
-				<left>40</left>
-				<top>144</top>
-				<width>920</width>
-				<height>34</height>
+				<left>50</left>
+				<top>630</top>
+				<width>900</width>
+				<height>36</height>
 				<align>center</align>
 				<aligny>center</aligny>
-				<font>font12</font>
+				<font>font10</font>
 				<textcolor>grey</textcolor>
 				<label>[COLOR grey]$LOCALIZE[35320][/COLOR]  $INFO[Window.Property(Manuals.Provider)]</label>
 				<visible>!String.IsEmpty(Window.Property(Manuals.Provider))</visible>
@@ -51,112 +207,13 @@
 			     control to bind them to; switching between them is only useful
 			     once more than one exists. -->
 			<control type="list" id="120">
-				<left>40</left>
-				<top>144</top>
-				<width>920</width>
+				<left>50</left>
+				<top>630</top>
+				<width>900</width>
 				<height>1</height>
 				<visible>false</visible>
-				<itemlayout height="1" width="920"/>
-				<focusedlayout height="1" width="920"/>
-			</control>
-
-			<control type="label">
-				<left>40</left>
-				<top>200</top>
-				<width>920</width>
-				<height>340</height>
-				<align>center</align>
-				<aligny>center</aligny>
-				<font>font13</font>
-				<textcolor>grey</textcolor>
-				<label>$INFO[Window.Property(Manuals.Status)]</label>
-				<visible>!String.IsEmpty(Window.Property(Manuals.Status))</visible>
-			</control>
-
-			<control type="list" id="110">
-				<left>40</left>
-				<top>200</top>
-				<width>920</width>
-				<height>340</height>
-				<onup>110</onup>
-				<ondown>110</ondown>
-				<visible>String.IsEmpty(Window.Property(Manuals.Status))</visible>
-				<scrolltime tween="sine" easing="out">200</scrolltime>
-
-				<itemlayout height="64" width="920">
-					<control type="image">
-						<left>0</left>
-						<top>2</top>
-						<width>920</width>
-						<height>60</height>
-						<texture colordiffuse="22FFFFFF">colors/white.png</texture>
-					</control>
-					<control type="label">
-						<left>24</left>
-						<top>2</top>
-						<width>740</width>
-						<height>60</height>
-						<aligny>center</aligny>
-						<font>font12</font>
-						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-					<control type="label">
-						<left>780</left>
-						<top>2</top>
-						<width>116</width>
-						<height>60</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>font12</font>
-						<textcolor>grey</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</itemlayout>
-
-				<focusedlayout height="64" width="920">
-					<control type="image">
-						<left>0</left>
-						<top>2</top>
-						<width>920</width>
-						<height>60</height>
-						<texture colordiffuse="button_focus">colors/white.png</texture>
-					</control>
-					<control type="label">
-						<left>24</left>
-						<top>2</top>
-						<width>740</width>
-						<height>60</height>
-						<aligny>center</aligny>
-						<font>font12</font>
-						<textcolor>black</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-					<control type="label">
-						<left>780</left>
-						<top>2</top>
-						<width>116</width>
-						<height>60</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>font12</font>
-						<textcolor>black</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</focusedlayout>
-			</control>
-
-			<control type="label">
-				<left>40</left>
-				<top>552</top>
-				<width>920</width>
-				<height>40</height>
-				<align>center</align>
-				<aligny>center</aligny>
-				<font>font10</font>
-				<textcolor>grey</textcolor>
-				<label>$LOCALIZE[35319]</label>
-				<visible>String.IsEmpty(Window.Property(Manuals.Status))</visible>
+				<itemlayout height="1" width="900"/>
+				<focusedlayout height="1" width="900"/>
 			</control>
 		</control>
 	</controls>

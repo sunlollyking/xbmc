@@ -19698,7 +19698,20 @@ msgctxt "#35326"
 msgid "Default video filter"
 msgstr ""
 
-#empty strings from id 35327 to 35504
+#. Label for the publisher of a game, shown beside a manual offered for download
+#: addons/skin.estuary/xml/DialogGameManuals.xml
+msgctxt "#35327"
+msgid "Publisher"
+msgstr ""
+
+#. Label for the developer of a game, shown beside a manual offered for download
+#: addons/skin.estuary/xml/DialogGameManuals.xml
+msgctxt "#35328"
+msgid "Developer"
+msgstr ""
+
+#empty strings from id 35329 to 35504
+
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
 msgctxt "#35505"
