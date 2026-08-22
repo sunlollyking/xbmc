@@ -19538,6 +19538,7 @@ msgstr ""
 msgctxt "#35299"
 msgid "This game renders with {0:s}, but this system only provides {1:s}. It can't be played on this hardware."
 msgstr ""
+
 #. Label of the Manual action in the game OSD, and heading of its notifications
 #: addons/skin.estuary/xml/GameOSD.xml
 msgctxt "#35311"
@@ -19674,7 +19675,7 @@ msgctxt "#35307"
 msgid "Subset completed"
 msgstr ""
 
-#empty strings from id 35308 to 35504#. Name of the save state feature, used when hardcore mode blocks it
+#. Name of the save state feature, used when hardcore mode blocks it
 #: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
 msgctxt "#35308"
 msgid "Loading save states"
@@ -19692,7 +19693,7 @@ msgctxt "#35310"
 msgid "Slow motion"
 msgstr ""
 
-#empty strings from id 35311 to 35504
+#empty strings from id 35326 to 35504
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
 msgctxt "#35505"
