@@ -19660,6 +19660,11 @@ msgstr ""
 
 #empty strings from id 35368 to 35504
 
+#. Label of the context menu item that sets the video filter for a game or folder
+#: xbmc/games/windows/GUIWindowGames.cpp
+msgctxt "#35326"
+msgid "Default video filter"
+msgstr ""
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
 msgctxt "#35505"
