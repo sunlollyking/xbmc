@@ -27,14 +27,17 @@ bool CGameDatabase::Open()
 void CGameDatabase::CreateTables()
 {
   m_gameClients.Create();
+  m_videoFilters.Create();
 }
 
 void CGameDatabase::CreateAnalytics()
 {
   m_gameClients.CreateAnalytics();
+  m_videoFilters.CreateAnalytics();
 }
 
 void CGameDatabase::UpdateTables(int version)
 {
   m_gameClients.UpdateTables(version);
+  m_videoFilters.UpdateTables(version);
 }

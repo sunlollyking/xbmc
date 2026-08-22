@@ -13,12 +13,14 @@
 #include "addons/AddonInstaller.h"
 #include "addons/AddonManager.h"
 #include "addons/addoninfo/AddonType.h"
+#include "application/Application.h"
 #include "cores/RetroPlayer/guibridge/GUIGameVideoHandle.h"
 #include "cores/RetroPlayer/rendering/RenderVideoSettings.h"
 #include "cores/RetroPlayer/shaders/ShaderPresetFactory.h"
 #include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/GameServices.h"
+#include "games/database/GameDatabase.h"
 #include "games/dialogs/DialogGameDefines.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
@@ -302,7 +304,38 @@ unsigned int CDialogGameVideoFilter::GetFocusedItem() const
 
 void CDialogGameVideoFilter::PostExit()
 {
+  SaveDefaultVideoFilter();
+
   m_items.Clear();
+}
+
+void CDialogGameVideoFilter::SaveDefaultVideoFilter()
+{
+  // Remembered against the game rather than the folder it sits in: a change
+  // made while playing is about this game, and rewriting a whole system's
+  // default from the OSD would be a surprise. Folder defaults are set
+  // deliberately, from the library.
+  const std::string gamePath = g_application.CurrentFileItem().GetDynPath();
+  if (gamePath.empty())
+    return;
+
+  const std::string videoFilter =
+      CMediaSettings::GetInstance().GetCurrentGameSettings().VideoFilter();
+
+  CGameDatabase db;
+  if (!db.Open())
+    return;
+
+  // An empty filter forgets the game, so turning the filter off is remembered
+  // as "no filter" rather than falling back to the folder again
+  if (!db.VideoFilters().SetVideoFilter(gamePath, videoFilter))
+    return;
+
+  if (videoFilter.empty())
+    CLog::Log(LOGDEBUG, "GAME: Forgot the video filter for {}", CURL::GetRedacted(gamePath));
+  else
+    CLog::Log(LOGDEBUG, "GAME: Remembered video filter {} for {}", videoFilter,
+              CURL::GetRedacted(gamePath));
 }
 
 bool CDialogGameVideoFilter::OnClickAction()
