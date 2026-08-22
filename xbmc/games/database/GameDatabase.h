@@ -9,6 +9,7 @@
 #pragma once
 
 #include "GameClientTable.h"
+#include "VideoFilterTable.h"
 #include "dbwrappers/Database.h"
 
 namespace KODI
@@ -47,17 +48,23 @@ public:
    */
   CGameClientTable& GameClients() { return m_gameClients; }
 
+  /*!
+   * \brief The table remembering how a game should be drawn
+   */
+  CVideoFilterTable& VideoFilters() { return m_videoFilters; }
+
 protected:
   // Implementation of CDatabase
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 1; }
+  int GetSchemaVersion() const override { return 2; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:
   // Tables
   CGameClientTable m_gameClients{*this};
+  CVideoFilterTable m_videoFilters{*this};
 };
 } // namespace GAME
 } // namespace KODI
