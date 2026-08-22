@@ -33,17 +33,10 @@ protected:
   void OnItemFocus(unsigned int index) override;
   unsigned int GetFocusedItem() const override;
   void PostExit() override;
-
-  /*!
-   * \brief Remember this game's video filter, so it is used next time
-   */
-  void SaveDefaultVideoFilter();
   bool OnClickAction() override;
   void RefreshList() override;
 
 private:
-  void InitScalingMethods();
-  void InitVideoFilters();
   void InitGetMoreButton();
   void OnGetMore();
   void OnGetMoreComplete();

@@ -23,6 +23,7 @@
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/AddonsDirectory.h"
 #include "filesystem/SpecialProtocol.h"
+#include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
 #include "games/database/GameDatabase.h"
 #include "games/dialogs/GUIDialogSelectGameClient.h"
@@ -263,6 +264,77 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
     CLog::Log(LOGDEBUG, "GAME: Forgot the emulator for {}", CURL::GetRedacted(path));
   else
     CLog::Log(LOGDEBUG, "GAME: Remembered emulator {} for {}", gameClient, CURL::GetRedacted(path));
+
+  return true;
+}
+
+bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
+{
+  const std::string path = item.GetPath();
+  if (path.empty())
+    return false;
+
+  CGUIDialogSelect* dialog =
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+          WINDOW_DIALOG_SELECT);
+  if (dialog == nullptr)
+    return false;
+
+  CGameDatabase db;
+  if (!db.Open())
+    return false;
+
+  const std::string currentVideoFilter = db.VideoFilters().GetVideoFilter(path);
+
+  dialog->Reset();
+  dialog->SetHeading(CVariant{35326}); // "Default video filter"
+  dialog->SetUseDetails(true);
+
+  CFileItemList items;
+
+  // First, so that clearing is as easy to reach as setting
+  {
+    CFileItemPtr noneItem = std::make_shared<CFileItem>(
+        CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(231)); // "None"
+    noneItem->SetProperty("game.videofilter", CVariant{""});
+    items.Add(std::move(noneItem));
+  }
+
+  // No game is running, so nothing can say which scaling methods it supports
+  GetVideoFilters(items);
+
+  for (int i = 0; i < items.Size(); ++i)
+  {
+    if (items[i]->GetProperty("game.videofilter").asString() == currentVideoFilter &&
+        !currentVideoFilter.empty())
+    {
+      items[i]->SetLabel2(
+          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35511)); // "Current"
+      items[i]->Select(true);
+    }
+  }
+
+  dialog->SetItems(items);
+  dialog->Open();
+
+  if (!dialog->IsConfirmed())
+    return false;
+
+  const int selectedIndex = dialog->GetSelectedItem();
+  if (selectedIndex < 0 || selectedIndex >= items.Size())
+    return false;
+
+  // An empty filter is the "None" entry, which forgets rather than stores
+  const std::string videoFilter = items[selectedIndex]->GetProperty("game.videofilter").asString();
+
+  if (!db.VideoFilters().SetVideoFilter(path, videoFilter))
+    return false;
+
+  if (videoFilter.empty())
+    CLog::Log(LOGDEBUG, "GAME: Forgot the video filter for {}", CURL::GetRedacted(path));
+  else
+    CLog::Log(LOGDEBUG, "GAME: Remembered video filter {} for {}", videoFilter,
+              CURL::GetRedacted(path));
 
   return true;
 }
