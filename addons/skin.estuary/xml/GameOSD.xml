@@ -249,7 +249,7 @@
 							<item>
 								<description>Manual button</description>
 								<label>$LOCALIZE[35311]</label>
-								<icon>osd/fullscreen/buttons/information.png</icon>
+								<icon>osd/fullscreen/buttons/manual.png</icon>
 								<onclick>ShowGameManual</onclick>
 							</item>
 							<item>
@@ -462,7 +462,7 @@
 							<item>
 								<description>Manual button</description>
 								<label>$LOCALIZE[35311]</label>
-								<icon>osd/fullscreen/buttons/information.png</icon>
+								<icon>osd/fullscreen/buttons/manual.png</icon>
 								<onclick>ShowGameManual</onclick>
 							</item>
 							<item>
