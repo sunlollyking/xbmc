@@ -334,6 +334,10 @@ void CGUIDialogGameManuals::OnDownloadComplete(bool success, const std::string& 
 
   Close();
 
+  // Closing this dialog still leaves the game OSD behind it, and a window
+  // cannot be activated while any modal dialog is up
+  CServiceBroker::GetGUI()->GetWindowManager().CloseDialogs(true);
+
   CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAME_MANUAL, path);
 }
 
