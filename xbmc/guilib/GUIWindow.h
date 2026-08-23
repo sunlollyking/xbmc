@@ -247,6 +247,15 @@ protected:
   RESOLUTION_INFO m_coordsRes; // resolution that the window coordinates are in.
   bool m_needsScaling;
   bool m_windowLoaded;  // true if the window's xml file has been loaded
+
+  /*!
+   * \brief The id this window was constructed with
+   *
+   * Kept because a window whose XML is missing from a skin has its id replaced
+   * with WINDOW_INVALID, and needs it back before it can be loaded from a skin
+   * that does have the file.
+   */
+  int m_defaultWindowID;
   //! bumped whenever the controls are cleared, so a control held across a call that may
   //! destroy the tree can be told apart from one that is still alive
   uint32_t m_controlsGeneration{0};
