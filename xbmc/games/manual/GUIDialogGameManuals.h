@@ -18,6 +18,7 @@
 #include <string>
 
 class CFileItem;
+class CGUIDialogProgressBarHandle;
 
 namespace KODI
 {
@@ -136,8 +137,8 @@ private:
   std::atomic<bool> m_downloadActive{false};
   std::atomic<int> m_downloadPercent{0};
 
-  //! Whether the progress dialog on screen is the one we opened
-  bool m_progressShown{false};
+  //! Our slot in Kodi's background progress bar while a download runs
+  CGUIDialogProgressBarHandle* m_progressHandle{nullptr};
 };
 
 } // namespace GAME

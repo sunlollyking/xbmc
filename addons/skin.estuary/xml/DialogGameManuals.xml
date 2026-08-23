@@ -118,13 +118,6 @@
 			<control type="group">
 				<visible>!String.IsEmpty(Window.Property(Manuals.Downloading))</visible>
 
-				<control type="progress">
-					<left>250</left>
-					<top>360</top>
-					<width>500</width>
-					<height>20</height>
-					<info>Window.Property(Manuals.Progress)</info>
-				</control>
 
 				<control type="label">
 					<left>250</left>
