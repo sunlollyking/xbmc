@@ -274,6 +274,24 @@
       <b>Close</b>
     </joystick>
   </VisualisationPresetList>
+  <GameManual>
+    <joystick profile="game.controller.default">
+      <b>Back</b>
+      <y>ZoomNormal</y>
+      <up>Up</up>
+      <down>Down</down>
+      <left>Left</left>
+      <right>Right</right>
+      <leftbumper>PageUp</leftbumper>
+      <rightbumper>PageDown</rightbumper>
+      <lefttrigger>ZoomOut</lefttrigger>
+      <righttrigger>ZoomIn</righttrigger>
+      <leftstick direction="left">Left</leftstick>
+      <leftstick direction="right">Right</leftstick>
+      <leftstick direction="up">Up</leftstick>
+      <leftstick direction="down">Down</leftstick>
+    </joystick>
+  </GameManual>
   <SlideShow>
     <joystick profile="game.controller.default">
       <a>Pause</a>

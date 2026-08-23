@@ -290,6 +290,16 @@
       <rootmenu>Back</rootmenu>
     </remote>
   </VisualisationPresetList>
+  <GameManual>
+    <remote>
+      <back>Back</back>
+      <zero>ZoomNormal</zero>
+      <channelplus>ZoomIn</channelplus>
+      <channelminus>ZoomOut</channelminus>
+      <skipplus>PageDown</skipplus>
+      <skipminus>PageUp</skipminus>
+    </remote>
+  </GameManual>
   <SlideShow>
     <remote>
       <zero>ZoomNormal</zero>

@@ -589,6 +589,16 @@
       <n>ActivateWindow(MusicPlaylist)</n>
     </keyboard>
   </VisualisationPresetList>
+  <GameManual>
+    <keyboard>
+      <plus>ZoomIn</plus>
+      <minus>ZoomOut</minus>
+      <zero>ZoomNormal</zero>
+      <pageup>PageUp</pageup>
+      <pagedown>PageDown</pagedown>
+      <backspace>Back</backspace>
+    </keyboard>
+  </GameManual>
   <SlideShow>
     <keyboard>
       <zero>ZoomNormal</zero>

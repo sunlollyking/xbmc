@@ -314,6 +314,17 @@ bool CGUIWindowGameManual::MovePage(int distance)
   return true;
 }
 
+bool CGUIWindowGameManual::ZoomToFit()
+{
+  if (m_pageCount == 0 || IsFitted())
+    return false;
+
+  // Deliberately absolute rather than stepping back down: a reader who has
+  // magnified a page and lost their place wants the whole page back in one
+  // press, not four
+  return Zoom(-static_cast<int>(m_zoomLevel));
+}
+
 bool CGUIWindowGameManual::Zoom(int steps)
 {
   if (m_pageCount == 0)
@@ -485,6 +496,10 @@ bool CGUIWindowGameManual::OnAction(const CAction& action)
 
     case ACTION_ZOOM_OUT:
       Zoom(-1);
+      return true;
+
+    case ACTION_ZOOM_LEVEL_NORMAL:
+      ZoomToFit();
       return true;
 
     case ACTION_MOVE_RIGHT:
