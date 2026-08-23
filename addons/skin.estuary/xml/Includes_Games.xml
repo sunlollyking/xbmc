@@ -8,23 +8,25 @@
 		<param name="property" default="" />
 		<definition>
 			<control type="group">
-				<height>34</height>
+				<height>40</height>
 				<visible>!String.IsEmpty(Container(110).ListItem.Property($PARAM[property]))</visible>
+				<!-- Lighter than the usual label grey: this is read across a room,
+				     and "grey" here sat too close to the panel behind it -->
 				<control type="label">
 					<left>0</left>
-					<width>170</width>
-					<height>34</height>
+					<width>190</width>
+					<height>40</height>
 					<aligny>center</aligny>
-					<font>font12</font>
-					<textcolor>grey</textcolor>
+					<font>font13</font>
+					<textcolor>FFC8C8C8</textcolor>
 					<label>$PARAM[label]</label>
 				</control>
 				<control type="label">
-					<left>180</left>
-					<width>440</width>
-					<height>34</height>
+					<left>200</left>
+					<width>420</width>
+					<height>40</height>
 					<aligny>center</aligny>
-					<font>font12</font>
+					<font>font13</font>
 					<textcolor>white</textcolor>
 					<label>$INFO[Container(110).ListItem.Property($PARAM[property])]</label>
 				</control>
