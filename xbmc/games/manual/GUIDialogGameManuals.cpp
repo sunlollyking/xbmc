@@ -19,6 +19,7 @@
 #include "filesystem/File.h"
 #include "games/GameManual.h"
 #include "guilib/GUIComponent.h"
+#include "guilib/GUIControl.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
@@ -29,6 +30,7 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <mutex>
 
 using namespace KODI::GAME;
@@ -42,6 +44,8 @@ constexpr int CONTROL_RESULT_LIST = 110;
 constexpr const char* PROPERTY_STATUS = "Manuals.Status";
 constexpr const char* PROPERTY_GAME = "Manuals.Game";
 constexpr const char* PROPERTY_PROVIDER = "Manuals.Provider";
+constexpr const char* PROPERTY_DOWNLOADING = "Manuals.Downloading";
+constexpr const char* PROPERTY_PROGRESS = "Manuals.Progress";
 
 //! What a plugin has to say it provides to be offered here. Unrecognised
 //! tokens are kept as written, so this needs no add-on type of its own.
@@ -75,8 +79,11 @@ private:
 
 /*!
  * \brief Fetches one manual, off the GUI thread
+ *
+ * Reports how far it has got, because a manual can be a hundred megabytes and
+ * a slow link makes a silent wait indistinguishable from a hang.
  */
-class CManualDownloadJob : public CJob
+class CManualDownloadJob : public CJob, public XFILE::IFileCallback
 {
 public:
   CManualDownloadJob(std::string source, std::string target)
@@ -95,7 +102,21 @@ public:
 
     // Copy() reads through the virtual filesystem, so a provider can answer
     // with anything Kodi can open, not only an http URL
-    return XFILE::CFile::Copy(m_source, m_target);
+    if (XFILE::CFile::Copy(m_source, m_target, this))
+      return true;
+
+    // A cancelled copy leaves a part-written file behind, which would then
+    // look like a manual the game already has
+    if (XFILE::CFile::Exists(m_target))
+      XFILE::CFile::Delete(m_target);
+
+    return false;
+  }
+
+  //! Returning false stops the copy, which is how the cancel button works
+  bool OnFileCallback(void* context, int percent, float averageSpeed) override
+  {
+    return !ShouldCancel(static_cast<unsigned int>(std::max(0, percent)), 100);
   }
 
   const std::string& GetTarget() const { return m_target; }
@@ -143,6 +164,13 @@ void CGUIDialogGameManuals::OnDeinitWindow(int nextWindowID)
     m_results.Clear();
     m_updateResults = false;
   }
+
+  m_focusResults = false;
+
+  // Anything still in flight is cancelled above, so the progress dialog must
+  // not be left on screen with nothing behind it
+  m_downloadActive = false;
+  UpdateDownloadProgress();
 
   m_gamePath.clear();
   m_downloadTarget.clear();
@@ -279,12 +307,25 @@ void CGUIDialogGameManuals::Process(unsigned int currentTime, CDirtyRegionList& 
     const bool haveResults = !m_results.IsEmpty();
     lock.unlock();
 
-    if (haveResults)
+    m_focusResults = haveResults;
+  }
+
+  // Kept trying rather than attempted once: the list is hidden while a status
+  // is showing, and its visibility is settled during rendering, so the frame
+  // that binds the results is often one where it still cannot take focus
+  if (m_focusResults)
+  {
+    const CGUIControl* results = GetControl(CONTROL_RESULT_LIST);
+    if (results != nullptr && results->IsVisible() && results->CanFocus())
     {
       CGUIMessage focus(GUI_MSG_SETFOCUS, GetID(), CONTROL_RESULT_LIST);
       OnMessage(focus);
+
+      m_focusResults = GetFocusedControlID() != CONTROL_RESULT_LIST;
     }
   }
+
+  UpdateDownloadProgress();
 
   CGUIDialog::Process(currentTime, dirtyregions);
 }
@@ -317,6 +358,12 @@ void CGUIDialogGameManuals::Download(const CFileItem& manual)
   m_downloadTarget = target;
 
   SetStatus(Status::DOWNLOADING);
+
+  // The progress dialog is opened from Process() rather than here, because a
+  // dialog has to be brought up on the GUI thread and this is also reached
+  // from a click handler that may not be on it
+  m_downloadPercent = 0;
+  m_downloadActive = true;
 
   AddJob(new CManualDownloadJob(manual.GetPath(), target));
 }
@@ -380,8 +427,53 @@ void CGUIDialogGameManuals::SetStatus(Status status, const std::string& detail)
   SetProperty(PROPERTY_STATUS, text);
 }
 
+void CGUIDialogGameManuals::UpdateDownloadProgress()
+{
+  // Reported through the dialog's own properties rather than by opening
+  // Kodi's progress dialog. A modal dialog cannot be opened from here without
+  // re-entering the window manager mid-render, which takes Kodi down with it -
+  // and stacking a second modal over this one would bury the panel describing
+  // the very thing being fetched.
+  if (!m_downloadActive)
+  {
+    if (m_progressShown)
+    {
+      SetProperty(PROPERTY_DOWNLOADING, "");
+      SetProperty(PROPERTY_PROGRESS, "");
+      m_progressShown = false;
+    }
+    return;
+  }
+
+  const int percent = m_downloadPercent;
+
+  if (!m_progressShown)
+  {
+    CLog::Log(LOGDEBUG, "CGUIDialogGameManuals: showing download progress");
+
+    SetProperty(PROPERTY_DOWNLOADING, "true");
+    m_progressShown = true;
+  }
+
+  SetProperty(PROPERTY_PROGRESS, percent);
+}
+
+void CGUIDialogGameManuals::OnJobProgress(unsigned int jobID,
+                                          unsigned int progress,
+                                          unsigned int total,
+                                          const CJob* job)
+{
+  if (StringUtils::EqualsNoCase(job->GetType(), "manual-download") && total > 0)
+    m_downloadPercent = static_cast<int>(progress * 100 / total);
+
+  CJobQueue::OnJobProgress(jobID, progress, total, job);
+}
+
 void CGUIDialogGameManuals::OnJobComplete(unsigned int jobID, bool success, CJob* job)
 {
+  if (StringUtils::EqualsNoCase(job->GetType(), "manual-download"))
+    m_downloadActive = false;
+
   if (StringUtils::EqualsNoCase(job->GetType(), "manual-search"))
   {
     // Copied out here because the job is destroyed as soon as this returns
