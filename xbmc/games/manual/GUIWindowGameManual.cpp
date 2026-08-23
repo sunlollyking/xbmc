@@ -8,6 +8,7 @@
 
 #include "GUIWindowGameManual.h"
 
+#include "ManualCache.h"
 #include "ManualPages.h"
 #include "ManualPosition.h"
 #include "ServiceBroker.h"
@@ -258,6 +259,11 @@ void CGUIWindowGameManual::FinishOpen()
 
   m_pages = std::move(pages);
   m_pageCount = m_pages->GetPageCount();
+
+  // Reading a manual is what keeps it: eviction takes the ones gone longest
+  // without being opened, so the one reached for every session outlives one
+  // downloaded later and never looked at
+  CManualCache::GetInstance().Touch(m_manualPath);
 
   // Pick up where the player left off, in case the manual has been shortened
   // since it was last read

@@ -2,12 +2,14 @@ set(SOURCES ArchiveManualPages.cpp
             GUIDialogGameManuals.cpp
             GUIWindowGameManual.cpp
             ManualPages.cpp
+            ManualCache.cpp
             ManualPosition.cpp)
 
 set(HEADERS ArchiveManualPages.h
             GUIDialogGameManuals.h
             GUIWindowGameManual.h
             ManualPages.h
+            ManualCache.h
             ManualPosition.h)
 
 # Comic archives are read with Kodi's own archive support, so the viewer is
