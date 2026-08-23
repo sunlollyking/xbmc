@@ -15,6 +15,7 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
 #include "addons/gui/GUIDialogAddonInfo.h"
+#include "ManualCache.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "games/GameManual.h"
@@ -331,6 +332,17 @@ void CGUIDialogGameManuals::OnDownloadComplete(bool success, const std::string& 
   }
 
   CLog::Log(LOGINFO, "CGUIDialogGameManuals: fetched \"{}\"", path);
+
+  // Tracked so that it counts against the player's budget, and so that it is
+  // one of the files eviction is allowed to take back. Only what Kodi
+  // downloaded is ever tracked, and only what is tracked is ever deleted.
+  struct __stat64 statBuffer = {};
+  if (XFILE::CFile::Stat(path, &statBuffer) == 0 && statBuffer.st_size > 0)
+    CManualCache::GetInstance().Add(path, static_cast<uint64_t>(statBuffer.st_size));
+
+  // Spare the manual just fetched: the player is about to read it, and it
+  // would be absurd to download something and immediately delete it
+  CManualCache::GetInstance().Enforce(path);
 
   Close();
 
