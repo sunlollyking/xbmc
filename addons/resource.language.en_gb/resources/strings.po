@@ -19710,7 +19710,19 @@ msgctxt "#35328"
 msgid "Developer"
 msgstr ""
 
-#empty strings from id 35329 to 35504
+#. Label of the setting bounding how much disk downloaded game manuals may use
+#: system/settings/settings.xml
+msgctxt "#35329"
+msgid "Maximum size of downloaded manuals"
+msgstr ""
+
+#. Help text for the downloaded manual size limit
+#: system/settings/settings.xml
+msgctxt "#35330"
+msgid "How much disk space downloaded game manuals may use. Once past this, the manuals you have gone longest without opening are removed. Manuals you added yourself are never removed."
+msgstr ""
+
+#empty strings from id 35331 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp

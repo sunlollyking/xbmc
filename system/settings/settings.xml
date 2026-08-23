@@ -2809,6 +2809,19 @@
             <formatlabel>14045</formatlabel>
           </control>
         </setting>
+        <setting id="gamesgeneral.manualcachesize" type="integer" label="35329" help="35330">
+          <level>0</level>
+          <default>250</default>
+          <constraints>
+            <minimum>50</minimum>
+            <step>50</step>
+            <maximum>1000</maximum>
+          </constraints>
+          <control type="slider" format="integer">
+            <popup>true</popup>
+            <formatlabel>37122</formatlabel>
+          </control>
+        </setting>
       </group>
     </category>
     <category id="gamesachievements" label="15312">
