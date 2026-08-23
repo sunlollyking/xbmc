@@ -16,6 +16,7 @@
 #include "addons/addoninfo/AddonType.h"
 #include "addons/gui/GUIDialogAddonInfo.h"
 #include "ManualCache.h"
+#include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "games/GameManual.h"
@@ -441,32 +442,50 @@ void CGUIDialogGameManuals::SetStatus(Status status, const std::string& detail)
 
 void CGUIDialogGameManuals::UpdateDownloadProgress()
 {
-  // Reported through the dialog's own properties rather than by opening
-  // Kodi's progress dialog. A modal dialog cannot be opened from here without
-  // re-entering the window manager mid-render, which takes Kodi down with it -
-  // and stacking a second modal over this one would bury the panel describing
-  // the very thing being fetched.
+  // Kodi's background progress bar, which every skin already draws and which
+  // is built to be driven from a job rather than from the GUI thread. The
+  // modal progress dialog cannot be used here: opening it from Process()
+  // re-enters the window manager mid-render, and stacking a second modal over
+  // this one would bury the panel describing what is being fetched.
   if (!m_downloadActive)
   {
-    if (m_progressShown)
+    if (m_progressHandle != nullptr)
     {
-      SetProperty(PROPERTY_DOWNLOADING, "");
-      SetProperty(PROPERTY_PROGRESS, "");
-      m_progressShown = false;
+      m_progressHandle->MarkFinished();
+      m_progressHandle = nullptr;
     }
+
+    SetProperty(PROPERTY_PROGRESS, "");
+    SetProperty(PROPERTY_DOWNLOADING, "");
     return;
   }
 
   const int percent = m_downloadPercent;
 
-  if (!m_progressShown)
+  if (m_progressHandle == nullptr)
   {
-    CLog::Log(LOGDEBUG, "CGUIDialogGameManuals: showing download progress");
+    CGUIDialogExtendedProgressBar* bar =
+        CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogExtendedProgressBar>(
+            WINDOW_DIALOG_EXT_PROGRESS);
+    if (bar != nullptr)
+    {
+      const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+
+      // "Find a manual" over the game being fetched for
+      m_progressHandle = bar->GetHandle(strings.Get(35318));
+      if (m_progressHandle != nullptr)
+        m_progressHandle->SetText(GetProperty(PROPERTY_GAME).asString());
+    }
 
     SetProperty(PROPERTY_DOWNLOADING, "true");
-    m_progressShown = true;
   }
 
+  if (m_progressHandle != nullptr)
+    m_progressHandle->SetPercentage(static_cast<float>(percent));
+
+  // Also published for the dialog itself, which shows the figure beside its
+  // "Downloading..." line - a window property is a string, so a skin cannot
+  // drive a progress control from one, only a label
   SetProperty(PROPERTY_PROGRESS, percent);
 }
 
