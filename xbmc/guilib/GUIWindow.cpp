@@ -45,6 +45,7 @@ bool CGUIWindow::icompare::operator()(const std::string &s1, const std::string &
 CGUIWindow::CGUIWindow(int id, const std::string &xmlFile)
 {
   CGUIWindow::SetID(id);
+  m_defaultWindowID = id;
   SetProperty("xmlfile", xmlFile);
   m_lastControlID = 0;
   m_needsScaling = true;
@@ -73,6 +74,15 @@ bool CGUIWindow::Load(const std::string& strFileName, bool bContainsPath)
   auto skin = CServiceBroker::GetGUI()->GetSkinInfo();
   if (m_windowLoaded || !skin)
     return true;      // no point loading if it's already there
+
+  // A window whose XML was missing from a previously loaded skin had its id
+  // replaced with WINDOW_INVALID, which leaves it unreachable for the rest of
+  // the session - it is still registered under its real id, so it is found and
+  // initialised, but it can no longer focus a control or draw. Give the id back
+  // before trying again; if this skin is missing the file too, LoadXML will
+  // take it away once more.
+  if (GetID() == WINDOW_INVALID && m_defaultWindowID != WINDOW_INVALID)
+    SetID(m_defaultWindowID);
 
 #ifdef _DEBUG
   const auto start = std::chrono::steady_clock::now();
