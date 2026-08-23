@@ -170,6 +170,24 @@
       <rightanalogtrigger>AnalogFastForward</rightanalogtrigger>
     </gamepad>
   </VisualisationPresetList>
+  <GameManual>
+    <gamepad>
+      <B>Back</B>
+      <Y>ZoomNormal</Y>
+      <dpadup>Up</dpadup>
+      <dpaddown>Down</dpaddown>
+      <dpadleft>Left</dpadleft>
+      <dpadright>Right</dpadright>
+      <white>PageUp</white>
+      <black>PageDown</black>
+      <lefttrigger>ZoomOut</lefttrigger>
+      <righttrigger>ZoomIn</righttrigger>
+      <leftthumbstickleft>Left</leftthumbstickleft>
+      <leftthumbstickright>Right</leftthumbstickright>
+      <leftthumbstickup>Up</leftthumbstickup>
+      <leftthumbstickdown>Down</leftthumbstickdown>
+    </gamepad>
+  </GameManual>
   <SlideShow>
     <gamepad>
       <A>Pause</A>

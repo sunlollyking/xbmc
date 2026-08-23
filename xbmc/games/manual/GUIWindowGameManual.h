@@ -95,6 +95,13 @@ private:
   bool Zoom(int steps);
 
   /*!
+   * \brief Put the whole page back on screen
+   *
+   * \return True if the zoom changed
+   */
+  bool ZoomToFit();
+
+  /*!
    * \brief Pan the zoomed page, in multiples of a step
    *
    * \return True if the view moved, false if it was already against the edge
