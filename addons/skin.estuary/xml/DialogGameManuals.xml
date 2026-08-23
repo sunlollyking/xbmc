@@ -28,7 +28,7 @@
 				<align>center</align>
 				<aligny>center</aligny>
 				<font>font13</font>
-				<textcolor>grey</textcolor>
+				<textcolor>white</textcolor>
 				<label>$INFO[Window.Property(Manuals.Status)]</label>
 				<visible>!String.IsEmpty(Window.Property(Manuals.Status))</visible>
 			</control>
@@ -80,9 +80,9 @@
 				     closes up rather than leaving a labelled blank -->
 				<control type="grouplist">
 					<left>324</left>
-					<top>212</top>
+					<top>206</top>
 					<width>620</width>
-					<height>236</height>
+					<height>264</height>
 					<itemgap>4</itemgap>
 					<orientation>vertical</orientation>
 
@@ -110,6 +110,32 @@
 						<param name="label" value="$LOCALIZE[21802]" />
 						<param name="property" value="manual.size" />
 					</include>
+				</control>
+			</control>
+
+			<!-- Download progress. A manual can be a hundred megabytes, and a
+			     silent wait is indistinguishable from Kodi having hung. -->
+			<control type="group">
+				<visible>!String.IsEmpty(Window.Property(Manuals.Downloading))</visible>
+
+				<control type="progress">
+					<left>250</left>
+					<top>360</top>
+					<width>500</width>
+					<height>20</height>
+					<info>Window.Property(Manuals.Progress)</info>
+				</control>
+
+				<control type="label">
+					<left>250</left>
+					<top>392</top>
+					<width>500</width>
+					<height>36</height>
+					<align>center</align>
+					<aligny>center</aligny>
+					<font>font12</font>
+					<textcolor>FFC8C8C8</textcolor>
+					<label>$INFO[Window.Property(Manuals.Progress)]%</label>
 				</control>
 			</control>
 
@@ -149,7 +175,7 @@
 						<align>right</align>
 						<aligny>center</aligny>
 						<font>font12</font>
-						<textcolor>grey</textcolor>
+						<textcolor>FFC8C8C8</textcolor>
 						<label>$INFO[ListItem.Property(manual.size)]</label>
 					</control>
 				</itemlayout>
@@ -197,9 +223,9 @@
 				<height>36</height>
 				<align>center</align>
 				<aligny>center</aligny>
-				<font>font10</font>
-				<textcolor>grey</textcolor>
-				<label>[COLOR grey]$LOCALIZE[35320][/COLOR]  $INFO[Window.Property(Manuals.Provider)]</label>
+				<font>font12</font>
+				<textcolor>FFC8C8C8</textcolor>
+				<label>$LOCALIZE[35320]  $INFO[Window.Property(Manuals.Provider)]</label>
 				<visible>!String.IsEmpty(Window.Property(Manuals.Provider))</visible>
 			</control>
 
