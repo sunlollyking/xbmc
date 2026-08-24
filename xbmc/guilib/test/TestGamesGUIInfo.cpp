@@ -145,6 +145,39 @@ TEST_F(TestGamesGUIInfo, ProgressIndicatorShowsWhatIsBeingWorkedTowards)
   EXPECT_EQ(percent, 0);
 }
 
+TEST_F(TestGamesGUIInfo, TheChallengeIndicatorCanBeTurnedOff)
+{
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const bool original = settings->GetBool("gamesachievements.challengeindicator");
+
+  CAchievementRuntime achievementRuntime;
+
+  AchievementChallenge challenge;
+  challenge.id = 38;
+  challenge.title = "Under-achiever";
+  achievementRuntime.SetChallenge(challenge, true);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+  std::string value;
+
+  settings->SetBool("gamesachievements.challengeindicator", true);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE), nullptr));
+  EXPECT_EQ(value, "Under-achiever");
+
+  // Answered empty rather than never recorded, so turning it off while an
+  // attempt is live takes it off screen at once rather than at the next one
+  settings->SetBool("gamesachievements.challengeindicator", false);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+
+  // The attempt itself is still known - only the showing of it was declined
+  EXPECT_EQ(achievementRuntime.GetChallenges().size(), 1u);
+
+  settings->SetBool("gamesachievements.challengeindicator", original);
+}
+
 TEST_F(TestGamesGUIInfo, TwoCountingAchievementsDoNotFightOverTheIndicator)
 {
   CAchievementRuntime achievementRuntime;

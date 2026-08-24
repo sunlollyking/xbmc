@@ -11,6 +11,7 @@
 #include "ServiceBroker.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
+#include "games/GameSettings.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
@@ -49,9 +50,15 @@ void CDialogGameIndicators::Process(unsigned int currentTime, CDirtyRegionList& 
 
 bool CDialogGameIndicators::AnythingToShow()
 {
-  const auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+  auto& gameServices = CServiceBroker::GetGameServices();
+  const auto& runtime = gameServices.AchievementRuntime();
 
-  return !runtime.GetChallenges().empty() || runtime.GetProgressIndicator().id != 0 ||
+  // The challenge indicator is the one a player can turn off, so it only counts
+  // towards keeping this open when they have left it on
+  const bool challenge =
+      gameServices.GameSettings().GetChallengeIndicator() && !runtime.GetChallenges().empty();
+
+  return challenge || runtime.GetProgressIndicator().id != 0 ||
          !runtime.GetLeaderboardTrackers().empty();
 }
 

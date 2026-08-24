@@ -27,6 +27,8 @@
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
 #include "settings/MediaSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -243,6 +245,15 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE:
     case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE:
     {
+      // Answered empty rather than never recorded, so that turning it off while
+      // an attempt is live takes the indicator off screen at once
+      const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+      if (settings && !settings->GetBool(SETTING_ACHIEVEMENTS_CHALLENGE_INDICATOR))
+      {
+        value.clear();
+        return true;
+      }
+
       // Only the first attempt is surfaced. More than one at a time is rare,
       // and a corner indicator has room for one.
       const std::vector<AchievementChallenge> challenges = AchievementRuntime().GetChallenges();
