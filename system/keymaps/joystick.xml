@@ -274,10 +274,19 @@
       <b>Close</b>
     </joystick>
   </VisualisationPresetList>
+  <GameManuals>
+    <joystick profile="game.controller.default">
+      <b>Back</b>
+      <start>Noop</start>
+    </joystick>
+  </GameManuals>
   <GameManual>
     <joystick profile="game.controller.default">
       <b>Back</b>
       <y>ZoomNormal</y>
+      <!-- Globally this opens the player controls, which have nothing to do
+           with reading a manual and cover the page while it is up -->
+      <start>Noop</start>
       <up>Up</up>
       <down>Down</down>
       <left>Left</left>
