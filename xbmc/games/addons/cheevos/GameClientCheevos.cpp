@@ -121,8 +121,12 @@ CGameClientCheevos::CGameClientCheevos(CGameClient& gameClient, AddonInstance_Ga
 
 bool CGameClientCheevos::RCGenerateHashFromFile(std::string& hash,
                                                 RETRO::RConsoleID consoleID,
-                                                const std::string& filePath)
+                                                const std::string& filePath,
+                                                bool* notImplemented)
 {
+  if (notImplemented != nullptr)
+    *notImplemented = false;
+
   char* _hash = nullptr;
   GAME_ERROR error = GAME_ERROR_NO_ERROR;
 
@@ -143,6 +147,9 @@ bool CGameClientCheevos::RCGenerateHashFromFile(std::string& hash,
     hash = _hash;
     m_struct.toAddon->FreeString(&m_struct, _hash);
   }
+
+  if (notImplemented != nullptr)
+    *notImplemented = (error == GAME_ERROR_NOT_IMPLEMENTED);
 
   return error == GAME_ERROR_NO_ERROR;
 }
