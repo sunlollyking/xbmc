@@ -2796,6 +2796,14 @@
             <formatlabel>37122</formatlabel>
           </control>
         </setting>
+        <setting id="gamesgeneral.clearmanualcache" parent="gamesgeneral.manualcachesize" type="action" label="35359" help="35360">
+          <level>0</level>
+          <control type="button" format="action" />
+        </setting>
+        <setting id="gamesgeneral.clearleaderboardcache" type="action" label="35361" help="35362">
+          <level>0</level>
+          <control type="button" format="action" />
+        </setting>
       </group>
     </category>
     <category id="gamesachievements" label="15312">

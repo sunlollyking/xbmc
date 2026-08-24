@@ -19883,7 +19883,32 @@ msgctxt "#35358"
 msgid "Your best is still {0:s}"
 msgstr ""
 
-#empty strings from id 35359 to 35504
+#. Settings button that deletes every downloaded game manual
+msgctxt "#35359"
+msgid "Clear cached manuals"
+msgstr ""
+
+#. Help text for the clear cached manuals button
+msgctxt "#35360"
+msgid "Delete every manual that has been downloaded. They will be fetched again when next opened."
+msgstr ""
+
+#. Settings button that deletes the kept leaderboard standings
+msgctxt "#35361"
+msgid "Clear cached leaderboards"
+msgstr ""
+
+#. Help text for the clear cached leaderboards button
+msgctxt "#35362"
+msgid "Forget the leaderboard standings kept from previous sessions, so they are asked for again."
+msgstr ""
+
+#. Notification shown after a cache has been emptied
+msgctxt "#35363"
+msgid "Cache cleared"
+msgstr ""
+
+#empty strings from id 35364 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp

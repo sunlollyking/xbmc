@@ -48,15 +48,24 @@ public:
   void Process(unsigned int currentTime, CDirtyRegionList& dirtyregions) override;
 
   /*!
-   * \brief Open or close the indicators to match what the runtime is showing
+   * \brief Start listening for indicators worth showing
    *
-   * Safe to call from the game thread: the work is posted to the GUI thread,
-   * which is the only one allowed to open a window.
-   *
-   * Called after every change to either indicator rather than being polled, so
-   * that nothing is on screen for longer than the runtime says it should be.
+   * Called once. Everything that changes an indicator reports to the runtime,
+   * and the runtime reports here, so a new indicator needs no wiring of its own.
    */
-  static void Update();
+  static void Register();
+
+private:
+  /*!
+   * \brief Open the dialog if the runtime has something to show
+   *
+   * Only ever opens: closing is decided in Process, on the GUI thread. Deciding
+   * both from the game thread meant posting a close and then testing whether it
+   * had happened, which raced.
+   */
+  static void Show();
+
+  static bool AnythingToShow();
 };
 } // namespace GAME
 } // namespace KODI

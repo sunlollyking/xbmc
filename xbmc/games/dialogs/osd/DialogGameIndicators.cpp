@@ -27,6 +27,17 @@ CDialogGameIndicators::CDialogGameIndicators()
 
 void CDialogGameIndicators::Process(unsigned int currentTime, CDirtyRegionList& dirtyregions)
 {
+  // Closing is decided here rather than where the runtime changed, because this
+  // runs on the GUI thread and can act at once. Deciding it from the game thread
+  // meant posting a close and testing IsActive() before the post had been
+  // served, so a burst of starts and stops raced itself and left the dialog up
+  // several seconds after the last one ended.
+  if (!AnythingToShow())
+  {
+    Close();
+    return;
+  }
+
   // Where the game has its own DRM plane the GUI layer is only composited when
   // something dirties it, and a label quietly changing its text is not reliably
   // enough. This is only reached while an indicator is up, so the rest of the
@@ -36,33 +47,29 @@ void CDialogGameIndicators::Process(unsigned int currentTime, CDirtyRegionList& 
   CGUIDialog::Process(currentTime, dirtyregions);
 }
 
-void CDialogGameIndicators::Update()
+bool CDialogGameIndicators::AnythingToShow()
 {
-  auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+  const auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
 
-  const bool wanted = !runtime.GetChallenges().empty() || runtime.GetProgressIndicator().id != 0 ||
-                      !runtime.GetLeaderboardTrackers().empty();
+  return !runtime.GetChallenges().empty() || runtime.GetProgressIndicator().id != 0 ||
+         !runtime.GetLeaderboardTrackers().empty();
+}
 
-  auto& windowManager = CServiceBroker::GetGUI()->GetWindowManager();
+void CDialogGameIndicators::Register()
+{
+  // One registration rather than a call at every site that changes an
+  // indicator, so that one added later is drawn without its author having to
+  // remember to ask for it
+  CServiceBroker::GetGameServices().AchievementRuntime().SetIndicatorCallback([]() { Show(); });
+}
 
-  // GetWindow is safe from any thread; opening one is not, so the change is
-  // posted rather than made here - this is called from the game thread
-  const CGUIWindow* dialog = windowManager.GetWindow(WINDOW_DIALOG_GAME_INDICATORS);
-  if (dialog == nullptr)
+void CDialogGameIndicators::Show()
+{
+  if (!AnythingToShow())
     return;
 
-  const bool showing = dialog->IsActive();
-  if (wanted == showing)
-    return;
-
-  if (wanted)
-  {
-    CServiceBroker::GetAppMessenger()->PostMsg(TMSG_GUI_ACTIVATE_WINDOW,
-                                               WINDOW_DIALOG_GAME_INDICATORS, 0);
-  }
-  else
-  {
-    CServiceBroker::GetAppMessenger()->PostMsg(TMSG_GUI_WINDOW_CLOSE, WINDOW_DIALOG_GAME_INDICATORS,
-                                               0);
-  }
+  // Only ever opens. Closing is the dialog's own business, above, which is what
+  // keeps the two decisions from racing each other across threads.
+  CServiceBroker::GetAppMessenger()->PostMsg(TMSG_GUI_ACTIVATE_WINDOW,
+                                             WINDOW_DIALOG_GAME_INDICATORS, 0);
 }

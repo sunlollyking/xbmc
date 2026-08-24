@@ -10,10 +10,13 @@
 
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "events/EventLog.h"
 #include "events/NotificationEvent.h"
 #include "filesystem/CurlFile.h"
 #include "filesystem/File.h"
+#include "games/dialogs/osd/LeaderboardUtils.h"
+#include "games/manual/ManualCache.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
 #include "settings/Settings.h"
@@ -58,6 +61,9 @@ constexpr auto VERIFY_ACCOUNT_URL_TEMPLATE =
 // relative path "/UserPic/<username>.png".
 constexpr auto RA_USER_PIC_URL_TEMPLATE = "https://i.retroachievements.org/UserPic/{}.png";
 
+const std::string SETTING_GAMES_CLEAR_MANUAL_CACHE = "gamesgeneral.clearmanualcache";
+const std::string SETTING_GAMES_CLEAR_LEADERBOARD_CACHE = "gamesgeneral.clearleaderboardcache";
+
 constexpr auto SUCCESS = "Success";
 constexpr auto TOKEN = "Token";
 } // namespace
@@ -66,10 +72,11 @@ CGameSettings::CGameSettings()
 {
   m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
 
-  m_settings->RegisterCallback(this, {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME,
-                                      SETTING_GAMES_ACHIEVEMENTS_USERNAME,
-                                      SETTING_GAMES_ACHIEVEMENTS_PASSWORD,
-                                      SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN});
+  m_settings->RegisterCallback(
+      this,
+      {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
+       SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
+       SETTING_GAMES_CLEAR_MANUAL_CACHE, SETTING_GAMES_CLEAR_LEADERBOARD_CACHE});
 
   // On startup reset logged-in flag if token is missing
   const std::string token = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
@@ -137,6 +144,34 @@ std::string CGameSettings::GetRAUsername() const
 std::string CGameSettings::GetRAToken() const
 {
   return m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
+}
+
+void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setting)
+{
+  if (!setting)
+    return;
+
+  const std::string& settingId = setting->GetId();
+
+  if (settingId == SETTING_GAMES_CLEAR_MANUAL_CACHE)
+  {
+    CManualCache::GetInstance().Clear();
+  }
+  else if (settingId == SETTING_GAMES_CLEAR_LEADERBOARD_CACHE)
+  {
+    ClearLeaderboardEntries();
+  }
+  else
+  {
+    return;
+  }
+
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+
+  // Said out loud, because emptying a cache looks exactly like nothing having
+  // happened
+  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, strings.Get(35363),
+                                        strings.Get(setting->GetLabel()));
 }
 
 void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& setting)
