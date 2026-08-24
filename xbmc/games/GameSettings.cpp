@@ -146,6 +146,11 @@ std::string CGameSettings::GetRAToken() const
   return m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
 }
 
+bool CGameSettings::GetChallengeIndicator() const
+{
+  return m_settings->GetBool(SETTING_ACHIEVEMENTS_CHALLENGE_INDICATOR);
+}
+
 void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setting)
 {
   if (!setting)

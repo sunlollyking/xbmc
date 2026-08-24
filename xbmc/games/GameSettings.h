@@ -24,6 +24,11 @@ namespace GAME
 /*!
  * \ingroup games
  */
+//! Read directly by the info provider, which is handed its dependencies rather
+//! than reaching for the game services, and so cannot go through CGameSettings
+constexpr const char* SETTING_ACHIEVEMENTS_CHALLENGE_INDICATOR =
+    "gamesachievements.challengeindicator";
+
 class CGameSettings : public ISettingCallback, public Observable
 {
 public:
@@ -76,6 +81,15 @@ public:
    * \param loggedIn True if the player is logged in
    */
   void SetAchievementsLoggedIn(bool loggedIn);
+
+  /*!
+   * \brief Whether to show the achievement being attempted over the game
+   *
+   * Some players want to know an attempt is live; others would rather nothing
+   * covered the picture. It is on by default, because an indicator nobody asked
+   * for is easier to turn off than one nobody knew existed.
+   */
+  bool GetChallengeIndicator() const;
 
   // Inherited from ISettingCallback
   void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;

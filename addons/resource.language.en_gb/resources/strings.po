@@ -19908,7 +19908,17 @@ msgctxt "#35363"
 msgid "Cache cleared"
 msgstr ""
 
-#empty strings from id 35364 to 35504
+#. Setting to show the achievement being attempted over the game
+msgctxt "#35364"
+msgid "Show challenge indicator on screen"
+msgstr ""
+
+#. Help text for the challenge indicator setting
+msgctxt "#35365"
+msgid "Show the achievement you are inside an attempt at in the corner of the screen while you play."
+msgstr ""
+
+#empty strings from id 35366 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
