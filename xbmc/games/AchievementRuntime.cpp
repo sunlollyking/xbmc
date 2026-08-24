@@ -130,8 +130,15 @@ void CAchievementRuntime::SetProgressIndicator(const AchievementProgressIndicato
   // Show and update are the same thing here: an indicator already on screen is
   // given its new value rather than replaced with a second one
   if (active)
+  {
     m_state.progressIndicator = indicator;
-  else if (m_state.progressIndicator.id == indicator.id)
+    return;
+  }
+
+  // The runtime sends no achievement with a hide, so an id of zero means clear
+  // whatever is showing. Matching on the id alone left the indicator stuck on
+  // screen for the rest of the session.
+  if (indicator.id == 0 || m_state.progressIndicator.id == indicator.id)
     m_state.progressIndicator = AchievementProgressIndicator{};
 }
 

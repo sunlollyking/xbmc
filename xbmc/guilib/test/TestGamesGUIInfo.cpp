@@ -132,7 +132,10 @@ TEST_F(TestGamesGUIInfo, ProgressIndicatorShowsWhatIsBeingWorkedTowards)
                                   CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT)));
   EXPECT_EQ(percent, 50);
 
-  achievementRuntime.SetProgressIndicator(indicator, false);
+  // The runtime sends no achievement with a hide, so this is what actually
+  // arrives - and matching on the id alone left the indicator on screen for the
+  // rest of the session
+  achievementRuntime.SetProgressIndicator(AchievementProgressIndicator{}, false);
 
   EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
                                     CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
