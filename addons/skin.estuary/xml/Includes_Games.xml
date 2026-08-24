@@ -33,13 +33,16 @@
 				<font>font12</font>
 				<textcolor>FFC8C8C8</textcolor>
 				<label>$INFO[RetroPlayer.Title]</label>
+				<visible>!String.IsEmpty(RetroPlayer.Title)</visible>
 			</control>
 
 			<control type="list" id="3">
 				<top>124</top>
 				<left>20</left>
 				<width>1148</width>
-				<height>590</height>
+				<!-- A whole number of 110px rows, so the last one is not sliced
+				     in half by the edge of the list -->
+				<height>550</height>
 				<orientation>vertical</orientation>
 				<pagecontrol>62</pagecontrol>
 				<scrolltime tween="sine" easing="out">200</scrolltime>
@@ -65,7 +68,7 @@
 				<left>1172</left>
 				<top>124</top>
 				<width>16</width>
-				<height>590</height>
+				<height>550</height>
 				<orientation>vertical</orientation>
 				<showonepage>false</showonepage>
 			</control>
@@ -167,22 +170,22 @@
 				<left>20</left>
 				<visible>String.IsEmpty(Window.Property(Leaderboards.Status))</visible>
 				<control type="label">
-					<left>10</left><width>110</width><height>30</height>
+					<left>10</left><top>0</top><width>80</width><height>30</height>
 					<font>font12</font><textcolor>blue</textcolor>
 					<label>$LOCALIZE[35344]</label>
 				</control>
 				<control type="label">
-					<left>130</left><width>500</width><height>30</height>
+					<left>146</left><top>0</top><width>440</width><height>30</height>
 					<font>font12</font><textcolor>blue</textcolor>
 					<label>$LOCALIZE[14200]</label>
 				</control>
 				<control type="label">
-					<left>640</left><width>260</width><height>30</height>
+					<left>600</left><top>0</top><width>280</width><height>30</height>
 					<font>font12</font><textcolor>blue</textcolor>
 					<label>$LOCALIZE[552]</label>
 				</control>
 				<control type="label">
-					<right>15</right><width>240</width><height>30</height>
+					<right>15</right><top>0</top><width>220</width><height>30</height>
 					<align>right</align>
 					<font>font12</font><textcolor>blue</textcolor>
 					<label>$LOCALIZE[35345]</label>
@@ -244,26 +247,32 @@
 
 	<include name="GameLeaderboardEntryRow">
 		<control type="label">
-			<left>10</left><width>110</width><height>50</height>
+			<left>10</left><top>0</top><width>80</width><height>50</height>
 			<aligny>center</aligny>
 			<font>font12</font>
 			<label>$INFO[ListItem.Property(RankLabel)]</label>
 		</control>
+		<!-- The player's RetroAchievements avatar, as the site shows it -->
+		<control type="image">
+			<left>96</left><top>7</top><width>36</width><height>36</height>
+			<aspectratio>keep</aspectratio>
+			<texture background="true" fallback="DefaultUser.png">$INFO[ListItem.Icon]</texture>
+		</control>
 		<control type="label">
-			<left>130</left><width>500</width><height>50</height>
+			<left>146</left><top>0</top><width>440</width><height>50</height>
 			<aligny>center</aligny>
 			<font>font12</font>
 			<label>$INFO[ListItem.Label]</label>
 		</control>
 		<control type="label">
-			<left>640</left><width>260</width><height>50</height>
+			<left>600</left><top>0</top><width>280</width><height>50</height>
 			<aligny>center</aligny>
 			<font>font12</font>
 			<textcolor>FFC8C8C8</textcolor>
 			<label>$INFO[ListItem.Property(Date)]</label>
 		</control>
 		<control type="label">
-			<right>15</right><width>240</width><height>50</height>
+			<right>15</right><top>0</top><width>220</width><height>50</height>
 			<align>right</align><aligny>center</aligny>
 			<font>font12</font>
 			<label>$INFO[ListItem.Label2]</label>

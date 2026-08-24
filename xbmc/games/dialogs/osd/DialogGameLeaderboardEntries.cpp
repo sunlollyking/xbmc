@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "XBDateTime.h"
 #include "filesystem/CurlFile.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
@@ -45,6 +46,9 @@ constexpr unsigned int ENTRY_COUNT = 50;
 
 constexpr const char* LBINFO_URL =
     "https://retroachievements.org/dorequest.php?r=lbinfo&i={}&u={}&t={}&c={}&o=0";
+
+//! Where RetroAchievements serves player avatars from
+constexpr const char* USER_PIC_URL = "https://i.retroachievements.org/UserPic/{}.png";
 
 constexpr const char* PROPERTY_TITLE = "Leaderboards.Title";
 constexpr const char* PROPERTY_DESCRIPTION = "Leaderboards.Description";
@@ -123,7 +127,15 @@ public:
       entry.username = row["User"].asString();
       entry.score = FormatScore(static_cast<unsigned int>(row["Score"].asUnsignedInteger()),
                                 m_format);
-      entry.date = row["DateSubmitted"].asString();
+      // Sent as a unix timestamp. Shown raw it is a meaningless ten digit
+      // number, so it is turned into whatever date format the player has set.
+      const auto submitted = static_cast<time_t>(row["DateSubmitted"].asInteger());
+      if (submitted > 0)
+      {
+        CDateTime date;
+        date.SetFromUTCDateTime(submitted);
+        entry.date = date.GetAsLocalizedDate();
+      }
       entry.isPlayer = StringUtils::EqualsNoCase(entry.username, m_username);
 
       m_entries.push_back(std::move(entry));
@@ -309,6 +321,10 @@ void CDialogGameLeaderboardEntries::PopulateList()
       auto item = std::make_shared<CFileItem>(entry.username);
       item->SetLabel(entry.username);
       item->SetLabel2(entry.score);
+
+      // A face against every name, the way the site shows them
+      if (!entry.username.empty())
+        item->SetArt("icon", StringUtils::Format(USER_PIC_URL, CURL::Encode(entry.username)));
 
       item->SetProperty("Rank", static_cast<int>(entry.rank));
       item->SetProperty("RankLabel", StringUtils::Format("{}", entry.rank));
