@@ -9,6 +9,7 @@
 #include "DialogGameLeaderboardEntries.h"
 
 #include "FileItem.h"
+#include "LeaderboardUtils.h"
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "XBDateTime.h"
@@ -29,7 +30,8 @@
 #include "utils/log.h"
 #include "view/ViewState.h"
 
-#include <cmath>
+#include <algorithm>
+#include <ctime>
 #include <mutex>
 
 using namespace KODI::GAME;
@@ -53,32 +55,7 @@ constexpr const char* USER_PIC_URL = "https://i.retroachievements.org/UserPic/{}
 constexpr const char* PROPERTY_TITLE = "Leaderboards.Title";
 constexpr const char* PROPERTY_DESCRIPTION = "Leaderboards.Description";
 constexpr const char* PROPERTY_STATUS = "Leaderboards.Status";
-
-std::string FormatScore(unsigned int score, const std::string& format)
-{
-  if (format == "TIME" || format == "FRAMES")
-  {
-    const double totalSeconds = static_cast<double>(score) / 60.0;
-    const auto minutes = static_cast<unsigned int>(totalSeconds) / 60;
-    const auto seconds = static_cast<unsigned int>(totalSeconds) % 60;
-    const auto centiseconds =
-        static_cast<unsigned int>((totalSeconds - std::floor(totalSeconds)) * 100);
-
-    return StringUtils::Format("{}:{:02d}.{:02d}", minutes, seconds, centiseconds);
-  }
-
-  if (format == "TIMESECS")
-    return StringUtils::Format("{}:{:02d}", score / 60, score % 60);
-
-  if (format == "FIXED1")
-    return StringUtils::Format("{:.1f}", static_cast<double>(score) / 10.0);
-  if (format == "FIXED2")
-    return StringUtils::Format("{:.2f}", static_cast<double>(score) / 100.0);
-  if (format == "FIXED3")
-    return StringUtils::Format("{:.3f}", static_cast<double>(score) / 1000.0);
-
-  return std::to_string(score);
-}
+constexpr const char* PROPERTY_PLAYER_BEST = "Leaderboards.PlayerBest";
 
 /*!
  * \brief Fetches one leaderboard's standings, off the GUI thread
@@ -125,20 +102,40 @@ public:
       LeaderboardEntry entry;
       entry.rank = static_cast<unsigned int>(row["Rank"].asUnsignedInteger());
       entry.username = row["User"].asString();
-      entry.score = FormatScore(static_cast<unsigned int>(row["Score"].asUnsignedInteger()),
-                                m_format);
+      entry.score = FormatLeaderboardScore(
+          static_cast<unsigned int>(row["Score"].asUnsignedInteger()), m_format);
       // Sent as a unix timestamp. Shown raw it is a meaningless ten digit
       // number, so it is turned into whatever date format the player has set.
-      const auto submitted = static_cast<time_t>(row["DateSubmitted"].asInteger());
-      if (submitted > 0)
-      {
-        CDateTime date;
-        date.SetFromUTCDateTime(submitted);
-        entry.date = date.GetAsLocalizedDate();
-      }
+      entry.submitted = static_cast<std::time_t>(row["DateSubmitted"].asInteger());
       entry.isPlayer = StringUtils::EqualsNoCase(entry.username, m_username);
 
       m_entries.push_back(std::move(entry));
+    }
+
+    // The player's own standing comes back separately, and is only in the rows
+    // above if they placed inside the page that was asked for. Seeing where you
+    // stand is the point of looking, so it is appended when it is not.
+    const CVariant& playerEntry = leaderboard["UserEntry"];
+    if (playerEntry.isObject() && !playerEntry["Rank"].isNull())
+    {
+      const auto rank = static_cast<unsigned int>(playerEntry["Rank"].asUnsignedInteger());
+
+      const bool alreadyListed =
+          std::any_of(m_entries.begin(), m_entries.end(),
+                      [rank](const LeaderboardEntry& e) { return e.rank == rank && e.isPlayer; });
+
+      if (!alreadyListed)
+      {
+        LeaderboardEntry entry;
+        entry.rank = rank;
+        entry.username = m_username;
+        entry.score = FormatLeaderboardScore(
+            static_cast<unsigned int>(playerEntry["Score"].asUnsignedInteger()), m_format);
+        entry.submitted = static_cast<std::time_t>(playerEntry["DateSubmitted"].asInteger());
+        entry.isPlayer = true;
+
+        m_entries.push_back(std::move(entry));
+      }
     }
 
     return true;
@@ -220,6 +217,15 @@ void CDialogGameLeaderboardEntries::OnInitWindow()
   if (!leaderboard->entries.empty())
     return;
 
+  // Nor if a previous session kept them and they are still fresh
+  std::vector<LeaderboardEntry> remembered;
+  if (LoadLeaderboardEntries(m_leaderboardId, remembered))
+  {
+    runtime.SetLeaderboardEntries(m_leaderboardId, remembered);
+    PopulateList();
+    return;
+  }
+
   const auto& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
   const std::string username = gameSettings.GetRAUsername();
@@ -247,6 +253,7 @@ void CDialogGameLeaderboardEntries::OnDeinitWindow(int nextWindowID)
   SetProperty(PROPERTY_TITLE, "");
   SetProperty(PROPERTY_DESCRIPTION, "");
   SetProperty(PROPERTY_STATUS, "");
+  SetProperty(PROPERTY_PLAYER_BEST, "");
 
   m_leaderboardId = 0;
 
@@ -263,6 +270,8 @@ void CDialogGameLeaderboardEntries::OnJobComplete(unsigned int jobID, bool succe
     {
       CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardEntries(
           entriesJob->GetLeaderboardId(), entriesJob->GetEntries());
+
+      SaveLeaderboardEntries(entriesJob->GetLeaderboardId(), entriesJob->GetEntries());
     }
     else
     {
@@ -311,6 +320,8 @@ void CDialogGameLeaderboardEntries::PopulateList()
     }
   }
 
+  const std::time_t now = std::time(nullptr);
+
   {
     std::unique_lock lock(m_section);
 
@@ -329,7 +340,20 @@ void CDialogGameLeaderboardEntries::PopulateList()
       item->SetProperty("Rank", static_cast<int>(entry.rank));
       item->SetProperty("RankLabel", StringUtils::Format("{}", entry.rank));
       item->SetProperty("Score", entry.score);
-      item->SetProperty("Date", entry.date);
+
+      // "gold" / "silver" / "bronze" for the top three, so a skin can mark
+      // them however suits it rather than being handed a drawn medal
+      item->SetProperty("Medal", RankMedal(entry.rank));
+
+      // Both forms: the age is what gets read at a glance, the date is there
+      // for anyone who wants to know exactly when
+      if (entry.submitted > 0)
+      {
+        CDateTime when;
+        when.SetFromUTCDateTime(entry.submitted);
+        item->SetProperty("Date", when.GetAsLocalizedDate());
+        item->SetProperty("DateRelative", FormatRelativeDate(entry.submitted, now));
+      }
 
       // So a skin can pick the player's own row out of the table
       item->SetProperty("IsPlayer", entry.isPlayer ? "true" : "");
@@ -339,6 +363,28 @@ void CDialogGameLeaderboardEntries::PopulateList()
   }
 
   m_viewControl.SetItems(m_items);
+
+  // Where the player stands, said once at the top rather than left to be found
+  // by reading down the table
+  const auto player = std::find_if(entries.begin(), entries.end(),
+                                   [](const LeaderboardEntry& e) { return e.isPlayer; });
+  if (player != entries.end())
+  {
+    // "Your best"
+    SetProperty(PROPERTY_PLAYER_BEST,
+                StringUtils::Format("{}  ·  {}  ·  {}", strings.Get(35350),
+                                    StringUtils::Format(strings.Get(35340), player->rank),
+                                    player->score));
+  }
+  else if (!entries.empty())
+  {
+    // "You have not set a time on this leaderboard yet"
+    SetProperty(PROPERTY_PLAYER_BEST, strings.Get(35351));
+  }
+  else
+  {
+    SetProperty(PROPERTY_PLAYER_BEST, "");
+  }
 
   // "The standings could not be loaded" only once there is nothing to show and
   // nothing still coming

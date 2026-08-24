@@ -33,6 +33,32 @@ namespace GAME
  * The player's own row is marked so a skin can pick it out, and is fetched
  * along with the top of the table even when they are far enough down it not to
  * appear: seeing where you stand is the point of looking.
+ *
+ * \section leaderboard_entry_properties What a skin is given
+ *
+ * On the window:
+ *
+ *  - \c Leaderboards.Title       The leaderboard's name
+ *  - \c Leaderboards.Description What it measures
+ *  - \c Leaderboards.Status      Set while loading, or when there is nothing
+ *                                to show. A skin shows the list only when this
+ *                                is empty.
+ *  - \c Leaderboards.PlayerBest  Where the player stands, as a whole sentence,
+ *                                including the case where they have never set
+ *                                a time. Empty if not signed in.
+ *
+ * On each row:
+ *
+ *  - \c ListItem.Label           The username
+ *  - \c ListItem.Label2          The score, already in the leaderboard's units
+ *  - \c ListItem.Icon            Their RetroAchievements avatar
+ *  - \c Rank / \c RankLabel      The place, as a number and as text
+ *  - \c Medal                    "gold", "silver", "bronze", or empty. The
+ *                                colour is the skin's decision; nothing is
+ *                                drawn here.
+ *  - \c Date                     The submission date in the player's locale
+ *  - \c DateRelative             The same, in words - "3 months ago"
+ *  - \c IsPlayer                 Non-empty on the signed-in player's own row
  */
 class CDialogGameLeaderboardEntries : public CGUIDialog, protected CJobQueue
 {
