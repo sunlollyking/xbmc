@@ -666,6 +666,26 @@ void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker&
   CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardTracker(tracker, show);
 }
 
+void CGameClientCheevos::OnAchievementProgressIndicator(
+    const game_rc_achievement_progress_indicator& data, bool show)
+{
+  CLog::Log(LOGDEBUG, "CGameClientCheevos: progress indicator {} for achievement {} \"{}\" at {}",
+            show ? "shown" : "hidden", data.id, SafeString(data.title),
+            SafeString(data.measured_progress));
+
+  // Published to the runtime rather than raised as a notification: this ticks
+  // up many times a second while the player works towards it, so it belongs in
+  // an on-screen indicator the skin can show and hide
+  AchievementProgressIndicator indicator;
+  indicator.id = data.id;
+  indicator.title = SafeString(data.title);
+  indicator.badgeUrl = SafeString(data.badge_url);
+  indicator.measuredProgress = SafeString(data.measured_progress);
+  indicator.measuredPercent = data.measured_percent;
+
+  CServiceBroker::GetGameServices().AchievementRuntime().SetProgressIndicator(indicator, show);
+}
+
 void CGameClientCheevos::OnRichPresenceUpdated(const std::string& evaluation)
 {
   CServiceBroker::GetGameServices().AchievementRuntime().SetRichPresence(evaluation);

@@ -132,6 +132,28 @@ struct LeaderboardInfo
 };
 
 /*!
+ * \brief How far along a measured achievement is
+ *
+ * Some achievements are measured rather than simply locked or unlocked -
+ * "collect 180 rings" - and the runtime reports progress while the player works
+ * towards one. Distinct from AchievementChallenge, which says an attempt is
+ * live without saying how far through it is.
+ */
+struct AchievementProgressIndicator
+{
+  unsigned int id{0};
+  std::string title;
+  std::string badgeUrl;
+
+  //! How far along, already formatted by the client - "13/180" - so it is shown
+  //! as given rather than interpreted
+  std::string measuredProgress;
+
+  //! The same as a percentage, so a skin can draw a bar without parsing the text
+  float measuredPercent{0.0f};
+};
+
+/*!
  * \brief A leaderboard attempt in progress
  *
  * While an attempt runs the client publishes a live value - the lap time so
@@ -177,6 +199,14 @@ struct AchievementState
    * Usually empty, and rarely more than one or two at a time.
    */
   std::vector<AchievementChallenge> challenges;
+
+  /*!
+   * \brief The measured achievement being worked towards, if any
+   *
+   * One at a time: the runtime picks which is worth showing, and a corner
+   * indicator has room for one.
+   */
+  AchievementProgressIndicator progressIndicator;
   bool loaded{false};
 };
 
@@ -247,6 +277,15 @@ public:
   void SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active);
 
   /*!
+   * \brief Show or hide how far along a measured achievement is
+   *
+   * Published to the runtime rather than raised as a notification, for the same
+   * reason as the challenge indicator: this updates many times a second while
+   * the player works towards one.
+   */
+  void SetProgressIndicator(const AchievementProgressIndicator& indicator, bool active);
+
+  /*!
    * \brief Record where the player now stands after a submission
    *
    * The server answers a submission with the new standing, which is the same
@@ -266,6 +305,8 @@ public:
   std::vector<AchievementChallenge> GetChallenges() const;
 
   std::vector<LeaderboardTracker> GetLeaderboardTrackers() const;
+
+  AchievementProgressIndicator GetProgressIndicator() const;
 
   /*!
    * \brief Replace the leaderboards of the loaded game

@@ -121,6 +121,74 @@
 		</control>
 		<control type="group">
 			<description>
+				Measured achievement indicator. Some achievements are counted rather
+				than simply locked or unlocked - "collect 180 rings" - and this shows
+				how far along one is while the player works towards it. Sits under
+				the challenge indicator.
+			</description>
+			<visible>!String.IsEmpty(RetroPlayer.AchievementsIndicatorTitle)</visible>
+			<animation effect="fade" time="200">VisibleChange</animation>
+			<right>40</right>
+			<top>40</top>
+			<width>420</width>
+			<height>72</height>
+			<animation effect="slide" end="0,82" time="0" condition="!String.IsEmpty(RetroPlayer.AchievementsChallengeTitle)">Conditional</animation>
+			<control type="image">
+				<left>0</left>
+				<top>0</top>
+				<width>420</width>
+				<height>72</height>
+				<texture border="10" colordiffuse="BB000000">dialogs/dialog-bg-nobo.png</texture>
+			</control>
+			<control type="image">
+				<description>Achievement badge</description>
+				<left>10</left>
+				<top>10</top>
+				<width>52</width>
+				<height>52</height>
+				<texture background="true">$INFO[RetroPlayer.AchievementsIndicatorBadge]</texture>
+				<aspectratio>keep</aspectratio>
+			</control>
+			<control type="label">
+				<left>72</left>
+				<top>6</top>
+				<width>270</width>
+				<height>32</height>
+				<label>$INFO[RetroPlayer.AchievementsIndicatorTitle]</label>
+				<font>font12</font>
+				<aligny>center</aligny>
+				<textcolor>white</textcolor>
+				<shadowcolor>black</shadowcolor>
+				<scroll>true</scroll>
+				<scrollsuffix>   </scrollsuffix>
+			</control>
+			<control type="label">
+				<description>How far along, as the client counts it</description>
+				<right>14</right>
+				<top>6</top>
+				<width>90</width>
+				<height>32</height>
+				<align>right</align>
+				<aligny>center</aligny>
+				<label>$INFO[RetroPlayer.AchievementsIndicatorProgress]</label>
+				<font>font12</font>
+				<textcolor>white</textcolor>
+				<shadowcolor>black</shadowcolor>
+			</control>
+			<control type="progress">
+				<description>
+					The same figure as a bar. Driven by the percentage rather than by
+					parsing "13/180" back into numbers.
+				</description>
+				<left>72</left>
+				<top>44</top>
+				<width>336</width>
+				<height>10</height>
+				<info>RetroPlayer.AchievementsIndicatorPercent</info>
+			</control>
+		</control>
+		<control type="group">
+			<description>
 				Leaderboard tracker. While an attempt at a leaderboard runs, the
 				client publishes the value as it stands - the lap time so far,
 				the score so far - and this shows it. Sits under the challenge
@@ -132,7 +200,9 @@
 			<top>40</top>
 			<width>420</width>
 			<height>56</height>
-			<animation effect="slide" end="0,82" time="0" condition="!String.IsEmpty(RetroPlayer.AchievementsChallengeTitle)">Conditional</animation>
+			<animation effect="slide" end="0,82" time="0" condition="!String.IsEmpty(RetroPlayer.AchievementsChallengeTitle) + String.IsEmpty(RetroPlayer.AchievementsIndicatorTitle)">Conditional</animation>
+			<animation effect="slide" end="0,82" time="0" condition="String.IsEmpty(RetroPlayer.AchievementsChallengeTitle) + !String.IsEmpty(RetroPlayer.AchievementsIndicatorTitle)">Conditional</animation>
+			<animation effect="slide" end="0,164" time="0" condition="!String.IsEmpty(RetroPlayer.AchievementsChallengeTitle) + !String.IsEmpty(RetroPlayer.AchievementsIndicatorTitle)">Conditional</animation>
 			<control type="image">
 				<description>Backdrop, so the value stays readable over any game</description>
 				<left>0</left>

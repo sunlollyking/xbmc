@@ -1293,6 +1293,41 @@ extern "C"
   //----------------------------------------------------------------------------
 
   //============================================================================
+  /// @brief **Payload of the achievement progress indicator callbacks**
+  ///
+  /// Some achievements are measured rather than simply locked or unlocked -
+  /// "collect 180 rings", "survive 120 seconds" - and the runtime reports how
+  /// far along one is while the player is working on it.
+  ///
+  /// Distinct from the challenge indicator, which says an attempt is live
+  /// without saying how far through it is.
+  ///
+  typedef struct game_rc_achievement_progress_indicator
+  {
+    /// @brief Unique RetroAchievements ID of the achievement
+    unsigned int id;
+
+    /// @brief Title of the achievement, or `NULL` if unknown
+    const char* title;
+
+    /// @brief URL of the achievement's badge, or `NULL`
+    const char* badge_url;
+
+    /// @brief How far along, already formatted - "13/180" - or `NULL`
+    ///
+    /// Formatted by the client because only it knows the units, so this is
+    /// shown as given rather than interpreted.
+    const char* measured_progress;
+
+    /// @brief How far along as a percentage, 0.0 to 100.0
+    ///
+    /// Sent alongside the text so a frontend can draw a bar without having to
+    /// parse "13/180" back into numbers.
+    float measured_percent;
+  } ATTR_PACKED game_rc_achievement_progress_indicator;
+  //----------------------------------------------------------------------------
+
+  //============================================================================
   /// @brief **Payload of the leaderboard attempt callbacks**
   ///
   /// A leaderboard is a scored challenge within a game - fastest lap, highest
@@ -1614,6 +1649,24 @@ extern "C"
      */
     void (*RCOnLeaderboardTrackerHide)(KODI_HANDLE kodiInstance,
                                        const struct game_rc_leaderboard_tracker* data);
+
+    /*!
+     * @brief The player has started working towards a measured achievement
+     */
+    void (*RCOnAchievementProgressShow)(KODI_HANDLE kodiInstance,
+                                        const struct game_rc_achievement_progress_indicator* data);
+
+    /*!
+     * @brief How far along a measured achievement is has changed
+     */
+    void (*RCOnAchievementProgressUpdate)(KODI_HANDLE kodiInstance,
+                                          const struct game_rc_achievement_progress_indicator* data);
+
+    /*!
+     * @brief Progress towards a measured achievement should stop being shown
+     */
+    void (*RCOnAchievementProgressHide)(KODI_HANDLE kodiInstance,
+                                        const struct game_rc_achievement_progress_indicator* data);
   } AddonToKodiFuncTable_Game;
 
   /*!
