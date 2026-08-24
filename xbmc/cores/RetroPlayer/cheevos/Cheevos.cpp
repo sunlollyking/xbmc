@@ -286,9 +286,20 @@ bool CCheevos::LoadData()
 
   // Generate ROM hash to identify the game on RA
   std::string hash;
-  if (!m_gameClient->Cheevos().RCGenerateHashFromFile(hash, ConsoleID(),
-                                                      m_gameClient->GetGamePath().c_str()))
+  bool notImplemented = false;
+  if (!m_gameClient->Cheevos().RCGenerateHashFromFile(
+          hash, ConsoleID(), m_gameClient->GetGamePath().c_str(), &notImplemented))
   {
+    // A client that does its own achievement support - which every client
+    // carrying rc_client does - answers this with "not implemented", and there
+    // is nothing here for it to do. That is how it says so, not a failure, and
+    // it used to be reported as one on every game that loaded.
+    if (notImplemented)
+    {
+      CLog::Log(LOGDEBUG, "CCheevos::LoadData -- client provides its own achievement support");
+      return false;
+    }
+
     CLog::Log(LOGERROR, "CCheevos::LoadData -- hash generation failed");
     return false;
   }

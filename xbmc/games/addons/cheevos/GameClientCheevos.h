@@ -42,9 +42,17 @@ class CGameClientCheevos
 public:
   CGameClientCheevos(CGameClient& gameClient, AddonInstance_Game& addonStruct);
 
+  /*!
+   * \brief Hash a ROM the way RetroAchievements identifies it
+   *
+   * \param[out] notImplemented Set when the client does its own achievement
+   *             support and has no use for this. Not a failure: it is how a
+   *             client says the frontend should stand down.
+   */
   bool RCGenerateHashFromFile(std::string& hash,
                               RETRO::RConsoleID consoleID,
-                              const std::string& filePath);
+                              const std::string& filePath,
+                              bool* notImplemented = nullptr);
   bool RCGetGameIDUrl(std::string& url, const std::string& hash);
   bool RCGetPatchFileUrl(std::string& url,
                          const std::string& username,
