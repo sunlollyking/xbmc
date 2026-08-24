@@ -170,10 +170,19 @@
       <rightanalogtrigger>AnalogFastForward</rightanalogtrigger>
     </gamepad>
   </VisualisationPresetList>
+  <GameManuals>
+    <gamepad>
+      <B>Back</B>
+      <start>Noop</start>
+    </gamepad>
+  </GameManuals>
   <GameManual>
     <gamepad>
       <B>Back</B>
       <Y>ZoomNormal</Y>
+      <!-- Globally this opens the player controls, which have nothing to do
+           with reading a manual and cover the page while it is up -->
+      <start>Noop</start>
       <dpadup>Up</dpadup>
       <dpaddown>Down</dpaddown>
       <dpadleft>Left</dpadleft>
