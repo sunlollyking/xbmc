@@ -64,6 +64,13 @@ constexpr auto GAME_GENRE = "Genre";
 constexpr auto IMAGE_ICON_URL = "ImageIconURL";
 constexpr unsigned int RA_MAX_ACHIEVEMENTS = 10000;
 constexpr auto ACHIEVEMENTS = "Achievements";
+constexpr auto LEADERBOARDS = "Leaderboards";
+constexpr auto LB_ID = "ID";
+constexpr auto LB_TITLE = "Title";
+constexpr auto LB_DESCRIPTION = "Description";
+constexpr auto LB_FORMAT = "Format";
+constexpr auto LB_LOWER_IS_BETTER = "LowerIsBetter";
+constexpr auto LB_HIDDEN = "Hidden";
 constexpr auto MEM_ADDR = "MemAddr";
 constexpr auto CHEEVO_ID = "ID";
 constexpr auto FLAGS = "Flags";
@@ -658,6 +665,44 @@ bool CCheevos::LoadData()
   // Set achievement state with correct unlock count from session ping
   achieveState.unlockedAchievements = unlockedCount;
   CServiceBroker::GetGameServices().AchievementRuntime().SetState(achieveState);
+
+  // The same response carries the game's leaderboards. Only their definitions
+  // are here - the standings are fetched when a leaderboard is opened, since
+  // pulling them all up front would be a request per leaderboard for a screen
+  // the player may never look at.
+  {
+    KODI::GAME::LeaderboardState leaderboardState;
+    leaderboardState.gameTitle = raTitle;
+    leaderboardState.loaded = true;
+
+    const CVariant& leaderboards = data[PATCH_DATA][LEADERBOARDS];
+    if (leaderboards.isArray())
+    {
+      for (auto it = leaderboards.begin_array(); it != leaderboards.end_array(); ++it)
+      {
+        const CVariant& leaderboard = *it;
+
+        // Hidden leaderboards are ones the authors have retired or not
+        // finished; the site does not show them either
+        if (leaderboard[LB_HIDDEN].asBoolean())
+          continue;
+
+        KODI::GAME::LeaderboardInfo info;
+        info.id = static_cast<unsigned int>(leaderboard[LB_ID].asUnsignedInteger());
+        info.title = leaderboard[LB_TITLE].asString();
+        info.description = leaderboard[LB_DESCRIPTION].asString();
+        info.format = leaderboard[LB_FORMAT].asString();
+        info.lowerIsBetter = leaderboard[LB_LOWER_IS_BETTER].asBoolean();
+
+        leaderboardState.leaderboards.push_back(std::move(info));
+      }
+    }
+
+    CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardState(leaderboardState);
+
+    CLog::Log(LOGINFO, "CCheevos: {} leaderboard(s) for game {}",
+              leaderboardState.leaderboards.size(), m_gameId);
+  }
   CLog::Log(LOGINFO, "CCheevos::LoadData -- achievement state set: title='{}' total={} unlocked={}",
             achieveState.gameTitle, achieveState.totalAchievements, unlockedCount);
 

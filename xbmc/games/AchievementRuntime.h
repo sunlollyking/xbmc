@@ -79,6 +79,65 @@ struct AchievementInfo
   std::string measuredProgress;
 };
 
+/*!
+ * \brief One row of a leaderboard's standings
+ */
+struct LeaderboardEntry
+{
+  unsigned int rank{0};
+  std::string username;
+
+  //! Already formatted by the server for this leaderboard's unit - seconds,
+  //! points, frames - so it is shown as given rather than interpreted
+  std::string score;
+
+  std::string date;
+
+  //! True for the signed-in player's own row, so the skin can pick it out
+  bool isPlayer{false};
+};
+
+/*!
+ * \brief A scored challenge within a game
+ */
+struct LeaderboardInfo
+{
+  unsigned int id{0};
+  std::string title;
+  std::string description;
+
+  //! How the server encodes this leaderboard's values - TIME, SCORE, FIXED2
+  //! and so on. Needed because the scores arrive as raw integers and only
+  //! this says whether 9000 means 9000 points or 2:30.00.
+  std::string format;
+
+  //! Whether a smaller value ranks higher, as it does for a time trial
+  bool lowerIsBetter{false};
+
+  unsigned int totalEntries{0};
+
+  //! Where the player stands, or 0 if they have never submitted
+  unsigned int playerRank{0};
+  std::string playerScore;
+
+  std::string topUsername;
+  std::string topScore;
+
+  //! Filled in only once the standings have been fetched for this one, which
+  //! happens when the player opens it rather than when the game loads
+  std::vector<LeaderboardEntry> entries;
+};
+
+/*!
+ * \brief The leaderboards of the loaded game
+ */
+struct LeaderboardState
+{
+  std::string gameTitle;
+  std::vector<LeaderboardInfo> leaderboards;
+  bool loaded{false};
+};
+
 struct AchievementState
 {
   std::string gameTitle;
@@ -160,6 +219,37 @@ public:
   std::vector<AchievementChallenge> GetChallenges() const;
 
   /*!
+   * \brief Replace the leaderboards of the loaded game
+   */
+  void SetLeaderboardState(const LeaderboardState& state);
+
+  /*!
+   * \brief Get a copy of the leaderboards, including their standings
+   */
+  LeaderboardState GetLeaderboardState() const;
+
+  /*!
+   * \brief Store the standings fetched for one leaderboard
+   *
+   * Kept on the runtime rather than in the dialog so that reopening a
+   * leaderboard already looked at costs nothing.
+   *
+   * \return False if that leaderboard is not in the loaded game
+   */
+  bool SetLeaderboardEntries(unsigned int leaderboardId,
+                             const std::vector<LeaderboardEntry>& entries);
+
+  /*!
+   * \brief Which leaderboard the entries dialog should show
+   *
+   * Passed this way rather than as a window parameter because the entries
+   * dialog is opened from the list by the skin, which has no way to hand over
+   * anything but a window id.
+   */
+  void SetSelectedLeaderboard(unsigned int leaderboardId);
+  unsigned int GetSelectedLeaderboard() const;
+
+  /*!
    * \name Targeted accessors for the progress info label
    *
    * The skin queries this once per frame per control, so these read a single
@@ -173,6 +263,8 @@ public:
 private:
   mutable std::mutex m_mutex;
   AchievementState m_state;
+  LeaderboardState m_leaderboards;
+  unsigned int m_selectedLeaderboard{0};
 };
 
 } // namespace KODI::GAME

@@ -247,6 +247,13 @@
 								<onclick>PlayerControl(Reset)</onclick>
 							</item>
 							<item>
+								<description>Leaderboards button</description>
+								<label>$LOCALIZE[35331]</label>
+								<icon>osd/fullscreen/buttons/rating.png</icon>
+								<onclick condition="RetroPlayer.AchievementsLoggedIn">ActivateWindow(gameleaderboards)</onclick>
+								<onclick condition="!RetroPlayer.AchievementsLoggedIn">Notification($LOCALIZE[35331],$LOCALIZE[35333],6000,DefaultIconWarning.png)</onclick>
+							</item>
+							<item>
 								<description>Manual button</description>
 								<label>$LOCALIZE[35311]</label>
 								<icon>osd/fullscreen/buttons/manual.png</icon>
@@ -458,6 +465,13 @@
 								<label>$LOCALIZE[13007]</label>
 								<icon>osd/fullscreen/buttons/reset.png</icon>
 								<onclick>PlayerControl(Reset)</onclick>
+							</item>
+							<item>
+								<description>Leaderboards button</description>
+								<label>$LOCALIZE[35331]</label>
+								<icon>osd/fullscreen/buttons/rating.png</icon>
+								<onclick condition="RetroPlayer.AchievementsLoggedIn">ActivateWindow(gameleaderboards)</onclick>
+								<onclick condition="!RetroPlayer.AchievementsLoggedIn">Notification($LOCALIZE[35331],$LOCALIZE[35333],6000,DefaultIconWarning.png)</onclick>
 							</item>
 							<item>
 								<description>Manual button</description>

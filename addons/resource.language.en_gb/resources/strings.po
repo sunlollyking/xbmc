@@ -19722,7 +19722,97 @@ msgctxt "#35330"
 msgid "How much disk space downloaded game manuals may use. Once past this, the manuals you have gone longest without opening are removed. Manuals you added yourself are never removed."
 msgstr ""
 
-#empty strings from id 35331 to 35504
+#. Label of the game OSD button that opens the leaderboards
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35331"
+msgid "Leaderboards"
+msgstr ""
+
+#. Shown in the leaderboards dialog: scores cannot be submitted yet
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35332"
+msgid "Leaderboards are read-only until this emulator is approved for hardcore mode"
+msgstr ""
+
+#. Shown when the player is not signed in
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35333"
+msgid "Sign in to RetroAchievements to see leaderboards"
+msgstr ""
+
+#. Shown when the game defines none
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35334"
+msgid "This game has no leaderboards"
+msgstr ""
+
+#. How a time-based leaderboard ranks, lowest first
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35335"
+msgid "Fastest time"
+msgstr ""
+
+#. How a time-based leaderboard ranks, highest first
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35336"
+msgid "Longest time"
+msgstr ""
+
+#. How a scored leaderboard ranks, lowest first
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35337"
+msgid "Lowest score"
+msgstr ""
+
+#. How a scored leaderboard ranks, highest first
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35338"
+msgid "Highest score"
+msgstr ""
+
+#. How many players have submitted to a leaderboard
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35339"
+msgid "{0:d} entries"
+msgstr ""
+
+#. Where the player stands on a leaderboard
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35340"
+msgid "Your rank: {0:d}"
+msgstr ""
+
+#. Shown when the player has never submitted to a leaderboard
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35341"
+msgid "Not ranked"
+msgstr ""
+
+#. Shown while a leaderboard's entries are being fetched
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35342"
+msgid "Loading standings…"
+msgstr ""
+
+#. Shown when the request for a leaderboard's entries failed
+#: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
+msgctxt "#35343"
+msgid "The standings could not be loaded"
+msgstr ""
+
+#. Column heading for a player's position on a leaderboard
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35344"
+msgid "Rank"
+msgstr ""
+
+#. Column heading for a leaderboard value
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35345"
+msgid "Score"
+msgstr ""
+
+#empty strings from id 35346 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
