@@ -62,6 +62,9 @@ private:
   //! Build the list from whatever the runtime currently holds
   void PopulateList();
 
+  //! Ask RetroAchievements which leaderboards this game has
+  void FetchList(unsigned int gameId);
+
   //! Ask for the standings of every leaderboard, one job at a time
   void FetchStandings();
 
