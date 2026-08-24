@@ -9,6 +9,7 @@
 #pragma once
 
 #include <mutex>
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -91,7 +92,10 @@ struct LeaderboardEntry
   //! points, frames - so it is shown as given rather than interpreted
   std::string score;
 
-  std::string date;
+  //! When it was submitted, as sent. Kept raw so that both the date and how
+  //! long ago it was can be worked out at display time, in the player's own
+  //! locale rather than the one that fetched it.
+  std::time_t submitted{0};
 
   //! True for the signed-in player's own row, so the skin can pick it out
   bool isPlayer{false};

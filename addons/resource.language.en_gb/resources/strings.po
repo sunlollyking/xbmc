@@ -19812,7 +19812,53 @@ msgctxt "#35345"
 msgid "Score"
 msgstr ""
 
-#empty strings from id 35346 to 35504
+#. A leaderboard entry submitted one day ago
+#: xbmc/games/dialogs/osd/LeaderboardUtils.cpp
+msgctxt "#35346"
+msgid "Yesterday"
+msgstr ""
+
+#. How long ago a leaderboard entry was submitted
+#: xbmc/games/dialogs/osd/LeaderboardUtils.cpp
+msgctxt "#35347"
+msgid "{0:d} days ago"
+msgstr ""
+
+#. How long ago a leaderboard entry was submitted
+#: xbmc/games/dialogs/osd/LeaderboardUtils.cpp
+msgctxt "#35348"
+msgid "{0:d} months ago"
+msgstr ""
+
+#. How long ago a leaderboard entry was submitted
+#: xbmc/games/dialogs/osd/LeaderboardUtils.cpp
+msgctxt "#35349"
+msgid "{0:d} years ago"
+msgstr ""
+
+#. Heading for the player's own standing on a leaderboard
+#: xbmc/games/dialogs/osd/LeaderboardUtils.cpp
+msgctxt "#35350"
+msgid "Your best"
+msgstr ""
+
+#. Shown when the player has never submitted
+#: xbmc/games/dialogs/osd/LeaderboardUtils.cpp
+msgctxt "#35351"
+msgid "You have not set a time on this leaderboard yet"
+msgstr ""
+
+#. A leaderboard entry submitted last month
+msgctxt "#35352"
+msgid "Last month"
+msgstr ""
+
+#. A leaderboard entry submitted last year
+msgctxt "#35353"
+msgid "Last year"
+msgstr ""
+
+#empty strings from id 35354 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp

@@ -103,7 +103,7 @@
 			<label>$INFO[ListItem.Property(Format)]</label>
 		</control>
 		<control type="label">
-			<left>15</left><top>74</top><width>760</width><height>26</height>
+			<left>15</left><top>74</top><width>620</width><height>26</height>
 			<font>font12</font>
 			<textcolor>FFC8C8C8</textcolor>
 			<label>$INFO[ListItem.Label2]</label>
@@ -123,7 +123,7 @@
 			<label>$INFO[ListItem.Property(TopUsername)]</label>
 		</control>
 		<control type="label">
-			<right>15</right><top>74</top><width>340</width><height>26</height>
+			<right>15</right><top>74</top><width>480</width><height>26</height>
 			<align>right</align>
 			<font>font12</font>
 			<textcolor>FFC8C8C8</textcolor>
@@ -164,9 +164,24 @@
 				<label>$INFO[Window.Property(Leaderboards.Description)]</label>
 			</control>
 
+			<!-- Where the player stands, without reading down the table for a
+			     name. Kodi composes the whole sentence, including the case where
+			     they have never set a time. -->
+			<control type="label">
+				<left>20</left>
+				<top>110</top>
+				<width>1148</width>
+				<height>30</height>
+				<align>center</align>
+				<font>font12</font>
+				<textcolor>blue</textcolor>
+				<label>$INFO[Window.Property(Leaderboards.PlayerBest)]</label>
+				<visible>!String.IsEmpty(Window.Property(Leaderboards.PlayerBest))</visible>
+			</control>
+
 			<!-- Column headings -->
 			<control type="group">
-				<top>126</top>
+				<top>146</top>
 				<left>20</left>
 				<visible>String.IsEmpty(Window.Property(Leaderboards.Status))</visible>
 				<control type="label">
@@ -175,7 +190,7 @@
 					<label>$LOCALIZE[35344]</label>
 				</control>
 				<control type="label">
-					<left>146</left><top>0</top><width>440</width><height>30</height>
+					<left>96</left><top>0</top><width>440</width><height>30</height>
 					<font>font12</font><textcolor>blue</textcolor>
 					<label>$LOCALIZE[14200]</label>
 				</control>
@@ -205,10 +220,10 @@
 			</control>
 
 			<control type="list" id="3">
-				<top>164</top>
+				<top>184</top>
 				<left>20</left>
 				<width>1148</width>
-				<height>600</height>
+				<height>580</height>
 				<orientation>vertical</orientation>
 				<pagecontrol>62</pagecontrol>
 				<visible>String.IsEmpty(Window.Property(Leaderboards.Status))</visible>
@@ -236,22 +251,50 @@
 
 			<control type="scrollbar" id="62">
 				<left>1172</left>
-				<top>164</top>
+				<top>184</top>
 				<width>16</width>
-				<height>600</height>
+				<height>580</height>
 				<orientation>vertical</orientation>
 				<showonepage>false</showonepage>
 			</control>
 		</control>
 	</include>
 
+	<!-- One place on a leaderboard. Kodi hands the row a Medal property for the
+	     top three, so the colour is the skin's decision rather than a glyph
+	     baked into the label. -->
+	<include name="GameLeaderboardRank">
+		<param name="medal" default="" />
+		<param name="color" default="white" />
+		<definition>
+			<control type="label">
+				<left>10</left><top>0</top><width>80</width><height>50</height>
+				<aligny>center</aligny>
+				<font>font12</font>
+				<textcolor>$PARAM[color]</textcolor>
+				<label>$INFO[ListItem.Property(RankLabel)]</label>
+				<visible>String.IsEqual(ListItem.Property(Medal),$PARAM[medal])</visible>
+			</control>
+		</definition>
+	</include>
+
 	<include name="GameLeaderboardEntryRow">
-		<control type="label">
-			<left>10</left><top>0</top><width>80</width><height>50</height>
-			<aligny>center</aligny>
-			<font>font12</font>
-			<label>$INFO[ListItem.Property(RankLabel)]</label>
-		</control>
+		<include content="GameLeaderboardRank">
+			<param name="medal" value="gold" />
+			<param name="color" value="FFFFD24A" />
+		</include>
+		<include content="GameLeaderboardRank">
+			<param name="medal" value="silver" />
+			<param name="color" value="FFB9C6D2" />
+		</include>
+		<include content="GameLeaderboardRank">
+			<param name="medal" value="bronze" />
+			<param name="color" value="FFCD8B45" />
+		</include>
+		<include content="GameLeaderboardRank">
+			<param name="medal" value="" />
+			<param name="color" value="white" />
+		</include>
 		<!-- The player's RetroAchievements avatar, as the site shows it -->
 		<control type="image">
 			<left>96</left><top>7</top><width>36</width><height>36</height>
@@ -264,10 +307,20 @@
 			<font>font12</font>
 			<label>$INFO[ListItem.Label]</label>
 		</control>
+		<!-- "3 months ago" is taken in at a glance where a date has to be worked
+		     out against today's, but the date itself is what settles an argument,
+		     so both are here -->
 		<control type="label">
-			<left>600</left><top>0</top><width>280</width><height>50</height>
+			<left>600</left><top>4</top><width>280</width><height>20</height>
 			<aligny>center</aligny>
 			<font>font12</font>
+			<textcolor>FFC8C8C8</textcolor>
+			<label>$INFO[ListItem.Property(DateRelative)]</label>
+		</control>
+		<control type="label">
+			<left>600</left><top>26</top><width>280</width><height>20</height>
+			<aligny>center</aligny>
+			<font>font10</font>
 			<textcolor>FFC8C8C8</textcolor>
 			<label>$INFO[ListItem.Property(Date)]</label>
 		</control>
