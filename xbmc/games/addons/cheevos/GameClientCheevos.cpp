@@ -547,6 +547,12 @@ void CGameClientCheevos::SetEncoreModeEnabled(bool enabled)
 
 void CGameClientCheevos::OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show)
 {
+  // Logged because there is no other way to tell whether this ever fired: the
+  // indicator is a skin element that simply does not appear, which looks the
+  // same as the event never arriving
+  CLog::Log(LOGDEBUG, "CGameClientCheevos: challenge indicator {} for achievement {} \"{}\"",
+            show ? "shown" : "hidden", data.id, SafeString(data.title));
+
   // Published to the runtime rather than raised as a notification: this fires
   // and clears repeatedly during play, so it belongs in an on-screen indicator
   // the skin can show and hide, not in the notification queue
@@ -645,6 +651,11 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
 
 void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show)
 {
+  // Same reasoning as the challenge indicator: silence here is indistinguishable
+  // from the event never arriving
+  CLog::Log(LOGDEBUG, "CGameClientCheevos: leaderboard tracker {} = \"{}\"",
+            show ? "shown" : "hidden", SafeString(data.display));
+
   // Published to the runtime rather than raised as a notification: this updates
   // many times a second while an attempt runs, so it belongs in an on-screen
   // indicator the skin can show and hide
