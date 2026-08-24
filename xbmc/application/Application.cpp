@@ -1596,9 +1596,13 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
 
     // a new request, or a latched one-shot still awaiting service, marks the
     // window manager dirty so an otherwise-idle GUI really renders a frame to tap
+    bool captureWantsFrame = false;
     if (const auto captureService = CServiceBroker::GetCaptureService();
         captureService && captureService->LatchFrame())
+    {
+      captureWantsFrame = true;
       CServiceBroker::GetGUI()->GetWindowManager().MarkDirty();
+    }
 
     /*! @todo look into the possibility to use this for GBM
     int fps = 0;
@@ -1627,7 +1631,14 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
     // Dirty-driven skip: on paths with a persistent framebuffer (D2P plane or
     // HDR GUI compositing FBO), skip Render when no controls dirtied themselves
     // this frame. The persistence keeps the previous OSD on screen for free.
-    if (!m_skipGuiRender && appPlayer->IsRenderingVideoLayer() &&
+    //
+    // A pending capture is exempt. Marking the window manager dirty above is not
+    // enough on its own: it asks the active window to dirty itself, and the
+    // window shown over a video layer is precisely the one that declines to,
+    // which is what the skip is for. Without this a screenshot taken while a
+    // game or video is on its own plane is never serviced, and the request is
+    // abandoned without writing a file or reporting anything.
+    if (!m_skipGuiRender && !captureWantsFrame && appPlayer->IsRenderingVideoLayer() &&
         !CServiceBroker::GetGUI()->GetWindowManager().HasDirtyRegions())
       m_skipGuiRender = true;
     CServiceBroker::GetGUI()->GetWindowManager().FrameMove();
