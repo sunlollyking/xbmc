@@ -43,6 +43,9 @@ constexpr int CONTROL_LEADERBOARD_LIST = 3;
 //! How long to wait on RetroAchievements before giving up on one leaderboard
 constexpr int REQUEST_TIMEOUT_SECS = 10;
 
+constexpr const char* PATCH_URL =
+    "https://retroachievements.org/dorequest.php?r=patch&u={}&t={}&g={}";
+
 constexpr const char* LBINFO_URL =
     "https://retroachievements.org/dorequest.php?r=lbinfo&i={}&u={}&t={}&c=1&o=0";
 
@@ -79,6 +82,81 @@ std::string FormatScore(unsigned int score, const std::string& format)
 
   return std::to_string(score);
 }
+
+/*!
+ * \brief Fetches which leaderboards a game has, off the GUI thread
+ *
+ * Kodi's own patch fetch cannot be relied on for this: it derives the game from
+ * a hash it generates itself, and that fails outright for anything the add-on
+ * opened on its behalf - a ROM inside an archive or a plugin's cache. The
+ * add-on hashes it instead and hands the resolved id over when the game loads,
+ * so that is what this asks with.
+ */
+class CLeaderboardListJob : public CJob
+{
+public:
+  CLeaderboardListJob(unsigned int gameId, std::string username, std::string token)
+    : m_gameId(gameId), m_username(std::move(username)), m_token(std::move(token))
+  {
+  }
+
+  const char* GetType() const override { return "leaderboard-list"; }
+
+  bool DoWork() override
+  {
+    const std::string url = StringUtils::Format(PATCH_URL, CURL::Encode(m_username),
+                                                CURL::Encode(m_token), m_gameId);
+
+    XFILE::CCurlFile curl;
+    curl.SetTimeout(REQUEST_TIMEOUT_SECS);
+
+    std::string response;
+    if (!curl.Get(url, response))
+      return false;
+
+    CVariant data;
+    if (!CJSONVariantParser::Parse(response, data) || !data["Success"].asBoolean())
+      return false;
+
+    const CVariant& patch = data["PatchData"];
+    m_gameTitle = patch["Title"].asString();
+
+    const CVariant& leaderboards = patch["Leaderboards"];
+    if (!leaderboards.isArray())
+      return true;
+
+    for (auto it = leaderboards.begin_array(); it != leaderboards.end_array(); ++it)
+    {
+      const CVariant& leaderboard = *it;
+
+      // Retired or unfinished ones, which the site does not show either
+      if (leaderboard["Hidden"].asBoolean())
+        continue;
+
+      LeaderboardInfo info;
+      info.id = static_cast<unsigned int>(leaderboard["ID"].asUnsignedInteger());
+      info.title = leaderboard["Title"].asString();
+      info.description = leaderboard["Description"].asString();
+      info.format = leaderboard["Format"].asString();
+      info.lowerIsBetter = leaderboard["LowerIsBetter"].asBoolean();
+
+      m_leaderboards.push_back(std::move(info));
+    }
+
+    return true;
+  }
+
+  const std::string& GetGameTitle() const { return m_gameTitle; }
+  const std::vector<LeaderboardInfo>& GetLeaderboards() const { return m_leaderboards; }
+
+private:
+  const unsigned int m_gameId;
+  const std::string m_username;
+  const std::string m_token;
+
+  std::string m_gameTitle;
+  std::vector<LeaderboardInfo> m_leaderboards;
+};
 
 /*!
  * \brief Fetches the standings of one leaderboard, off the GUI thread
@@ -202,10 +280,13 @@ void CDialogGameLeaderboards::OnInitWindow()
     return;
   }
 
-  const LeaderboardState state =
-      CServiceBroker::GetGameServices().AchievementRuntime().GetLeaderboardState();
+  const auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+  const LeaderboardState state = runtime.GetLeaderboardState();
+  const unsigned int gameId = runtime.GetState().gameId;
 
-  if (!state.loaded || state.leaderboards.empty())
+  // Nothing to show and nothing to ask with: no game, or one RetroAchievements
+  // does not know
+  if (state.leaderboards.empty() && gameId == 0)
   {
     // "Leaderboards", "This game has no leaderboards"
     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, strings.Get(35331),
@@ -223,7 +304,16 @@ void CDialogGameLeaderboards::OnInitWindow()
   if (m_lastSelected >= 0)
     m_viewControl.SetSelectedItem(m_lastSelected);
 
-  FetchStandings();
+  if (state.leaderboards.empty())
+  {
+    // "Loading standings…" while the list itself is fetched
+    SetProperty("Leaderboards.Status", strings.Get(35342));
+    FetchList(gameId);
+  }
+  else
+  {
+    FetchStandings();
+  }
 }
 
 void CDialogGameLeaderboards::OnDeinitWindow(int nextWindowID)
@@ -239,6 +329,18 @@ void CDialogGameLeaderboards::OnDeinitWindow(int nextWindowID)
   m_viewControl.Clear();
 
   CGUIDialog::OnDeinitWindow(nextWindowID);
+}
+
+void CDialogGameLeaderboards::FetchList(unsigned int gameId)
+{
+  const auto& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+
+  const std::string username = gameSettings.GetRAUsername();
+  const std::string token = gameSettings.GetRAToken();
+  if (username.empty() || token.empty())
+    return;
+
+  AddJob(new CLeaderboardListJob(gameId, username, token));
 }
 
 void CDialogGameLeaderboards::FetchStandings()
@@ -265,7 +367,29 @@ void CDialogGameLeaderboards::FetchStandings()
 
 void CDialogGameLeaderboards::OnJobComplete(unsigned int jobID, bool success, CJob* job)
 {
-  if (success && StringUtils::EqualsNoCase(job->GetType(), "leaderboard-standings"))
+  if (StringUtils::EqualsNoCase(job->GetType(), "leaderboard-list"))
+  {
+    const auto* listJob = static_cast<CLeaderboardListJob*>(job);
+
+    auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+
+    LeaderboardState fetched;
+    fetched.gameTitle = listJob->GetGameTitle();
+    fetched.leaderboards = listJob->GetLeaderboards();
+    fetched.loaded = success;
+    runtime.SetLeaderboardState(fetched);
+
+    CLog::Log(LOGINFO, "CDialogGameLeaderboards: {} leaderboard(s) for this game",
+              fetched.leaderboards.size());
+
+    CGUIMessage refresh(GUI_MSG_NOTIFY_ALL, GetID(), 0, GUI_MSG_REFRESH_LIST);
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(refresh, GetID());
+
+    // Now that there is a list, fill in where everyone stands on each
+    if (success && !fetched.leaderboards.empty())
+      FetchStandings();
+  }
+  else if (success && StringUtils::EqualsNoCase(job->GetType(), "leaderboard-standings"))
   {
     const auto* standings = static_cast<CLeaderboardStandingsJob*>(job);
 
@@ -408,5 +532,11 @@ void CDialogGameLeaderboards::PopulateList()
 
   lock.unlock();
 
+  const bool empty = m_items.IsEmpty();
+
   m_viewControl.SetItems(m_items);
+
+  // "This game has no leaderboards" once the fetch has been and gone
+  SetProperty("Leaderboards.Status",
+              empty ? CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35334) : "");
 }
