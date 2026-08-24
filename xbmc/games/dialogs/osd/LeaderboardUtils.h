@@ -93,5 +93,17 @@ void SaveLeaderboardEntries(unsigned int leaderboardId,
  */
 bool LoadLeaderboardEntries(unsigned int leaderboardId, std::vector<LeaderboardEntry>& entries);
 
+/*!
+ * \ingroup games
+ *
+ * \brief Forget a leaderboard's kept standings
+ *
+ * Called when the player's own standing on it changes. The kept page was
+ * fetched before they submitted, so it is wrong rather than merely old, and
+ * leaving it would show them a table they are no longer in the right place in
+ * until it aged out a week later.
+ */
+void ForgetLeaderboardEntries(unsigned int leaderboardId);
+
 } // namespace GAME
 } // namespace KODI
