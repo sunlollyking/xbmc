@@ -164,7 +164,11 @@ void CGUIWindowGameManual::OnDeinitWindow(int nextWindowID)
   // keep it once it is off screen
   m_pages.reset();
 
-  ClearProperties();
+  // Only ours: ClearProperties() would take the window's own "xmlfile" with
+  // them, and AllocResources reloads the skin file from that property. Wiping
+  // it leaves the window unable to load after the next skin change - it inits
+  // with no XML, draws nothing, and logs no error at all.
+  ClearManualProperties();
 
   m_manualPath.clear();
   m_page = 0;
@@ -444,6 +448,14 @@ void CGUIWindowGameManual::Process(unsigned int currentTime, CDirtyRegionList& d
   ApplyZoom();
 
   CGUIWindow::Process(currentTime, dirtyregions);
+}
+
+void CGUIWindowGameManual::ClearManualProperties()
+{
+  for (const char* property : {PROPERTY_IMAGE, PROPERTY_PAGE, PROPERTY_PAGE_COUNT,
+                               PROPERTY_PAGE_LABEL, PROPERTY_TITLE, PROPERTY_STATUS,
+                               PROPERTY_ZOOM_LABEL})
+    SetProperty(property, "");
 }
 
 void CGUIWindowGameManual::UpdateProperties()
