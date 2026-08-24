@@ -139,6 +139,9 @@ private:
    */
   void UpdateProperties();
 
+  //! Clears only the properties this window sets
+  void ClearManualProperties();
+
   /*!
    * \brief Show the placeholder while the document is being read
    */
