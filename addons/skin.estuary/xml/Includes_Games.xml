@@ -1,5 +1,275 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+	<!-- The leaderboards of the game being played. Browsing only: a score can
+	     only be submitted in hardcore mode, which RetroAchievements grants an
+	     emulator once it has been approved. -->
+	<include name="GameDialogLeaderboards">
+		<control type="image">
+			<left>0</left>
+			<top>0</top>
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="CC000000">colors/white.png</texture>
+		</control>
+		<control type="group">
+			<centertop>50%</centertop>
+			<centerleft>50%</centerleft>
+			<width>1200</width>
+			<height>810</height>
+
+			<include content="DialogBackgroundCommons">
+				<param name="width" value="1200" />
+				<param name="height" value="810" />
+				<param name="header_label" value="$LOCALIZE[35331]" />
+				<param name="header_id" value="2" />
+			</include>
+
+			<control type="label">
+				<left>20</left>
+				<top>84</top>
+				<width>1148</width>
+				<height>30</height>
+				<align>center</align>
+				<font>font12</font>
+				<textcolor>FFC8C8C8</textcolor>
+				<label>$INFO[RetroPlayer.Title]</label>
+			</control>
+
+			<control type="list" id="3">
+				<top>124</top>
+				<left>20</left>
+				<width>1148</width>
+				<height>590</height>
+				<orientation>vertical</orientation>
+				<pagecontrol>62</pagecontrol>
+				<scrolltime tween="sine" easing="out">200</scrolltime>
+
+				<itemlayout width="1148" height="110">
+					<control type="image">
+						<left>0</left><top>2</top><width>1148</width><height>106</height>
+						<texture colordiffuse="22FFFFFF">colors/white.png</texture>
+					</control>
+					<include content="GameLeaderboardRow" />
+				</itemlayout>
+
+				<focusedlayout width="1148" height="110">
+					<control type="image">
+						<left>0</left><top>2</top><width>1148</width><height>106</height>
+						<texture colordiffuse="button_focus">colors/white.png</texture>
+					</control>
+					<include content="GameLeaderboardRow" />
+				</focusedlayout>
+			</control>
+
+			<control type="scrollbar" id="62">
+				<left>1172</left>
+				<top>124</top>
+				<width>16</width>
+				<height>590</height>
+				<orientation>vertical</orientation>
+				<showonepage>false</showonepage>
+			</control>
+
+			<!-- Said once, at the foot, rather than on every row -->
+			<control type="label">
+				<left>20</left>
+				<top>730</top>
+				<width>1148</width>
+				<height>40</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font12</font>
+				<textcolor>FFC8C8C8</textcolor>
+				<label>$LOCALIZE[35332]</label>
+			</control>
+		</control>
+	</include>
+
+	<!-- One row of the leaderboards list, shared by both layouts so the focused
+	     and unfocused versions cannot drift apart -->
+	<include name="GameLeaderboardRow">
+		<control type="label">
+			<left>15</left><top>8</top><width>760</width><height>35</height>
+			<font>font25_title</font>
+			<label>$INFO[ListItem.Label]</label>
+		</control>
+		<control type="label">
+			<left>15</left><top>46</top><width>600</width><height>26</height>
+			<font>font12</font>
+			<textcolor>blue</textcolor>
+			<label>$INFO[ListItem.Property(Format)]</label>
+		</control>
+		<control type="label">
+			<left>15</left><top>74</top><width>760</width><height>26</height>
+			<font>font12</font>
+			<textcolor>FFC8C8C8</textcolor>
+			<label>$INFO[ListItem.Label2]</label>
+		</control>
+
+		<control type="label">
+			<right>15</right><top>8</top><width>340</width><height>35</height>
+			<align>right</align>
+			<font>font25_title</font>
+			<label>$INFO[ListItem.Property(TopScore)]</label>
+		</control>
+		<control type="label">
+			<right>15</right><top>46</top><width>340</width><height>26</height>
+			<align>right</align>
+			<font>font12</font>
+			<textcolor>FFC8C8C8</textcolor>
+			<label>$INFO[ListItem.Property(TopUsername)]</label>
+		</control>
+		<control type="label">
+			<right>15</right><top>74</top><width>340</width><height>26</height>
+			<align>right</align>
+			<font>font12</font>
+			<textcolor>FFC8C8C8</textcolor>
+			<label>$INFO[ListItem.Property(PlayerRank)]$INFO[ListItem.Property(TotalEntries),  ·  ,]</label>
+		</control>
+	</include>
+
+	<!-- The standings of one leaderboard -->
+	<include name="GameDialogLeaderboardEntries">
+		<control type="image">
+			<left>0</left>
+			<top>0</top>
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="CC000000">colors/white.png</texture>
+		</control>
+		<control type="group">
+			<centertop>50%</centertop>
+			<centerleft>50%</centerleft>
+			<width>1200</width>
+			<height>810</height>
+
+			<include content="DialogBackgroundCommons">
+				<param name="width" value="1200" />
+				<param name="height" value="810" />
+				<param name="header_label" value="$INFO[Window.Property(Leaderboards.Title)]" />
+				<param name="header_id" value="2" />
+			</include>
+
+			<control type="label">
+				<left>20</left>
+				<top>84</top>
+				<width>1148</width>
+				<height>30</height>
+				<align>center</align>
+				<font>font12</font>
+				<textcolor>FFC8C8C8</textcolor>
+				<label>$INFO[Window.Property(Leaderboards.Description)]</label>
+			</control>
+
+			<!-- Column headings -->
+			<control type="group">
+				<top>126</top>
+				<left>20</left>
+				<visible>String.IsEmpty(Window.Property(Leaderboards.Status))</visible>
+				<control type="label">
+					<left>10</left><width>110</width><height>30</height>
+					<font>font12</font><textcolor>blue</textcolor>
+					<label>$LOCALIZE[35344]</label>
+				</control>
+				<control type="label">
+					<left>130</left><width>500</width><height>30</height>
+					<font>font12</font><textcolor>blue</textcolor>
+					<label>$LOCALIZE[14200]</label>
+				</control>
+				<control type="label">
+					<left>640</left><width>260</width><height>30</height>
+					<font>font12</font><textcolor>blue</textcolor>
+					<label>$LOCALIZE[552]</label>
+				</control>
+				<control type="label">
+					<right>15</right><width>240</width><height>30</height>
+					<align>right</align>
+					<font>font12</font><textcolor>blue</textcolor>
+					<label>$LOCALIZE[35345]</label>
+				</control>
+			</control>
+
+			<control type="label">
+				<left>20</left>
+				<top>300</top>
+				<width>1148</width>
+				<height>40</height>
+				<align>center</align>
+				<font>font13</font>
+				<textcolor>white</textcolor>
+				<label>$INFO[Window.Property(Leaderboards.Status)]</label>
+				<visible>!String.IsEmpty(Window.Property(Leaderboards.Status))</visible>
+			</control>
+
+			<control type="list" id="3">
+				<top>164</top>
+				<left>20</left>
+				<width>1148</width>
+				<height>600</height>
+				<orientation>vertical</orientation>
+				<pagecontrol>62</pagecontrol>
+				<visible>String.IsEmpty(Window.Property(Leaderboards.Status))</visible>
+				<scrolltime tween="sine" easing="out">200</scrolltime>
+
+				<itemlayout width="1148" height="50">
+					<!-- The player's own row is tinted, so it can be found without
+					     reading down the table -->
+					<control type="image">
+						<left>0</left><top>1</top><width>1148</width><height>48</height>
+						<texture colordiffuse="33FFFFFF">colors/white.png</texture>
+						<visible>!String.IsEmpty(ListItem.Property(IsPlayer))</visible>
+					</control>
+					<include content="GameLeaderboardEntryRow" />
+				</itemlayout>
+
+				<focusedlayout width="1148" height="50">
+					<control type="image">
+						<left>0</left><top>1</top><width>1148</width><height>48</height>
+						<texture colordiffuse="button_focus">colors/white.png</texture>
+					</control>
+					<include content="GameLeaderboardEntryRow" />
+				</focusedlayout>
+			</control>
+
+			<control type="scrollbar" id="62">
+				<left>1172</left>
+				<top>164</top>
+				<width>16</width>
+				<height>600</height>
+				<orientation>vertical</orientation>
+				<showonepage>false</showonepage>
+			</control>
+		</control>
+	</include>
+
+	<include name="GameLeaderboardEntryRow">
+		<control type="label">
+			<left>10</left><width>110</width><height>50</height>
+			<aligny>center</aligny>
+			<font>font12</font>
+			<label>$INFO[ListItem.Property(RankLabel)]</label>
+		</control>
+		<control type="label">
+			<left>130</left><width>500</width><height>50</height>
+			<aligny>center</aligny>
+			<font>font12</font>
+			<label>$INFO[ListItem.Label]</label>
+		</control>
+		<control type="label">
+			<left>640</left><width>260</width><height>50</height>
+			<aligny>center</aligny>
+			<font>font12</font>
+			<textcolor>FFC8C8C8</textcolor>
+			<label>$INFO[ListItem.Property(Date)]</label>
+		</control>
+		<control type="label">
+			<right>15</right><width>240</width><height>50</height>
+			<align>right</align><aligny>center</aligny>
+			<font>font12</font>
+			<label>$INFO[ListItem.Label2]</label>
+		</control>
+	</include>
+
 	<!-- One field of a manual offered for download. Sits in a grouplist, so a
 	     field the catalogue knows nothing about takes no room at all rather
 	     than leaving a labelled blank. -->

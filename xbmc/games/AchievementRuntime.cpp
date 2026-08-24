@@ -22,6 +22,11 @@ void CAchievementRuntime::Clear()
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_state = AchievementState{};
+
+  // The leaderboards belong to the game that just went away too, and a stale
+  // selection would point the entries dialog at nothing
+  m_leaderboards = LeaderboardState{};
+  m_selectedLeaderboard = 0;
 }
 
 AchievementState CAchievementRuntime::GetState() const
@@ -133,4 +138,46 @@ unsigned int CAchievementRuntime::GetUnlockedAchievements() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_state.unlockedAchievements;
+}
+
+void CAchievementRuntime::SetLeaderboardState(const LeaderboardState& state)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_leaderboards = state;
+}
+
+LeaderboardState CAchievementRuntime::GetLeaderboardState() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_leaderboards;
+}
+
+bool CAchievementRuntime::SetLeaderboardEntries(unsigned int leaderboardId,
+                                                const std::vector<LeaderboardEntry>& entries)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  for (LeaderboardInfo& leaderboard : m_leaderboards.leaderboards)
+  {
+    if (leaderboard.id != leaderboardId)
+      continue;
+
+    leaderboard.entries = entries;
+    return true;
+  }
+
+  // The game changed while the standings were being fetched
+  return false;
+}
+
+void CAchievementRuntime::SetSelectedLeaderboard(unsigned int leaderboardId)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_selectedLeaderboard = leaderboardId;
+}
+
+unsigned int CAchievementRuntime::GetSelectedLeaderboard() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_selectedLeaderboard;
 }

@@ -1293,6 +1293,79 @@ extern "C"
   //----------------------------------------------------------------------------
 
   //============================================================================
+  /// @brief **Payload of the leaderboard attempt callbacks**
+  ///
+  /// A leaderboard is a scored challenge within a game - fastest lap, highest
+  /// score on a level. The client watches memory for the conditions that start
+  /// one, and either submits a value or gives up when it ends.
+  ///
+  typedef struct game_rc_leaderboard
+  {
+    /// @brief Unique RetroAchievements ID of the leaderboard
+    unsigned int id;
+
+    /// @brief Title of the leaderboard, or `NULL` if unknown
+    const char* title;
+
+    /// @brief Description of what is being measured, or `NULL`
+    const char* description;
+
+    /// @brief The value as it stands, already formatted for display, or `NULL`
+    ///
+    /// Leaderboards are scored in different units - seconds, points, frames -
+    /// and the client formats the raw value accordingly, so this is shown as
+    /// given rather than interpreted.
+    const char* value;
+  } ATTR_PACKED game_rc_leaderboard;
+  //----------------------------------------------------------------------------
+
+  //============================================================================
+  /// @brief **Payload of @ref AddonToKodiFuncTable_Game::RCOnLeaderboardScoreboard**
+  ///
+  /// Sent once the server has said where a submitted attempt placed. Separate
+  /// from the submitted callback because it arrives later, and may not arrive.
+  ///
+  typedef struct game_rc_leaderboard_scoreboard
+  {
+    /// @brief Unique RetroAchievements ID of the leaderboard
+    unsigned int id;
+
+    /// @brief The value that was submitted, formatted for display, or `NULL`
+    const char* submitted_score;
+
+    /// @brief The player's best value on this leaderboard, or `NULL`
+    ///
+    /// Not always the value just submitted: a worse attempt still gets a
+    /// scoreboard, and leaves the player's standing where it was.
+    const char* best_score;
+
+    /// @brief The player's rank after the submission, counting from one
+    unsigned int new_rank;
+
+    /// @brief How many entries the leaderboard holds
+    unsigned int num_entries;
+  } ATTR_PACKED game_rc_leaderboard_scoreboard;
+  //----------------------------------------------------------------------------
+
+  //============================================================================
+  /// @brief **Payload of the leaderboard tracker callbacks**
+  ///
+  /// While an attempt runs the client publishes a live value to show on screen.
+  ///
+  typedef struct game_rc_leaderboard_tracker
+  {
+    /// @brief Identifies the tracker, not the leaderboard
+    ///
+    /// Two leaderboards measuring the same thing share one tracker, so this
+    /// cannot be used to look a leaderboard up.
+    unsigned int id;
+
+    /// @brief The value as it stands, formatted for display, or `NULL`
+    const char* display;
+  } ATTR_PACKED game_rc_leaderboard_tracker;
+  //----------------------------------------------------------------------------
+
+  //============================================================================
   /// @brief **Payload of @ref AddonToKodiFuncTable_Game::RCOnLoginResult**
   ///
   typedef struct game_rc_login_result
@@ -1493,6 +1566,54 @@ extern "C"
      * not allow a session started in casual mode to continue into hardcore.
      */
     void (*RCOnReset)(KODI_HANDLE kodiInstance);
+
+    /*!
+     * @brief A leaderboard attempt has begun
+     *
+     * @note Added in Game API 7.6.0, appended so that add-ons built against
+     *       7.5.0 keep the offsets they were compiled with
+     */
+    void (*RCOnLeaderboardStarted)(KODI_HANDLE kodiInstance,
+                                   const struct game_rc_leaderboard* data);
+
+    /*!
+     * @brief A leaderboard attempt ended without a submission
+     *
+     * The usual case, and not an error: the player crashed, died or otherwise
+     * broke the conditions the leaderboard was watching for.
+     */
+    void (*RCOnLeaderboardFailed)(KODI_HANDLE kodiInstance,
+                                  const struct game_rc_leaderboard* data);
+
+    /*!
+     * @brief A leaderboard attempt completed and its value was sent
+     */
+    void (*RCOnLeaderboardSubmitted)(KODI_HANDLE kodiInstance,
+                                     const struct game_rc_leaderboard* data);
+
+    /*!
+     * @brief The server said where a submitted attempt placed
+     */
+    void (*RCOnLeaderboardScoreboard)(KODI_HANDLE kodiInstance,
+                                      const struct game_rc_leaderboard_scoreboard* data);
+
+    /*!
+     * @brief A live value should be shown for a running attempt
+     */
+    void (*RCOnLeaderboardTrackerShow)(KODI_HANDLE kodiInstance,
+                                       const struct game_rc_leaderboard_tracker* data);
+
+    /*!
+     * @brief A live value has changed
+     */
+    void (*RCOnLeaderboardTrackerUpdate)(KODI_HANDLE kodiInstance,
+                                         const struct game_rc_leaderboard_tracker* data);
+
+    /*!
+     * @brief A live value should stop being shown
+     */
+    void (*RCOnLeaderboardTrackerHide)(KODI_HANDLE kodiInstance,
+                                       const struct game_rc_leaderboard_tracker* data);
   } AddonToKodiFuncTable_Game;
 
   /*!
