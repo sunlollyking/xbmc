@@ -16,6 +16,9 @@ struct game_rc_achievement_challenge;
 struct game_rc_achievement_progress;
 struct game_rc_achievement_triggered;
 struct game_rc_game_loaded;
+struct game_rc_leaderboard;
+struct game_rc_leaderboard_scoreboard;
+struct game_rc_leaderboard_tracker;
 struct game_rc_login_result;
 
 namespace KODI
@@ -81,6 +84,11 @@ public:
   void OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show);
   void OnSubsetCompleted(const std::string& title);
   void OnReset();
+  void OnLeaderboardStarted(const game_rc_leaderboard& data);
+  void OnLeaderboardFailed(const game_rc_leaderboard& data);
+  void OnLeaderboardSubmitted(const game_rc_leaderboard& data);
+  void OnLeaderboardScoreboard(const game_rc_leaderboard_scoreboard& data);
+  void OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show);
   //@}
 
   /*!

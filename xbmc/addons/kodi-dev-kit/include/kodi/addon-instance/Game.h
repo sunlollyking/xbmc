@@ -1358,6 +1358,109 @@ public:
   ///
   void KodiRCOnReset() { m_instanceData->toKodi->RCOnReset(m_instanceData->toKodi->kodiInstance); }
 
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Notify Kodi that an attempt at a leaderboard has begun
+  ///
+  /// @param[in] data The leaderboard being attempted
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.6.0
+  ///
+  void KodiRCOnLeaderboardStarted(const game_rc_leaderboard& data)
+  {
+    m_instanceData->toKodi->RCOnLeaderboardStarted(m_instanceData->toKodi->kodiInstance, &data);
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Notify Kodi that an attempt at a leaderboard has been abandoned
+  ///
+  /// @param[in] data The leaderboard that was being attempted
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.6.0
+  ///
+  void KodiRCOnLeaderboardFailed(const game_rc_leaderboard& data)
+  {
+    m_instanceData->toKodi->RCOnLeaderboardFailed(m_instanceData->toKodi->kodiInstance, &data);
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Notify Kodi that a leaderboard value has been sent to the server
+  ///
+  /// Where it placed arrives later, through
+  /// @ref KodiRCOnLeaderboardScoreboard, and may not arrive at all.
+  ///
+  /// @param[in] data The leaderboard and the value submitted
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.6.0
+  ///
+  void KodiRCOnLeaderboardSubmitted(const game_rc_leaderboard& data)
+  {
+    m_instanceData->toKodi->RCOnLeaderboardSubmitted(m_instanceData->toKodi->kodiInstance, &data);
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Tell Kodi where a submitted attempt placed
+  ///
+  /// @param[in] data The new standing
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.6.0
+  ///
+  void KodiRCOnLeaderboardScoreboard(const game_rc_leaderboard_scoreboard& data)
+  {
+    m_instanceData->toKodi->RCOnLeaderboardScoreboard(m_instanceData->toKodi->kodiInstance, &data);
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Show, update or hide the live value of an attempt in progress
+  ///
+  /// Show and update are separate events in the runtime but the same thing on
+  /// screen, so both set the value; hide removes it.
+  ///
+  /// @param[in] data The tracker and its current value
+  /// @param[in] show True to show or update it, false to hide it
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.6.0
+  ///
+  void KodiRCOnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show)
+  {
+    if (show)
+      m_instanceData->toKodi->RCOnLeaderboardTrackerShow(m_instanceData->toKodi->kodiInstance,
+                                                         &data);
+    else
+      m_instanceData->toKodi->RCOnLeaderboardTrackerHide(m_instanceData->toKodi->kodiInstance,
+                                                         &data);
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Give Kodi a new value for an attempt already on screen
+  ///
+  /// @param[in] data The tracker and its current value
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.6.0
+  ///
+  void KodiRCOnLeaderboardTrackerUpdate(const game_rc_leaderboard_tracker& data)
+  {
+    m_instanceData->toKodi->RCOnLeaderboardTrackerUpdate(m_instanceData->toKodi->kodiInstance,
+                                                         &data);
+  }
+
   //----------------------------------------------------------------------------
 
   ///@}
@@ -1955,7 +2058,7 @@ private:
   }
 
   inline static GAME_ERROR ADDON_RCSetHardcoreEnabled(const AddonInstance_Game* instance,
-                                                     bool enabled)
+                                                      bool enabled)
   {
     return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
         ->RCSetHardcoreEnabled(enabled);

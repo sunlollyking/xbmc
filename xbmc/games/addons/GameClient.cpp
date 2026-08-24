@@ -223,6 +223,13 @@ bool CGameClient::Initialize(void)
   m_ifc.game->toKodi->RCOnChallengeIndicator = cb_rc_on_challenge_indicator;
   m_ifc.game->toKodi->RCOnSubsetCompleted = cb_rc_on_subset_completed;
   m_ifc.game->toKodi->RCOnReset = cb_rc_on_reset;
+  m_ifc.game->toKodi->RCOnLeaderboardStarted = cb_rc_on_leaderboard_started;
+  m_ifc.game->toKodi->RCOnLeaderboardFailed = cb_rc_on_leaderboard_failed;
+  m_ifc.game->toKodi->RCOnLeaderboardSubmitted = cb_rc_on_leaderboard_submitted;
+  m_ifc.game->toKodi->RCOnLeaderboardScoreboard = cb_rc_on_leaderboard_scoreboard;
+  m_ifc.game->toKodi->RCOnLeaderboardTrackerShow = cb_rc_on_leaderboard_tracker_show;
+  m_ifc.game->toKodi->RCOnLeaderboardTrackerUpdate = cb_rc_on_leaderboard_tracker_update;
+  m_ifc.game->toKodi->RCOnLeaderboardTrackerHide = cb_rc_on_leaderboard_tracker_hide;
 
   memset(m_ifc.game->toAddon, 0, sizeof(KodiToAddonFuncTable_Game));
 
@@ -298,7 +305,7 @@ bool CGameClient::OpenFile(const CFileItem& file,
     {
       CClientFrameScope hwScope(Streams());
       LogError(error = m_ifc.game->toAddon->LoadGame(m_ifc.game, path.c_str()), "LoadGame()");
-      }
+    }
   }
   catch (...)
   {
@@ -343,7 +350,7 @@ bool CGameClient::OpenStandalone(RETRO::IStreamManager& streamManager, IGameInpu
     {
       CClientFrameScope hwScope(Streams());
       LogError(error = m_ifc.game->toAddon->LoadStandalone(m_ifc.game), "LoadStandalone()");
-      }
+    }
   }
   catch (...)
   {
@@ -437,8 +444,8 @@ bool CGameClient::LoadGameInfo()
   // rate leaves the loop with nothing to pace against, so it runs as fast as
   // the machine allows; one declaring no sample rate gets no audio stream, so
   // it plays silently. Both look like emulator faults from the outside.
-  CLog::Log(LOGINFO, "GameClient: {} declares {:.3f} fps, {:.0f} Hz audio", ID(),
-            timingInfo.fps, timingInfo.sample_rate);
+  CLog::Log(LOGINFO, "GameClient: {} declares {:.3f} fps, {:.0f} Hz audio", ID(), timingInfo.fps,
+            timingInfo.sample_rate);
 
   if (timingInfo.fps <= 0.0)
     CLog::Log(LOGERROR, "GameClient: {} declared no frame rate, the game will not be paced", ID());
@@ -495,14 +502,18 @@ void CGameClient::NotifyError(GAME_ERROR error)
       // This game renders with {0:s}, but this system only provides {1:s}. ...
       MESSAGING::HELPERS::ShowOKDialogText(
           CVariant{35210},
-          CVariant{StringUtils::Format(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35299), wanted, available)});
+          CVariant{StringUtils::Format(
+              CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35299), wanted,
+              available)});
     }
     else if (!wanted.empty())
     {
       // Failed to play game
       // This game renders with {0:s}, which isn't available on this display. ...
       MESSAGING::HELPERS::ShowOKDialogText(
-          CVariant{35210}, CVariant{StringUtils::Format(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35300), wanted)});
+          CVariant{35210},
+          CVariant{StringUtils::Format(
+              CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35300), wanted)});
     }
     else
     {
@@ -567,8 +578,8 @@ void CGameClient::Reset()
     try
     {
       {
-      CClientFrameScope hwScope(Streams());
-      LogError(m_ifc.game->toAddon->Reset(m_ifc.game), "Reset()");
+        CClientFrameScope hwScope(Streams());
+        LogError(m_ifc.game->toAddon->Reset(m_ifc.game), "Reset()");
       }
     }
     catch (...)
@@ -602,17 +613,17 @@ void CGameClient::CloseFile()
     try
     {
       {
-      CClientFrameScope hwScope(Streams());
+        CClientFrameScope hwScope(Streams());
 
-      // Tell a hardware-rendering client its context is going before the game
-      // is unloaded, rather than when the stream closes underneath the unload.
-      // Both happen inside this scope, so the context stays current for the
-      // client's cleanup and for whatever unloading the game does after it --
-      // but a client told only afterwards has already dismantled the state its
-      // context_destroy then walks, and YabaSanshiro segfaults exactly there.
-      Streams().DestroyHwContext();
+        // Tell a hardware-rendering client its context is going before the game
+        // is unloaded, rather than when the stream closes underneath the unload.
+        // Both happen inside this scope, so the context stays current for the
+        // client's cleanup and for whatever unloading the game does after it --
+        // but a client told only afterwards has already dismantled the state its
+        // context_destroy then walks, and YabaSanshiro segfaults exactly there.
+        Streams().DestroyHwContext();
 
-      LogError(m_ifc.game->toAddon->UnloadGame(m_ifc.game), "UnloadGame()");
+        LogError(m_ifc.game->toAddon->UnloadGame(m_ifc.game), "UnloadGame()");
       }
     }
     catch (...)
@@ -643,18 +654,18 @@ void CGameClient::RunFrame()
     try
     {
       {
-      CClientFrameScope hwScope(Streams());
-      LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()");
+        CClientFrameScope hwScope(Streams());
+        LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()");
 
-      // A client using the asynchronous audio interface produces no audio of
-      // its own accord: it waits to be asked, once per frame, and writes what
-      // it has from this thread. One that is never asked is silent, and since
-      // the frame rate is paced against the audio it delivers, it also runs as
-      // fast as the machine allows. Clients on the ordinary synchronous path
-      // answer this with GAME_ERROR_NOT_IMPLEMENTED and are unaffected.
-      const GAME_ERROR audioError = m_ifc.game->toAddon->AudioAvailable(m_ifc.game);
-      if (audioError != GAME_ERROR_NO_ERROR && audioError != GAME_ERROR_NOT_IMPLEMENTED)
-        LogError(audioError, "AudioAvailable()");
+        // A client using the asynchronous audio interface produces no audio of
+        // its own accord: it waits to be asked, once per frame, and writes what
+        // it has from this thread. One that is never asked is silent, and since
+        // the frame rate is paced against the audio it delivers, it also runs as
+        // fast as the machine allows. Clients on the ordinary synchronous path
+        // answer this with GAME_ERROR_NOT_IMPLEMENTED and are unaffected.
+        const GAME_ERROR audioError = m_ifc.game->toAddon->AudioAvailable(m_ifc.game);
+        if (audioError != GAME_ERROR_NO_ERROR && audioError != GAME_ERROR_NOT_IMPLEMENTED)
+          LogError(audioError, "AudioAvailable()");
       }
       m_hasFrameRun = true;
     }
@@ -814,7 +825,7 @@ void CGameClient::HardwareContextReset()
     {
       CClientFrameScope hwScope(Streams());
       LogError(m_ifc.game->toAddon->HwContextReset(m_ifc.game), "HwContextReset()");
-      }
+    }
   }
   catch (...)
   {
@@ -829,7 +840,7 @@ void CGameClient::HardwareContextDestroy()
     {
       CClientFrameScope hwScope(Streams());
       LogError(m_ifc.game->toAddon->HwContextDestroy(m_ifc.game), "HwContextDestroy()");
-      }
+    }
   }
   catch (...)
   {
@@ -1085,6 +1096,77 @@ void CGameClient::cb_rc_on_reset(KODI_HANDLE kodiInstance)
     return;
 
   gameClient->Cheevos().OnReset();
+}
+
+void CGameClient::cb_rc_on_leaderboard_started(KODI_HANDLE kodiInstance,
+                                               const game_rc_leaderboard* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnLeaderboardStarted(*data);
+}
+
+void CGameClient::cb_rc_on_leaderboard_failed(KODI_HANDLE kodiInstance,
+                                              const game_rc_leaderboard* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnLeaderboardFailed(*data);
+}
+
+void CGameClient::cb_rc_on_leaderboard_submitted(KODI_HANDLE kodiInstance,
+                                                 const game_rc_leaderboard* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnLeaderboardSubmitted(*data);
+}
+
+void CGameClient::cb_rc_on_leaderboard_scoreboard(KODI_HANDLE kodiInstance,
+                                                  const game_rc_leaderboard_scoreboard* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnLeaderboardScoreboard(*data);
+}
+
+void CGameClient::cb_rc_on_leaderboard_tracker_show(KODI_HANDLE kodiInstance,
+                                                    const game_rc_leaderboard_tracker* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnLeaderboardTracker(*data, true);
+}
+
+void CGameClient::cb_rc_on_leaderboard_tracker_update(KODI_HANDLE kodiInstance,
+                                                      const game_rc_leaderboard_tracker* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  // An update to a tracker that was never shown is still a tracker to show
+  gameClient->Cheevos().OnLeaderboardTracker(*data, true);
+}
+
+void CGameClient::cb_rc_on_leaderboard_tracker_hide(KODI_HANDLE kodiInstance,
+                                                    const game_rc_leaderboard_tracker* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnLeaderboardTracker(*data, false);
 }
 
 std::pair<std::string, std::string> CGameClient::ParseLibretroName(const std::string& addonName)

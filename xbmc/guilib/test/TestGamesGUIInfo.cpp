@@ -66,6 +66,90 @@ TEST_F(TestGamesGUIInfo, TranslatesRetroPlayerLabels)
             RETROPLAYER_ACHIEVEMENTS_LOGGED_IN);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsProgress"),
             RETROPLAYER_ACHIEVEMENTS_PROGRESS);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.LeaderboardTracker"),
+            RETROPLAYER_LEADERBOARD_TRACKER);
+}
+
+TEST_F(TestGamesGUIInfo, LeaderboardTrackerIsEmptyWithNoAttemptRunning)
+{
+  CAchievementRuntime achievementRuntime;
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+  std::string value{"stale"};
+
+  EXPECT_TRUE(
+      gamesGUIInfo.GetLabel(value, nullptr, 0, CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER), nullptr));
+  EXPECT_TRUE(value.empty());
+}
+
+TEST_F(TestGamesGUIInfo, LeaderboardTrackerShowsTheRunningAttempt)
+{
+  CAchievementRuntime achievementRuntime;
+
+  LeaderboardTracker tracker;
+  tracker.id = 4;
+  tracker.display = "1:24.60";
+  achievementRuntime.SetLeaderboardTracker(tracker, true);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+  std::string value;
+
+  EXPECT_TRUE(
+      gamesGUIInfo.GetLabel(value, nullptr, 0, CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER), nullptr));
+  EXPECT_EQ(value, "1:24.60");
+
+  // An update to an attempt already showing replaces its value rather than
+  // adding a second tracker
+  tracker.display = "1:31.02";
+  achievementRuntime.SetLeaderboardTracker(tracker, true);
+
+  EXPECT_EQ(achievementRuntime.GetLeaderboardTrackers().size(), 1u);
+  EXPECT_TRUE(
+      gamesGUIInfo.GetLabel(value, nullptr, 0, CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER), nullptr));
+  EXPECT_EQ(value, "1:31.02");
+
+  achievementRuntime.SetLeaderboardTracker(tracker, false);
+
+  EXPECT_TRUE(achievementRuntime.GetLeaderboardTrackers().empty());
+  EXPECT_TRUE(
+      gamesGUIInfo.GetLabel(value, nullptr, 0, CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER), nullptr));
+  EXPECT_TRUE(value.empty());
+}
+
+TEST_F(TestGamesGUIInfo, ScoreboardWritesThePlayersNewStandingBack)
+{
+  LeaderboardInfo leaderboard;
+  leaderboard.id = 7;
+  leaderboard.title = "Green Hill Zone - Act 1";
+  leaderboard.playerRank = 274;
+  leaderboard.playerScore = "0:41.88";
+  leaderboard.totalEntries = 1483;
+
+  // Standings fetched before the submission, which the new one is not in
+  LeaderboardEntry entry;
+  entry.rank = 1;
+  entry.username = "Sonikku";
+  leaderboard.entries = {entry};
+
+  LeaderboardState state;
+  state.leaderboards = {leaderboard};
+
+  CAchievementRuntime achievementRuntime;
+  achievementRuntime.SetLeaderboardState(state);
+
+  EXPECT_TRUE(achievementRuntime.SetLeaderboardStanding(7, 12, "0:26.11", 1484));
+
+  const LeaderboardInfo& updated = achievementRuntime.GetLeaderboardState().leaderboards.front();
+  EXPECT_EQ(updated.playerRank, 12u);
+  EXPECT_EQ(updated.playerScore, "0:26.11");
+  EXPECT_EQ(updated.totalEntries, 1484u);
+
+  // Guessing where the submission slots into the fetched page would be wrong as
+  // often as right, so the page is dropped and refetched on next open
+  EXPECT_TRUE(updated.entries.empty());
+
+  // A leaderboard belonging to a game that has since been unloaded
+  EXPECT_FALSE(achievementRuntime.SetLeaderboardStanding(999, 1, "0:01.00", 2));
 }
 
 namespace

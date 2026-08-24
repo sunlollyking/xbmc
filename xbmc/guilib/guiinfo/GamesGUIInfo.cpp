@@ -257,6 +257,16 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
                   : challenges.front().badgeUrl;
       return true;
     }
+    case RETROPLAYER_LEADERBOARD_TRACKER:
+    {
+      // Only the first attempt is surfaced. More than one at a time is rare,
+      // and a corner indicator has room for one.
+      const std::vector<LeaderboardTracker> trackers =
+          AchievementRuntime().GetLeaderboardTrackers();
+
+      value = trackers.empty() ? "" : trackers.front().display;
+      return true;
+    }
     case RETROPLAYER_ACHIEVEMENTS_PROGRESS:
     {
       const CAchievementRuntime& runtime = AchievementRuntime();

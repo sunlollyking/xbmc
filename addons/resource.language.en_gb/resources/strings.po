@@ -19858,7 +19858,32 @@ msgctxt "#35353"
 msgid "Last year"
 msgstr ""
 
-#empty strings from id 35354 to 35504
+#. Notification heading when a leaderboard attempt begins
+msgctxt "#35354"
+msgid "Leaderboard attempt started"
+msgstr ""
+
+#. Notification heading when a leaderboard attempt is abandoned
+msgctxt "#35355"
+msgid "Leaderboard attempt failed"
+msgstr ""
+
+#. Notification heading when a leaderboard score is sent to the server
+msgctxt "#35356"
+msgid "Leaderboard attempt submitted"
+msgstr ""
+
+#. Where a submitted leaderboard score placed
+msgctxt "#35357"
+msgid "Your rank: {0:d} of {1:d}"
+msgstr ""
+
+#. Shown when a submitted score did not beat the player's existing best
+msgctxt "#35358"
+msgid "Your best is still {0:s}"
+msgstr ""
+
+#empty strings from id 35359 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
