@@ -18,6 +18,7 @@
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "games/dialogs/osd/DialogGameIndicators.h"
 #include "games/dialogs/osd/LeaderboardUtils.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
@@ -563,6 +564,8 @@ void CGameClientCheevos::OnChallengeIndicator(const game_rc_achievement_challeng
   challenge.badgeUrl = SafeString(data.badge_url);
 
   CServiceBroker::GetGameServices().AchievementRuntime().SetChallenge(challenge, show);
+
+  CDialogGameIndicators::Update();
 }
 
 void CGameClientCheevos::OnSubsetCompleted(const std::string& title)
@@ -670,6 +673,8 @@ void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker&
   tracker.display = SafeString(data.display);
 
   CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardTracker(tracker, show);
+
+  CDialogGameIndicators::Update();
 }
 
 void CGameClientCheevos::OnAchievementProgressIndicator(
@@ -690,6 +695,8 @@ void CGameClientCheevos::OnAchievementProgressIndicator(
   indicator.measuredPercent = data.measured_percent;
 
   CServiceBroker::GetGameServices().AchievementRuntime().SetProgressIndicator(indicator, show);
+
+  CDialogGameIndicators::Update();
 }
 
 void CGameClientCheevos::OnRichPresenceUpdated(const std::string& evaluation)
