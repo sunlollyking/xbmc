@@ -15,6 +15,7 @@
 #include "games/GameSettings.h"
 #include "games/GameUtils.h"
 #include "games/agents/input/AgentInput.h"
+#include "games/dialogs/osd/DialogGameIndicators.h"
 #include "profiles/ProfileManager.h"
 #include "utils/FileExtensionProvider.h"
 
@@ -48,10 +49,15 @@ void CGameServices::Initialize()
 {
   // Update game extensions
   m_fileExtensionProvider.RegisterGameExtensions(CGameUtils::GetGameExtensions());
+
+  // The on-screen indicators listen to the achievement runtime from here on,
+  // rather than every site that changes one having to ask for them
+  CDialogGameIndicators::Register();
 }
 
 void CGameServices::Deinitialize()
 {
+  m_achievementRuntime->SetIndicatorCallback(nullptr);
 }
 
 ControllerPtr CGameServices::GetController(const std::string& controllerId)

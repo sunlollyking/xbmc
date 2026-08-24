@@ -145,6 +145,92 @@ TEST_F(TestGamesGUIInfo, ProgressIndicatorShowsWhatIsBeingWorkedTowards)
   EXPECT_EQ(percent, 0);
 }
 
+TEST_F(TestGamesGUIInfo, TwoCountingAchievementsDoNotFightOverTheIndicator)
+{
+  CAchievementRuntime achievementRuntime;
+
+  // A game counting two things at once announces each separately, milliseconds
+  // apart. Holding one slot meant they overwrote each other and neither could
+  // be read.
+  AchievementProgressIndicator rings;
+  rings.id = 41785;
+  rings.title = "Orange Ace";
+  rings.measuredProgress = "1/20";
+  rings.measuredPercent = 5.0f;
+
+  AchievementProgressIndicator survive;
+  survive.id = 3415;
+  survive.title = "Trip Pop Pro";
+  survive.measuredProgress = "60%";
+  survive.measuredPercent = 60.0f;
+
+  achievementRuntime.SetProgressIndicator(rings, true);
+  achievementRuntime.SetProgressIndicator(survive, true);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+  std::string value;
+
+  // The one closest to being earned, not whichever ticked last
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Trip Pop Pro");
+
+  // ...and it stays that way when the other one ticks again
+  rings.measuredProgress = "2/20";
+  rings.measuredPercent = 10.0f;
+  achievementRuntime.SetProgressIndicator(rings, true);
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Trip Pop Pro");
+
+  // Overtaking swaps which is shown
+  rings.measuredPercent = 90.0f;
+  achievementRuntime.SetProgressIndicator(rings, true);
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Orange Ace");
+
+  // Retiring one leaves the other showing rather than clearing both
+  achievementRuntime.SetProgressIndicator(rings, false);
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Trip Pop Pro");
+
+  // A hide with no achievement means everything has stopped
+  achievementRuntime.SetProgressIndicator(AchievementProgressIndicator{}, false);
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+}
+
+TEST_F(TestGamesGUIInfo, IndicatorChangesAreAnnouncedOnce)
+{
+  CAchievementRuntime achievementRuntime;
+
+  int announced = 0;
+  achievementRuntime.SetIndicatorCallback([&announced]() { ++announced; });
+
+  AchievementProgressIndicator indicator;
+  indicator.id = 1;
+  achievementRuntime.SetProgressIndicator(indicator, true);
+
+  AchievementChallenge challenge;
+  challenge.id = 2;
+  achievementRuntime.SetChallenge(challenge, true);
+
+  LeaderboardTracker tracker;
+  tracker.id = 3;
+  achievementRuntime.SetLeaderboardTracker(tracker, true);
+
+  // Every indicator reports through the one path, so a fourth added later is
+  // announced without anyone having to remember to wire it up
+  EXPECT_EQ(announced, 3);
+}
+
 TEST_F(TestGamesGUIInfo, LeaderboardTrackerIsEmptyWithNoAttemptRunning)
 {
   CAchievementRuntime achievementRuntime;

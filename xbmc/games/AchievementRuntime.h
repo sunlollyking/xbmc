@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <functional>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -201,12 +202,14 @@ struct AchievementState
   std::vector<AchievementChallenge> challenges;
 
   /*!
-   * \brief The measured achievement being worked towards, if any
+   * \brief The measured achievements being worked towards
    *
-   * One at a time: the runtime picks which is worth showing, and a corner
-   * indicator has room for one.
+   * More than one can be counting at once - a game will happily track rings
+   * collected and time survived together - and the runtime announces each
+   * separately. Kept as a set so that one does not overwrite another; which of
+   * them is worth a corner indicator is decided on the way out.
    */
-  AchievementProgressIndicator progressIndicator;
+  std::vector<AchievementProgressIndicator> progressIndicators;
   bool loaded{false};
 };
 
@@ -286,6 +289,17 @@ public:
   void SetProgressIndicator(const AchievementProgressIndicator& indicator, bool active);
 
   /*!
+   * \brief Be told when anything an on-screen indicator shows has changed
+   *
+   * Set once by whatever draws them. Every indicator the runtime holds reports
+   * through here, so one added later is announced without its author having to
+   * remember to wire it up.
+   *
+   * Called on whichever thread made the change, which is the game's.
+   */
+  void SetIndicatorCallback(std::function<void()> callback);
+
+  /*!
    * \brief Record where the player now stands after a submission
    *
    * The server answers a submission with the new standing, which is the same
@@ -306,6 +320,12 @@ public:
 
   std::vector<LeaderboardTracker> GetLeaderboardTrackers() const;
 
+  /*!
+   * \brief The measured achievement worth showing, if any
+   *
+   * The one closest to completion, so that what is on screen is the one about
+   * to be earned rather than whichever happened to tick last.
+   */
   AchievementProgressIndicator GetProgressIndicator() const;
 
   /*!
@@ -351,7 +371,15 @@ public:
   //@}
 
 private:
+  //! Tell whoever draws the indicators that one of them moved
+  void NotifyIndicatorsChanged();
+
   mutable std::mutex m_mutex;
+
+  //! Whatever draws the on-screen indicators, told whenever one changes. Held
+  //! rather than called directly so the runtime keeps knowing nothing about the
+  //! GUI, and invoked outside the lock so it may read back safely.
+  std::function<void()> m_indicatorCallback;
   AchievementState m_state;
   LeaderboardState m_leaderboards;
   unsigned int m_selectedLeaderboard{0};

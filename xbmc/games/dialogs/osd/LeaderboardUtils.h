@@ -105,5 +105,16 @@ bool LoadLeaderboardEntries(unsigned int leaderboardId, std::vector<LeaderboardE
  */
 void ForgetLeaderboardEntries(unsigned int leaderboardId);
 
+/*!
+ * \ingroup games
+ *
+ * \brief Forget every leaderboard's kept standings
+ *
+ * Offered to the player because the kept copies are the only thing between them
+ * and a fresh answer, and a table that has been beaten in the last few minutes
+ * is otherwise a week away from being asked for again.
+ */
+void ClearLeaderboardEntries();
+
 } // namespace GAME
 } // namespace KODI

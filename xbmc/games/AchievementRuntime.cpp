@@ -98,22 +98,26 @@ unsigned int CAchievementRuntime::SetAchievementProgress(
 
 void CAchievementRuntime::SetChallenge(const AchievementChallenge& challenge, bool active)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
-
-  auto it = std::find_if(m_state.challenges.begin(), m_state.challenges.end(),
-                         [&challenge](const AchievementChallenge& existing)
-                         { return existing.id == challenge.id; });
-
-  if (active)
   {
-    // The runtime can re-announce an attempt that is already showing
-    if (it == m_state.challenges.end())
-      m_state.challenges.emplace_back(challenge);
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto it = std::find_if(m_state.challenges.begin(), m_state.challenges.end(),
+                           [&challenge](const AchievementChallenge& existing)
+                           { return existing.id == challenge.id; });
+
+    if (active)
+    {
+      // The runtime can re-announce an attempt that is already showing
+      if (it == m_state.challenges.end())
+        m_state.challenges.emplace_back(challenge);
+    }
+    else if (it != m_state.challenges.end())
+    {
+      m_state.challenges.erase(it);
+    }
   }
-  else if (it != m_state.challenges.end())
-  {
-    m_state.challenges.erase(it);
-  }
+
+  NotifyIndicatorsChanged();
 }
 
 std::vector<AchievementChallenge> CAchievementRuntime::GetChallenges() const
@@ -125,50 +129,99 @@ std::vector<AchievementChallenge> CAchievementRuntime::GetChallenges() const
 void CAchievementRuntime::SetProgressIndicator(const AchievementProgressIndicator& indicator,
                                                bool active)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
-
-  // Show and update are the same thing here: an indicator already on screen is
-  // given its new value rather than replaced with a second one
-  if (active)
   {
-    m_state.progressIndicator = indicator;
-    return;
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto& indicators = m_state.progressIndicators;
+    auto it = std::find_if(indicators.begin(), indicators.end(),
+                           [&indicator](const AchievementProgressIndicator& existing)
+                           { return existing.id == indicator.id; });
+
+    if (active)
+    {
+      // Show and update are the same thing here: one already counting is given
+      // its new value rather than added twice
+      if (it != indicators.end())
+        *it = indicator;
+      else
+        indicators.emplace_back(indicator);
+    }
+    else if (indicator.id == 0)
+    {
+      // The runtime sends no achievement with a hide, so an id of zero means
+      // everything currently counting has stopped
+      indicators.clear();
+    }
+    else if (it != indicators.end())
+    {
+      indicators.erase(it);
+    }
   }
 
-  // The runtime sends no achievement with a hide, so an id of zero means clear
-  // whatever is showing. Matching on the id alone left the indicator stuck on
-  // screen for the rest of the session.
-  if (indicator.id == 0 || m_state.progressIndicator.id == indicator.id)
-    m_state.progressIndicator = AchievementProgressIndicator{};
+  NotifyIndicatorsChanged();
 }
 
 AchievementProgressIndicator CAchievementRuntime::GetProgressIndicator() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  return m_state.progressIndicator;
+
+  const auto& indicators = m_state.progressIndicators;
+
+  // Whichever is closest to being earned. A game counting two things at once
+  // used to hand the single slot back and forth between them every few
+  // milliseconds, so neither could be read.
+  const auto best = std::max_element(
+      indicators.begin(), indicators.end(),
+      [](const AchievementProgressIndicator& a, const AchievementProgressIndicator& b)
+      { return a.measuredPercent < b.measuredPercent; });
+
+  return (best != indicators.end()) ? *best : AchievementProgressIndicator{};
+}
+
+void CAchievementRuntime::SetIndicatorCallback(std::function<void()> callback)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_indicatorCallback = std::move(callback);
+}
+
+void CAchievementRuntime::NotifyIndicatorsChanged()
+{
+  std::function<void()> callback;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    callback = m_indicatorCallback;
+  }
+
+  // Outside the lock: what this calls reads the state straight back
+  if (callback)
+    callback();
 }
 
 void CAchievementRuntime::SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
-
-  auto it = std::find_if(m_leaderboards.trackers.begin(), m_leaderboards.trackers.end(),
-                         [&tracker](const LeaderboardTracker& existing)
-                         { return existing.id == tracker.id; });
-
-  if (active)
   {
-    // Show and update are the same thing here: an attempt already on screen is
-    // given its new value rather than added twice
-    if (it != m_leaderboards.trackers.end())
-      it->display = tracker.display;
-    else
-      m_leaderboards.trackers.emplace_back(tracker);
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto it = std::find_if(m_leaderboards.trackers.begin(), m_leaderboards.trackers.end(),
+                           [&tracker](const LeaderboardTracker& existing)
+                           { return existing.id == tracker.id; });
+
+    if (active)
+    {
+      // Show and update are the same thing here: an attempt already on screen is
+      // given its new value rather than added twice
+      if (it != m_leaderboards.trackers.end())
+        it->display = tracker.display;
+      else
+        m_leaderboards.trackers.emplace_back(tracker);
+    }
+    else if (it != m_leaderboards.trackers.end())
+    {
+      m_leaderboards.trackers.erase(it);
+    }
   }
-  else if (it != m_leaderboards.trackers.end())
-  {
-    m_leaderboards.trackers.erase(it);
-  }
+
+  NotifyIndicatorsChanged();
 }
 
 std::vector<LeaderboardTracker> CAchievementRuntime::GetLeaderboardTrackers() const

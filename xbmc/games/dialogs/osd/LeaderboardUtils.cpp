@@ -242,6 +242,18 @@ void KODI::GAME::ForgetLeaderboardEntries(unsigned int leaderboardId)
     CLog::Log(LOGERROR, "Leaderboards: unable to save {}", path);
 }
 
+void KODI::GAME::ClearLeaderboardEntries()
+{
+  const std::string path = CachePath();
+  if (path.empty() || !XFILE::CFile::Exists(path))
+    return;
+
+  if (!XFILE::CFile::Delete(path))
+    CLog::Log(LOGERROR, "Leaderboards: unable to delete {}", path);
+  else
+    CLog::Log(LOGINFO, "Leaderboards: kept standings cleared");
+}
+
 bool KODI::GAME::LoadLeaderboardEntries(unsigned int leaderboardId,
                                         std::vector<LeaderboardEntry>& entries)
 {
