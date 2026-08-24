@@ -122,6 +122,25 @@ std::vector<AchievementChallenge> CAchievementRuntime::GetChallenges() const
   return m_state.challenges;
 }
 
+void CAchievementRuntime::SetProgressIndicator(const AchievementProgressIndicator& indicator,
+                                               bool active)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  // Show and update are the same thing here: an indicator already on screen is
+  // given its new value rather than replaced with a second one
+  if (active)
+    m_state.progressIndicator = indicator;
+  else if (m_state.progressIndicator.id == indicator.id)
+    m_state.progressIndicator = AchievementProgressIndicator{};
+}
+
+AchievementProgressIndicator CAchievementRuntime::GetProgressIndicator() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_state.progressIndicator;
+}
+
 void CAchievementRuntime::SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active)
 {
   std::lock_guard<std::mutex> lock(m_mutex);

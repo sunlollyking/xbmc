@@ -257,6 +257,38 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
                   : challenges.front().badgeUrl;
       return true;
     }
+    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE:
+    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE:
+    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS:
+    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT:
+    {
+      const AchievementProgressIndicator indicator = AchievementRuntime().GetProgressIndicator();
+
+      // The title being empty is what keeps the whole indicator hidden, so
+      // every field of an inactive one must come back empty rather than "0"
+      if (indicator.id == 0)
+      {
+        value.clear();
+        return true;
+      }
+
+      switch (info.GetInfo())
+      {
+        case RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE:
+          value = indicator.title;
+          break;
+        case RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE:
+          value = indicator.badgeUrl;
+          break;
+        case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS:
+          value = indicator.measuredProgress;
+          break;
+        default:
+          value = std::to_string(static_cast<int>(indicator.measuredPercent));
+          break;
+      }
+      return true;
+    }
     case RETROPLAYER_LEADERBOARD_TRACKER:
     {
       // Only the first attempt is surfaced. More than one at a time is rare,
@@ -292,6 +324,22 @@ bool CGamesGUIInfo::GetInt(int& value,
                            int contextWindow,
                            const CGUIInfo& info) const
 {
+  switch (info.GetInfo())
+  {
+    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT:
+    {
+      // A progress control reads its value here rather than through GetLabel,
+      // so the same info has to answer in both places: as text for a label, and
+      // as a number for a bar
+      const AchievementProgressIndicator indicator = AchievementRuntime().GetProgressIndicator();
+
+      value = (indicator.id == 0) ? 0 : static_cast<int>(indicator.measuredPercent);
+      return true;
+    }
+    default:
+      break;
+  }
+
   return false;
 }
 

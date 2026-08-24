@@ -68,6 +68,78 @@ TEST_F(TestGamesGUIInfo, TranslatesRetroPlayerLabels)
             RETROPLAYER_ACHIEVEMENTS_PROGRESS);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.LeaderboardTracker"),
             RETROPLAYER_LEADERBOARD_TRACKER);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorTitle"),
+            RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorPercent"),
+            RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT);
+}
+
+TEST_F(TestGamesGUIInfo, ProgressIndicatorIsEmptyWithNothingBeingWorkedTowards)
+{
+  CAchievementRuntime achievementRuntime;
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+  std::string value{"stale"};
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+
+  // The percentage must come back empty too, not "0": the skin hides the whole
+  // indicator on the title being empty, and a stray "0%" would sit on screen
+  value = "stale";
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT), nullptr));
+  EXPECT_TRUE(value.empty());
+}
+
+TEST_F(TestGamesGUIInfo, ProgressIndicatorShowsWhatIsBeingWorkedTowards)
+{
+  CAchievementRuntime achievementRuntime;
+
+  AchievementProgressIndicator indicator;
+  indicator.id = 123615;
+  indicator.title = "Ring Collector";
+  indicator.badgeUrl = "https://example.invalid/badge.png";
+  indicator.measuredProgress = "13/180";
+  indicator.measuredPercent = 7.2f;
+  achievementRuntime.SetProgressIndicator(indicator, true);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+  std::string value;
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Ring Collector");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS), nullptr));
+  EXPECT_EQ(value, "13/180");
+
+  // A progress control reads the value through GetInt, not GetLabel, so the
+  // bar would never move if only the string path answered
+  int percent = -1;
+  EXPECT_TRUE(gamesGUIInfo.GetInt(percent, nullptr, 0,
+                                  CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT)));
+  EXPECT_EQ(percent, 7);
+
+  // An update replaces the value rather than stacking a second indicator
+  indicator.measuredProgress = "90/180";
+  indicator.measuredPercent = 50.0f;
+  achievementRuntime.SetProgressIndicator(indicator, true);
+
+  EXPECT_TRUE(gamesGUIInfo.GetInt(percent, nullptr, 0,
+                                  CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT)));
+  EXPECT_EQ(percent, 50);
+
+  achievementRuntime.SetProgressIndicator(indicator, false);
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+  EXPECT_TRUE(gamesGUIInfo.GetInt(percent, nullptr, 0,
+                                  CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT)));
+  EXPECT_EQ(percent, 0);
 }
 
 TEST_F(TestGamesGUIInfo, LeaderboardTrackerIsEmptyWithNoAttemptRunning)

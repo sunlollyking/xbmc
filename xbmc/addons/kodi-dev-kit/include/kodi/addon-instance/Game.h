@@ -1461,6 +1461,49 @@ public:
                                                          &data);
   }
 
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Show, update or hide how far along a measured achievement is
+  ///
+  /// Some achievements are measured rather than simply locked or unlocked, and
+  /// the runtime reports progress while the player works towards one. Show and
+  /// update are separate events but the same thing on screen, so both set the
+  /// value; hide removes it.
+  ///
+  /// @param[in] data The achievement and how far along it is
+  /// @param[in] show True to show or update it, false to hide it
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.7.0
+  ///
+  void KodiRCOnAchievementProgressIndicator(const game_rc_achievement_progress_indicator& data,
+                                            bool show)
+  {
+    if (show)
+      m_instanceData->toKodi->RCOnAchievementProgressShow(m_instanceData->toKodi->kodiInstance,
+                                                          &data);
+    else
+      m_instanceData->toKodi->RCOnAchievementProgressHide(m_instanceData->toKodi->kodiInstance,
+                                                          &data);
+  }
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Give Kodi a new value for a measured achievement already on screen
+  ///
+  /// @param[in] data The achievement and how far along it is
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  /// @note Added in Game API 7.7.0
+  ///
+  void KodiRCOnAchievementProgressUpdate(const game_rc_achievement_progress_indicator& data)
+  {
+    m_instanceData->toKodi->RCOnAchievementProgressUpdate(m_instanceData->toKodi->kodiInstance,
+                                                          &data);
+  }
+
   //----------------------------------------------------------------------------
 
   ///@}

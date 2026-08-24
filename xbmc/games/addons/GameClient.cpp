@@ -230,6 +230,9 @@ bool CGameClient::Initialize(void)
   m_ifc.game->toKodi->RCOnLeaderboardTrackerShow = cb_rc_on_leaderboard_tracker_show;
   m_ifc.game->toKodi->RCOnLeaderboardTrackerUpdate = cb_rc_on_leaderboard_tracker_update;
   m_ifc.game->toKodi->RCOnLeaderboardTrackerHide = cb_rc_on_leaderboard_tracker_hide;
+  m_ifc.game->toKodi->RCOnAchievementProgressShow = cb_rc_on_achievement_progress_show;
+  m_ifc.game->toKodi->RCOnAchievementProgressUpdate = cb_rc_on_achievement_progress_update;
+  m_ifc.game->toKodi->RCOnAchievementProgressHide = cb_rc_on_achievement_progress_hide;
 
   memset(m_ifc.game->toAddon, 0, sizeof(KodiToAddonFuncTable_Game));
 
@@ -1167,6 +1170,37 @@ void CGameClient::cb_rc_on_leaderboard_tracker_hide(KODI_HANDLE kodiInstance,
     return;
 
   gameClient->Cheevos().OnLeaderboardTracker(*data, false);
+}
+
+void CGameClient::cb_rc_on_achievement_progress_show(
+    KODI_HANDLE kodiInstance, const game_rc_achievement_progress_indicator* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnAchievementProgressIndicator(*data, true);
+}
+
+void CGameClient::cb_rc_on_achievement_progress_update(
+    KODI_HANDLE kodiInstance, const game_rc_achievement_progress_indicator* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  // An update to an indicator that was never shown is still one to show
+  gameClient->Cheevos().OnAchievementProgressIndicator(*data, true);
+}
+
+void CGameClient::cb_rc_on_achievement_progress_hide(
+    KODI_HANDLE kodiInstance, const game_rc_achievement_progress_indicator* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnAchievementProgressIndicator(*data, false);
 }
 
 std::pair<std::string, std::string> CGameClient::ParseLibretroName(const std::string& addonName)

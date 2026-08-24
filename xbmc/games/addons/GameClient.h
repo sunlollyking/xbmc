@@ -271,6 +271,12 @@ private:
                                                   const struct game_rc_leaderboard_tracker* data);
   static void cb_rc_on_leaderboard_tracker_hide(KODI_HANDLE kodiInstance,
                                                 const struct game_rc_leaderboard_tracker* data);
+  static void cb_rc_on_achievement_progress_show(
+      KODI_HANDLE kodiInstance, const struct game_rc_achievement_progress_indicator* data);
+  static void cb_rc_on_achievement_progress_update(
+      KODI_HANDLE kodiInstance, const struct game_rc_achievement_progress_indicator* data);
+  static void cb_rc_on_achievement_progress_hide(
+      KODI_HANDLE kodiInstance, const struct game_rc_achievement_progress_indicator* data);
   //@}
 
   /*!
