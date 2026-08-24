@@ -280,7 +280,9 @@ void CDialogGameLeaderboards::OnInitWindow()
     return;
   }
 
-  const auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+  auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+
+
   const LeaderboardState state = runtime.GetLeaderboardState();
   const unsigned int gameId = runtime.GetState().gameId;
 
