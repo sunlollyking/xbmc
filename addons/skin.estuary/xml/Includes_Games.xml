@@ -265,6 +265,72 @@
 	<!-- One place on a leaderboard. Kodi hands the row a Medal property for the
 	     top three, so the colour is the skin's decision rather than a glyph
 	     baked into the label. -->
+	<!-- One corner indicator over a running game. The three of them are the
+	     same shape - a backdrop, something to look at, something to read - so
+	     they are described once here and differ only by what they are told. -->
+	<include name="GameIndicator">
+		<param name="condition" default="" />
+		<param name="badge" default="" />
+		<param name="title" default="" />
+		<param name="detail" default="" />
+		<param name="bar" default="" />
+		<param name="height" default="72" />
+		<definition>
+			<control type="group">
+				<visible>$PARAM[condition]</visible>
+				<width>420</width>
+				<height>$PARAM[height]</height>
+				<animation effect="fade" time="200">VisibleChange</animation>
+				<control type="image">
+					<description>Backdrop, so it stays readable over any game</description>
+					<left>0</left><top>0</top>
+					<width>420</width><height>$PARAM[height]</height>
+					<texture border="10" colordiffuse="BB000000">dialogs/dialog-bg-nobo.png</texture>
+				</control>
+				<control type="image">
+					<description>Badge, where there is one to show</description>
+					<left>10</left><top>10</top>
+					<width>52</width><height>52</height>
+					<aspectratio>keep</aspectratio>
+					<texture background="true">$INFO[$PARAM[badge]]</texture>
+					<visible>!String.IsEmpty($PARAM[badge])</visible>
+				</control>
+				<control type="label">
+					<left>72</left><top>6</top>
+					<width>270</width><height>32</height>
+					<aligny>center</aligny>
+					<font>font12</font>
+					<textcolor>white</textcolor>
+					<shadowcolor>black</shadowcolor>
+					<label>$INFO[$PARAM[title]]</label>
+					<scroll>true</scroll>
+					<scrollsuffix>   </scrollsuffix>
+				</control>
+				<control type="label">
+					<description>How far along, where that is counted</description>
+					<right>14</right><top>6</top>
+					<width>90</width><height>32</height>
+					<align>right</align><aligny>center</aligny>
+					<font>font12</font>
+					<textcolor>white</textcolor>
+					<shadowcolor>black</shadowcolor>
+					<label>$INFO[$PARAM[detail]]</label>
+					<visible>!String.IsEmpty($PARAM[detail])</visible>
+				</control>
+				<control type="progress">
+					<description>
+						Driven by the percentage Kodi sends alongside the text, rather
+						than parsing "13/180" back into numbers.
+					</description>
+					<left>72</left><top>44</top>
+					<width>336</width><height>10</height>
+					<info>$PARAM[bar]</info>
+					<visible>!String.IsEmpty($PARAM[bar])</visible>
+				</control>
+			</control>
+		</definition>
+	</include>
+
 	<include name="GameLeaderboardRank">
 		<param name="medal" default="" />
 		<param name="color" default="white" />

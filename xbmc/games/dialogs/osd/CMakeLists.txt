@@ -33,3 +33,7 @@ set(HEADERS DialogGameIndicators.h
 )
 
 core_add_library(gameosddialogs)
+
+if(ENABLE_TESTING)
+  add_subdirectory(test)
+endif()
