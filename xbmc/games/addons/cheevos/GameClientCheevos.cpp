@@ -18,6 +18,7 @@
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "games/dialogs/osd/LeaderboardUtils.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
@@ -635,6 +636,11 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
   // this attempt until the game is reloaded
   CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardStanding(
       data.id, data.new_rank, best.empty() ? submitted : best, data.num_entries);
+
+  // Dropping the fetched page is not enough on its own: the kept copy in
+  // userdata was fetched before this submission, so it would be loaded straight
+  // back in and show the player a table they are no longer in the right place in
+  ForgetLeaderboardEntries(data.id);
 
   // "Your rank: {0:d} of {1:d}"
   std::string message = StringUtils::Format(Localize(35357), data.new_rank, data.num_entries);

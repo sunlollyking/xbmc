@@ -212,6 +212,36 @@ void KODI::GAME::SaveLeaderboardEntries(unsigned int leaderboardId,
     CLog::Log(LOGERROR, "Leaderboards: unable to save {}", path);
 }
 
+void KODI::GAME::ForgetLeaderboardEntries(unsigned int leaderboardId)
+{
+  const std::string path = CachePath();
+  if (path.empty() || !XFILE::CFile::Exists(path))
+    return;
+
+  CXBMCTinyXML2 doc;
+  if (!doc.LoadFile(path))
+    return;
+
+  auto* root = doc.RootElement();
+  if (root == nullptr || std::string(root->Value()) != ROOT_ELEMENT)
+    return;
+
+  bool removed = false;
+  for (auto* board = root->FirstChildElement(BOARD_ELEMENT); board != nullptr;)
+  {
+    auto* next = board->NextSiblingElement(BOARD_ELEMENT);
+    if (board->UnsignedAttribute("id") == leaderboardId)
+    {
+      root->DeleteChild(board);
+      removed = true;
+    }
+    board = next;
+  }
+
+  if (removed && !doc.SaveFile(path))
+    CLog::Log(LOGERROR, "Leaderboards: unable to save {}", path);
+}
+
 bool KODI::GAME::LoadLeaderboardEntries(unsigned int leaderboardId,
                                         std::vector<LeaderboardEntry>& entries)
 {
