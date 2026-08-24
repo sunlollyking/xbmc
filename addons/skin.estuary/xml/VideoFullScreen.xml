@@ -119,5 +119,41 @@
 				<scrollsuffix>   </scrollsuffix>
 			</control>
 		</control>
+		<control type="group">
+			<description>
+				Leaderboard tracker. While an attempt at a leaderboard runs, the
+				client publishes the value as it stands - the lap time so far,
+				the score so far - and this shows it. Sits under the challenge
+				indicator, and drops to where that one sits when there is none.
+			</description>
+			<visible>!String.IsEmpty(RetroPlayer.LeaderboardTracker)</visible>
+			<animation effect="fade" time="200">VisibleChange</animation>
+			<right>40</right>
+			<top>40</top>
+			<width>420</width>
+			<height>56</height>
+			<animation effect="slide" end="0,82" time="0" condition="!String.IsEmpty(RetroPlayer.AchievementsChallengeTitle)">Conditional</animation>
+			<control type="image">
+				<description>Backdrop, so the value stays readable over any game</description>
+				<left>0</left>
+				<top>0</top>
+				<width>420</width>
+				<height>56</height>
+				<texture border="10" colordiffuse="BB000000">dialogs/dialog-bg-nobo.png</texture>
+			</control>
+			<control type="label">
+				<description>The value as it stands, formatted by the client</description>
+				<left>14</left>
+				<top>0</top>
+				<width>392</width>
+				<height>56</height>
+				<label>$INFO[RetroPlayer.LeaderboardTracker]</label>
+				<font>font13</font>
+				<align>center</align>
+				<aligny>center</aligny>
+				<textcolor>white</textcolor>
+				<shadowcolor>black</shadowcolor>
+			</control>
+		</control>
 	</controls>
 </window>

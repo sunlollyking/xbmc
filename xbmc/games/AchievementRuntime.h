@@ -9,7 +9,6 @@
 #pragma once
 
 #include <mutex>
-#include <ctime>
 #include <string>
 #include <vector>
 
@@ -133,12 +132,33 @@ struct LeaderboardInfo
 };
 
 /*!
+ * \brief A leaderboard attempt in progress
+ *
+ * While an attempt runs the client publishes a live value - the lap time so
+ * far, the score so far - for the skin to show in a corner.
+ */
+struct LeaderboardTracker
+{
+  //! Identifies the tracker, not the leaderboard. Two leaderboards measuring
+  //! the same thing share one, so this cannot be used to look a leaderboard up.
+  unsigned int id{0};
+
+  //! The value as it stands, already formatted by the client for this
+  //! leaderboard's unit, so it is shown as given rather than interpreted
+  std::string display;
+};
+
+/*!
  * \brief The leaderboards of the loaded game
  */
 struct LeaderboardState
 {
   std::string gameTitle;
   std::vector<LeaderboardInfo> leaderboards;
+
+  //! Usually empty, and rarely more than one at a time
+  std::vector<LeaderboardTracker> trackers;
+
   bool loaded{false};
 };
 
@@ -218,9 +238,34 @@ public:
   void SetChallenge(const AchievementChallenge& challenge, bool active);
 
   /*!
+   * \brief Show or hide a leaderboard attempt's live value
+   *
+   * Published to the runtime rather than raised as a notification: an attempt
+   * updates many times a second, which belongs in an on-screen indicator the
+   * skin can show and hide.
+   */
+  void SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active);
+
+  /*!
+   * \brief Record where the player now stands after a submission
+   *
+   * The server answers a submission with the new standing, which is the same
+   * thing the leaderboards list shows. Writing it back means the list is right
+   * without asking for it again.
+   *
+   * \return False if the game changed before the answer arrived
+   */
+  bool SetLeaderboardStanding(unsigned int leaderboardId,
+                              unsigned int rank,
+                              const std::string& score,
+                              unsigned int totalEntries);
+
+  /*!
    * \brief Get the achievements currently being attempted
    */
   std::vector<AchievementChallenge> GetChallenges() const;
+
+  std::vector<LeaderboardTracker> GetLeaderboardTrackers() const;
 
   /*!
    * \brief Replace the leaderboards of the loaded game

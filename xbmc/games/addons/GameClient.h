@@ -257,6 +257,20 @@ private:
                                            bool show);
   static void cb_rc_on_subset_completed(KODI_HANDLE kodiInstance, const char* title);
   static void cb_rc_on_reset(KODI_HANDLE kodiInstance);
+  static void cb_rc_on_leaderboard_started(KODI_HANDLE kodiInstance,
+                                           const struct game_rc_leaderboard* data);
+  static void cb_rc_on_leaderboard_failed(KODI_HANDLE kodiInstance,
+                                          const struct game_rc_leaderboard* data);
+  static void cb_rc_on_leaderboard_submitted(KODI_HANDLE kodiInstance,
+                                             const struct game_rc_leaderboard* data);
+  static void cb_rc_on_leaderboard_scoreboard(KODI_HANDLE kodiInstance,
+                                              const struct game_rc_leaderboard_scoreboard* data);
+  static void cb_rc_on_leaderboard_tracker_show(KODI_HANDLE kodiInstance,
+                                                const struct game_rc_leaderboard_tracker* data);
+  static void cb_rc_on_leaderboard_tracker_update(KODI_HANDLE kodiInstance,
+                                                  const struct game_rc_leaderboard_tracker* data);
+  static void cb_rc_on_leaderboard_tracker_hide(KODI_HANDLE kodiInstance,
+                                                const struct game_rc_leaderboard_tracker* data);
   //@}
 
   /*!

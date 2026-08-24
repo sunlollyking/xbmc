@@ -577,6 +577,84 @@ void CGameClientCheevos::OnReset()
   m_gameClient.Reset();
 }
 
+void CGameClientCheevos::OnLeaderboardStarted(const game_rc_leaderboard& data)
+{
+  const std::string title = SafeString(data.title);
+
+  CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" started", data.id, title);
+
+  // "Leaderboard attempt started"
+  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35354), title,
+                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+}
+
+void CGameClientCheevos::OnLeaderboardFailed(const game_rc_leaderboard& data)
+{
+  const std::string title = SafeString(data.title);
+
+  CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" failed", data.id, title);
+
+  // "Leaderboard attempt failed"
+  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35355), title,
+                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+}
+
+void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
+{
+  const std::string title = SafeString(data.title);
+  const std::string value = SafeString(data.value);
+
+  CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" submitted {}", data.id, title,
+            value);
+
+  // The value is worth more than the title here - "1:24.60" is what the player
+  // wants to see - so it leads, with the leaderboard named after it
+  const std::string message =
+      value.empty() ? title : StringUtils::Format("{}  ·  {}", value, title);
+
+  // "Leaderboard attempt submitted"
+  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35356), message,
+                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+}
+
+void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_scoreboard& data)
+{
+  const std::string submitted = SafeString(data.submitted_score);
+  const std::string best = SafeString(data.best_score);
+
+  CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} placed {} of {} with {}", data.id,
+            data.new_rank, data.num_entries, submitted);
+
+  // The leaderboards list would otherwise show where the player stood before
+  // this attempt until the game is reloaded
+  CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardStanding(
+      data.id, data.new_rank, best.empty() ? submitted : best, data.num_entries);
+
+  // "Your rank: {0:d} of {1:d}"
+  std::string message = StringUtils::Format(Localize(35357), data.new_rank, data.num_entries);
+
+  // A worse attempt still gets a scoreboard, and saying so is kinder than
+  // showing a rank that did not move with no explanation
+  if (!best.empty() && !submitted.empty() && best != submitted)
+    message += StringUtils::Format("  ·  {}", StringUtils::Format(Localize(35358), best));
+
+  // "Leaderboard attempt submitted"
+  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35356), message,
+                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+}
+
+void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show)
+{
+  // Published to the runtime rather than raised as a notification: this updates
+  // many times a second while an attempt runs, so it belongs in an on-screen
+  // indicator the skin can show and hide
+  LeaderboardTracker tracker;
+  tracker.id = data.id;
+  tracker.display = SafeString(data.display);
+
+  CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardTracker(tracker, show);
+}
+
 void CGameClientCheevos::OnRichPresenceUpdated(const std::string& evaluation)
 {
   CServiceBroker::GetGameServices().AchievementRuntime().SetRichPresence(evaluation);
