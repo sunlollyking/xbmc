@@ -223,26 +223,28 @@
 				<top>184</top>
 				<left>20</left>
 				<width>1148</width>
+				<!-- Ten rows of 58, filling the height exactly. Thirteen smaller
+				     rows fitted, but were not readable at a glance across a room. -->
 				<height>580</height>
 				<orientation>vertical</orientation>
 				<pagecontrol>62</pagecontrol>
 				<visible>String.IsEmpty(Window.Property(Leaderboards.Status))</visible>
 				<scrolltime tween="sine" easing="out">200</scrolltime>
 
-				<itemlayout width="1148" height="50">
+				<itemlayout width="1148" height="58">
 					<!-- The player's own row is tinted, so it can be found without
 					     reading down the table -->
 					<control type="image">
-						<left>0</left><top>1</top><width>1148</width><height>48</height>
+						<left>0</left><top>1</top><width>1148</width><height>56</height>
 						<texture colordiffuse="33FFFFFF">colors/white.png</texture>
 						<visible>!String.IsEmpty(ListItem.Property(IsPlayer))</visible>
 					</control>
 					<include content="GameLeaderboardEntryRow" />
 				</itemlayout>
 
-				<focusedlayout width="1148" height="50">
+				<focusedlayout width="1148" height="58">
 					<control type="image">
-						<left>0</left><top>1</top><width>1148</width><height>48</height>
+						<left>0</left><top>1</top><width>1148</width><height>56</height>
 						<texture colordiffuse="button_focus">colors/white.png</texture>
 					</control>
 					<include content="GameLeaderboardEntryRow" />
@@ -268,9 +270,9 @@
 		<param name="color" default="white" />
 		<definition>
 			<control type="label">
-				<left>10</left><top>0</top><width>80</width><height>50</height>
+				<left>10</left><top>0</top><width>80</width><height>58</height>
 				<aligny>center</aligny>
-				<font>font12</font>
+				<font>font13</font>
 				<textcolor>$PARAM[color]</textcolor>
 				<label>$INFO[ListItem.Property(RankLabel)]</label>
 				<visible>String.IsEqual(ListItem.Property(Medal),$PARAM[medal])</visible>
@@ -297,37 +299,37 @@
 		</include>
 		<!-- The player's RetroAchievements avatar, as the site shows it -->
 		<control type="image">
-			<left>96</left><top>7</top><width>36</width><height>36</height>
+			<left>96</left><top>10</top><width>40</width><height>40</height>
 			<aspectratio>keep</aspectratio>
 			<texture background="true" fallback="DefaultUser.png">$INFO[ListItem.Icon]</texture>
 		</control>
 		<control type="label">
-			<left>146</left><top>0</top><width>440</width><height>50</height>
+			<left>150</left><top>0</top><width>440</width><height>58</height>
 			<aligny>center</aligny>
-			<font>font12</font>
+			<font>font13</font>
 			<label>$INFO[ListItem.Label]</label>
 		</control>
 		<!-- "3 months ago" is taken in at a glance where a date has to be worked
 		     out against today's, but the date itself is what settles an argument,
 		     so both are here -->
 		<control type="label">
-			<left>600</left><top>4</top><width>280</width><height>20</height>
+			<left>600</left><top>6</top><width>280</width><height>24</height>
 			<aligny>center</aligny>
-			<font>font12</font>
+			<font>font13</font>
 			<textcolor>FFC8C8C8</textcolor>
 			<label>$INFO[ListItem.Property(DateRelative)]</label>
 		</control>
 		<control type="label">
-			<left>600</left><top>26</top><width>280</width><height>20</height>
+			<left>600</left><top>31</top><width>280</width><height>22</height>
 			<aligny>center</aligny>
-			<font>font10</font>
+			<font>font12</font>
 			<textcolor>FFC8C8C8</textcolor>
 			<label>$INFO[ListItem.Property(Date)]</label>
 		</control>
 		<control type="label">
-			<right>15</right><top>0</top><width>220</width><height>50</height>
+			<right>15</right><top>0</top><width>220</width><height>58</height>
 			<align>right</align><aligny>center</aligny>
-			<font>font12</font>
+			<font>font13</font>
 			<label>$INFO[ListItem.Label2]</label>
 		</control>
 	</include>
