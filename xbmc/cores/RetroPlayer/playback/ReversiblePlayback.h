@@ -17,6 +17,7 @@
 #include <memory>
 #include <stddef.h>
 #include <stdint.h>
+#include <vector>
 
 class CDateTime;
 
@@ -31,6 +32,7 @@ namespace RETRO
 {
 class CGUIGameMessenger;
 class CRPRenderManager;
+class CRPStreamManager;
 class CSavestateDatabase;
 class IMemoryStream;
 
@@ -39,6 +41,8 @@ class CReversiblePlayback : public IPlayback, public IGameLoopCallback, public O
 public:
   CReversiblePlayback(GAME::CGameClient* gameClient,
                       CRPRenderManager& renderManager,
+                      CRPStreamManager& streamManager,
+                      CCheevos* cheevos,
                       CGUIGameMessenger& guiMessenger,
                       double fps,
                       size_t serializeSize);
@@ -69,12 +73,42 @@ public:
   void Notify(const Observable& obs, const ObservableMessage msg) override;
 
 private:
-  void AddFrame();
+  /*!
+   * \brief Run one frame, showing the player one from several frames later
+   *
+   * The emulator is run forward past the frame that is really happening, and
+   * the picture and sound from that later frame are what reach the player;
+   * the emulator is then put back to where it truly is. The player sees their
+   * input take effect earlier than the emulator could otherwise manage,
+   * because the frame they are shown already contains the answer to it.
+   *
+   * Costs a whole extra run of the client per hidden frame.
+   *
+   * \param frames How many frames ahead to look, at least 1
+   *
+   * \return True if the sequence ran and the frame is accounted for
+   */
+  bool RunaheadFrameEvent(unsigned int frames);
+
+  /*!
+   * \brief How many frames to run ahead right now, or 0 for none
+   *
+   * Asked afresh each frame: a client cannot always say how large its state
+   * is until it has run one (Dolphin builds the machine it serializes during
+   * the game's boot), so a client that is ineligible at the first frame may
+   * become eligible at the second.
+   */
+  unsigned int GetRunaheadFrames() const;
+
+  //! \param serialized A state already taken from the client this frame, to
+  //!                   save serializing it a second time, or empty to ask
+  void AddFrame(const std::vector<uint8_t>& serialized = {});
   void UpdateFrameRate();
   void RewindFrames(uint64_t frames);
   void AdvanceFrames(uint64_t frames);
   void UpdatePlaybackStats();
   void UpdateMemoryStream();
+  void UpdateRunahead();
   void CommitSavestate(bool autosave,
                        const std::string& savePath,
                        const CDateTime& nowUTC,
@@ -83,6 +117,8 @@ private:
   // Construction parameter
   GAME::CGameClient* const m_gameClient;
   CRPRenderManager& m_renderManager;
+  CRPStreamManager& m_streamManager;
+  CCheevos* const m_cheevos;
   CGUIGameMessenger& m_guiMessenger;
 
   // Gameplay functionality
@@ -95,6 +131,13 @@ private:
   std::string m_autosavePath{};
   std::vector<std::future<void>> m_savestateThreads;
   CCriticalSection m_savestateMutex;
+
+  // Run-ahead functionality
+  bool m_runaheadEnabled = false;
+  unsigned int m_runaheadFrameCount = 0;
+  std::vector<uint8_t> m_runaheadState;
+  std::vector<uint8_t> m_runaheadAchievementState;
+  bool m_runaheadFailed = false;
 
   // Playback stats
   uint64_t m_totalFrameCount = 0;

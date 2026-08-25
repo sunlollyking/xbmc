@@ -15,6 +15,7 @@
 #include "cores/RetroPlayer/rendering/RPRenderManager.h"
 #include "cores/RetroPlayer/savestates/ISavestate.h"
 #include "cores/RetroPlayer/savestates/SavestateDatabase.h"
+#include "cores/RetroPlayer/streams/RPStreamManager.h"
 #include "cores/RetroPlayer/streams/memory/DeltaPairMemoryStream.h"
 #include "filesystem/File.h"
 #include "games/AchievementRuntime.h"
@@ -38,16 +39,21 @@ using namespace RETRO;
 
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
                                          CRPRenderManager& renderManager,
+                                         CRPStreamManager& streamManager,
+                                         CCheevos* cheevos,
                                          CGUIGameMessenger& guiMessenger,
                                          double fps,
                                          size_t serializeSize)
   : m_gameClient(gameClient),
     m_renderManager(renderManager),
+    m_streamManager(streamManager),
+    m_cheevos(cheevos),
     m_guiMessenger(guiMessenger),
     m_gameLoop(this, fps),
     m_savestateDatabase(new CSavestateDatabase)
 {
   UpdateMemoryStream();
+  UpdateRunahead();
 
   GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
   gameSettings.RegisterObserver(this);
@@ -377,10 +383,136 @@ bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
 
 void CReversiblePlayback::FrameEvent()
 {
+  if (const unsigned int runaheadFrames = GetRunaheadFrames(); runaheadFrames > 0)
+  {
+    if (RunaheadFrameEvent(runaheadFrames))
+      return;
+
+    // The sequence could not be completed, so fall through and run the frame
+    // the ordinary way rather than dropping it
+  }
+
   m_gameClient->RunFrame();
   UpdateFrameRate();
 
   AddFrame();
+}
+
+unsigned int CReversiblePlayback::GetRunaheadFrames() const
+{
+  if (!m_runaheadEnabled || m_runaheadFrameCount == 0 || m_runaheadFailed)
+    return 0;
+
+  // Only while the game is running forward at its own speed. Fast-forward,
+  // slow motion and rewind have all had the streams reconfigured underneath
+  // them by OnSpeedChange, and looking into the future of a game being wound
+  // backwards means nothing.
+  if (m_gameLoop.GetSpeed() != 1.0)
+    return 0;
+
+  // Asked every frame rather than cached, because hardcore can be turned on
+  // without this object being told, and a single settings read is nothing
+  // beside the extra run of the emulator it is guarding
+  if (HardcoreRestrictionsApply())
+    return 0;
+
+  // A client that cannot serialize cannot be put back, and one that has not
+  // run yet may not be able to say how large its state is
+  if (m_gameClient->GetSerializeSize() == 0)
+    return 0;
+
+  return m_runaheadFrameCount;
+}
+
+bool CReversiblePlayback::RunaheadFrameEvent(unsigned int frames)
+{
+  const size_t memorySize = m_gameClient->GetSerializeSize();
+
+  // Whatever happens below, the player must not be left muted or blind
+  struct CStreamRestore
+  {
+    explicit CStreamRestore(CRPStreamManager& streamManager) : m_streamManager(streamManager) {}
+    ~CStreamRestore()
+    {
+      m_streamManager.EnableAudio(true);
+      m_streamManager.EnableVideo(true);
+    }
+    CRPStreamManager& m_streamManager;
+  } streamRestore(m_streamManager);
+
+  // The frame that is really happening. Its picture and sound are thrown away
+  // -- the player is shown a later one instead -- but its input is the input
+  // the whole sequence is predicting from, so this is the only frame that polls.
+  m_streamManager.EnableAudio(false);
+  m_streamManager.EnableVideo(false);
+
+  m_gameClient->RunFrame();
+  UpdateFrameRate();
+
+  // Where the game truly is, and where it will be put back to
+  m_runaheadState.resize(memorySize);
+  if (!m_gameClient->Serialize(m_runaheadState.data(), memorySize))
+  {
+    // Without a state to return to, running further would carry the game away
+    // from where it belongs. The frame that just ran still counts.
+    CLog::Log(LOGERROR, "RetroPlayer[SAVE]: Run-ahead disabled: client failed to serialize");
+    m_runaheadFailed = true;
+    AddFrame();
+    return true;
+  }
+
+  // Beside the emulator's state, not inside it. The achievement runtime is
+  // driven by the frames the client runs, and it is about to run frames that
+  // will be taken back -- without this, an achievement triggered on a frame
+  // that never really happened stays triggered, and gets submitted.
+  const size_t achievementSize = m_gameClient->GetAchievementStateSize();
+  bool achievementsSaved = false;
+  if (achievementSize > 0)
+  {
+    m_runaheadAchievementState.resize(achievementSize);
+    achievementsSaved =
+        m_gameClient->SerializeAchievements(m_runaheadAchievementState.data(), achievementSize);
+  }
+
+  // Look into the future. These frames deliberately do not poll: they have to
+  // answer to the same input as the frame that committed, or the picture the
+  // player is shown predicts a button they never pressed.
+  for (unsigned int frame = 1; frame <= frames; ++frame)
+  {
+    const bool bLastFrame = (frame == frames);
+
+    // Only the furthest frame is seen and heard, so exactly one frame's worth
+    // of sound is produced per frame of real time and the audio rate is
+    // unchanged
+    m_streamManager.EnableAudio(bLastFrame);
+    m_streamManager.EnableVideo(bLastFrame);
+
+    m_gameClient->RunFrame(false);
+  }
+
+  // Put the game back to where it really is. RestoreState() rather than
+  // Deserialize(): the state came from this client moments ago and the disc
+  // has not moved, so none of the disc handling a loaded savestate needs
+  // applies sixty times a second.
+  if (!m_gameClient->RestoreState(m_runaheadState.data(), memorySize))
+  {
+    // The game is now several frames further on than it should be. That is
+    // survivable -- those frames really did run -- but the prediction cannot
+    // be trusted again, so stop.
+    CLog::Log(LOGERROR, "RetroPlayer[SAVE]: Run-ahead disabled: client failed to restore state");
+    m_runaheadFailed = true;
+    AddFrame();
+    return true;
+  }
+
+  if (achievementsSaved)
+    m_gameClient->DeserializeAchievements(m_runaheadAchievementState.data(), achievementSize);
+
+  // The client is back at the state just serialized, so hand it to the rewind
+  // buffer rather than asking for it a second time
+  AddFrame(m_runaheadState);
+
+  return true;
 }
 
 void CReversiblePlayback::RewindEvent()
@@ -405,13 +537,24 @@ void CReversiblePlayback::EndEvent()
   // while the client is unloading and its context is still current.
 }
 
-void CReversiblePlayback::AddFrame()
+void CReversiblePlayback::AddFrame(const std::vector<uint8_t>& serialized /* = {} */)
 {
   std::unique_lock lock(m_mutex);
 
   if (m_memoryStream)
   {
-    if (m_gameClient->Serialize(m_memoryStream->BeginFrame(), m_memoryStream->FrameSize()))
+    const size_t frameSize = m_memoryStream->FrameSize();
+
+    // Run-ahead has already taken a state from the client this frame. Copying
+    // it is what keeps rewind and run-ahead together down to one serialize per
+    // frame rather than two.
+    if (serialized.size() == frameSize)
+    {
+      std::memcpy(m_memoryStream->BeginFrame(), serialized.data(), frameSize);
+      m_memoryStream->SubmitFrame();
+      UpdatePlaybackStats();
+    }
+    else if (m_gameClient->Serialize(m_memoryStream->BeginFrame(), frameSize))
     {
       m_memoryStream->SubmitFrame();
       UpdatePlaybackStats();
@@ -478,10 +621,47 @@ void CReversiblePlayback::Notify(const Observable& obs, const ObservableMessage 
   {
     case ObservableMessageSettingsChanged:
       UpdateMemoryStream();
+      UpdateRunahead();
       break;
     default:
       break;
   }
+}
+
+void CReversiblePlayback::UpdateRunahead()
+{
+  GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+
+  const bool bEnabled = gameSettings.RunaheadEnabled();
+  const unsigned int frameCount = bEnabled ? gameSettings.RunaheadFrames() : 0;
+
+  if (bEnabled == m_runaheadEnabled && frameCount == m_runaheadFrameCount)
+    return;
+
+  m_runaheadEnabled = bEnabled;
+  m_runaheadFrameCount = frameCount;
+
+  // A player who turned this on gets to try again after a client refused it
+  m_runaheadFailed = false;
+
+  if (!bEnabled || frameCount == 0)
+  {
+    m_runaheadState.clear();
+    m_runaheadState.shrink_to_fit();
+    m_runaheadAchievementState.clear();
+    m_runaheadAchievementState.shrink_to_fit();
+
+    CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Run-ahead disabled");
+    return;
+  }
+
+  // Said out loud because the cost is a multiple of the whole emulator and is
+  // otherwise invisible until the game will not hold its frame rate. Rewind
+  // adds nothing to it -- the two share the one state taken per frame.
+  CLog::Log(LOGINFO,
+            "RetroPlayer[SAVE]: Run-ahead: {} frame(s) ahead, {} client run(s) per displayed "
+            "frame, 1 serialize and 1 restore",
+            frameCount, frameCount + 1);
 }
 
 void CReversiblePlayback::UpdateMemoryStream()
