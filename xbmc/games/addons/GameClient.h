@@ -189,6 +189,21 @@ public:
   bool Serialize(uint8_t* data, size_t size);
   bool Deserialize(const uint8_t* data, size_t size);
 
+  /*!
+   * \brief How many bytes the client's achievement state needs right now
+   *
+   * Kept beside the emulator's state rather than inside it: a savestate whose
+   * emulator memory does not match what the client reports is refused before
+   * the client sees it, so appending would make a state written with
+   * achievements on unloadable with them off.
+   *
+   * \return The size, or 0 if the client has no achievement state to save
+   */
+  size_t GetAchievementStateSize() const;
+
+  bool SerializeAchievements(uint8_t* data, size_t size);
+  bool DeserializeAchievements(const uint8_t* data, size_t size);
+
   // Implementation of IHwFramebufferCallback
   void HardwareContextReset() override;
   void HardwareContextDestroy() override;

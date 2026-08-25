@@ -1708,6 +1708,25 @@ extern "C"
     size_t(__cdecl* SerializeSize)(const struct AddonInstance_Game*);
     GAME_ERROR(__cdecl* Serialize)(const struct AddonInstance_Game*, uint8_t*, size_t);
     GAME_ERROR(__cdecl* Deserialize)(const struct AddonInstance_Game*, const uint8_t*, size_t);
+
+    /*!
+     * @brief The achievement runtime's state, kept beside the emulator's rather
+     * than inside it
+     *
+     * A savestate whose emulator memory does not match what the core reports is
+     * refused before the core sees it, so anything appended to that blob makes a
+     * state written with achievements on unloadable with them off. These carry
+     * it separately, and the size is asked for each time so it grows with the
+     * runtime rather than being capped.
+     *
+     * A client without achievement support answers GAME_ERROR_NOT_IMPLEMENTED
+     * and nothing is stored.
+     */
+    size_t(__cdecl* AchievementStateSize)(const struct AddonInstance_Game*);
+    GAME_ERROR(__cdecl* SerializeAchievements)
+    (const struct AddonInstance_Game*, uint8_t*, size_t);
+    GAME_ERROR(__cdecl* DeserializeAchievements)
+    (const struct AddonInstance_Game*, const uint8_t*, size_t);
     GAME_ERROR(__cdecl* CheatReset)(const struct AddonInstance_Game*);
     GAME_ERROR(__cdecl* GetMemory)
     (const struct AddonInstance_Game*, enum GAME_MEMORY, uint8_t**, size_t*);

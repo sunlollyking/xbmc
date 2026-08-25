@@ -785,6 +785,67 @@ bool CGameClient::Deserialize(const uint8_t* data, size_t size)
   return bSuccess;
 }
 
+size_t CGameClient::GetAchievementStateSize() const
+{
+  if (!m_bIsPlaying)
+    return 0;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return m_ifc.game->toAddon->AchievementStateSize(m_ifc.game);
+  }
+  catch (...)
+  {
+    LogException("AchievementStateSize()");
+  }
+
+  return 0;
+}
+
+bool CGameClient::SerializeAchievements(uint8_t* data, size_t size)
+{
+  if (data == nullptr || size == 0 || !m_bIsPlaying)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    // Not logged as an error when unimplemented: a client without achievement
+    // support is the ordinary case, and LogError already keeps that at debug
+    return LogError(m_ifc.game->toAddon->SerializeAchievements(m_ifc.game, data, size),
+                    "SerializeAchievements()");
+  }
+  catch (...)
+  {
+    LogException("SerializeAchievements()");
+  }
+
+  return false;
+}
+
+bool CGameClient::DeserializeAchievements(const uint8_t* data, size_t size)
+{
+  if (data == nullptr || size == 0 || !m_bIsPlaying)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return LogError(m_ifc.game->toAddon->DeserializeAchievements(m_ifc.game, data, size),
+                    "DeserializeAchievements()");
+  }
+  catch (...)
+  {
+    LogException("DeserializeAchievements()");
+  }
+
+  return false;
+}
+
 void CGameClient::LogAddonProperties(void) const
 {
   CLog::Log(LOGINFO, "GAME: ------------------------------------");
