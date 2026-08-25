@@ -83,7 +83,7 @@ void CRetroPlayerVideo::AddStreamData(const StreamPacket& packet)
 {
   const VideoStreamPacket& videoPacket = static_cast<const VideoStreamPacket&>(packet);
 
-  if (m_bOpen)
+  if (m_bOpen && m_bVideoEnabled)
   {
     unsigned int orientationDegCCW = 0;
     switch (videoPacket.rotation)

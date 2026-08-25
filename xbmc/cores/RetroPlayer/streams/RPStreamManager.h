@@ -15,6 +15,8 @@ namespace KODI
 namespace RETRO
 {
 class CRetroPlayerAudio;
+class CRetroPlayerRendering;
+class CRetroPlayerVideo;
 class CRPProcessInfo;
 class CRPRenderManager;
 
@@ -25,6 +27,14 @@ public:
   ~CRPStreamManager() override = default;
 
   void EnableAudio(bool bEnable);
+
+  /*!
+   * \brief Whether frames the client produces reach the screen
+   *
+   * Only one of the video streams exists for a given client -- software or
+   * hardware rendered -- so this addresses whichever was created.
+   */
+  void EnableVideo(bool bEnable);
 
   // Implementation of IStreamManager
   StreamPtr CreateStream(StreamType streamType) override;
@@ -42,6 +52,8 @@ private:
 
   // Stream parameters
   CRetroPlayerAudio* m_audioStream = nullptr;
+  CRetroPlayerVideo* m_videoStream = nullptr;
+  CRetroPlayerRendering* m_renderingStream = nullptr;
 };
 } // namespace RETRO
 } // namespace KODI
