@@ -13,6 +13,7 @@
 #include "threads/CriticalSection.h"
 #include "utils/Observer.h"
 
+#include <atomic>
 #include <future>
 #include <memory>
 #include <stddef.h>
@@ -133,11 +134,19 @@ private:
   CCriticalSection m_savestateMutex;
 
   // Run-ahead functionality
-  bool m_runaheadEnabled = false;
-  unsigned int m_runaheadFrameCount = 0;
+  //
+  // The settings observer runs on whatever thread changed the setting, and the
+  // sequence runs on the game loop, so what the observer touches is limited to
+  // these three. The buffers belong to the game loop alone: freeing them from
+  // the observer pulled the state out from under a sequence that was midway
+  // through running, and the client was handed a pointer to freed memory.
+  std::atomic<bool> m_runaheadEnabled{false};
+  std::atomic<unsigned int> m_runaheadFrameCount{0};
+  std::atomic<bool> m_runaheadFailed{false};
+
+  // Owned by the game loop thread
   std::vector<uint8_t> m_runaheadState;
   std::vector<uint8_t> m_runaheadAchievementState;
-  bool m_runaheadFailed = false;
 
   // Playback stats
   uint64_t m_totalFrameCount = 0;

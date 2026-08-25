@@ -391,6 +391,15 @@ void CReversiblePlayback::FrameEvent()
     // The sequence could not be completed, so fall through and run the frame
     // the ordinary way rather than dropping it
   }
+  else if (!m_runaheadState.empty())
+  {
+    // Run-ahead has been turned off, and this is the thread that owns the
+    // buffers, so this is where they are safe to release
+    m_runaheadState.clear();
+    m_runaheadState.shrink_to_fit();
+    m_runaheadAchievementState.clear();
+    m_runaheadAchievementState.shrink_to_fit();
+  }
 
   m_gameClient->RunFrame();
   UpdateFrameRate();
@@ -638,6 +647,10 @@ void CReversiblePlayback::UpdateRunahead()
   if (bEnabled == m_runaheadEnabled && frameCount == m_runaheadFrameCount)
     return;
 
+  // Deliberately does not touch the state buffers. A sequence may be running
+  // on the game loop this instant, holding a pointer into them and about to
+  // hand it to the client; the game loop releases them itself once it sees
+  // run-ahead is off.
   m_runaheadEnabled = bEnabled;
   m_runaheadFrameCount = frameCount;
 
@@ -646,12 +659,16 @@ void CReversiblePlayback::UpdateRunahead()
 
   if (!bEnabled || frameCount == 0)
   {
-    m_runaheadState.clear();
-    m_runaheadState.shrink_to_fit();
-    m_runaheadAchievementState.clear();
-    m_runaheadAchievementState.shrink_to_fit();
-
     CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Run-ahead disabled");
+    return;
+  }
+
+  // Said here as well as refused per-frame, so the log does not claim run-ahead
+  // is happening to someone who has hardcore on and is wondering why nothing
+  // feels different
+  if (HardcoreRestrictionsApply())
+  {
+    CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Run-ahead requested but held off by hardcore mode");
     return;
   }
 
