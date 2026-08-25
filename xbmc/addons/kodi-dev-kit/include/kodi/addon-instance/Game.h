@@ -935,6 +935,47 @@ public:
   }
   //----------------------------------------------------------------------------
 
+  //============================================================================
+  /// @brief How many bytes the achievement runtime's state needs right now
+  ///
+  /// Asked each time rather than reserved once, so it grows with the runtime.
+  ///
+  /// @return The size, or 0 when there is nothing to save
+  ///
+  /// @note Added in Game API 7.8.0
+  ///
+  virtual size_t AchievementStateSize() { return 0; }
+  //----------------------------------------------------------------------------
+
+  //============================================================================
+  /// @brief Write the achievement runtime's state
+  ///
+  /// Kept beside the emulator's state, not inside it: a savestate whose
+  /// emulator memory does not match what the core reports is refused before the
+  /// core sees it.
+  ///
+  /// @note Added in Game API 7.8.0
+  ///
+  virtual GAME_ERROR SerializeAchievements(uint8_t* data, size_t size)
+  {
+    return GAME_ERROR_NOT_IMPLEMENTED;
+  }
+  //----------------------------------------------------------------------------
+
+  //============================================================================
+  /// @brief Restore achievement state written by SerializeAchievements()
+  ///
+  /// Best effort: a savestate written without it, or by a build that did not
+  /// have it, simply leaves the runtime where it is.
+  ///
+  /// @note Added in Game API 7.8.0
+  ///
+  virtual GAME_ERROR DeserializeAchievements(const uint8_t* data, size_t size)
+  {
+    return GAME_ERROR_NOT_IMPLEMENTED;
+  }
+  //----------------------------------------------------------------------------
+
   ///@}
 
   //--==----==----==----==----==----==----==----==----==----==----==----==----==--
@@ -1688,6 +1729,9 @@ private:
     instance->game->toAddon->SerializeSize = ADDON_SerializeSize;
     instance->game->toAddon->Serialize = ADDON_Serialize;
     instance->game->toAddon->Deserialize = ADDON_Deserialize;
+    instance->game->toAddon->AchievementStateSize = ADDON_AchievementStateSize;
+    instance->game->toAddon->SerializeAchievements = ADDON_SerializeAchievements;
+    instance->game->toAddon->DeserializeAchievements = ADDON_DeserializeAchievements;
 
     instance->game->toAddon->CheatReset = ADDON_CheatReset;
     instance->game->toAddon->GetMemory = ADDON_GetMemory;
@@ -1891,6 +1935,27 @@ private:
                                              size_t size)
   {
     return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)->Deserialize(data, size);
+  }
+
+  inline static size_t ADDON_AchievementStateSize(const AddonInstance_Game* instance)
+  {
+    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)->AchievementStateSize();
+  }
+
+  inline static GAME_ERROR ADDON_SerializeAchievements(const AddonInstance_Game* instance,
+                                                       uint8_t* data,
+                                                       size_t size)
+  {
+    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
+        ->SerializeAchievements(data, size);
+  }
+
+  inline static GAME_ERROR ADDON_DeserializeAchievements(const AddonInstance_Game* instance,
+                                                         const uint8_t* data,
+                                                         size_t size)
+  {
+    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
+        ->DeserializeAchievements(data, size);
   }
 
   // --- Cheat operations --------------------------------------------------------

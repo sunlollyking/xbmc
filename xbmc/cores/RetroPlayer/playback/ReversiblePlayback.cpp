@@ -271,6 +271,23 @@ void CReversiblePlayback::CommitSavestate(bool autosave,
     }
   }
 
+  // Captured beside the emulator's memory, not inside it: a savestate whose
+  // memory does not match GetSerializeSize() is refused before the client sees
+  // it, so appending would make a state written with achievements on
+  // unloadable with them off. Asked for each time, so it grows with the runtime.
+  if (const size_t achievementSize = m_gameClient->GetAchievementStateSize(); achievementSize > 0)
+  {
+    if (uint8_t* const achievementData = savestate->GetAchievementBuffer(achievementSize))
+    {
+      if (!m_gameClient->SerializeAchievements(achievementData, achievementSize))
+      {
+        // Best effort: the emulator state is still worth writing on its own
+        savestate->GetAchievementBuffer(0);
+        CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: No achievement state to store");
+      }
+    }
+  }
+
   // Attempt to get existing properties
   {
     std::unique_lock lock(m_savestateMutex);
@@ -365,6 +382,12 @@ bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
 
       if (m_gameClient->Deserialize(savestate->GetMemoryData(), memorySize))
       {
+        // After the emulator, so the runtime is restored against the machine
+        // state it belongs to. Absent on savestates written before this existed,
+        // or with achievements off, and neither is a failure.
+        if (const size_t achievementSize = savestate->GetAchievementSize(); achievementSize > 0)
+          m_gameClient->DeserializeAchievements(savestate->GetAchievementData(), achievementSize);
+
         m_totalFrameCount = savestate->TimestampFrames();
         bSuccess = true;
         if (savestate->Type() == SAVE_TYPE::AUTO)

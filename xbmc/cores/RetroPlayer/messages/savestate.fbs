@@ -66,6 +66,15 @@ table Savestate {
   video_data_compression:CompressionType = None (id: 28);
   video_data_uncompressed_size:uint64 = 0 (id: 29);
 
+  // Achievement properties
+  //
+  // Kept beside the emulator's memory rather than inside it. The emulator's
+  // blob has to stay exactly the size the core reports, because a savestate
+  // whose memory does not match retro_serialize_size() is refused before it
+  // reaches the core - so anything appended to it would make states written
+  // with achievements on unloadable with them off.
+  achievement_data:[uint8] (id: 30);
+
   // Memory properties
   memory_data:[uint8] (id: 10);
   memory_data_compressed:[uint8] (id: 24);
