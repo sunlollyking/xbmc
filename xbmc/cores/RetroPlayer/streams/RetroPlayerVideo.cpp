@@ -73,6 +73,19 @@ bool CRetroPlayerVideo::GetStreamBuffer(unsigned int width,
 {
   VideoStreamBuffer& videoBuffer = static_cast<VideoStreamBuffer&>(buffer);
 
+  // A frame that is going to be thrown away does not need a render buffer, and
+  // on some platforms getting one is the most expensive thing in the frame:
+  // measured at 7 ms a call on the GBM path, against 0.6 ms to emulate the
+  // frame itself. Run-ahead asks for two or three frames it will never show,
+  // and paying that for each of them is what put the game below real time.
+  //
+  // Refusing is a supported answer. This buffer is offered to the client as an
+  // optimisation -- somewhere to draw that saves a copy -- and a client that is
+  // told no draws into its own memory and hands the frame over the ordinary
+  // way. That frame is then discarded on arrival, as it already was.
+  if (!m_bVideoEnabled)
+    return false;
+
   if (m_bOpen)
     return m_renderManager.GetVideoBuffer(width, height, videoBuffer);
 
