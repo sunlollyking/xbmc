@@ -174,6 +174,7 @@ public:
    * \brief Run the client for one frame
    *
    * \param pollInput Whether to drain the peripheral event queue first
+   * \param speculative Whether this frame is going to be rolled back
    *
    * Input reaches the client as events, pushed as they arrive, so the client
    * answers a frame from whatever state those events last left it in. Polling
@@ -181,8 +182,25 @@ public:
    * to be run against the same input as the frame that commits, or the
    * prediction is of a button press that never happened -- so runahead runs
    * its speculative frames without polling.
+   *
+   * A speculative frame also asks the client to advance the emulator and
+   * nothing else, so that work whose effect outlives the rollback -- announcing
+   * an achievement, posting rich presence -- does not happen for a frame that
+   * never really did. Clients that cannot do this are run the ordinary way.
    */
-  void RunFrame(bool pollInput = true);
+  void RunFrame(bool pollInput = true, bool speculative = false);
+
+  /*!
+   * \brief Whether the client can run a frame without side effects
+   *
+   * Only meaningful once a speculative frame has been attempted; before that
+   * the answer is not yet known and this reports false, which is the safe
+   * direction -- the caller then protects the achievement state itself.
+   */
+  bool RunsSpeculativeFrames() const
+  {
+    return m_speculativeFrames == SpeculativeSupport::SUPPORTED;
+  }
 
   /*!
    * \brief Tell the client what speed the player is running at
@@ -384,9 +402,18 @@ private:
   std::string m_platforms;
   bool m_supportsDiscControl{false};
 
+  //! \brief Whether the client answers RunFrameSpeculative(), asked once
+  enum class SpeculativeSupport
+  {
+    UNKNOWN,
+    SUPPORTED,
+    UNSUPPORTED,
+  };
+
   // Properties of the current playing file
   std::atomic_bool m_bIsPlaying; // True between OpenFile() and CloseFile()
   std::atomic_bool m_hasFrameRun{false};
+  std::atomic<SpeculativeSupport> m_speculativeFrames{SpeculativeSupport::UNKNOWN};
   // The speed the player is running at, as a multiple of normal speed. Written
   // by the thread that changes the speed and read by the client's own, so it is
   // atomic; a client asks for it from inside a call of its own, which can be on

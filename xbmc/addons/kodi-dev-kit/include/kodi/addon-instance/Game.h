@@ -391,6 +391,24 @@ public:
   //----------------------------------------------------------------------------
 
   //============================================================================
+  /// @brief Run a single frame whose effects are about to be taken back
+  ///
+  /// Run-ahead shows the player a frame from further on than the one really
+  /// happening, then restores the state from before it. Advance the emulator
+  /// and nothing else: anything whose effect escapes the state that
+  /// Deserialize() restores -- announcing an achievement, posting rich
+  /// presence -- has happened for a frame that never really did, and cannot be
+  /// taken back with the state.
+  ///
+  /// Leave unimplemented if the client has no such side effects, or has no
+  /// cheap way to suppress them; the frontend falls back to @ref RunFrame().
+  ///
+  /// @return The error, or @ref GAME_ERROR_NO_ERROR if there was no error
+  ///
+  virtual GAME_ERROR RunFrameSpeculative() { return GAME_ERROR_NOT_IMPLEMENTED; }
+  //----------------------------------------------------------------------------
+
+  //============================================================================
   /// @brief Reset the current game
   ///
   /// @return The error, or @ref GAME_ERROR_NO_ERROR if the game was reset
@@ -1438,6 +1456,7 @@ private:
     instance->game->toAddon->GetRegion = ADDON_GetRegion;
     instance->game->toAddon->RequiresGameLoop = ADDON_RequiresGameLoop;
     instance->game->toAddon->RunFrame = ADDON_RunFrame;
+    instance->game->toAddon->RunFrameSpeculative = ADDON_RunFrameSpeculative;
     instance->game->toAddon->Reset = ADDON_Reset;
 
     instance->game->toAddon->HwContextReset = ADDON_HwContextReset;
@@ -1542,6 +1561,11 @@ private:
   inline static GAME_ERROR ADDON_RunFrame(const AddonInstance_Game* instance)
   {
     return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)->RunFrame();
+  }
+
+  inline static GAME_ERROR ADDON_RunFrameSpeculative(const AddonInstance_Game* instance)
+  {
+    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)->RunFrameSpeculative();
   }
 
   inline static GAME_ERROR ADDON_Reset(const AddonInstance_Game* instance)
