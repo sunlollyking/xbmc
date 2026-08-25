@@ -671,28 +671,49 @@ void CGameClient::RunFrame(bool pollInput /* = true */, bool speculative /* = fa
         // client built against an older Game API leaves this one null rather
         // than pointing it somewhere unfortunate.
         bool bRanSpeculative = false;
-        if (speculative && m_speculativeFrames != SpeculativeSupport::UNSUPPORTED &&
-            m_ifc.game->toAddon->RunFrameSpeculative != nullptr)
+        if (speculative && m_speculativeFrames != SpeculativeSupport::UNSUPPORTED)
         {
-          const GAME_ERROR error = m_ifc.game->toAddon->RunFrameSpeculative(m_ifc.game);
-          if (error == GAME_ERROR_NOT_IMPLEMENTED)
+          const bool bFirstAnswer = (m_speculativeFrames == SpeculativeSupport::UNKNOWN);
+
+          if (m_ifc.game->toAddon->RunFrameSpeculative == nullptr)
           {
-            if (m_speculativeFrames == SpeculativeSupport::UNKNOWN)
+            // Said out loud rather than quietly falling back. An add-on built
+            // against an older Game API leaves this entry null, which is the
+            // whole point of putting it at the end of the table -- but silence
+            // here reads exactly like the feature working, and did.
+            if (bFirstAnswer)
             {
               CLog::Log(LOGINFO,
-                        "GAME: {} does not run speculative frames; run-ahead will save and "
-                        "restore its achievement state instead",
+                        "GAME: {} was built before speculative frames existed; run-ahead will "
+                        "save and restore its achievement state instead",
                         ID());
             }
             m_speculativeFrames = SpeculativeSupport::UNSUPPORTED;
           }
           else
           {
-            if (m_speculativeFrames == SpeculativeSupport::UNKNOWN)
+            const GAME_ERROR error = m_ifc.game->toAddon->RunFrameSpeculative(m_ifc.game);
+            if (error == GAME_ERROR_NOT_IMPLEMENTED)
+            {
+              if (bFirstAnswer)
+              {
+                CLog::Log(LOGINFO,
+                          "GAME: {} does not run speculative frames; run-ahead will save and "
+                          "restore its achievement state instead",
+                          ID());
+              }
+              m_speculativeFrames = SpeculativeSupport::UNSUPPORTED;
+            }
+            else
+            {
+              if (bFirstAnswer)
+                CLog::Log(LOGINFO, "GAME: {} runs speculative frames", ID());
+
               m_speculativeFrames = SpeculativeSupport::SUPPORTED;
 
-            LogError(error, "RunFrameSpeculative()");
-            bRanSpeculative = true;
+              LogError(error, "RunFrameSpeculative()");
+              bRanSpeculative = true;
+            }
           }
         }
 
