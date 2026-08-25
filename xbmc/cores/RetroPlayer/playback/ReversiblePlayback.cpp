@@ -37,6 +37,49 @@ using namespace RETRO;
 
 #define REWIND_FACTOR 0.25 // Rewind at 25% of gameplay speed
 
+namespace
+{
+constexpr unsigned int TOAST_DISPLAY_TIME_MS = 5000;
+
+/*!
+ * \brief The largest savestate run-ahead will work with
+ *
+ * Every frame costs one state taken and one put back, so the price is the size
+ * of the state. Clients at or under 1 MB were measured running at full speed
+ * two frames ahead; nothing larger has been shown to. Set just above the
+ * largest proven size, and meant to be raised once the bigger clients have been
+ * measured rather than left as a permanent ceiling.
+ */
+constexpr size_t MAX_RUNAHEAD_STATE_SIZE = 2 * 1024 * 1024;
+
+/*!
+ * \brief Whether hardcore mode is currently blocking gameplay assistance
+ *
+ * RetroAchievements requires save state loading, rewind, slow motion and
+ * cheats to be unavailable while hardcore is on. Saving states is still
+ * allowed, and so is fast forward.
+ */
+bool HardcoreRestrictionsApply()
+{
+  return CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+}
+
+/*!
+ * \brief Tell the player why something they asked for didn't happen
+ *
+ * Silently ignoring the request would read as a broken control.
+ */
+void NotifyBlockedByHardcore(uint32_t featureStringId)
+{
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+
+  // "{0:s} is not available in hardcore mode"
+  CGUIDialogKaiToast::QueueNotification(
+      CGUIDialogKaiToast::Info, strings.Get(35264),
+      StringUtils::Format(strings.Get(35302), strings.Get(featureStringId)), TOAST_DISPLAY_TIME_MS);
+}
+} // namespace
+
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
                                          CRPRenderManager& renderManager,
                                          CRPStreamManager& streamManager,
@@ -427,8 +470,35 @@ unsigned int CReversiblePlayback::GetRunaheadFrames() const
 
   // A client that cannot serialize cannot be put back, and one that has not
   // run yet may not be able to say how large its state is
-  if (m_gameClient->GetSerializeSize() == 0)
+  const size_t memorySize = m_gameClient->GetSerializeSize();
+  if (memorySize == 0)
     return 0;
+
+  // Run-ahead takes a state and puts one back every single frame, so its cost
+  // follows the size of that state while the emulation it hides does not.
+  // Measured on a Ryzen 9: every client with a state of 1 MB or less -- NES,
+  // Game Boy, Master System, Mega Drive, SNES, 32X -- runs at full speed two
+  // frames ahead, the copying disappearing into the frame budget entirely.
+  // Above that it has not been shown to work, and a client that cannot keep up
+  // does not fail cleanly: it quietly runs at a fraction of full speed, which
+  // reads as a broken emulator rather than a setting that costs too much.
+  //
+  // So this refuses rather than letting the player find out. The limit is set
+  // just above the largest state proven to work, and is deliberately cautious;
+  // it should move once the cost has been measured properly for the big ones.
+  if (memorySize > MAX_RUNAHEAD_STATE_SIZE)
+  {
+    if (!m_runaheadStateTooLarge)
+    {
+      m_runaheadStateTooLarge = true;
+      CLog::Log(LOGINFO,
+                "RetroPlayer[SAVE]: Run-ahead held off: {} needs {:.1f} MB a frame, and the limit "
+                "is {:.1f} MB. The emulator would run below full speed.",
+                m_gameClient->ID(), static_cast<double>(memorySize) / (1024.0 * 1024.0),
+                static_cast<double>(MAX_RUNAHEAD_STATE_SIZE) / (1024.0 * 1024.0));
+    }
+    return 0;
+  }
 
   return m_runaheadFrameCount;
 }
@@ -665,8 +735,10 @@ void CReversiblePlayback::UpdateRunahead()
   m_runaheadEnabled = bEnabled;
   m_runaheadFrameCount = frameCount;
 
-  // A player who turned this on gets to try again after a client refused it
+  // A player who turned this on gets to try again after a client refused it,
+  // and gets told again why if it is simply too big
   m_runaheadFailed = false;
+  m_runaheadStateTooLarge = false;
 
   if (!bEnabled || frameCount == 0)
   {
