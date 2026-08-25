@@ -145,6 +145,9 @@ private:
   std::atomic<unsigned int> m_runaheadFrameCount{0};
   std::atomic<bool> m_runaheadFailed{false};
 
+  //! \brief Whether the state-too-large refusal has been said once already
+  mutable std::atomic<bool> m_runaheadStateTooLarge{false};
+
   // Owned by the game loop thread
   std::vector<uint8_t> m_runaheadState;
   std::vector<uint8_t> m_runaheadAchievementState;
