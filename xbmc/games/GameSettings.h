@@ -43,6 +43,22 @@ public:
   bool AutosaveEnabled();
   bool RewindEnabled();
   unsigned int MaxRewindTimeSec();
+
+  /*!
+   * \brief Whether to run the emulator ahead of itself to hide input latency
+   *
+   * Costs a whole extra run of the emulator per hidden frame, so it is only
+   * usable on clients that already have the headroom to spare.
+   */
+  bool RunaheadEnabled();
+
+  /*!
+   * \brief How many frames ahead of itself to run the emulator
+   *
+   * Each frame removes about one frame's worth of input latency and adds
+   * another full run of the emulator per displayed frame.
+   */
+  unsigned int RunaheadFrames();
   std::string GetRAUsername() const;
   std::string GetRAToken() const;
 

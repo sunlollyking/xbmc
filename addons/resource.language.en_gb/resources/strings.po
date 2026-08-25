@@ -19918,7 +19918,32 @@ msgctxt "#35365"
 msgid "Show the achievement you are inside an attempt at in the corner of the screen while you play."
 msgstr ""
 
-#empty strings from id 35366 to 35504
+#. Setting to run the emulator ahead of itself to hide input latency
+msgctxt "#35366"
+msgid "Enable run-ahead"
+msgstr ""
+
+#. Help text for the run-ahead setting
+msgctxt "#35367"
+msgid "Make games respond sooner to the controller by running the emulator ahead of itself and showing you a frame from the future. Very demanding: the emulator has to run twice over for every frame you see, or three times at two frames ahead. Only use it on games that already run at full speed with power to spare, and only on emulators that support save states. Unavailable in hardcore achievement mode."
+msgstr ""
+
+#. Setting for how many frames to run ahead
+msgctxt "#35368"
+msgid "Frames to run ahead"
+msgstr ""
+
+#. Help text for the run-ahead frames setting
+msgctxt "#35369"
+msgid "How far into the future to look. Each frame removes about one frame's worth of delay and costs another full run of the emulator. Start at one and only raise it if the game still runs at full speed."
+msgstr ""
+
+#. Label for the run-ahead frames slider, e.g. "2 frames"
+msgctxt "#35370"
+msgid "{0:d} frames"
+msgstr ""
+
+#empty strings from id 35371 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
