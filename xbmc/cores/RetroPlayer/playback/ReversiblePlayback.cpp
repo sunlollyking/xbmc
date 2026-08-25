@@ -495,17 +495,28 @@ bool CReversiblePlayback::RunaheadFrameEvent(unsigned int frames)
     return true;
   }
 
-  // Beside the emulator's state, not inside it. The achievement runtime is
-  // driven by the frames the client runs, and it is about to run frames that
-  // will be taken back -- without this, an achievement triggered on a frame
-  // that never really happened stays triggered, and gets submitted.
-  const size_t achievementSize = m_gameClient->GetAchievementStateSize();
+  // Saving and restoring the achievement runtime around the sequence is the
+  // fallback, for clients that cannot run a frame without side effects. It puts
+  // the runtime back, but it cannot unsend what the runtime already announced:
+  // a challenge that ended on a speculative frame is reported ended, and then
+  // reported started again by the restore, so the indicator flickers at frame
+  // rate -- and an achievement unlocked on a frame that never happened has
+  // already been queued for submission. A client that runs speculative frames
+  // properly never announces any of it, so there is nothing to undo and none of
+  // this work is done.
+  const bool bProtectAchievements = !m_gameClient->RunsSpeculativeFrames();
+
+  size_t achievementSize = 0;
   bool achievementsSaved = false;
-  if (achievementSize > 0)
+  if (bProtectAchievements)
   {
-    m_runaheadAchievementState.resize(achievementSize);
-    achievementsSaved =
-        m_gameClient->SerializeAchievements(m_runaheadAchievementState.data(), achievementSize);
+    achievementSize = m_gameClient->GetAchievementStateSize();
+    if (achievementSize > 0)
+    {
+      m_runaheadAchievementState.resize(achievementSize);
+      achievementsSaved =
+          m_gameClient->SerializeAchievements(m_runaheadAchievementState.data(), achievementSize);
+    }
   }
 
   // Look into the future. These frames deliberately do not poll: they have to
@@ -521,7 +532,7 @@ bool CReversiblePlayback::RunaheadFrameEvent(unsigned int frames)
     m_streamManager.EnableAudio(bLastFrame);
     m_streamManager.EnableVideo(bLastFrame);
 
-    m_gameClient->RunFrame(false);
+    m_gameClient->RunFrame(false, true);
   }
 
   // Put the game back to where it really is. RestoreState() rather than

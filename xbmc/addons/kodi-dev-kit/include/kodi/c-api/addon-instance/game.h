@@ -1789,6 +1789,29 @@ extern "C"
     char*(__cdecl* GetImagePath)(const AddonInstance_Game*, unsigned int);
     char*(__cdecl* GetImageLabel)(const AddonInstance_Game*, unsigned int);
     void(__cdecl* FreeString)(const AddonInstance_Game*, char*);
+
+    /*!
+     * @brief Run a frame that is about to be taken back
+     *
+     * Run-ahead runs the client past the frame that is really happening so the
+     * player can be shown one from further on, then restores the state from
+     * before those frames. Deserialize() puts back everything the emulator
+     * holds -- but nothing the client does *outside* that state comes back with
+     * it. An achievement runtime driven by these frames announces challenges
+     * starting and ending, and unlocks achievements, for frames that never
+     * really happened; the announcements have already been sent by the time the
+     * state is restored, and cannot be recalled.
+     *
+     * A client implementing this should advance the emulator and do nothing
+     * else: no achievement processing, no rich presence, nothing whose effect
+     * escapes what Deserialize() will put back.
+     *
+     * A client that answers GAME_ERROR_NOT_IMPLEMENTED is run through
+     * RunFrame() instead, and the frontend falls back to saving and restoring
+     * the achievement state around the sequence, which keeps the runtime
+     * consistent but cannot unsend what it already announced.
+     */
+    GAME_ERROR(__cdecl* RunFrameSpeculative)(const struct AddonInstance_Game*);
   } KodiToAddonFuncTable_Game;
 
   /*!

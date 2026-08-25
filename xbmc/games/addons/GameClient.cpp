@@ -638,7 +638,7 @@ void CGameClient::CloseFile()
   }
 }
 
-void CGameClient::RunFrame(bool pollInput /* = true */)
+void CGameClient::RunFrame(bool pollInput /* = true */, bool speculative /* = false */)
 {
   IGameInputCallback* input;
 
@@ -658,7 +658,46 @@ void CGameClient::RunFrame(bool pollInput /* = true */)
     {
       {
         CClientFrameScope hwScope(Streams());
-        LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()");
+
+        // A speculative frame is one the client is about to be rewound past,
+        // so it must advance the emulator and leave everything else alone.
+        // Asked for once, at the first speculative frame, and remembered: a
+        // client that does not offer it is run the ordinary way and the caller
+        // deals with the consequences itself.
+        //
+        // The null check is what lets this be added without forcing every
+        // add-on to be rebuilt. The entry sits at the end of the function
+        // table and Kodi zeroes the table before the client fills it, so a
+        // client built against an older Game API leaves this one null rather
+        // than pointing it somewhere unfortunate.
+        bool bRanSpeculative = false;
+        if (speculative && m_speculativeFrames != SpeculativeSupport::UNSUPPORTED &&
+            m_ifc.game->toAddon->RunFrameSpeculative != nullptr)
+        {
+          const GAME_ERROR error = m_ifc.game->toAddon->RunFrameSpeculative(m_ifc.game);
+          if (error == GAME_ERROR_NOT_IMPLEMENTED)
+          {
+            if (m_speculativeFrames == SpeculativeSupport::UNKNOWN)
+            {
+              CLog::Log(LOGINFO,
+                        "GAME: {} does not run speculative frames; run-ahead will save and "
+                        "restore its achievement state instead",
+                        ID());
+            }
+            m_speculativeFrames = SpeculativeSupport::UNSUPPORTED;
+          }
+          else
+          {
+            if (m_speculativeFrames == SpeculativeSupport::UNKNOWN)
+              m_speculativeFrames = SpeculativeSupport::SUPPORTED;
+
+            LogError(error, "RunFrameSpeculative()");
+            bRanSpeculative = true;
+          }
+        }
+
+        if (!bRanSpeculative)
+          LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()");
 
         // A client using the asynchronous audio interface produces no audio of
         // its own accord: it waits to be asked, once per frame, and writes what
