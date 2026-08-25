@@ -638,7 +638,7 @@ void CGameClient::CloseFile()
   }
 }
 
-void CGameClient::RunFrame()
+void CGameClient::RunFrame(bool pollInput /* = true */)
 {
   IGameInputCallback* input;
 
@@ -647,7 +647,7 @@ void CGameClient::RunFrame()
     input = m_input;
   }
 
-  if (input)
+  if (input && pollInput)
     input->PollInput();
 
   std::unique_lock lock(m_critSection);
@@ -734,6 +734,26 @@ bool CGameClient::Serialize(uint8_t* data, size_t size)
   return bSuccess;
 }
 
+bool CGameClient::RestoreState(const uint8_t* data, size_t size)
+{
+  if (data == nullptr || size == 0 || !m_bIsPlaying)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    CClientFrameScope hwScope(Streams());
+    return LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
+  }
+  catch (...)
+  {
+    LogException("Deserialize()");
+  }
+
+  return false;
+}
+
 bool CGameClient::Deserialize(const uint8_t* data, size_t size)
 {
   if (data == nullptr || size == 0)
@@ -746,18 +766,7 @@ bool CGameClient::Deserialize(const uint8_t* data, size_t size)
     if (SupportsDiscControl())
       Discs().SetEjected(false);
 
-    std::unique_lock lock(m_critSection);
-
-    try
-    {
-      CClientFrameScope hwScope(Streams());
-      bSuccess =
-          LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
-    }
-    catch (...)
-    {
-      LogException("Deserialize()");
-    }
+    bSuccess = RestoreState(data, size);
   }
 
   // Some cores, like Mupen64Plus-NX, initialize on the first frame, so run
@@ -766,10 +775,7 @@ bool CGameClient::Deserialize(const uint8_t* data, size_t size)
   {
     RunFrame();
 
-    std::unique_lock lock(m_critSection);
-
-    CClientFrameScope hwScope(Streams());
-    bSuccess = LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
+    bSuccess = RestoreState(data, size);
   }
 
   if (bSuccess)
