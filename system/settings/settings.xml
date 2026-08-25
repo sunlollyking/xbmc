@@ -2819,6 +2819,48 @@
             <formatlabel>14045</formatlabel>
           </control>
         </setting>
+        <setting id="gamesgeneral.enablerunahead" type="boolean" label="35366" help="35367">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamesgeneral.runaheadframes" type="integer" label="35368" help="35369">
+          <level>0</level>
+          <default>1</default>
+          <constraints>
+            <minimum>1</minimum>
+            <step>1</step>
+            <maximum>3</maximum>
+          </constraints>
+          <dependencies>
+            <dependency type="enable" setting="gamesgeneral.enablerunahead">true</dependency>
+          </dependencies>
+          <control type="slider" format="integer">
+            <popup>true</popup>
+            <formatlabel>35370</formatlabel>
+          </control>
+        </setting>
+        <setting id="gamesgeneral.manualcachesize" type="integer" label="35329" help="35330">
+          <level>0</level>
+          <default>250</default>
+          <constraints>
+            <minimum>50</minimum>
+            <step>50</step>
+            <maximum>1000</maximum>
+          </constraints>
+          <control type="slider" format="integer">
+            <popup>true</popup>
+            <formatlabel>37122</formatlabel>
+          </control>
+        </setting>
+        <setting id="gamesgeneral.clearmanualcache" parent="gamesgeneral.manualcachesize" type="action" label="35359" help="35360">
+          <level>0</level>
+          <control type="button" format="action" />
+        </setting>
+        <setting id="gamesgeneral.clearleaderboardcache" type="action" label="35361" help="35362">
+          <level>0</level>
+          <control type="button" format="action" />
+        </setting>
       </group>
     </category>
     <category id="gamesachievements" label="15312">
