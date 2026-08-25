@@ -236,6 +236,12 @@ public:
   /*!
    * \brief The achievement runtime's state, if the savestate carries any
    *
+   * Kept beside the emulator's memory rather than inside it. The emulator's
+   * blob has to stay exactly the size the core reports - a savestate whose
+   * memory does not match retro_serialize_size() is refused before the core
+   * sees it - so anything appended to it would make a state written with
+   * achievements on unloadable with them off.
+   *
    * \return The state, or nullptr when the savestate was written without it
    */
   virtual const uint8_t* GetAchievementData() const = 0;
@@ -249,6 +255,8 @@ public:
    * \brief A buffer to write the achievement runtime's state into
    *
    * Sized by the caller from what the runtime reports, so it is not capped.
+   * Sized by the caller from what the runtime reports it needs, so it grows
+   * with the runtime instead of being capped.
    */
   virtual uint8_t* GetAchievementBuffer(size_t size) = 0;
   virtual void Finalize() = 0;

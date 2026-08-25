@@ -943,6 +943,7 @@ public:
   /// @return The size, or 0 when there is nothing to save
   ///
   /// @note Added in Game API 8.0.0
+  /// @note Added in Game API 7.8.0
   ///
   virtual size_t AchievementStateSize() { return 0; }
   //----------------------------------------------------------------------------
@@ -955,6 +956,7 @@ public:
   /// core sees it.
   ///
   /// @note Added in Game API 8.0.0
+  /// @note Added in Game API 7.8.0
   ///
   virtual GAME_ERROR SerializeAchievements(uint8_t* data, size_t size)
   {
@@ -977,6 +979,10 @@ public:
   /// @param[in] size The size of @p data, or 0 if the savestate carries none
   ///
   /// @note Added in Game API 8.0.0
+  /// Best effort: a savestate written without it, or by a build that did not
+  /// have it, simply leaves the runtime where it is.
+  ///
+  /// @note Added in Game API 7.8.0
   ///
   virtual GAME_ERROR DeserializeAchievements(const uint8_t* data, size_t size)
   {
@@ -984,8 +990,7 @@ public:
   }
   //----------------------------------------------------------------------------
 
-  //============================================================================
-  /// @brief Turn encore mode on or off
+  //=====================================================================  /// @brief Turn encore mode on or off
   ///
   /// Encore mode re-activates achievements the player has already earned, so
   /// they can be played for again. Nothing is submitted for them a second time.
@@ -1001,6 +1006,7 @@ public:
   virtual GAME_ERROR RCSetEncoreModeEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
   //----------------------------------------------------------------------------
 
+=======
   ///@}
 
   //--==----==----==----==----==----==----==----==----==----==----==----==----==--

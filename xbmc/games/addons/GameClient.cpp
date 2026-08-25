@@ -809,6 +809,16 @@ bool CGameClient::SerializeAchievementState(std::vector<uint8_t>& data)
   try
   {
     size = m_ifc.game->toAddon->AchievementStateSize(m_ifc.game);
+size_t CGameClient::GetAchievementStateSize() const
+{
+  if (!m_bIsPlaying)
+    return 0;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return m_ifc.game->toAddon->AchievementStateSize(m_ifc.game);
   }
   catch (...)
   {
@@ -826,6 +836,24 @@ bool CGameClient::SerializeAchievementState(std::vector<uint8_t>& data)
     if (LogError(m_ifc.game->toAddon->SerializeAchievements(m_ifc.game, data.data(), size),
                  "SerializeAchievements()"))
       return true;
+  }
+
+  return 0;
+}
+
+bool CGameClient::SerializeAchievements(uint8_t* data, size_t size)
+{
+  if (data == nullptr || size == 0 || !m_bIsPlaying)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    // Not logged as an error when unimplemented: a client without achievement
+    // support is the ordinary case, and LogError already keeps that at debug
+    return LogError(m_ifc.game->toAddon->SerializeAchievements(m_ifc.game, data, size),
+                    "SerializeAchievements()");
   }
   catch (...)
   {
@@ -912,6 +940,7 @@ bool CGameClient::DeserializeAchievements(const uint8_t* data, size_t size)
   // machine state jumped without carrying anything to restore. See the caller
   // in CReversiblePlayback::LoadSavestate().
   if (!m_bIsPlaying)
+  if (data == nullptr || size == 0 || !m_bIsPlaying)
     return false;
 
   std::unique_lock lock(m_critSection);
