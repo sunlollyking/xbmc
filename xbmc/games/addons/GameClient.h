@@ -169,7 +169,20 @@ public:
   bool IsPlaying() const { return m_bIsPlaying; }
   double GetFrameRate() const { return m_framerate.load(); }
   double GetSampleRate() const { return m_samplerate.load(); }
-  void RunFrame();
+
+  /*!
+   * \brief Run the client for one frame
+   *
+   * \param pollInput Whether to drain the peripheral event queue first
+   *
+   * Input reaches the client as events, pushed as they arrive, so the client
+   * answers a frame from whatever state those events last left it in. Polling
+   * is how new events get there. A frame that is going to be rolled back has
+   * to be run against the same input as the frame that commits, or the
+   * prediction is of a button press that never happened -- so runahead runs
+   * its speculative frames without polling.
+   */
+  void RunFrame(bool pollInput = true);
 
   /*!
    * \brief Tell the client what speed the player is running at
@@ -243,6 +256,21 @@ public:
   //! \brief Drop every cheat the client is holding
   bool CheatReset();
 
+   * \brief Put back a state this client itself produced moments ago
+   *
+   * Deserialize() treats the incoming state as foreign: it may have come from
+   * disc, from another session, or from a client that had not run yet, so it
+   * reseats the disc, restores the disc list and refreshes the disc state
+   * around every call, and runs a frame to retry if the client was not ready.
+   * All of that is right for loading a savestate and wrong sixty times a
+   * second -- for a rollback the disc has not moved since the state was taken
+   * moments earlier by the same client.
+   *
+   * \return True if the client accepted the state
+   */
+  bool RestoreState(const uint8_t* data, size_t size);
+
+  /*!
    * \brief How many bytes the client's achievement state needs right now
    *
    * Kept beside the emulator's state rather than inside it: a savestate whose
