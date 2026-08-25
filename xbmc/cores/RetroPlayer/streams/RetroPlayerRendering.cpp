@@ -204,5 +204,8 @@ void CRetroPlayerRendering::AddStreamData(const StreamPacket& packet)
 {
   const HwFramebufferPacket& hwPacket = static_cast<const HwFramebufferPacket&>(packet);
 
+  if (!m_bVideoEnabled)
+    return;
+
   m_renderManager.RenderFrame(hwPacket.width, hwPacket.height);
 }

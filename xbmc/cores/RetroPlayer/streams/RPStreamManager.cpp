@@ -30,6 +30,15 @@ void CRPStreamManager::EnableAudio(bool bEnable)
     m_audioStream->Enable(bEnable);
 }
 
+void CRPStreamManager::EnableVideo(bool bEnable)
+{
+  if (m_videoStream != nullptr)
+    m_videoStream->Enable(bEnable);
+
+  if (m_renderingStream != nullptr)
+    m_renderingStream->Enable(bEnable);
+}
+
 StreamPtr CRPStreamManager::CreateStream(StreamType streamType)
 {
   switch (streamType)
@@ -44,11 +53,17 @@ StreamPtr CRPStreamManager::CreateStream(StreamType streamType)
     case StreamType::VIDEO:
     case StreamType::SW_BUFFER:
     {
-      return StreamPtr(new CRetroPlayerVideo(m_renderManager, m_processInfo));
+      // Save pointer to video stream
+      m_videoStream = new CRetroPlayerVideo(m_renderManager, m_processInfo);
+
+      return StreamPtr(m_videoStream);
     }
     case StreamType::HW_BUFFER:
     {
-      return StreamPtr(new CRetroPlayerRendering(m_renderManager, m_processInfo));
+      // Save pointer to rendering stream
+      m_renderingStream = new CRetroPlayerRendering(m_renderManager, m_processInfo);
+
+      return StreamPtr(m_renderingStream);
     }
     default:
       break;
@@ -63,6 +78,10 @@ void CRPStreamManager::CloseStream(StreamPtr stream)
   {
     if (stream.get() == m_audioStream)
       m_audioStream = nullptr;
+    else if (stream.get() == m_videoStream)
+      m_videoStream = nullptr;
+    else if (stream.get() == m_renderingStream)
+      m_renderingStream = nullptr;
 
     stream->CloseStream();
   }

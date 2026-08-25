@@ -96,6 +96,15 @@ public:
 
   ~CRetroPlayerRendering() override;
 
+  /*!
+   * \brief Whether frames handed over are shown or thrown away
+   *
+   * The client has already drawn into the framebuffer by the time this is
+   * consulted, so a discarded frame costs the same to render as a shown one.
+   * Only the presentation is skipped.
+   */
+  void Enable(bool bEnabled) { m_bVideoEnabled = bEnabled; }
+
   // Implementation of IRetroPlayerStream
   bool OpenStream(const StreamProperties& properties) override;
   bool GetStreamBuffer(unsigned int width, unsigned int height, StreamBuffer& buffer) override;
@@ -123,6 +132,7 @@ private:
 
   // Stream parameters
   bool m_bOpen = false;
+  bool m_bVideoEnabled = true;
   std::unique_ptr<HwFramebufferProperties> m_hwProperties;
   unsigned int m_width = 0;
   unsigned int m_height = 0;
