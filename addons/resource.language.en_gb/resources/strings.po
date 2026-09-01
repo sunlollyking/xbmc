@@ -19551,7 +19551,19 @@ msgctxt "#35301"
 msgid "This game renders with {0:s}, which isn't available on this display. It can't be played."
 msgstr ""
 
-#empty strings from id 35302 to 35504
+#empty strings from id 35302 to 35363
+
+#. Setting to show achievement indicators over the game while playing
+msgctxt "#35364"
+msgid "Enable on screen achievement indicators"
+msgstr ""
+
+#. Help text for the on screen achievement indicators setting
+msgctxt "#35365"
+msgid "Show the achievement you are attempting, and how far along a counted achievement is, in the corner of the screen while you play."
+msgstr ""
+
+#empty strings from id 35366 to 35504
 
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
