@@ -2850,6 +2850,11 @@
           <default>true</default>
           <control type="toggle" />
         </setting>
+        <setting id="gamesachievements.encore" type="boolean" label="35366" help="35367">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
       </group>
     </category>
   </section>
