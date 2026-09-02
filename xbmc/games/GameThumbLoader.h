@@ -19,8 +19,8 @@ namespace GAME
  *
  * \brief Loads the artwork and the info tag a game collection carries
  *
- * The artwork is whatever CProgramThumbLoader finds beside the file, which is
- * the same local artwork every other file listing in Kodi shows. The info tag
+ * CProgramThumbLoader finds a folder's art and the .tbn a file may carry; the
+ * per-type artwork a game collection holds is found here. The info tag
  * is read here too, on the same background thread, because the only other
  * place it is filled is for the game being played, and a list needs it before
  * anything is playing.
@@ -33,6 +33,16 @@ public:
 
   // Implementation of CBackgroundInfoLoader
   bool LoadItemCached(CFileItem* item) override;
+
+  /*!
+   * \brief Attach the artwork sitting beside a game
+   *
+   * Looks for "<game>-<type>.jpg" and the same as a .png, which is the naming
+   * the video library has used since art stopped being one image per item.
+   *
+   * \return True if any artwork was attached
+   */
+  static bool LoadLocalArt(CFileItem& item);
 };
 } // namespace GAME
 } // namespace KODI
