@@ -19873,7 +19873,7 @@ msgstr ""
 
 #. Help text for the run-ahead setting
 msgctxt "#35367"
-msgid "Make games respond sooner to the controller by running the emulator ahead of itself and showing you a frame from the future. Very demanding: the emulator has to run twice over for every frame you see, or three times at two frames ahead. Works well on 8-bit and 16-bit systems; emulators with large save states, such as disc-based consoles, keep their own speed instead and are left alone. Unavailable in hardcore achievement mode."
+msgid "Make games respond sooner to the controller by running the emulator ahead of itself and showing you a frame from the future. Very demanding: the emulator has to run twice over for every frame you see, or three times at two frames ahead. Works well on 8-bit and 16-bit systems; emulators with large save states, such as disc-based consoles, keep their own speed instead and are left alone."
 msgstr ""
 
 #. Setting for how many frames to run ahead
