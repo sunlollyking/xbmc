@@ -247,7 +247,7 @@
 									nothing in it.
 								</description>
 								<visible>RetroPlayer.HasCheats</visible>
-								<label>$LOCALIZE[35322]</label>
+								<label>$LOCALIZE[35329]</label>
 								<icon>osd/fullscreen/buttons/cheats.png</icon>
 								<onclick>ActivateWindow(GameCheats)</onclick>
 							</item>
@@ -471,7 +471,7 @@
 									nothing in it.
 								</description>
 								<visible>RetroPlayer.HasCheats</visible>
-								<label>$LOCALIZE[35322]</label>
+								<label>$LOCALIZE[35329]</label>
 								<icon>osd/fullscreen/buttons/cheats.png</icon>
 								<onclick>ActivateWindow(GameCheats)</onclick>
 							</item>

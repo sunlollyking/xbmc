@@ -32,7 +32,7 @@ namespace
 constexpr auto SETTING_CHEAT_PREFIX = "cheat";
 
 //! "Cheats"
-constexpr int HEADING_CHEATS = 35322;
+constexpr int HEADING_CHEATS = 35329;
 
 //! Cheat files are written by hand and a description is sometimes a sentence
 //! of instructions rather than a name. Past this the text runs under the

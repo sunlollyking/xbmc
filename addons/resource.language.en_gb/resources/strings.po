@@ -19609,19 +19609,22 @@ msgctxt "#35319"
 msgid "Provider"
 msgstr ""
 
-#. Label of the setting that points at the folder holding cheat files
+#. Shown when no add-on is installed that can look for manuals
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
 msgctxt "#35320"
-msgid "Cheats folder"
+msgid "No add-on is installed that can find manuals"
 msgstr ""
 
-#. Help text for the cheats folder setting
+#. Shown while a manual is being looked for
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
 msgctxt "#35321"
-msgid "The folder holding libretro cheat files. Cheats are offered for a game when a matching cheat file is found here."
+msgid "Searching…"
 msgstr ""
 
-#. Label of the Cheats button in the game OSD, and heading of the cheats dialog
+#. Shown when the search for a manual came back with nothing
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
 msgctxt "#35322"
-msgid "Cheats"
+msgid "No manual was found for this game"
 msgstr ""
 
 #. Shown while a chosen manual is being fetched
@@ -19664,6 +19667,21 @@ msgstr ""
 #: xbmc/games/windows/GUIWindowGames.cpp
 msgctxt "#35326"
 msgid "Default video filter"
+msgstr ""
+
+#. Label of the setting that points at the folder holding cheat files
+msgctxt "#35327"
+msgid "Cheats folder"
+msgstr ""
+
+#. Help text for the cheats folder setting
+msgctxt "#35328"
+msgid "The folder holding libretro cheat files. Cheats are offered for a game when a matching cheat file is found here."
+msgstr ""
+
+#. Label of the Cheats button in the game OSD, and heading of the cheats dialog
+msgctxt "#35329"
+msgid "Cheats"
 msgstr ""
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
