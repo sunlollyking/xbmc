@@ -371,6 +371,12 @@ bool CGamesGUIInfo::GetBool(bool& value,
     case RETROPLAYER_HAS_CHEATS:
     {
       value = CServiceBroker::GetGameServices().CheatRuntime().HasCheats();
+    case RETROPLAYER_HAS_LEADERBOARDS:
+    {
+      value = !CServiceBroker::GetGameServices()
+                   .AchievementRuntime()
+                   .GetLeaderboardState()
+                   .leaderboards.empty();
       return true;
     }
     default:

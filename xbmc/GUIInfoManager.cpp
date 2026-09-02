@@ -4666,11 +4666,21 @@ constexpr std::array<InfoMap, 88> videoplayer = {{
 ///     @skinning_v18 **[New Infolabel]** \link RetroPlayer_VideoRotation `RetroPlayer.VideoRotation`\endlink
 ///     <p>
 ///   }
+///   \table_row3{   <b>`RetroPlayer.HasLeaderboards`</b>,
+///                  \anchor RetroPlayer_HasLeaderboards
+///                  _boolean_,
+///     @return **True** if the currently-playing game has leaderboards\,
+///     **False** otherwise.
+///     <p><hr>
+///     @skinning_v22 **[New Boolean Condition]** \link RetroPlayer_HasLeaderboards `RetroPlayer.HasLeaderboards`\endlink
+///     <p>
+///   }
 /// \table_end
 ///
 /// -----------------------------------------------------------------------------
 // clang-format off
 constexpr std::array<InfoMap, 26> retroplayer = {{
+constexpr std::array<InfoMap, 28> retroplayer = {{
     {"title", RETROPLAYER_TITLE},
     {"platform", RETROPLAYER_PLATFORM},
     {"genres", RETROPLAYER_GENRES},
@@ -4690,6 +4700,8 @@ constexpr std::array<InfoMap, 26> retroplayer = {{
     {"achievementsindicatorprogress", RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS},
     {"achievementsindicatorpercent", RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT},
     {"achievementsindicatorbadge", RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE},
+    {"achievementshardcore", RETROPLAYER_ACHIEVEMENTS_HARDCORE},
+    {"hasleaderboards", RETROPLAYER_HAS_LEADERBOARDS},
     {"supportseject", RETROPLAYER_SUPPORTS_EJECT},
     {"discejected", RETROPLAYER_DISC_EJECTED},
     {"disclabel", RETROPLAYER_DISC_LABEL},
