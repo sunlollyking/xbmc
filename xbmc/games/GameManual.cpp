@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <array>
+#include <vector>
 #include <cctype>
 
 using namespace KODI::GAME;
@@ -29,7 +30,14 @@ namespace
 constexpr std::array<const char*, 3> MANUAL_EXTENSIONS = {".pdf", ".cbz", ".cbr"};
 
 //! Where a manual is kept if it is not beside the game
-constexpr const char* MANUAL_SUBFOLDER = "manuals";
+//!
+//! Both spellings are looked in. The collections people already have use the
+//! capitalised one, and a case-sensitive filesystem makes that a different
+//! folder that would otherwise never be read.
+constexpr std::array<const char*, 2> MANUAL_SUBFOLDERS = {"manuals", "Manuals"};
+
+//! The one to create when none exists yet
+constexpr const char* MANUAL_SUBFOLDER = MANUAL_SUBFOLDERS[0];
 
 /*!
  * \brief Whether a path could have a manual sitting beside it
@@ -159,15 +167,18 @@ std::vector<std::string> CGameManual::BuildManualPaths(const std::string& gamePa
   std::vector<std::string> paths;
 
   const std::string folder = URIUtils::GetDirectory(gamePath);
-  const std::string subfolder = URIUtils::AddFileToFolder(folder, MANUAL_SUBFOLDER);
   const std::string stem = GetGameStem(gamePath);
 
   if (stem.empty())
     return {};
 
+  std::vector<std::string> directories{folder};
+  for (const char* subfolder : MANUAL_SUBFOLDERS)
+    directories.emplace_back(URIUtils::AddFileToFolder(folder, subfolder));
+
   // Beside the game first, since that is where a manual kept with one game
-  // lives, then the shared folder
-  for (const std::string& directory : {folder, subfolder})
+  // lives, then the shared folders
+  for (const std::string& directory : directories)
   {
     for (const char* extension : MANUAL_EXTENSIONS)
       paths.emplace_back(URIUtils::AddFileToFolder(directory, stem + extension));
@@ -194,7 +205,11 @@ std::string CGameManual::GetManualPath(const std::string& gamePath)
   const std::string normalised = NormaliseName(GetGameStem(gamePath));
   const std::string folder = URIUtils::GetDirectory(gamePath);
 
-  for (const std::string& directory : {folder, URIUtils::AddFileToFolder(folder, MANUAL_SUBFOLDER)})
+  std::vector<std::string> directories{folder};
+  for (const char* subfolder : MANUAL_SUBFOLDERS)
+    directories.emplace_back(URIUtils::AddFileToFolder(folder, subfolder));
+
+  for (const std::string& directory : directories)
   {
     const std::string found = FindByNormalisedName(directory, normalised);
     if (!found.empty())
@@ -215,8 +230,22 @@ std::string CGameManual::GetDownloadPath(const std::string& gamePath, bool& writ
   if (stem.empty())
     return {};
 
-  const std::string folder =
-      URIUtils::AddFileToFolder(URIUtils::GetDirectory(gamePath), MANUAL_SUBFOLDER);
+  // Downloads join the folder a source already keeps its manuals in, whichever
+  // spelling that is, rather than making a second one beside it
+  const std::string parent = URIUtils::GetDirectory(gamePath);
+  std::string folder;
+  for (const char* subfolder : MANUAL_SUBFOLDERS)
+  {
+    const std::string candidate = URIUtils::AddFileToFolder(parent, subfolder);
+    if (XFILE::CDirectory::Exists(candidate))
+    {
+      folder = candidate;
+      break;
+    }
+  }
+
+  if (folder.empty())
+    folder = URIUtils::AddFileToFolder(parent, MANUAL_SUBFOLDER);
 
   // Whether the folder can be made is the question, not whether it is there:
   // the first manual fetched for a source has to create it

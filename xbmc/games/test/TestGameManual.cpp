@@ -267,6 +267,27 @@ TEST(TestGameManual, FindsAManualInTheManualsSubfolder)
   EXPECT_EQ(CGameManual::GetManualPath(fixture.Path("Game (USA).md")), manual);
 }
 
+TEST(TestGameManual, FindsAManualInACapitalisedManualsSubfolder)
+{
+  // Collections built elsewhere use "Manuals", and on a case-sensitive
+  // filesystem that is a different folder from the one downloads go in
+  const CManualFixture fixture;
+  fixture.Touch("Game (USA).md");
+  const std::string manual = fixture.Touch("Manuals/Game (USA).pdf");
+
+  EXPECT_EQ(CGameManual::GetManualPath(fixture.Path("Game (USA).md")), manual);
+}
+
+TEST(TestGameManual, FindsATagStrippedManualInACapitalisedSubfolder)
+{
+  const CManualFixture fixture;
+  fixture.Touch("Sonic The Hedgehog 2 (World) (Rev A).md");
+  const std::string manual = fixture.Touch("Manuals/Sonic The Hedgehog 2.pdf");
+
+  EXPECT_EQ(CGameManual::GetManualPath(fixture.Path("Sonic The Hedgehog 2 (World) (Rev A).md")),
+            manual);
+}
+
 TEST(TestGameManual, FindsAManualWhoseTagsDiffer)
 {
   // The case the exact match cannot serve: ROM naming conventions add region
