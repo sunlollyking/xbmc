@@ -51,6 +51,12 @@ bool CGUIWindowGames::OnMessage(CGUIMessage& message)
 {
   switch (message.GetMessage())
   {
+    case GUI_MSG_WINDOW_DEINIT:
+    {
+      if (m_thumbLoader.IsLoading())
+        m_thumbLoader.StopThread();
+      break;
+    }
     case GUI_MSG_WINDOW_INIT:
     {
       m_rootDir.AllowNonLocalSources(true); //! @todo
@@ -240,6 +246,23 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
 bool CGUIWindowGames::OnAddMediaSource()
 {
   return CGUIDialogMediaSource::ShowAndAddMediaSource("games");
+}
+
+bool CGUIWindowGames::Update(const std::string& strDirectory, bool updateFilterPath /* = true */)
+{
+  if (m_thumbLoader.IsLoading())
+    m_thumbLoader.StopThread();
+
+  if (!CGUIMediaWindow::Update(strDirectory, updateFilterPath))
+    return false;
+
+  // Games carry no artwork of their own: nothing scrapes them and the add-ons
+  // that run them describe the emulator rather than the game. What a collection
+  // does have is images sitting beside the files, so a platform folder shows
+  // the system it holds and a game shows its own cover.
+  m_thumbLoader.Load(*m_vecItems);
+
+  return true;
 }
 
 bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemList& items)
