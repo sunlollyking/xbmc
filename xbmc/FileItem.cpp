@@ -24,6 +24,7 @@
 #include "filesystem/VideoDatabaseDirectory/QueryParams.h"
 #include "games/GameUtils.h"
 #include "games/tags/GameInfoTag.h"
+#include "games/tags/GameInfoTagLoader.h"
 #include "music/Album.h"
 #include "music/Artist.h"
 #include "music/MusicDatabase.h"
@@ -2123,12 +2124,11 @@ bool CFileItem::LoadGameTag()
   if (HasGameInfoTag() && m_gameInfoTag->IsLoaded())
     return true;
 
-  //! @todo
-  GetGameInfoTag();
+  const bool loaded = KODI::GAME::CGameInfoTagLoader::Load(*this, *GetGameInfoTag());
 
   m_gameInfoTag->SetLoaded(true);
 
-  return false;
+  return loaded;
 }
 
 bool CFileItem::LoadDetails()

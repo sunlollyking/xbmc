@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ThumbLoader.h"
+#include "games/GameThumbLoader.h"
 #include "windows/GUIMediaWindow.h"
 
 class CGUIDialogProgress;
@@ -47,7 +47,7 @@ protected:
 
   CGUIDialogProgress* m_dlgProgress = nullptr;
 
-  CProgramThumbLoader m_thumbLoader;
+  CGameThumbLoader m_thumbLoader;
 };
 } // namespace GAME
 } // namespace KODI
