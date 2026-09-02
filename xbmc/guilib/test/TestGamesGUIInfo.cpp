@@ -347,6 +347,8 @@ TEST_F(TestGamesGUIInfo, ShowsTheClosestOfTwoAchievementsCountingAtOnce)
   EXPECT_TRUE(gamesGUIInfo.GetLabel(
       value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
   EXPECT_EQ(value, "Trip Pop Pro");
+}
+
 TEST_F(TestGamesGUIInfo, AListItemAnswersForItsOwnGame)
 {
   //

@@ -99,9 +99,6 @@
 
 #define ADDON_INSTANCE_VERSION_GAME                   "8.1.0"
 #define ADDON_INSTANCE_VERSION_GAME_MIN               "8.1.0"
-#define ADDON_INSTANCE_VERSION_GAME                   "7.8.0"
-#define ADDON_INSTANCE_VERSION_GAME                   "7.9.0"
-#define ADDON_INSTANCE_VERSION_GAME_MIN               "7.5.0"
 #define ADDON_INSTANCE_VERSION_GAME_XML_ID            "kodi.binary.instance.game"
 #define ADDON_INSTANCE_VERSION_GAME_DEPENDS           "c-api/addon-instance/game.h" \
                                                       "addon-instance/Game.h"
