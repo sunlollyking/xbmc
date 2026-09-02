@@ -45,6 +45,8 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.passw
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
+const std::string SETTING_GAMES_CLEAR_MANUAL_CACHE = "gamesgeneral.clearmanualcache";
+const std::string SETTING_GAMES_CLEAR_LEADERBOARD_CACHE = "gamesgeneral.clearleaderboardcache";
 
 constexpr auto LOGIN_TO_RETRO_ACHIEVEMENTS_URL =
     "https://retroachievements.org/dorequest.php?r=login2";
@@ -65,10 +67,6 @@ CGameSettings::CGameSettings()
 {
   m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
 
-  m_settings->RegisterCallback(this, {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME,
-                                      SETTING_GAMES_ACHIEVEMENTS_USERNAME,
-                                      SETTING_GAMES_ACHIEVEMENTS_PASSWORD,
-                                      SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN});
   m_settings->RegisterCallback(
       this,
       {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ENABLERUNAHEAD,

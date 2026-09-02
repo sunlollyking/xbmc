@@ -247,14 +247,6 @@ public:
   bool SerializeAchievementState(std::vector<uint8_t>& data);
 
   /*!
-   * \brief Restore the client's achievement state after a savestate load
-   *
-   * Called for every load, including savestates that carry no achievement
-   * data: the client has to know the machine state jumped either way.
-   */
-  bool DeserializeAchievements(const uint8_t* data, size_t size);
-
-  /*!
    * \brief Give the client the RetroAchievements account to sign in with
    *
    * The account is held by Kodi, which owns the settings it is entered in.
@@ -274,6 +266,7 @@ public:
   //! \brief Drop every cheat the client is holding
   bool CheatReset();
 
+  /*!
    * \brief Put back a state this client itself produced moments ago
    *
    * Deserialize() treats the incoming state as foreign: it may have come from
@@ -301,6 +294,13 @@ public:
   size_t GetAchievementStateSize() const;
 
   bool SerializeAchievements(uint8_t* data, size_t size);
+
+  /*!
+   * \brief Restore the client's achievement state after a savestate load
+   *
+   * Called for every load, including savestates that carry no achievement
+   * data: the client has to know the machine state jumped either way.
+   */
   bool DeserializeAchievements(const uint8_t* data, size_t size);
 
   // Implementation of IHwFramebufferCallback

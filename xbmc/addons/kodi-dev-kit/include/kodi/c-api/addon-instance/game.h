@@ -1592,11 +1592,6 @@ extern "C"
     (const AddonInstance_Game*,
      void(__cdecl*)(const void*, const char*, unsigned int),
      const void*);
-    size_t(__cdecl* AchievementStateSize)(const struct AddonInstance_Game*);
-    GAME_ERROR(__cdecl* SerializeAchievements)
-    (const struct AddonInstance_Game*, uint8_t*, size_t);
-    GAME_ERROR(__cdecl* DeserializeAchievements)
-    (const struct AddonInstance_Game*, const uint8_t*, size_t);
     void(__cdecl* FreeString)(const AddonInstance_Game*, char*);
     GAME_ERROR(__cdecl* RCSetEncoreModeEnabled)(const AddonInstance_Game*, bool);
 

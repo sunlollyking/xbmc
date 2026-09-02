@@ -665,8 +665,6 @@ void CGameClient::RunFrame(bool pollInput /* = true */, bool speculative /* = fa
     try
     {
       {
-      CClientFrameScope hwScope(Streams());
-      LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()");
         CClientFrameScope hwScope(Streams());
 
         // A speculative frame is one the client is about to be rewound past,
@@ -877,16 +875,6 @@ bool CGameClient::SerializeAchievementState(std::vector<uint8_t>& data)
   try
   {
     size = m_ifc.game->toAddon->AchievementStateSize(m_ifc.game);
-size_t CGameClient::GetAchievementStateSize() const
-{
-  if (!m_bIsPlaying)
-    return 0;
-
-  std::unique_lock lock(m_critSection);
-
-  try
-  {
-    return m_ifc.game->toAddon->AchievementStateSize(m_ifc.game);
   }
   catch (...)
   {
@@ -904,6 +892,31 @@ size_t CGameClient::GetAchievementStateSize() const
     if (LogError(m_ifc.game->toAddon->SerializeAchievements(m_ifc.game, data.data(), size),
                  "SerializeAchievements()"))
       return true;
+  }
+  catch (...)
+  {
+    LogException("SerializeAchievements()");
+  }
+
+  data.clear();
+
+  return false;
+}
+
+size_t CGameClient::GetAchievementStateSize() const
+{
+  if (!m_bIsPlaying)
+    return 0;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return m_ifc.game->toAddon->AchievementStateSize(m_ifc.game);
+  }
+  catch (...)
+  {
+    LogException("AchievementStateSize()");
   }
 
   return 0;
@@ -928,7 +941,28 @@ bool CGameClient::SerializeAchievements(uint8_t* data, size_t size)
     LogException("SerializeAchievements()");
   }
 
-  data.clear();
+  return false;
+}
+
+bool CGameClient::DeserializeAchievements(const uint8_t* data, size_t size)
+{
+  // An empty payload is forwarded, not refused: it tells the client the
+  // machine state jumped without carrying anything to restore. See the caller
+  // in CReversiblePlayback::LoadSavestate().
+  if (!m_bIsPlaying)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return LogError(m_ifc.game->toAddon->DeserializeAchievements(m_ifc.game, data, size),
+                    "DeserializeAchievements()");
+  }
+  catch (...)
+  {
+    LogException("DeserializeAchievements()");
+  }
 
   return false;
 }
@@ -997,30 +1031,6 @@ bool CGameClient::CheatReset()
   catch (...)
   {
     LogException("CheatReset()");
-  }
-
-  return false;
-}
-
-bool CGameClient::DeserializeAchievements(const uint8_t* data, size_t size)
-{
-  // An empty payload is forwarded, not refused: it tells the client the
-  // machine state jumped without carrying anything to restore. See the caller
-  // in CReversiblePlayback::LoadSavestate().
-  if (!m_bIsPlaying)
-  if (data == nullptr || size == 0 || !m_bIsPlaying)
-    return false;
-
-  std::unique_lock lock(m_critSection);
-
-  try
-  {
-    return LogError(m_ifc.game->toAddon->DeserializeAchievements(m_ifc.game, data, size),
-                    "DeserializeAchievements()");
-  }
-  catch (...)
-  {
-    LogException("DeserializeAchievements()");
   }
 
   return false;

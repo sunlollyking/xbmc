@@ -151,28 +151,6 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
                   delaySecs * 1000);
       }
 
-      const unsigned int accepted =
-          m_pAudioStream->AddData(&audioPacket.data, 0, frameCount, nullptr);
-
-      // Dropping what the sink won't take is deliberate; being silent about it
-      // is not.
-      if (accepted < frameCount)
-      {
-        m_droppedFrames += frameCount - accepted;
-        ++m_dropEvents;
-
-        const auto now = std::chrono::steady_clock::now();
-
-        if (!m_lastDropLog || now - *m_lastDropLog >= DROP_LOG_INTERVAL)
-        {
-          CLog::Log(LOGDEBUG,
-                    "RetroPlayer[AUDIO]: Sink accepted {} of {} frames, {} refusals since the last "
-                    "message, {} frames dropped so far",
-                    accepted, frameCount, m_dropEvents, m_droppedFrames);
-
-          m_lastDropLog = now;
-          m_dropEvents = 0;
-        }
       // Feed the sink until it has taken everything, waiting while it is full.
       //
       // The waiting is the point. A client that renders faster than real time
@@ -189,7 +167,6 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       const std::chrono::steady_clock::time_point giveUpAt =
           std::chrono::steady_clock::now() + MAX_WAIT;
 
-      // Feed the sink until it has taken everything, waiting if it is full.
       unsigned int framesWritten = 0;
       while (framesWritten < frameCount)
       {
@@ -200,14 +177,30 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
           break;
 
         if (std::chrono::steady_clock::now() >= giveUpAt)
-        {
-          CLog::Log(LOGDEBUG,
-                    "RetroPlayer[AUDIO]: Sink took {} of {} frames before the wait ran out",
-                    framesWritten, frameCount);
           break;
-        }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+
+      // Dropping what the sink would not take even after the wait is
+      // deliberate; being silent about it is not.
+      if (framesWritten < frameCount)
+      {
+        m_droppedFrames += frameCount - framesWritten;
+        ++m_dropEvents;
+
+        const auto now = std::chrono::steady_clock::now();
+
+        if (!m_lastDropLog || now - *m_lastDropLog >= DROP_LOG_INTERVAL)
+        {
+          CLog::Log(LOGDEBUG,
+                    "RetroPlayer[AUDIO]: Sink accepted {} of {} frames, {} refusals since the last "
+                    "message, {} frames dropped so far",
+                    framesWritten, frameCount, m_dropEvents, m_droppedFrames);
+
+          m_lastDropLog = now;
+          m_dropEvents = 0;
+        }
       }
 
       // Then hold the client to the speed its own sound plays at.
@@ -224,14 +217,12 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       // several have no other throttle. Waiting here for the queue to drain to
       // TARGET_DELAY is what supplies that.
       //
-      // Bounded by the same deadline, so a stream that has stopped draining
-      // costs the game loop a frame rather than hanging it.
-      // Never wait longer than the audio just handed over would take to play.
-      // That bound is what makes this safe: however wrong the target turns out
-      // to be for a given sink, the client can only ever be held to real time,
-      // never slower. Waiting a fixed 100 ms instead, with a target below the
-      // sink's floor, cost every packet the full wait and ran games at about
-      // half a frame per second.
+      // Never wait past the shared deadline, nor longer than the audio just
+      // handed over would take to play. That second bound is what makes this
+      // safe: however wrong the target turns out to be for a given sink, the
+      // client can only ever be held to real time, never slower. Waiting a
+      // fixed 100 ms instead, with a target below the sink's floor, cost every
+      // packet the full wait and ran games at about half a frame per second.
       const unsigned int sampleRate = m_pAudioStream->GetSampleRate();
       if (sampleRate > 0)
       {

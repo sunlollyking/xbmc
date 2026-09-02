@@ -43,7 +43,6 @@ public:
   CReversiblePlayback(GAME::CGameClient* gameClient,
                       CRPRenderManager& renderManager,
                       CRPStreamManager& streamManager,
-                      CCheevos* cheevos,
                       CGUIGameMessenger& guiMessenger,
                       double fps,
                       size_t serializeSize);
@@ -119,7 +118,6 @@ private:
   GAME::CGameClient* const m_gameClient;
   CRPRenderManager& m_renderManager;
   CRPStreamManager& m_streamManager;
-  CCheevos* const m_cheevos;
   CGUIGameMessenger& m_guiMessenger;
 
   // Gameplay functionality

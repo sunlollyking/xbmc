@@ -4699,7 +4699,6 @@ constexpr std::array<InfoMap, 28> retroplayer = {{
     {"achievementsindicatorprogress", RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS},
     {"achievementsindicatorpercent", RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT},
     {"achievementsindicatorbadge", RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE},
-    {"achievementshardcore", RETROPLAYER_ACHIEVEMENTS_HARDCORE},
     {"hasleaderboards", RETROPLAYER_HAS_LEADERBOARDS},
     {"supportseject", RETROPLAYER_SUPPORTS_EJECT},
     {"discejected", RETROPLAYER_DISC_EJECTED},

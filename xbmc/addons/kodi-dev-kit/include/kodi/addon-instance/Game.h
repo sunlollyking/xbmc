@@ -1008,7 +1008,8 @@ public:
   }
   //----------------------------------------------------------------------------
 
-  //=====================================================================  /// @brief Turn encore mode on or off
+  //============================================================================
+  /// @brief Turn encore mode on or off
   ///
   /// Encore mode re-activates achievements the player has already earned, so
   /// they can be played for again. Nothing is submitted for them a second time.
@@ -1024,7 +1025,6 @@ public:
   virtual GAME_ERROR RCSetEncoreModeEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
   //----------------------------------------------------------------------------
 
-=======
   ///@}
 
   //--==----==----==----==----==----==----==----==----==----==----==----==----==--

@@ -141,9 +141,6 @@ private:
   std::vector<uint8_t> m_achievementData;
   std::vector<uint8_t> m_memoryDataDecompressed;
 
-  //! Small and written rarely, so it is stored as-is rather than through the
-  //! compressing blob path the video and memory payloads use
-  std::vector<uint8_t> m_achievementData;
 };
 } // namespace RETRO
 } // namespace KODI

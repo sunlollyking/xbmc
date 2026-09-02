@@ -39,8 +39,6 @@ using namespace RETRO;
 
 namespace
 {
-constexpr unsigned int TOAST_DISPLAY_TIME_MS = 5000;
-
 /*!
  * \brief The largest savestate run-ahead will work with
  *
@@ -51,46 +49,17 @@ constexpr unsigned int TOAST_DISPLAY_TIME_MS = 5000;
  * measured rather than left as a permanent ceiling.
  */
 constexpr size_t MAX_RUNAHEAD_STATE_SIZE = 2 * 1024 * 1024;
-
-/*!
- * \brief Whether hardcore mode is currently blocking gameplay assistance
- *
- * RetroAchievements requires save state loading, rewind, slow motion and
- * cheats to be unavailable while hardcore is on. Saving states is still
- * allowed, and so is fast forward.
- */
-bool HardcoreRestrictionsApply()
-{
-  return CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
-}
-
-/*!
- * \brief Tell the player why something they asked for didn't happen
- *
- * Silently ignoring the request would read as a broken control.
- */
-void NotifyBlockedByHardcore(uint32_t featureStringId)
-{
-  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
-
-  // "{0:s} is not available in hardcore mode"
-  CGUIDialogKaiToast::QueueNotification(
-      CGUIDialogKaiToast::Info, strings.Get(35264),
-      StringUtils::Format(strings.Get(35302), strings.Get(featureStringId)), TOAST_DISPLAY_TIME_MS);
-}
 } // namespace
 
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
                                          CRPRenderManager& renderManager,
                                          CRPStreamManager& streamManager,
-                                         CCheevos* cheevos,
                                          CGUIGameMessenger& guiMessenger,
                                          double fps,
                                          size_t serializeSize)
   : m_gameClient(gameClient),
     m_renderManager(renderManager),
     m_streamManager(streamManager),
-    m_cheevos(cheevos),
     m_guiMessenger(guiMessenger),
     m_gameLoop(this, fps),
     m_savestateDatabase(new CSavestateDatabase)
@@ -284,23 +253,6 @@ void CReversiblePlayback::CommitSavestate(bool autosave,
       std::memcpy(achievementData, achievementState.data(), achievementState.size());
   }
 
-  // Captured beside the emulator's memory, not inside it: a savestate whose
-  // memory does not match GetSerializeSize() is refused before the client sees
-  // it, so appending would make a state written with achievements on
-  // unloadable with them off. Asked for each time, so it grows with the runtime.
-  if (const size_t achievementSize = m_gameClient->GetAchievementStateSize(); achievementSize > 0)
-  {
-    if (uint8_t* const achievementData = savestate->GetAchievementBuffer(achievementSize))
-    {
-      if (!m_gameClient->SerializeAchievements(achievementData, achievementSize))
-      {
-        // Best effort: the emulator state is still worth writing on its own
-        savestate->GetAchievementBuffer(0);
-        CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: No achievement state to store");
-      }
-    }
-  }
-
   // Attempt to get existing properties
   {
     std::unique_lock lock(m_savestateMutex);
@@ -407,12 +359,6 @@ bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
 
           m_gameClient->DeserializeAchievements(nullptr, 0);
         }
-        // After the emulator, so the runtime is restored against the machine
-        // state it belongs to. Absent on savestates written before this existed,
-        // or with achievements off, and neither is a failure.
-        if (const size_t achievementSize = savestate->GetAchievementSize(); achievementSize > 0)
-          m_gameClient->DeserializeAchievements(savestate->GetAchievementData(), achievementSize);
-
         m_totalFrameCount = savestate->TimestampFrames();
         bSuccess = true;
         if (savestate->Type() == SAVE_TYPE::AUTO)
@@ -460,12 +406,6 @@ unsigned int CReversiblePlayback::GetRunaheadFrames() const
   // them by OnSpeedChange, and looking into the future of a game being wound
   // backwards means nothing.
   if (m_gameLoop.GetSpeed() != 1.0)
-    return 0;
-
-  // Asked every frame rather than cached, because hardcore can be turned on
-  // without this object being told, and a single settings read is nothing
-  // beside the extra run of the emulator it is guarding
-  if (HardcoreRestrictionsApply())
     return 0;
 
   // A client that cannot serialize cannot be put back, and one that has not
@@ -743,15 +683,6 @@ void CReversiblePlayback::UpdateRunahead()
   if (!bEnabled || frameCount == 0)
   {
     CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Run-ahead disabled");
-    return;
-  }
-
-  // Said here as well as refused per-frame, so the log does not claim run-ahead
-  // is happening to someone who has hardcore on and is wondering why nothing
-  // feels different
-  if (HardcoreRestrictionsApply())
-  {
-    CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Run-ahead requested but held off by hardcore mode");
     return;
   }
 
