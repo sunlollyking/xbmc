@@ -144,6 +144,65 @@ TEST(TestGameThumbLoader, TakesAPictureLeftBesideTheGame)
   EXPECT_EQ(item.GetArt("thumb"), plain);
 }
 
+TEST(TestGameThumbLoader, FindsBoxArtInAFolderOfItsOwn)
+{
+  // Spec: a platform folder holding thousands of games doubles in length once
+  // each has a picture beside it, so the art may be kept together instead
+  const CArtFixture fixture;
+  fixture.Touch("Sonic The Hedgehog.md");
+  const std::string boxfront = fixture.Touch("Box Art/Sonic The Hedgehog.jpg");
+
+  CFileItem item{fixture.Path("Sonic The Hedgehog.md"), false};
+  EXPECT_TRUE(CGameThumbLoader::LoadLocalArt(item));
+  EXPECT_EQ(item.GetArt("boxfront"), boxfront);
+  EXPECT_EQ(item.GetArt("thumb"), boxfront);
+}
+
+TEST(TestGameThumbLoader, FindsTypedArtInTheArtFolder)
+{
+  const CArtFixture fixture;
+  fixture.Touch("Sonic The Hedgehog.md");
+  const std::string fanart = fixture.Touch("Box Art/Sonic The Hedgehog-fanart.jpg");
+
+  CFileItem item{fixture.Path("Sonic The Hedgehog.md"), false};
+  EXPECT_TRUE(CGameThumbLoader::LoadLocalArt(item));
+  EXPECT_EQ(item.GetArt("fanart"), fanart);
+}
+
+TEST(TestGameThumbLoader, PrefersArtBesideTheGameOverTheArtFolder)
+{
+  const CArtFixture fixture;
+  fixture.Touch("Sonic The Hedgehog.md");
+  const std::string beside = fixture.Touch("Sonic The Hedgehog-boxfront.jpg");
+  fixture.Touch("Box Art/Sonic The Hedgehog.jpg");
+
+  CFileItem item{fixture.Path("Sonic The Hedgehog.md"), false};
+  EXPECT_TRUE(CGameThumbLoader::LoadLocalArt(item));
+  EXPECT_EQ(item.GetArt("boxfront"), beside);
+}
+
+TEST(TestGameThumbLoader, ReadsAnArtFolderWhateverItIsCalled)
+{
+  const CArtFixture fixture;
+  fixture.Touch("Sonic The Hedgehog.md");
+  const std::string boxfront = fixture.Touch("boxart/Sonic The Hedgehog.png");
+
+  CFileItem item{fixture.Path("Sonic The Hedgehog.md"), false};
+  EXPECT_TRUE(CGameThumbLoader::LoadLocalArt(item));
+  EXPECT_EQ(item.GetArt("boxfront"), boxfront);
+}
+
+TEST(TestGameThumbLoader, DoesNotTakeAnotherGamesArtFromTheArtFolder)
+{
+  const CArtFixture fixture;
+  fixture.Touch("Sonic The Hedgehog.md");
+  fixture.Touch("Box Art/Sonic The Hedgehog 2.jpg");
+
+  CFileItem item{fixture.Path("Sonic The Hedgehog.md"), false};
+  EXPECT_FALSE(CGameThumbLoader::LoadLocalArt(item));
+  EXPECT_TRUE(item.GetArt("boxfront").empty());
+}
+
 TEST(TestGameThumbLoader, DoesNotTakeAnotherGamesArtwork)
 {
   const CArtFixture fixture;
