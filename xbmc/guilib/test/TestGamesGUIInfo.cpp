@@ -347,4 +347,70 @@ TEST_F(TestGamesGUIInfo, ShowsTheClosestOfTwoAchievementsCountingAtOnce)
   EXPECT_TRUE(gamesGUIInfo.GetLabel(
       value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
   EXPECT_EQ(value, "Trip Pop Pro");
+TEST_F(TestGamesGUIInfo, AListItemAnswersForItsOwnGame)
+{
+  //
+  // Spec: a row describes the game it holds. RetroPlayer.* deliberately
+  // describes the game being played instead, so a listing asks through
+  // ListItem.* the way it would for anything else
+  //
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  CFileItem item{"/roms/zelda.n64", false};
+  item.GetGameInfoTag()->SetOverview("A boy, a sword, and a great deal of walking.");
+  item.GetGameInfoTag()->SetGenres({"Adventure", "Action"});
+  item.GetGameInfoTag()->SetPublisher("Nintendo");
+  item.GetGameInfoTag()->SetYear(1998);
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_PLOT), nullptr));
+  EXPECT_EQ(value, "A boy, a sword, and a great deal of walking.");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_GENRE), nullptr));
+  EXPECT_EQ(value, "Adventure, Action");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_STUDIO), nullptr));
+  EXPECT_EQ(value, "Nintendo");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_YEAR), nullptr));
+  EXPECT_EQ(value, "1998");
+}
+
+TEST_F(TestGamesGUIInfo, AnItemWithNoGameTagIsPassedOn)
+{
+  //
+  // Spec: most of a listing is not games. The question has to be refused so it
+  // reaches the provider that can answer it, and asking must not create a tag,
+  // since anything carrying one answers CFileItem::IsGame()
+  //
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  CFileItem item{"/roms/Some Folder/", true};
+  ASSERT_FALSE(item.HasGameInfoTag());
+
+  std::string value{"untouched"};
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_PLOT), nullptr));
+  EXPECT_EQ(value, "untouched");
+  EXPECT_FALSE(item.HasGameInfoTag());
+}
+
+TEST_F(TestGamesGUIInfo, AnEmptyFieldIsPassedOn)
+{
+  //
+  // Spec: a game tag carrying nothing for a field must not claim the label,
+  // or a row would show blank where another provider had something to say
+  //
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  CFileItem item{"/roms/zelda.n64", false};
+  item.GetGameInfoTag()->SetTitle("Has a title, nothing else");
+
+  std::string value;
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_PLOT), nullptr));
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_GENRE), nullptr));
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_YEAR), nullptr));
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_STUDIO), nullptr));
 }

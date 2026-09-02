@@ -149,6 +149,51 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
       value = std::to_string(rotationDegCCW);
       return true;
     }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // LISTITEM_*
+    //
+    // A row in a listing, answered from the item's own tag rather than from the
+    // game being played. RetroPlayer.* deliberately describes the latter, the
+    // way VideoPlayer.* does, so a browsing skin asks through ListItem.* as it
+    // would for anything else.
+    //
+    // Refused where the item carries no game tag, so the question passes to the
+    // provider that can answer it.
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    case LISTITEM_PLOT:
+    case LISTITEM_GENRE:
+    case LISTITEM_YEAR:
+    case LISTITEM_STUDIO:
+    {
+      // Const access, so asking does not create a tag on an item that has none
+      if (item == nullptr || !item->HasGameInfoTag())
+        break;
+
+      const CGameInfoTag* tag = item->GetGameInfoTag();
+
+      switch (info.GetInfo())
+      {
+        case LISTITEM_PLOT:
+          value = tag->GetOverview();
+          return !value.empty();
+        case LISTITEM_GENRE:
+          value = StringUtils::Join(tag->GetGenres(), ", ");
+          return !value.empty();
+        case LISTITEM_YEAR:
+          if (tag->GetYear() > 0)
+          {
+            value = std::to_string(tag->GetYear());
+            return true;
+          }
+          break;
+        case LISTITEM_STUDIO:
+          value = tag->GetPublisher();
+          return !value.empty();
+        default:
+          break;
+      }
+      break;
+    }
     case RETROPLAYER_TITLE:
     {
       if (const auto* tag = GetGUIGameTag(); tag != nullptr)
