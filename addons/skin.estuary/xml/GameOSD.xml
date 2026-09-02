@@ -247,7 +247,11 @@
 								<onclick>PlayerControl(Reset)</onclick>
 							</item>
 							<item>
-								<description>Leaderboards button</description>
+								<description>
+									Leaderboards button. Only shown when the game has leaderboards,
+									so a system that has none never offers a list with nothing in it.
+								</description>
+								<visible>RetroPlayer.HasLeaderboards</visible>
 								<label>$LOCALIZE[35331]</label>
 								<icon>osd/fullscreen/buttons/rating.png</icon>
 								<onclick condition="RetroPlayer.AchievementsLoggedIn">ActivateWindow(gameleaderboards)</onclick>
@@ -467,7 +471,11 @@
 								<onclick>PlayerControl(Reset)</onclick>
 							</item>
 							<item>
-								<description>Leaderboards button</description>
+								<description>
+									Leaderboards button. Only shown when the game has leaderboards,
+									so a system that has none never offers a list with nothing in it.
+								</description>
+								<visible>RetroPlayer.HasLeaderboards</visible>
 								<label>$LOCALIZE[35331]</label>
 								<icon>osd/fullscreen/buttons/rating.png</icon>
 								<onclick condition="RetroPlayer.AchievementsLoggedIn">ActivateWindow(gameleaderboards)</onclick>

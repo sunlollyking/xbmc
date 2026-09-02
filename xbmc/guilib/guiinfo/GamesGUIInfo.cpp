@@ -401,6 +401,14 @@ bool CGamesGUIInfo::GetBool(bool& value,
       value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsLoggedIn();
       return true;
     }
+    case RETROPLAYER_HAS_LEADERBOARDS:
+    {
+      value = !CServiceBroker::GetGameServices()
+                   .AchievementRuntime()
+                   .GetLeaderboardState()
+                   .leaderboards.empty();
+      return true;
+    }
     default:
       break;
   }
