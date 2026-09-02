@@ -89,6 +89,11 @@ int ShowGameManual(const std::vector<std::string>& params)
 
   CLog::Log(LOGINFO, "ShowGameManual: found manual \"{}\"", manualPath);
 
+  // The viewer is a window, and the window manager refuses to activate one
+  // while a modal dialog is up. This is reached from the game OSD, which is
+  // exactly that.
+  CServiceBroker::GetGUI()->GetWindowManager().CloseDialogs(true);
+
   CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAME_MANUAL, manualPath);
 
   return 0;
