@@ -90,6 +90,19 @@ TEST(TestGameThumbLoader, TheBoxFrontBecomesTheThumb)
   EXPECT_EQ(item.GetArt("thumb"), boxfront);
 }
 
+TEST(TestGameThumbLoader, TheBoxFrontFillsThePosterSkinsAskFor)
+{
+  // Spec: skins built for films ask for a poster, and nothing writes one for
+  // a game, so the box front fills it rather than the slot staying empty
+  const CArtFixture fixture;
+  fixture.Touch("Sonic The Hedgehog.md");
+  const std::string boxfront = fixture.Touch("Sonic The Hedgehog-boxfront.jpg");
+
+  CFileItem item{fixture.Path("Sonic The Hedgehog.md"), false};
+  EXPECT_TRUE(CGameThumbLoader::LoadLocalArt(item));
+  EXPECT_EQ(item.GetArt("poster"), boxfront);
+}
+
 TEST(TestGameThumbLoader, FindsEveryTypeItKnows)
 {
   const CArtFixture fixture;

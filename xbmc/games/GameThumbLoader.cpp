@@ -84,6 +84,12 @@ bool CGameThumbLoader::LoadLocalArt(CFileItem& item)
     found = true;
   }
 
+  // Skins built for films ask for a poster, and the box front is the picture
+  // that slot wants. Filled rather than looked for: nothing writes a poster
+  // for a game, so leaving it empty only hides artwork that is right there.
+  if (item.HasArt("boxfront") && !item.HasArt("poster"))
+    item.SetArt("poster", item.GetArt("boxfront"));
+
   if (item.HasArt("thumb"))
     return found;
 
