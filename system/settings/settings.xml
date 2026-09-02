@@ -2783,14 +2783,14 @@
           <default>true</default>
           <control type="toggle" />
         </setting>
-        <setting id="gamesgeneral.cheatspath" type="path" label="35327" help="35328">
+        <setting id="gamesgeneral.cheatspath" type="path" label="35371" help="35372">
           <level>0</level>
           <default></default>
           <constraints>
             <allowempty>true</allowempty>
           </constraints>
           <control type="button" format="path">
-            <heading>35327</heading>
+            <heading>35371</heading>
           </control>
         </setting>
         <setting id="gamesgeneral.enableautosave" type="boolean" label="35253" help="35254">
@@ -2902,7 +2902,7 @@
           <default>true</default>
           <control type="toggle" />
         </setting>
-        <setting id="gamesachievements.encore" type="boolean" label="35366" help="35367">
+        <setting id="gamesachievements.encore" type="boolean" label="35374" help="35375">
           <level>0</level>
           <default>false</default>
           <control type="toggle" />

@@ -19651,15 +19651,6 @@ msgctxt "#35365"
 msgid "Show the achievement you are attempting, and how far along a counted achievement is, in the corner of the screen while you play."
 msgstr ""
 
-#. Label of the setting that enables RetroAchievements encore mode
-msgctxt "#35366"
-msgid "Encore mode"
-msgstr ""
-
-#. Help text for the encore mode setting
-msgctxt "#35367"
-msgid "Play for achievements you have already earned. They are re-activated so they can be earned again, and nothing is submitted for them a second time."
-msgstr ""
 
 #empty strings from id 35368 to 35504
 
@@ -19669,19 +19660,19 @@ msgctxt "#35326"
 msgid "Default video filter"
 msgstr ""
 
-#. Label of the setting that points at the folder holding cheat files
+#. Publisher of a game, shown in its information
 msgctxt "#35327"
-msgid "Cheats folder"
+msgid "Publisher"
 msgstr ""
 
-#. Help text for the cheats folder setting
+#. Developer of a game, shown in its information
 msgctxt "#35328"
-msgid "The folder holding libretro cheat files. Cheats are offered for a game when a matching cheat file is found here."
+msgid "Developer"
 msgstr ""
 
-#. Label of the Cheats button in the game OSD, and heading of the cheats dialog
+#. Label of the setting bounding the disk downloaded manuals may use
 msgctxt "#35329"
-msgid "Cheats"
+msgid "Maximum size of downloaded manuals"
 msgstr ""
 #. Help text for the downloaded manual size limit
 #: system/settings/settings.xml
@@ -19875,16 +19866,6 @@ msgctxt "#35363"
 msgid "Cache cleared"
 msgstr ""
 
-#. Setting to show the achievement being attempted over the game
-msgctxt "#35364"
-msgid "Show challenge indicator on screen"
-msgstr ""
-
-#. Help text for the challenge indicator setting
-msgctxt "#35365"
-msgid "Show the achievement you are inside an attempt at in the corner of the screen while you play."
-msgstr ""
-
 #. Setting to run the emulator ahead of itself to hide input latency
 msgctxt "#35366"
 msgid "Enable run-ahead"
@@ -19910,7 +19891,32 @@ msgctxt "#35370"
 msgid "{0:d} frames"
 msgstr ""
 
-#empty strings from id 35371 to 35504
+#. Label of the setting that points at the folder holding cheat files
+msgctxt "#35371"
+msgid "Cheats folder"
+msgstr ""
+
+#. Help text for the cheats folder setting
+msgctxt "#35372"
+msgid "The folder holding libretro cheat files. Cheats are offered for a game when a matching cheat file is found here."
+msgstr ""
+
+#. Label of the Cheats button in the game OSD, and heading of the cheats dialog
+msgctxt "#35373"
+msgid "Cheats"
+msgstr ""
+
+#. Label of the setting that enables RetroAchievements encore mode
+msgctxt "#35374"
+msgid "Encore mode"
+msgstr ""
+
+#. Help text for the encore mode setting
+msgctxt "#35375"
+msgid "Play for achievements you have already earned. They are re-activated so they can be earned again, and nothing is submitted for them a second time."
+msgstr ""
+
+#empty strings from id 35376 to 35504
 #. connection state "host unreachable"
 #: xbmc/pvr/addons/PVRClients.cpp
 msgctxt "#35505"
