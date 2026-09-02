@@ -151,6 +151,7 @@
 #include "games/dialogs/disc/DialogGameDiscManager.h"
 #include "games/dialogs/osd/DialogGameAchievements.h"
 #include "games/dialogs/osd/DialogGameIndicators.h"
+#include "games/dialogs/osd/DialogGameCheats.h"
 #include "games/dialogs/osd/DialogGameAdvancedSettings.h"
 #include "games/dialogs/osd/DialogGameOSD.h"
 #include "games/dialogs/osd/DialogGameSaves.h"
@@ -358,6 +359,7 @@ void CGUIWindowManager::CreateWindows()
   Add(new GAME::CDialogGameDiscManager);
   Add(new GAME::CDialogGameAchievements);
   Add(new GAME::CDialogGameIndicators);
+  Add(new GAME::CDialogGameCheats);
   Add(new RETRO::CGameWindowFullScreen);
 }
 
