@@ -152,8 +152,7 @@ void CGUIDialogGameManuals::OnDeinitWindow(int nextWindowID)
   // them, and AllocResources reloads the skin file from that property. Wiping
   // it leaves the dialog unable to load after the next skin change - it inits
   // with no XML, draws nothing, and logs no error at all.
-  for (const char* property : {PROPERTY_STATUS, PROPERTY_GAME, PROPERTY_PROVIDER,
-                               PROPERTY_DOWNLOADING, PROPERTY_PROGRESS})
+  for (const char* property : {PROPERTY_STATUS, PROPERTY_GAME, PROPERTY_PROVIDER})
     SetProperty(property, "");
 
   CGUIDialog::OnDeinitWindow(nextWindowID);
