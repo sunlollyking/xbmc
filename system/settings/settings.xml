@@ -2857,10 +2857,6 @@
           <level>0</level>
           <control type="button" format="action" />
         </setting>
-        <setting id="gamesgeneral.clearleaderboardcache" type="action" label="35361" help="35362">
-          <level>0</level>
-          <control type="button" format="action" />
-        </setting>
       </group>
     </category>
     <category id="gamesachievements" label="15312">

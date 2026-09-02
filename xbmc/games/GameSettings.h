@@ -80,6 +80,7 @@ public:
 
   // Inherited from ISettingCallback
   void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
+  void OnSettingAction(const std::shared_ptr<const CSetting>& setting) override;
 
 private:
   std::string LoginToRA(const std::string& username,

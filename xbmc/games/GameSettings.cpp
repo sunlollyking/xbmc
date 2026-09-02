@@ -8,6 +8,8 @@
 
 #include "GameSettings.h"
 
+#include "games/manual/ManualCache.h"
+
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "events/EventLog.h"
@@ -46,7 +48,6 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_CLEAR_MANUAL_CACHE = "gamesgeneral.clearmanualcache";
-const std::string SETTING_GAMES_CLEAR_LEADERBOARD_CACHE = "gamesgeneral.clearleaderboardcache";
 
 constexpr auto LOGIN_TO_RETRO_ACHIEVEMENTS_URL =
     "https://retroachievements.org/dorequest.php?r=login2";
@@ -72,7 +73,7 @@ CGameSettings::CGameSettings()
       {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ENABLERUNAHEAD,
        SETTING_GAMES_RUNAHEADFRAMES, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
-       SETTING_GAMES_CLEAR_MANUAL_CACHE, SETTING_GAMES_CLEAR_LEADERBOARD_CACHE});
+       SETTING_GAMES_CLEAR_MANUAL_CACHE});
 
   // On startup reset logged-in flag if token is missing
   const std::string token = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
@@ -152,6 +153,15 @@ std::string CGameSettings::GetRAUsername() const
 std::string CGameSettings::GetRAToken() const
 {
   return m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
+}
+
+void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setting)
+{
+  if (setting == nullptr)
+    return;
+
+  if (setting->GetId() == SETTING_GAMES_CLEAR_MANUAL_CACHE)
+    CManualCache::GetInstance().Clear();
 }
 
 void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& setting)
