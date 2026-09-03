@@ -957,6 +957,40 @@ bool CGameClient::SerializeAchievements(uint8_t* data, size_t size)
   return false;
 }
 
+bool CGameClient::SetHardcoreEnabled(bool enabled)
+{
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return LogError(m_ifc.game->toAddon->RCSetHardcoreEnabled(m_ifc.game, enabled),
+                    "RCSetHardcoreEnabled()");
+  }
+  catch (...)
+  {
+    LogException("RCSetHardcoreEnabled()");
+  }
+
+  return false;
+}
+
+bool CGameClient::SetEncoreModeEnabled(bool enabled)
+{
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return LogError(m_ifc.game->toAddon->RCSetEncoreModeEnabled(m_ifc.game, enabled),
+                    "RCSetEncoreModeEnabled()");
+  }
+  catch (...)
+  {
+    LogException("RCSetEncoreModeEnabled()");
+  }
+
+  return false;
+}
+
 bool CGameClient::DeserializeAchievements(const uint8_t* data, size_t size)
 {
   // An empty payload is forwarded, not refused: it tells the client the

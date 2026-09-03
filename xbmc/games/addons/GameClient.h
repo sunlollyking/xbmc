@@ -303,6 +303,22 @@ public:
    */
   bool DeserializeAchievements(const uint8_t* data, size_t size);
 
+  /*!
+   * \brief Give the client the RetroAchievements account to sign in with
+   *
+   * The account is held by Kodi, which owns the settings it is entered in.
+   */
+  bool SetRetroAchievementsCredentials(const std::string& username, const std::string& token);
+
+  /*!
+   * \brief Tell the client which achievement modes are in force
+   *
+   * The frontend enforces what hardcore forbids; the client is told so its
+   * runtime agrees and so it can refuse what only it can do.
+   */
+  bool SetHardcoreEnabled(bool enabled);
+  bool SetEncoreModeEnabled(bool enabled);
+
   // Implementation of IHwFramebufferCallback
   void HardwareContextReset() override;
   void HardwareContextDestroy() override;
