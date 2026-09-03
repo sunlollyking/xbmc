@@ -7,16 +7,21 @@
  */
 
 #include "GameDatabase.h"
+
 #include "GameDatabaseColumns.h"
+#include "ServiceBroker.h"
 #include "XBDateTime.h"
 #include "dbwrappers/dataset.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "games/tags/GameInfoTag.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <set>
 
 using namespace KODI;
@@ -336,7 +341,44 @@ void CGameDatabase::LoadAgeRatings(int idGame, CGameInfoTag& details)
     m_pDS->close();
   }
 
+  // The board a person recognises comes first, so the game shows the
+  // classification their own country uses
+  const std::vector<std::string> preferred = PreferredAgeRatingBoards();
+  std::ranges::stable_sort(ratings,
+                           [&preferred](const GameAgeRating& a, const GameAgeRating& b)
+                           {
+                             const auto rank = [&preferred](const std::string& board)
+                             {
+                               const auto it = std::ranges::find_if(
+                                   preferred, [&board](const std::string& wanted)
+                                   { return StringUtils::EqualsNoCase(wanted, board); });
+                               return it == preferred.end() ? preferred.size()
+                                                            : static_cast<size_t>(
+                                                                  it - preferred.begin());
+                             };
+                             return rank(a.board) < rank(b.board);
+                           });
+
   details.SetAgeRatings(ratings);
+}
+
+std::vector<std::string> CGameDatabase::PreferredAgeRatingBoards()
+{
+  std::string setting;
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  if (settings)
+    setting = settings->GetString(SETTING_GAMELIBRARY_AGERATINGBOARDS);
+  if (setting.empty())
+    setting = SETTING_GAMELIBRARY_AGERATINGBOARDS_DEFAULT;
+
+  std::vector<std::string> boards;
+  for (std::string board : StringUtils::Split(setting, ','))
+  {
+    StringUtils::Trim(board);
+    if (!board.empty())
+      boards.emplace_back(std::move(board));
+  }
+  return boards;
 }
 
 void CGameDatabase::GetReleasesForGame(int idGame, std::vector<GameRelease>& releases)

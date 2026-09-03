@@ -20242,7 +20242,79 @@ msgctxt "#35574"
 msgid "Completed"
 msgstr ""
 
-#empty strings from id 35575 to 35999
+#. The kinds of picture a game has, listed by the artwork button
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35575"
+msgid "Artwork"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35576"
+msgid "Box front"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35577"
+msgid "Box back"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35578"
+msgid "Cartridge"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35579"
+msgid "Disc"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35580"
+msgid "Title screen"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35581"
+msgid "Screenshot"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35582"
+msgid "Logo"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35583"
+msgid "Banner"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35584"
+msgid "Spine"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35585"
+msgid "Manual"
+msgstr ""
+
+#. Label of the setting choosing which classification board's rating is shown
+#: system/settings/settings.xml
+msgctxt "#35586"
+msgid "Ratings boards in order of preference"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35587"
+msgid "Which board's classification a game shows, when it carries several. Separate them with commas, such as PEGI, BBFC, ESRB. A board that is not listed here is shown only when a game has no other."
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35588"
+msgid "Achievements"
+msgstr ""
+
+#empty strings from id 35589 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

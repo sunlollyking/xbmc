@@ -8,8 +8,6 @@
 
 #include "GUIDialogGameInfo.h"
 
-#include <array>
-
 #include "FileItem.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
@@ -24,7 +22,15 @@
 #include "guilib/WindowIDs.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "application/ApplicationComponents.h"
+#include "messaging/ApplicationMessenger.h"
+#include "utils/URIUtils.h"
 #include "utils/Variant.h"
+
+#include <array>
+#include <set>
+#include <utility>
+#include <vector>
 
 using namespace KODI;
 using namespace GAME;
@@ -39,6 +45,28 @@ constexpr int CONTROL_BTN_FAVOURITE = 12;
 constexpr int CONTROL_BTN_PLAY_STATE = 13;
 constexpr int CONTROL_BTN_GAME_CLIENT = 14;
 constexpr int CONTROL_BTN_VIDEO_FILTER = 15;
+constexpr int CONTROL_BTN_ARTWORK = 16;
+
+/*!
+ * \brief The pictures a game has, in the order a person would look at them
+ *
+ * A game is not a film: what it is recognised by is the front of its box, and
+ * what is worth looking at after that is the rest of the package and the game
+ * on screen. Anything the library holds that is not listed here is shown
+ * after these, under the name the scraper gave it.
+ */
+constexpr std::array<std::pair<const char*, int>, 10> ART_TYPES = {{
+    {"boxfront", 35576},
+    {"boxback", 35577},
+    {"spine", 35584},
+    {"cartridge", 35578},
+    {"disc", 35579},
+    {"titlescreen", 35580},
+    {"screenshot", 35581},
+    {"snap", 35581},
+    {"clearlogo", 35582},
+    {"banner", 35583},
+}};
 
 std::string Localize(int id)
 {
@@ -165,6 +193,9 @@ bool CGUIDialogGameInfo::OnMessage(CGUIMessage& message)
         case CONTROL_BTN_VIDEO_FILTER:
           OnVideoFilter();
           return true;
+        case CONTROL_BTN_ARTWORK:
+          OnArtwork();
+          return true;
         default:
           break;
       }
@@ -194,6 +225,60 @@ void CGUIDialogGameInfo::OnRefresh()
     return;
   CGameLibraryQueue::GetInstance().RefreshGame(
       static_cast<int>(m_item->GetProperty("gameid").asInteger()), true);
+}
+
+void CGUIDialogGameInfo::OnArtwork()
+{
+  if (!m_item)
+    return;
+
+  auto* select =
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
+  if (select == nullptr)
+    return;
+
+  // The known kinds first, in their own order, then anything else the library
+  // was given, so a new kind of picture appears without a change here
+  std::vector<std::pair<std::string, std::string>> pictures; // label, url
+  std::set<std::string, std::less<>> taken;
+  for (const auto& [type, label] : ART_TYPES)
+  {
+    const std::string url = m_item->GetArt(type);
+    if (url.empty() || taken.contains(url))
+      continue;
+    taken.insert(url);
+    pictures.emplace_back(Localize(label), url);
+  }
+  for (const auto& [type, url] : m_item->GetArt())
+  {
+    if (url.empty() || taken.contains(url))
+      continue;
+    taken.insert(url);
+    pictures.emplace_back(type, url);
+  }
+
+  if (pictures.empty())
+    return;
+
+  select->Reset();
+  select->SetHeading(CVariant{35575}); // "Artwork"
+  select->SetUseDetails(true);
+  for (const auto& [label, url] : pictures)
+  {
+    CFileItem picture(label);
+    picture.SetArt("thumb", url);
+    picture.SetLabel2(URIUtils::GetFileName(url));
+    select->Add(picture);
+  }
+  select->Open();
+
+  const int chosen = select->GetSelectedItem();
+  if (chosen < 0 || chosen >= static_cast<int>(pictures.size()))
+    return;
+
+  // The picture viewer shows it whole, and zooming and panning come with it
+  CServiceBroker::GetAppMessenger()->PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr,
+                                            "ShowPicture(" + pictures[chosen].second + ")");
 }
 
 void CGUIDialogGameInfo::OnReleases()

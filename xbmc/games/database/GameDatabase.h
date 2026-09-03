@@ -224,6 +224,9 @@ public:
 
   //! \brief How often a game was played, over every file it has
   bool SetPlayCount(int idGame, int count);
+
+  //! \brief The classification boards a person wants to see, in their order
+  static std::vector<std::string> PreferredAgeRatingBoards();
   bool SetUserRating(int idGame, int rating);
 
   /*!

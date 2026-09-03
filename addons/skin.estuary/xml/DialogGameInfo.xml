@@ -91,6 +91,24 @@
 							<param name="label" value="$LOCALIZE[35543]" />
 							<param name="info" value="ListItem.ReleaseCount" />
 						</include>
+						<control type="group">
+							<height>31</height>
+							<visible>!String.IsEmpty(ListItem.AchievementsTotal)</visible>
+							<control type="label">
+								<width>260</width>
+								<height>31</height>
+								<font>font12</font>
+								<textcolor>grey</textcolor>
+								<label>$LOCALIZE[35588]</label>
+							</control>
+							<control type="label">
+								<left>260</left>
+								<width>560</width>
+								<height>31</height>
+								<font>font12</font>
+								<label>$INFO[ListItem.AchievementsEarned,, / ]$INFO[ListItem.AchievementsTotal]</label>
+							</control>
+						</control>
 					</control>
 					<control type="group">
 						<description>Rating and play state</description>
@@ -168,17 +186,62 @@
 						<label>$INFO[ListItem.Plot]</label>
 						<autoscroll delay="8000" time="3000" repeat="10000">Control.HasFocus(138)</autoscroll>
 					</control>
-					<control type="label">
-						<left>40</left>
-						<top>30</top>
-						<width>1164</width>
-						<height>300</height>
-						<font>font13</font>
-						<textcolor>grey</textcolor>
-						<align>center</align>
-						<aligny>center</aligny>
-						<label>$LOCALIZE[19055]</label>
+					<control type="group">
+						<description>The rest of the pictures, where a description would be</description>
 						<visible>String.IsEmpty(ListItem.Plot)</visible>
+						<control type="label">
+							<left>40</left>
+							<top>20</top>
+							<width>1164</width>
+							<height>40</height>
+							<font>font12</font>
+							<textcolor>grey</textcolor>
+							<label>$LOCALIZE[35575]</label>
+						</control>
+						<control type="grouplist">
+							<left>40</left>
+							<top>66</top>
+							<width>1164</width>
+							<height>250</height>
+							<itemgap>20</itemgap>
+							<orientation>horizontal</orientation>
+							<include content="GameArtThumb">
+								<param name="art" value="boxback" />
+							</include>
+							<include content="GameArtThumb">
+								<param name="art" value="cartridge" />
+							</include>
+							<include content="GameArtThumb">
+								<param name="art" value="disc" />
+							</include>
+							<include content="GameArtThumb">
+								<param name="art" value="titlescreen" />
+							</include>
+							<include content="GameArtThumb">
+								<param name="art" value="screenshot" />
+							</include>
+							<include content="GameArtThumb">
+								<param name="art" value="snap" />
+							</include>
+							<include content="GameArtThumb">
+								<param name="art" value="clearlogo" />
+							</include>
+							<include content="GameArtThumb">
+								<param name="art" value="fanart" />
+							</include>
+						</control>
+						<control type="label">
+							<left>40</left>
+							<top>30</top>
+							<width>1164</width>
+							<height>300</height>
+							<font>font13</font>
+							<textcolor>grey</textcolor>
+							<align>center</align>
+							<aligny>center</aligny>
+							<label>$LOCALIZE[19055]</label>
+							<visible>String.IsEmpty(ListItem.Art(boxback)) + String.IsEmpty(ListItem.Art(cartridge)) + String.IsEmpty(ListItem.Art(disc)) + String.IsEmpty(ListItem.Art(titlescreen)) + String.IsEmpty(ListItem.Art(screenshot)) + String.IsEmpty(ListItem.Art(snap)) + String.IsEmpty(ListItem.Art(clearlogo)) + String.IsEmpty(ListItem.Art(fanart))</visible>
+						</control>
 					</control>
 				</control>
 				<control type="grouplist" id="5000">
@@ -202,6 +265,12 @@
 						<param name="icon" value="icons/infodialogs/versions.png" />
 						<param name="label" value="$LOCALIZE[35543]" />
 						<param name="visible" value="Integer.IsGreater(ListItem.ReleaseCount,1)" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="16" />
+						<param name="icon" value="icons/infodialogs/image.png" />
+						<param name="label" value="$LOCALIZE[35575]" />
+						<param name="visible" value="true" />
 					</include>
 					<include content="InfoDialogButton">
 						<param name="id" value="12" />

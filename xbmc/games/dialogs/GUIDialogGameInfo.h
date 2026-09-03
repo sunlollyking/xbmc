@@ -75,6 +75,9 @@ private:
 
   static PlayStateValue PlayState(const CGameInfoTag& tag);
   void OnPlayState();
+
+  //! \brief Every picture the library holds for this game, one to look at
+  void OnArtwork();
   void OnUserRating();
   void OnGameClient();
   void OnVideoFilter();

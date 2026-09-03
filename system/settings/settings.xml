@@ -2919,6 +2919,11 @@
           <default>Europe,World,USA,Japan</default>
           <control type="edit" format="string" />
         </setting>
+        <setting id="gamelibrary.ageratingboards" type="string" label="35586" help="35587">
+          <level>1</level>
+          <default>PEGI,BBFC,ESRB,USK,CERO,ACB,GRAC</default>
+          <control type="edit" format="string" />
+        </setting>
         <setting id="gamelibrary.preferretail" type="boolean" label="35554" help="35557">
           <level>1</level>
           <default>true</default>
