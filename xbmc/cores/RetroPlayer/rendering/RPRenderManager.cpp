@@ -217,20 +217,21 @@ void CRPRenderManager::AddFrame(const uint8_t* data,
   // Get render buffers to copy the frame into
   std::vector<IRenderBuffer*> renderBuffers;
 
-  // Check and consume pending buffers. The client has finished writing, so
-  // end any CPU access it opened before handing a submitted buffer to the GPU.
+  IRenderBuffer* submittedBuffer = nullptr;
+
+  // Check and consume pending buffers. The client has finished writing, so end
+  // any CPU access it opened, except on the buffer it submitted: data points
+  // into that mapping and the frame is still read out of it below.
   for (const PendingBuffer& pending : m_pendingBuffers)
   {
-    const bool bSubmitted = (pending.memory == data);
-
-    if (pending.memory != nullptr)
-      pending.buffer->ReleaseMemory();
-
-    if (bSubmitted)
+    if (pending.memory == data)
     {
+      submittedBuffer = pending.buffer;
       pending.buffer->Acquire();
       renderBuffers.emplace_back(pending.buffer);
     }
+    else if (pending.memory != nullptr)
+      pending.buffer->ReleaseMemory();
 
     pending.buffer->Release();
   }
@@ -258,18 +259,6 @@ void CRPRenderManager::AddFrame(const uint8_t* data,
 
   {
     std::unique_lock lock(m_bufferMutex);
-
-    // Set render buffers
-    for (auto renderBuffer : m_renderBuffers)
-      renderBuffer->Release();
-    m_renderBuffers = std::move(renderBuffers);
-
-    // Apply video properties to render buffers
-    for (auto renderBuffer : m_renderBuffers)
-    {
-      renderBuffer->SetDisplayAspectRatio(displayAspectRatio);
-      renderBuffer->SetRotation(orientationDegCCW);
-    }
 
     // Cache frame if it arrived after being paused
     if (m_speed == 0.0)
@@ -299,6 +288,25 @@ void CRPRenderManager::AddFrame(const uint8_t* data,
         m_cachedDisplayAspectRatio = displayAspectRatio;
         m_cachedRotationCCW = orientationDegCCW;
       }
+    }
+  }
+
+  if (submittedBuffer != nullptr)
+    submittedBuffer->ReleaseMemory();
+
+  {
+    std::unique_lock lock(m_bufferMutex);
+
+    // Set render buffers
+    for (auto renderBuffer : m_renderBuffers)
+      renderBuffer->Release();
+    m_renderBuffers = std::move(renderBuffers);
+
+    // Apply video properties to render buffers
+    for (auto renderBuffer : m_renderBuffers)
+    {
+      renderBuffer->SetDisplayAspectRatio(displayAspectRatio);
+      renderBuffer->SetRotation(orientationDegCCW);
     }
   }
 }
