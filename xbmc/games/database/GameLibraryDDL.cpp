@@ -34,6 +34,7 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "overview text, "
                   "extensions text, "
                   "defaultGameClient text, "
+                  "defaultVideoFilter text, "
                   "dateAdded text, "
                   "lastScraped text)");
 
@@ -358,5 +359,13 @@ void CGameLibraryDDL::CreateTriggers(CDatabase& db)
 void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
 {
   if (version < FIRST_VERSION)
+  {
     CreateTables(db);
+    return;
+  }
+
+  // 4: a platform remembers the picture its games play with, as it already
+  // remembered the emulator
+  if (version < 4)
+    db.ExecuteQuery("ALTER TABLE platform ADD COLUMN defaultVideoFilter text");
 }

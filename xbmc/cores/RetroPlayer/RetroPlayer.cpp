@@ -38,6 +38,7 @@
 #include "games/addons/disc/GameClientDiscs.h"
 #include "games/addons/input/GameClientInput.h"
 #include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryTypes.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -84,7 +85,15 @@ void CRetroPlayer::SetVideoFilterForGame(const std::string& gamePath)
   if (!db.Open())
     return;
 
-  const std::string videoFilter = db.VideoFilters().GetVideoFilterForGame(gamePath);
+  std::string videoFilter = db.VideoFilters().GetVideoFilterForGame(gamePath);
+  if (videoFilter.empty())
+  {
+    // What the machine plays with, where neither the game nor its folder said
+    const int idPlatform = db.GetPlatformIdForGame(gamePath);
+    GAME::PlatformInfo platform;
+    if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+      videoFilter = platform.defaultVideoFilter;
+  }
   if (videoFilter.empty())
     return;
 

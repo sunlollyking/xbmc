@@ -54,6 +54,8 @@ namespace
 constexpr std::array<const char*, 8> commonExtensions{"zip", "7z", "cue", "gdi", "m3u",
                                                       "chd", "iso", "bin"};
 constexpr std::array<const char*, 3> sheetExtensions{".cue", ".gdi", ".m3u"};
+//! What names a set of discs rather than being one of them
+constexpr std::array<const char*, 1> playlistExtensions{".m3u"};
 constexpr std::array<const char*, 4> trackExtensions{".bin", ".img", ".raw", ".wav"};
 
 std::string Localize(int id)
@@ -99,6 +101,71 @@ bool SameRelease(const GameRelease& a, const GameRelease& b)
   };
   return sorted(a.regions) == sorted(b.regions) && sorted(a.languages) == sorted(b.languages) &&
          a.revision == b.revision && a.status == b.status && a.licence == b.licence;
+}
+
+/*!
+ * \brief The files a cue or GDI sheet names
+ *
+ * A cue names them in FILE lines; a GDI lists one track a line, the file name
+ * in the fifth column and quoted when it holds a space. Neither is obliged to
+ * name them after the game: a GDI beside "Crazy Taxi.gdi" usually points at
+ * track01.bin, which is why the names have to be read rather than guessed.
+ */
+std::vector<std::string> ReadSheet(const std::string& path)
+{
+  std::vector<std::string> tracks;
+  XFILE::CFile file;
+  std::vector<uint8_t> data;
+  if (!file.LoadFile(path, data) || data.size() > 256 * 1024)
+    return tracks;
+
+  const bool cue = StringUtils::EqualsNoCase(URIUtils::GetExtension(path), ".cue");
+  const std::string folder = URIUtils::GetDirectory(path);
+
+  for (std::string line : StringUtils::Split(std::string(data.begin(), data.end()), '\n'))
+  {
+    StringUtils::Trim(line, " \t\r");
+    if (line.empty())
+      continue;
+
+    std::string name;
+    if (cue)
+    {
+      if (!StringUtils::StartsWithNoCase(line, "FILE "))
+        continue;
+      const size_t open = line.find('"');
+      const size_t close = line.rfind('"');
+      if (open == std::string::npos || close <= open)
+        continue;
+      name = line.substr(open + 1, close - open - 1);
+    }
+    else
+    {
+      // "3 45000 4 2352 track03.bin 0", or with the name in quotes
+      const size_t open = line.find('"');
+      if (open != std::string::npos)
+      {
+        const size_t close = line.find('"', open + 1);
+        if (close == std::string::npos)
+          continue;
+        name = line.substr(open + 1, close - open - 1);
+      }
+      else
+      {
+        const std::vector<std::string> columns = StringUtils::Split(line, ' ');
+        if (columns.size() < 5)
+          continue;
+        name = columns[4];
+      }
+    }
+
+    StringUtils::Trim(name);
+    if (name.empty())
+      continue;
+    tracks.emplace_back(CURL::IsFullPath(name) ? name : URIUtils::AddFileToFolder(folder, name));
+  }
+
+  return tracks;
 }
 
 std::vector<std::string> ReadM3U(const std::string& path)
@@ -309,6 +376,17 @@ std::vector<CGameInfoScanner::Entry> CGameInfoScanner::GroupEntries(const CFileI
     entry.path = path;
     entry.folder = URIUtils::GetDirectory(path);
     entry.files.emplace_back(path);
+
+    // What the sheet itself names comes first
+    for (const std::string& track : ReadSheet(path))
+    {
+      if (track == path || claimed.contains(track))
+        continue;
+      entry.files.emplace_back(track);
+      claimed.insert(track);
+    }
+
+    // Then anything named after the sheet, for a set the sheet does not list
     const std::string stem = Stem(path);
     for (const std::string& track : files)
     {
@@ -725,12 +803,19 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   release.dump = parsed.bad ? DumpStatus::BAD : (parsed.verified ? DumpStatus::VERIFIED : DumpStatus::UNKNOWN);
   release.serial = identity.serial;
   release.isDefault = true;
+  // Number the discs a release has, so the disc manager can be handed the set
+  // rather than only the file that was launched. A track belonging to a sheet
+  // is part of a disc, not a disc of its own, and a game with one file has no
+  // disc number at all.
   int disc = 0;
+  const bool manyDiscs = std::ranges::count_if(files, [](const std::string& file)
+                                               { return !HasExtension(file, trackExtensions); }) > 1;
   for (const std::string& file : files)
   {
     GameFile f = (file == playPath) ? identity : GameFile{};
     f.path = file;
-    if (files.size() > 1 && HasExtension(file, sheetExtensions))
+    if (manyDiscs && !HasExtension(file, trackExtensions) &&
+        !HasExtension(file, playlistExtensions))
       f.disc = ++disc;
     release.files.emplace_back(std::move(f));
   }

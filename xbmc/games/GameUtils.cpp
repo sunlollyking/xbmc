@@ -26,6 +26,8 @@
 #include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
 #include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryTypes.h"
+#include "utils/Variant.h"
 #include "games/dialogs/GUIDialogSelectGameClient.h"
 #include "games/dialogs/GUIDialogSelectSavestate.h"
 #include "games/tags/GameInfoTag.h"
@@ -155,7 +157,16 @@ std::string CGameUtils::GetDefaultGameClient(const std::string& path,
   if (!db.Open())
     return "";
 
-  const std::string gameClient = db.GameClients().GetGameClientForGame(path);
+  std::string gameClient = db.GameClients().GetGameClientForGame(path);
+  if (gameClient.empty())
+  {
+    // A library game plays with what its platform plays with: a collection is
+    // arranged by machine, and the emulator belongs to the machine
+    const int idPlatform = db.GetPlatformIdForGame(path);
+    PlatformInfo platform;
+    if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+      gameClient = platform.defaultGameClient;
+  }
   if (gameClient.empty())
     return "";
 
@@ -189,6 +200,12 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   if (path.empty())
     return false;
 
+  // A platform in the library is not a folder on a disk, so what is chosen for
+  // it is stored against the machine
+  const int idPlatform = item.HasProperty("platformid")
+                             ? static_cast<int>(item.GetProperty("platformid").asInteger())
+                             : -1;
+
   // A folder can be given anything later, so it offers every emulator that is
   // installed. A game only offers the ones that can open it.
   GameClientVector emulators;
@@ -216,7 +233,10 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   if (!db.Open())
     return false;
 
-  const std::string currentGameClient = db.GameClients().GetGameClient(path);
+  PlatformInfo platform;
+  const bool forPlatform = idPlatform > 0 && db.GetPlatform(idPlatform, platform);
+  const std::string currentGameClient =
+      forPlatform ? platform.defaultGameClient : db.GameClients().GetGameClient(path);
 
   dialog->Reset();
   dialog->SetHeading(CVariant{35510}); // "Default emulator"
@@ -257,7 +277,10 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   // An empty path is the "None" entry, which forgets rather than stores
   const std::string gameClient = items[selectedIndex]->GetPath();
 
-  if (!db.GameClients().SetGameClient(path, gameClient))
+  const bool stored = forPlatform
+                          ? db.SetPlatformDefaults(idPlatform, gameClient, platform.defaultVideoFilter)
+                          : db.GameClients().SetGameClient(path, gameClient);
+  if (!stored)
     return false;
 
   if (gameClient.empty())
@@ -284,7 +307,13 @@ bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
   if (!db.Open())
     return false;
 
-  const std::string currentVideoFilter = db.VideoFilters().GetVideoFilter(path);
+  PlatformInfo platform;
+  const int idPlatform = item.HasProperty("platformid")
+                             ? static_cast<int>(item.GetProperty("platformid").asInteger())
+                             : -1;
+  const bool forPlatform = idPlatform > 0 && db.GetPlatform(idPlatform, platform);
+  const std::string currentVideoFilter =
+      forPlatform ? platform.defaultVideoFilter : db.VideoFilters().GetVideoFilter(path);
 
   dialog->Reset();
   dialog->SetHeading(CVariant{35326}); // "Default video filter"
@@ -327,7 +356,10 @@ bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
   // An empty filter is the "None" entry, which forgets rather than stores
   const std::string videoFilter = items[selectedIndex]->GetProperty("game.videofilter").asString();
 
-  if (!db.VideoFilters().SetVideoFilter(path, videoFilter))
+  const bool stored =
+      forPlatform ? db.SetPlatformDefaults(idPlatform, platform.defaultGameClient, videoFilter)
+                  : db.VideoFilters().SetVideoFilter(path, videoFilter);
+  if (!stored)
     return false;
 
   if (videoFilter.empty())

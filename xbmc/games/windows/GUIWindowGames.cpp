@@ -213,10 +213,9 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
         buttons.Add(CONTEXT_BUTTON_PLAY_ITEM, 208); // Play
       }
 
-      // Offered on folders as well as games: setting one on a folder is the
-      // point, and a game only overrides the folder it sits in
-      // A game may override the emulator and video filter its folder chose
-      if (!item->IsFolder() && CanPlay(*item))
+      // A machine in the library is where the emulator and the picture belong;
+      // a single game may still override what its machine chose
+      if (item->HasProperty("platformid") || (!item->IsFolder() && CanPlay(*item)))
       {
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_EMULATOR, 35510); // "Default emulator"
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35326); // "Default video filter"

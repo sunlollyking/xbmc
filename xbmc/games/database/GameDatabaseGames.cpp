@@ -22,7 +22,9 @@
 #include "utils/log.h"
 
 #include <algorithm>
+#include <array>
 #include <set>
+#include <string_view>
 
 using namespace KODI;
 using namespace GAME;
@@ -319,6 +321,46 @@ void CGameDatabase::LoadUniqueIds(int idGame, CGameInfoTag& details)
 
   if (!ids.empty())
     details.SetUniqueIDs(ids, defaultType);
+}
+
+std::vector<std::string> CGameDatabase::GetDiscsForFile(const std::string& path)
+{
+  std::vector<std::string> discs;
+
+  try
+  {
+    // Every file of the release this one belongs to, in the order a set is
+    // numbered in its names
+    const std::string sql = PrepareSQL(
+        "SELECT p.strPath, f.strFilename, f.discNumber FROM files f JOIN path p ON p.idPath = "
+        "f.idPath WHERE f.idRelease = (SELECT f2.idRelease FROM files f2 JOIN path p2 ON "
+        "p2.idPath = f2.idPath WHERE p2.strPath || f2.strFilename = '%s') "
+        "ORDER BY f.discNumber, f.strFilename",
+        path.c_str());
+
+    if (m_pDS->query(sql))
+    {
+      while (!m_pDS->eof())
+      {
+        const std::string file = m_pDS->fv(0).get_asString() + m_pDS->fv(1).get_asString();
+        // The tracks of a disc are part of it, and a playlist names the set
+        // rather than being one of it
+        static constexpr std::array<std::string_view, 5> notADisc{".bin", ".raw", ".wav", ".img",
+                                                                  ".m3u"};
+        const std::string extension = StringUtils::ToLower(URIUtils::GetExtension(file));
+        if (std::ranges::find(notADisc, extension) == notADisc.end())
+          discs.emplace_back(file);
+        m_pDS->next();
+      }
+      m_pDS->close();
+    }
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: Failed to read the discs of {}", path);
+  }
+
+  return discs.size() > 1 ? discs : std::vector<std::string>{};
 }
 
 void CGameDatabase::LoadAgeRatings(int idGame, CGameInfoTag& details)

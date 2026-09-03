@@ -8,6 +8,8 @@
 
 #include "GameClientDiscs.h"
 
+#include "games/database/GameDatabase.h"
+
 #include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/game.h"
 #include "games/GameUtils.h"
 #include "games/addons/GameClient.h"
@@ -84,6 +86,20 @@ void CGameClientDiscs::Initialize(const std::string& gamePath)
 
     // Prune unsupported extensions
     PruneExtensions(*m_discModel, supportedExtensions);
+  }
+
+  // A game of several discs is one game in the library, so the set it belongs
+  // to is what the disc manager is given, not just the file that was launched
+  if (m_discModel->Empty())
+  {
+    CGameDatabase db;
+    if (db.Open())
+    {
+      for (const std::string& disc : db.GetDiscsForFile(gamePath))
+        m_discModel->AddDisc(disc);
+    }
+    if (!m_discModel->Empty())
+      PruneExtensions(*m_discModel, supportedExtensions);
   }
 
   // If the model is empty, seed it with the game path as the initial disc

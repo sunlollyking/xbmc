@@ -140,6 +140,19 @@ void CGUIDialogGameContentSettings::SetFolder(const std::string& folder)
     }
     m_gameClient = db.GameClients().GetGameClient(m_folder);
     m_videoFilter = db.VideoFilters().GetVideoFilter(m_folder);
+
+    // What the machine already plays with, where this folder says nothing
+    if (content.idPlatform > 0 && (m_gameClient.empty() || m_videoFilter.empty()))
+    {
+      PlatformInfo known;
+      if (db.GetPlatform(content.idPlatform, known))
+      {
+        if (m_gameClient.empty())
+          m_gameClient = known.defaultGameClient;
+        if (m_videoFilter.empty())
+          m_videoFilter = known.defaultVideoFilter;
+      }
+    }
   }
 
   if (m_platformSlug.empty() && m_catalogue->IsLoaded())
@@ -478,6 +491,12 @@ bool CGUIDialogGameContentSettings::Save()
 
   if (!db.SetPathContent(m_folder, content))
     return false;
+
+  // The emulator and the picture belong to the machine, so a second folder of
+  // the same platform inherits what was chosen here. The folder keeps them too,
+  // for a collection browsed as files rather than as a library.
+  if (content.idPlatform > 0)
+    db.SetPlatformDefaults(content.idPlatform, m_gameClient, m_videoFilter);
 
   db.GameClients().SetGameClient(m_folder, m_gameClient);
   db.VideoFilters().SetVideoFilter(m_folder, m_videoFilter);

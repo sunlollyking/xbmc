@@ -48,12 +48,14 @@ int CGameDatabase::AddPlatform(const PlatformInfo& platform)
     {
       m_pDS->exec(PrepareSQL(
           "INSERT INTO platform (slug, name, sortName, manufacturer, type, media, family, "
-          "released, discontinued, overview, extensions, defaultGameClient, dateAdded) VALUES "
-          "('%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, '%s', '%s', '%s', '%s')",
+          "released, discontinued, overview, extensions, defaultGameClient, "
+          "defaultVideoFilter, dateAdded) VALUES "
+          "('%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, '%s', '%s', '%s', '%s', '%s')",
           platform.slug.c_str(), platform.name.c_str(), sortName.c_str(),
           platform.manufacturer.c_str(), type.c_str(), media.c_str(), platform.family.c_str(),
           platform.released, platform.discontinued, platform.overview.c_str(),
           extensions.c_str(), platform.defaultGameClient.c_str(),
+          platform.defaultVideoFilter.c_str(),
           CDateTime::GetCurrentDateTime().GetAsDBDateTime().c_str()));
       idPlatform = static_cast<int>(m_pDS->lastinsertid());
     }
@@ -101,9 +103,27 @@ void CGameDatabase::GetPlatformFromRecord(PlatformInfo& platform)
   platform.extensions = StringUtils::Split(m_pDS->fv("extensions").get_asString(), ' ');
   std::erase_if(platform.extensions, [](const std::string& s) { return s.empty(); });
   platform.defaultGameClient = m_pDS->fv("defaultGameClient").get_asString();
+  platform.defaultVideoFilter = m_pDS->fv("defaultVideoFilter").get_asString();
   platform.dateAdded = m_pDS->fv("dateAdded").get_asString();
   platform.lastScraped = m_pDS->fv("lastScraped").get_asString();
   platform.gameCount = m_pDS->fv("gameCount").get_asInt();
+}
+
+bool CGameDatabase::SetPlatformDefaults(int idPlatform,
+                                       const std::string& gameClient,
+                                       const std::string& videoFilter)
+{
+  return ExecuteQuery(PrepareSQL("UPDATE platform SET defaultGameClient = '%s', "
+                                 "defaultVideoFilter = '%s' WHERE idPlatform = %i",
+                                 gameClient.c_str(), videoFilter.c_str(), idPlatform));
+}
+
+int CGameDatabase::GetPlatformIdForGame(const std::string& path)
+{
+  const int idGame = GetGameIdByFile(path);
+  if (idGame <= 0)
+    return -1;
+  return GetSingleValueInt(PrepareSQL("SELECT idPlatform FROM game WHERE idGame = %i", idGame));
 }
 
 bool CGameDatabase::GetPlatform(int idPlatform, PlatformInfo& platform)

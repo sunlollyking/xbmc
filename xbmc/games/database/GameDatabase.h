@@ -162,6 +162,28 @@ public:
    * \return The platform's ID, or -1
    */
   int AddPlatform(const PlatformInfo& platform);
+
+  /*!
+   * \brief What a platform's games play with unless a game says otherwise
+   *
+   * A collection is arranged by machine, and the emulator and the picture
+   * belong to the machine rather than to the folder a file happens to sit in.
+   */
+  bool SetPlatformDefaults(int idPlatform,
+                           const std::string& gameClient,
+                           const std::string& videoFilter);
+
+  //! \brief The platform of the game a file belongs to, or -1
+  int GetPlatformIdForGame(const std::string& path);
+
+  /*!
+   * \brief Every disc of the game a file belongs to, in order
+   *
+   * A game of several discs is one game in the library, so the disc manager is
+   * handed the whole set rather than the one file that was launched. Empty
+   * where the game has a single disc or is not in the library.
+   */
+  std::vector<std::string> GetDiscsForFile(const std::string& path);
   bool GetPlatform(int idPlatform, PlatformInfo& platform);
   bool GetPlatformBySlug(const std::string& slug, PlatformInfo& platform);
   bool GetPlatforms(std::vector<PlatformInfo>& platforms, bool onlyWithGames = false);
@@ -277,7 +299,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 3; }
+  int GetSchemaVersion() const override { return 4; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

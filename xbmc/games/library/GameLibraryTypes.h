@@ -274,6 +274,7 @@ struct PlatformInfo
   std::vector<std::string> aliases;
   std::map<std::string, std::string> providerIds; // provider name -> that provider's id
   std::string defaultGameClient;
+  std::string defaultVideoFilter;
   std::string dateAdded;
   std::string lastScraped;
   int gameCount{0};
