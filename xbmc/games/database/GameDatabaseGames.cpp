@@ -77,7 +77,8 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           "UPDATE game SET idPlatform = %i, title = '%s', sortTitle = '%s', titleKey = '%s', "
           "originalTitle = '%s', overview = '%s', releaseDate = '%s', year = %i, playersMin = "
           "%i, playersMax = %i, coop = %i, category = '%s', idParentGame = %i, userRating = %i, "
-          "favourite = %i, completed = %i, achievementsTotal = %i, achievementsEarned = %i, "
+          "favourite = %i, completed = %i, hidden = %i, achievementsTotal = %i, "
+          "achievementsEarned = %i, "
           "achievementsHardcore = %i, lastUnlock = '%s', matchedBy = '%s', trailer = '%s', "
           "manual = '%s', lastScraped = '%s', genres = '%s', developers = '%s', publishers = "
           "'%s', collections = '%s' WHERE idGame = %i",
@@ -87,7 +88,7 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           details.GetPlayersMin(), details.GetPlayersMax(), details.IsCoop() ? 1 : 0,
           category.c_str(), details.GetParentGameId(), details.GetUserRating(),
           details.IsFavourite() ? 1 : 0, details.IsCompleted() ? 1 : 0,
-          details.GetAchievementsTotal(), details.GetAchievementsEarned(),
+          details.IsHidden() ? 1 : 0, details.GetAchievementsTotal(), details.GetAchievementsEarned(),
           details.GetAchievementsHardcore(), details.GetLastUnlock().c_str(), matchedBy.c_str(),
           details.GetTrailer().c_str(), details.GetManual().c_str(), Now().c_str(),
           genres.c_str(), developers.c_str(), publishers.c_str(), collections.c_str(), idGame));
@@ -102,7 +103,7 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           "completed, hidden, achievementsTotal, achievementsEarned, achievementsHardcore, "
           "lastUnlock, matchedBy, trailer, manual, lastScraped, dateAdded, genres, developers, "
           "publishers, collections) VALUES (%i, '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i, "
-          "%i, '%s', %i, -1, -1, -1, %i, %i, %i, 0, %i, %i, %i, '%s', '%s', '%s', '%s', '%s', "
+          "%i, '%s', %i, -1, -1, -1, %i, %i, %i, %i, %i, %i, %i, '%s', '%s', '%s', '%s', '%s', "
           "'%s', '%s', '%s', '%s', '%s')",
           idPlatform, details.GetTitle().c_str(), sortTitle.c_str(), titleKey.c_str(),
           details.GetOriginalTitle().c_str(), details.GetOverview().c_str(),
@@ -110,8 +111,9 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           details.GetPlayersMin(), details.GetPlayersMax(), details.IsCoop() ? 1 : 0,
           category.c_str(), details.GetParentGameId(), details.GetUserRating(),
           details.IsFavourite() ? 1 : 0, details.IsCompleted() ? 1 : 0,
-          details.GetAchievementsTotal(), details.GetAchievementsEarned(),
-          details.GetAchievementsHardcore(), details.GetLastUnlock().c_str(), matchedBy.c_str(),
+          details.IsHidden() ? 1 : 0, details.GetAchievementsTotal(),
+          details.GetAchievementsEarned(), details.GetAchievementsHardcore(),
+          details.GetLastUnlock().c_str(), matchedBy.c_str(),
           details.GetTrailer().c_str(), details.GetManual().c_str(), Now().c_str(),
           dateAdded.c_str(), genres.c_str(), developers.c_str(), publishers.c_str(),
           collections.c_str()));
@@ -394,6 +396,7 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   details.SetUserRating(record->at(GAMEDB_USER_RATING).get_asInt());
   details.SetFavourite(record->at(GAMEDB_FAVOURITE).get_asBool());
   details.SetCompleted(record->at(GAMEDB_COMPLETED).get_asBool());
+  details.SetHidden(record->at(GAMEDB_HIDDEN).get_asBool());
   details.SetAchievements(record->at(GAMEDB_ACHIEVEMENTS_TOTAL).get_asInt(),
                           record->at(GAMEDB_ACHIEVEMENTS_EARNED).get_asInt(),
                           record->at(GAMEDB_ACHIEVEMENTS_HARDCORE).get_asInt());

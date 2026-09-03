@@ -3,6 +3,7 @@ set(SOURCES GameDbUrl.cpp
             GameInfoScanner.cpp
             GameLibraryQueue.cpp
             GameLibraryTypes.cpp
+            GameListXml.cpp
             GameNameParser.cpp
             GameScraper.cpp
             PlatformCatalogue.cpp
@@ -13,6 +14,7 @@ set(HEADERS GameDbUrl.h
             GameInfoScanner.h
             GameLibraryQueue.h
             GameLibraryTypes.h
+            GameListXml.h
             GameNameParser.h
             GameScraper.h
             PlatformCatalogue.h

@@ -410,6 +410,11 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
     }
   }
 
+  // A collection curated by another front end arrives with a gamelist.xml,
+  // and what a person already corrected there is better than a scrape
+  m_gameList.clear();
+  CGameListXml::Load(folder, m_gameList);
+
   const std::string hash = FolderHash(items);
   std::string storedHash;
   m_database.GetPathHash(folder, storedHash);
@@ -452,6 +457,7 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   {
     CLog::Log(LOGDEBUG, "GAME: {} is unchanged", folder);
   }
+  m_gameList.clear();
 
   // Subfolders hold more games, unless each subfolder was itself a game
   if (content.scanRecursive && !content.useFolderNames)
@@ -844,6 +850,54 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
         }
         ++m_identified;
       }
+    }
+  }
+
+  // What the collection's own game list says stands over what was scraped:
+  // someone has already corrected it, and the art beside it is on this disk
+  if (const auto listed = m_gameList.find(playPath); listed != m_gameList.end())
+  {
+    const GameListEntry& entry = listed->second;
+    if (!entry.title.empty())
+      tag.SetTitle(entry.title);
+    if (!entry.overview.empty())
+      tag.SetOverview(entry.overview);
+    if (!entry.developer.empty())
+      tag.SetDevelopers({entry.developer});
+    if (!entry.publisher.empty())
+      tag.SetPublishers({entry.publisher});
+    if (!entry.genres.empty())
+      tag.SetGenres(entry.genres);
+    if (entry.year > 0)
+      tag.SetYear(static_cast<unsigned int>(entry.year));
+    if (!entry.releaseDate.empty())
+      tag.SetReleaseDate(entry.releaseDate);
+    if (entry.playersMax > 0)
+      tag.SetPlayers(entry.playersMin, entry.playersMax);
+    if (entry.rating > 0.0f)
+      tag.SetRating("gamelist", GameRating{entry.rating, 10.0f, 0});
+    if (!entry.trailer.empty())
+      tag.SetTrailer(entry.trailer);
+    if (entry.favourite)
+      tag.SetFavourite(true);
+    if (entry.hidden)
+      tag.SetHidden(true);
+    if (entry.playCount > 0)
+      tag.SetPlayCount(entry.playCount);
+    if (!entry.lastPlayed.empty())
+      tag.SetLastPlayed(entry.lastPlayed);
+    if (!entry.region.empty() && release.regions.empty())
+      release.regions.emplace_back(entry.region);
+    if (!entry.languages.empty() && release.languages.empty())
+      release.languages = entry.languages;
+
+    for (const auto& [type, path] : entry.art)
+      art[type] = path;
+
+    if (matchedBy == MatchMethod::NONE && !entry.title.empty())
+    {
+      matchedBy = MatchMethod::GAMELIST;
+      ++m_identified;
     }
   }
 

@@ -102,11 +102,12 @@ constexpr Words<DumpStatus, 4> dumpStatuses{{
     {DumpStatus::VERIFIED, "verified"},
 }};
 
-constexpr Words<MatchMethod, 6> matchMethods{{
+constexpr Words<MatchMethod, 7> matchMethods{{
     {MatchMethod::NONE, ""},
     {MatchMethod::HASH, "hash"},
     {MatchMethod::SERIAL, "serial"},
     {MatchMethod::SIDECAR, "sidecar"},
+    {MatchMethod::GAMELIST, "gamelist"},
     {MatchMethod::NAME, "name"},
     {MatchMethod::MANUAL, "manual"},
 }};

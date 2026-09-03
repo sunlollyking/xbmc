@@ -132,6 +132,7 @@ enum class MatchMethod
   HASH,
   SERIAL,
   SIDECAR,
+  GAMELIST,
   NAME,
   MANUAL,
 };

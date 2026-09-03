@@ -9,8 +9,9 @@
 #pragma once
 
 #include "GameLibraryTypes.h"
-#include "InfoScanner.h"
+#include "GameListXml.h"
 #include "GameScraper.h"
+#include "InfoScanner.h"
 #include "games/database/GameDatabase.h"
 
 #include <map>
@@ -138,12 +139,12 @@ private:
                 const PlatformInfo& platform);
 
   std::string FolderHash(const CFileItemList& items) const;
-  void ApplyLocalArt(const Entry& entry, CGameInfoTag& tag, KODI::ART::Artwork& art) const;
 
   CGameDatabase m_database;
   std::unique_ptr<CPlatformCatalogue> m_catalogue;
   std::map<std::string, std::unique_ptr<CGameScraper>> m_scrapers;
   std::string m_extensions;
+  std::map<std::string, GameListEntry> m_gameList; // what the folder's gamelist.xml said
   std::map<std::string, GameFile> m_identities; // hashed ahead of the scan, by path
   std::map<std::string, std::vector<struct GameScrapeCandidate>> m_prefetched;
   std::set<std::string> m_pathsToClean;

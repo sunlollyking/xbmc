@@ -245,6 +245,10 @@ public:
   bool IsFavourite() const { return m_favourite; }
   void SetFavourite(bool favourite) { m_favourite = favourite; }
 
+  //! \brief A game the collection asked not to be shown, as a game list may say
+  bool IsHidden() const { return m_hidden; }
+  void SetHidden(bool hidden) { m_hidden = hidden; }
+
   bool IsCompleted() const { return m_completed; }
   void SetCompleted(bool completed) { m_completed = completed; }
 
@@ -322,6 +326,7 @@ private:
   std::string m_strDateAdded;
   int m_userRating;
   bool m_favourite;
+  bool m_hidden{false};
   bool m_completed;
   int m_achievementsTotal;
   int m_achievementsEarned;
