@@ -20155,6 +20155,16 @@ msgctxt "#35557"
 msgid "Decides which of a game's releases plays by default. Choosing a release in the game's releases list always wins."
 msgstr ""
 
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35558"
+msgid "Mark as completed"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35559"
+msgid "Mark as not completed"
+msgstr ""
+
 #empty strings from id 35512 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp

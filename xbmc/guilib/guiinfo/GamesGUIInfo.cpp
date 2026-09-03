@@ -162,6 +162,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     // Refused where the item carries no game tag, so the question passes to the
     // provider that can answer it.
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    case LISTITEM_TITLE:
     case LISTITEM_PLOT:
     case LISTITEM_GENRE:
     case LISTITEM_YEAR:
@@ -196,6 +197,9 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
 
       switch (info.GetInfo())
       {
+        case LISTITEM_TITLE:
+          value = tag->GetTitle();
+          return !value.empty();
         case LISTITEM_PLOT:
           value = tag->GetOverview();
           return !value.empty();

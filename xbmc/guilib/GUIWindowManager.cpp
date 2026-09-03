@@ -107,6 +107,7 @@
 #include "profiles/dialogs/GUIDialogLockSettings.h"
 #include "profiles/dialogs/GUIDialogProfileSettings.h"
 #include "games/dialogs/GUIDialogGameContentSettings.h"
+#include "games/dialogs/GUIDialogGameInfo.h"
 #include "settings/dialogs/GUIDialogContentSettings.h"
 #include "settings/dialogs/GUIDialogLibExportSettings.h"
 #include "video/dialogs/GUIDialogAudioSettings.h"
@@ -274,6 +275,7 @@ void CGUIWindowManager::CreateWindows()
 
   Add(new CGUIDialogContentSettings);
   Add(new KODI::GAME::CGUIDialogGameContentSettings);
+  Add(new KODI::GAME::CGUIDialogGameInfo);
 
   Add(new CGUIDialogLibExportSettings);
 

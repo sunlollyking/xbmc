@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<onload>SetFocus(5000,0,absolute)</onload>
+	<onload>SetProperty(infobackground,$ESCINFO[ListItem.Art(fanart)],home)</onload>
+	<onunload>ClearProperty(infobackground,home)</onunload>
+	<controls>
+		<control type="image">
+			<description>Backdrop</description>
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="DD000000">colors/black.png</texture>
+			<animation effect="fade" time="200">WindowOpen</animation>
+			<animation effect="fade" time="200">WindowClose</animation>
+		</control>
+		<control type="button" id="14">
+			<include>HiddenObject</include>
+		</control>
+		<control type="button" id="15">
+			<include>HiddenObject</include>
+		</control>
+		<control type="group">
+			<centertop>50%</centertop>
+			<height>1080</height>
+			<centerleft>50%</centerleft>
+			<width>1920</width>
+			<control type="group">
+				<description>Box art</description>
+				<top>150</top>
+				<left>66</left>
+				<include>OpenClose_Left</include>
+				<control type="image">
+					<top>-16</top>
+					<left>-16</left>
+					<width>566</width>
+					<height>841</height>
+					<texture>colors/black.png</texture>
+					<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+					<bordersize>20</bordersize>
+				</control>
+				<control type="image">
+					<depth>DepthContentPopout</depth>
+					<left>4</left>
+					<top>4</top>
+					<width>526</width>
+					<height>801</height>
+					<aspectratio align="center" aligny="center">keep</aspectratio>
+					<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+				</control>
+			</control>
+			<control type="group">
+				<include>OpenClose_Right</include>
+				<left>620</left>
+				<top>-30</top>
+				<control type="group" id="140">
+					<top>180</top>
+					<control type="image">
+						<width>1244</width>
+						<height>280</height>
+						<texture border="21">dialogs/dialog-bg.png</texture>
+					</control>
+					<control type="grouplist" id="4000">
+						<description>Facts</description>
+						<left>40</left>
+						<top>20</top>
+						<width>1170</width>
+						<height>250</height>
+						<itemgap>0</itemgap>
+						<orientation>vertical</orientation>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35549]" />
+							<param name="info" value="ListItem.Platform" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[562]" />
+							<param name="info" value="ListItem.Year" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35521]" />
+							<param name="info" value="ListItem.Developer" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35522]" />
+							<param name="info" value="ListItem.Publisher" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[135]" />
+							<param name="info" value="ListItem.Genre" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35525]" />
+							<param name="info" value="ListItem.Players" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35524]" />
+							<param name="info" value="ListItem.Region" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35543]" />
+							<param name="info" value="ListItem.ReleaseCount" />
+						</include>
+					</control>
+					<control type="group">
+						<description>Rating and play state</description>
+						<left>860</left>
+						<top>20</top>
+						<control type="label">
+							<width>340</width>
+							<height>50</height>
+							<font>font45_title</font>
+							<align>right</align>
+							<label>$INFO[ListItem.Rating]</label>
+							<visible>!String.IsEmpty(ListItem.Rating)</visible>
+						</control>
+						<control type="label">
+							<top>50</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.UserRating,$LOCALIZE[38023] ,]</label>
+						</control>
+						<control type="label">
+							<top>90</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.PlayCount,$LOCALIZE[567] ,]</label>
+						</control>
+						<control type="label">
+							<top>130</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.LastPlayed,$LOCALIZE[568] ,]</label>
+						</control>
+						<control type="label">
+							<top>170</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.Mpaa]</label>
+						</control>
+					</control>
+				</control>
+				<control type="group" id="141">
+					<top>468</top>
+					<control type="button" id="138">
+						<width>1244</width>
+						<height>380</height>
+						<textoffsetx>40</textoffsetx>
+						<textoffsety>20</textoffsety>
+						<aligny>bottom</aligny>
+						<label></label>
+						<onclick>SetProperty(TextViewer_Header,$LOCALIZE[207],home)</onclick>
+						<onclick>SetProperty(TextViewer_Text,$ESCINFO[ListItem.Plot],home)</onclick>
+						<onclick>ActivateWindow(1102)</onclick>
+						<onup>4000</onup>
+						<ondown>5000</ondown>
+						<texturenofocus border="21">dialogs/dialog-bg.png</texturenofocus>
+						<texturefocus border="21">dialogs/dialog-bg.png</texturefocus>
+					</control>
+					<control type="textbox">
+						<left>40</left>
+						<top>30</top>
+						<width>1164</width>
+						<height>300</height>
+						<font>font13</font>
+						<label>$INFO[ListItem.Plot]</label>
+						<autoscroll delay="8000" time="3000" repeat="10000">Control.HasFocus(138)</autoscroll>
+					</control>
+					<control type="label">
+						<left>40</left>
+						<top>30</top>
+						<width>1164</width>
+						<height>300</height>
+						<font>font13</font>
+						<textcolor>grey</textcolor>
+						<align>center</align>
+						<aligny>center</aligny>
+						<label>$LOCALIZE[19055]</label>
+						<visible>String.IsEmpty(ListItem.Plot)</visible>
+					</control>
+				</control>
+				<control type="grouplist" id="5000">
+					<description>Buttons</description>
+					<left>0</left>
+					<top>864</top>
+					<width>1244</width>
+					<height>150</height>
+					<itemgap>-19</itemgap>
+					<orientation>horizontal</orientation>
+					<onup>138</onup>
+					<ondown>5000</ondown>
+					<include content="InfoDialogButton">
+						<param name="id" value="8" />
+						<param name="icon" value="icons/infodialogs/play.png" />
+						<param name="label" value="$LOCALIZE[208]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="5" />
+						<param name="icon" value="icons/infodialogs/versions.png" />
+						<param name="label" value="$LOCALIZE[35543]" />
+						<param name="visible" value="Integer.IsGreater(ListItem.ReleaseCount,1)" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="12" />
+						<param name="icon" value="icons/infodialogs/rating.png" />
+						<param name="label" value="$LOCALIZE[14076]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="13" />
+						<param name="icon" value="icons/infodialogs/enabled.png" />
+						<param name="label" value="$LOCALIZE[35558]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="7" />
+						<param name="icon" value="icons/infodialogs/rating.png" />
+						<param name="label" value="$LOCALIZE[38023]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="6" />
+						<param name="icon" value="icons/infodialogs/update.png" />
+						<param name="label" value="$LOCALIZE[184]" />
+						<param name="visible" value="true" />
+					</include>
+				</control>
+			</control>
+		</control>
+		<include content="InfoDialogTopBarInfo">
+			<param name="main_label" value="$INFO[ListItem.Title]" />
+			<param name="sub_label" value="$INFO[ListItem.Platform]$INFO[ListItem.Year, · ,]" />
+		</include>
+		<include condition="Skin.HasSetting(touchmode)">TouchBackButton</include>
+	</controls>
+</window>

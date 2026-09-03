@@ -24,6 +24,7 @@
 #include "games/GameUtils.h"
 #include "games/database/GameDatabase.h"
 #include "games/dialogs/GUIDialogGameContentSettings.h"
+#include "games/dialogs/GUIDialogGameInfo.h"
 #include "games/library/GameLibraryQueue.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -145,6 +146,12 @@ bool CGUIWindowGames::OnClickMsg(int controlId, int actionId)
           CGUIDialogAddonInfo::ShowForItem(pItem);
           return true;
         }
+        if (pItem->HasProperty("gameid"))
+        {
+          if (CGUIDialogGameInfo::ShowFor(pItem))
+            PlayGame(*pItem);
+          return true;
+        }
       }
       break;
     }
@@ -211,9 +218,12 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35326); // "Default video filter"
       }
 
-      // A library game can be identified and described again
+      // A library game has an information dialog and can be described again
       if (item->HasProperty("gameid") && !item->HasProperty("releaseid"))
+      {
+        buttons.Add(CONTEXT_BUTTON_INFO, 19033); // "Information"
         buttons.Add(CONTEXT_BUTTON_REFRESH_THUMBS, 184); // "Refresh"
+      }
 
       // A release of a library game can be made the one that plays
       if (item->HasProperty("releaseid") && !item->GetProperty("isdefaultrelease").asBoolean())
@@ -289,7 +299,13 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         return true;
       }
       case CONTEXT_BUTTON_INFO:
-        CGUIDialogAddonInfo::ShowForItem(item);
+        if (item->HasProperty("gameid"))
+        {
+          if (CGUIDialogGameInfo::ShowFor(item))
+            PlayGame(*item);
+        }
+        else
+          CGUIDialogAddonInfo::ShowForItem(item);
         return true;
       case CONTEXT_BUTTON_DELETE:
         OnDeleteItem(itemNumber);
