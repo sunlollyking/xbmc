@@ -35,8 +35,10 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     SetSortOrder(SortOrder::ASCENDING);
     SetViewAsControl(DEFAULT_VIEW_LIST);
   }
-  else if (URIUtils::IsProtocol(items.GetPath(), "gamedb"))
+  else if (URIUtils::IsProtocol(items.GetPath(), "gamedb") || items.GetContent() == "games" ||
+           items.GetContent() == "releases" || items.GetContent() == "platforms")
   {
+    // A smart playlist lists the library too, so it sorts and looks the same
     if (items.GetContent() == "games" || items.GetContent() == "releases")
     {
       AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Title, Year
@@ -94,6 +96,9 @@ std::string CGUIViewStateWindowGames::GetExtensions()
 
   // Ensure .zip appears
   exts.insert(".zip");
+
+  // A smart playlist is listed alongside games, as it is for video and music
+  exts.insert(".xsp");
 
   return StringUtils::Join(exts, "|");
 }

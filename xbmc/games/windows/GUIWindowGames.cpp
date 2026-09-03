@@ -423,6 +423,7 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
     newPlaylist->SetArt("icon", "DefaultAddSource.png");
     newPlaylist->SetLabelPreformatted(true);
     items.Add(newPlaylist);
+    items.SetLabel(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(136)); // "Playlists"
   }
 
   std::string label;
