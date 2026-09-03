@@ -11,9 +11,12 @@
 #include <string>
 
 struct AddonInstance_Game;
-struct game_rc_progress_indicator;
-struct game_rc_challenge_indicator;
+struct game_rc_achievement_challenge;
 struct game_rc_achievement_progress;
+struct game_rc_achievement_progress_indicator;
+struct game_rc_leaderboard;
+struct game_rc_leaderboard_scoreboard;
+struct game_rc_leaderboard_tracker;
 struct game_rc_achievement_triggered;
 struct game_rc_game_loaded;
 struct game_rc_login_result;
@@ -55,6 +58,25 @@ public:
   void OnChallengeIndicator(const game_rc_challenge_indicator* indicator);
   void OnServerError(const std::string& message, const std::string& api);
   void OnConnectionChanged(bool connected);
+
+  void OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show);
+
+  void OnAchievementProgressIndicator(const game_rc_achievement_progress_indicator& data,
+                                      bool show);
+
+  void OnLeaderboardStarted(const game_rc_leaderboard& data);
+
+  void OnLeaderboardFailed(const game_rc_leaderboard& data);
+
+  void OnLeaderboardSubmitted(const game_rc_leaderboard& data);
+
+  void OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show);
+
+  void OnLeaderboardScoreboard(const game_rc_leaderboard_scoreboard& data);
+
+  void OnReset();
+
+  void OnSubsetCompleted(const std::string& title);
   //@}
 
   /*!
