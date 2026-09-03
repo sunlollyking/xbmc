@@ -16,6 +16,8 @@
 #include "addons/Scraper.h"
 #include "addons/addoninfo/AddonType.h"
 #include "filesystem/Directory.h"
+#include "filesystem/File.h"
+#include "filesystem/SpecialProtocol.h"
 #include "filesystem/PluginDirectory.h"
 #include "games/tags/GameInfoTag.h"
 #include "utils/JSONVariantParser.h"
@@ -33,6 +35,7 @@ constexpr int PROTOCOL_VERSION = 1;
 constexpr const char* PROPERTY_CANDIDATE = "gamelibrary.candidate";
 constexpr const char* PROPERTY_DETAILS = "gamelibrary.details";
 constexpr const char* PROPERTY_PLATFORM = "gamelibrary.platform";
+constexpr const char* PROPERTY_BATCH = "gamelibrary.batch";
 
 std::vector<std::string> Strings(const CVariant& value)
 {
@@ -191,6 +194,41 @@ std::string CGameScraper::BuildUrl(const std::string& action, const GameScrapeRe
   return url.Get();
 }
 
+bool CGameScraper::ReadCandidate(const CFileItem& item,
+                                 GameScrapeCandidate& candidate,
+                                 int& queryIndex)
+{
+  CVariant payload;
+  if (!ParsePayload(item, PROPERTY_CANDIDATE, payload))
+    return false;
+
+  candidate.id = payload["id"].asString();
+  if (candidate.id.empty())
+    candidate.id = item.GetPath();
+  if (candidate.id.empty())
+    return false;
+  candidate.title = payload["title"].asString();
+  if (candidate.title.empty())
+    candidate.title = item.GetLabel();
+  candidate.year = static_cast<int>(payload["year"].asInteger());
+  candidate.score = static_cast<float>(payload["score"].asDouble());
+  candidate.matchedBy = CGameLibraryTypes::MatchMethodFromString(payload["matchedby"].asString());
+  if (candidate.matchedBy == MatchMethod::NONE)
+    candidate.matchedBy = MatchMethod::NAME;
+
+  candidate.subtitle = payload["subtitle"].asString();
+  candidate.regions = Strings(payload["regions"]);
+  if (candidate.regions.empty() && payload["regions"].isString())
+    candidate.regions = StringUtils::Split(payload["regions"].asString(), ",");
+  candidate.provider = payload["provider"].asString();
+  candidate.thumb = payload["thumb"].asString();
+
+  candidate.details = item.GetProperty(PROPERTY_DETAILS).asString();
+
+  queryIndex = payload.isMember("query") ? static_cast<int>(payload["query"].asInteger()) : -1;
+  return true;
+}
+
 std::vector<GameScrapeCandidate> CGameScraper::Find(const GameScrapeRequest& request)
 {
   std::vector<GameScrapeCandidate> candidates;
@@ -205,39 +243,128 @@ std::vector<GameScrapeCandidate> CGameScraper::Find(const GameScrapeRequest& req
 
   for (const auto& item : items)
   {
-    CVariant payload;
-    if (!ParsePayload(*item, PROPERTY_CANDIDATE, payload))
-      continue;
-
     GameScrapeCandidate candidate;
-    candidate.id = payload["id"].asString();
-    if (candidate.id.empty())
-      candidate.id = item->GetPath();
-    candidate.title = payload["title"].asString();
-    if (candidate.title.empty())
-      candidate.title = item->GetLabel();
-    candidate.year = static_cast<int>(payload["year"].asInteger());
-    candidate.score = static_cast<float>(payload["score"].asDouble());
-    candidate.matchedBy = CGameLibraryTypes::MatchMethodFromString(payload["matchedby"].asString());
-    if (candidate.matchedBy == MatchMethod::NONE)
-      candidate.matchedBy = MatchMethod::NAME;
-
-    candidate.subtitle = payload["subtitle"].asString();
-    candidate.regions = Strings(payload["regions"]);
-    if (candidate.regions.empty() && payload["regions"].isString())
-      candidate.regions = StringUtils::Split(payload["regions"].asString(), ",");
-    candidate.provider = payload["provider"].asString();
-    candidate.thumb = payload["thumb"].asString();
-
-    candidate.details = item->GetProperty(PROPERTY_DETAILS).asString();
-
-    if (!candidate.id.empty())
+    int queryIndex = -1;
+    if (ReadCandidate(*item, candidate, queryIndex))
       candidates.emplace_back(std::move(candidate));
   }
 
   std::ranges::stable_sort(candidates,
                            [](const auto& a, const auto& b) { return a.score > b.score; });
   return candidates;
+}
+
+bool CGameScraper::FindMany(const std::vector<GameScrapeRequest>& requests,
+                            std::vector<std::vector<GameScrapeCandidate>>& answers)
+{
+  answers.clear();
+  if (requests.empty())
+    return true;
+  if (!m_answersBatches)
+    return false;
+
+  // The queries travel in a file: a hundred of them do not belong in a URL
+  CVariant batch(CVariant::VariantTypeObject);
+  batch["version"] = PROTOCOL_VERSION;
+  CVariant queries(CVariant::VariantTypeArray);
+  for (const GameScrapeRequest& request : requests)
+  {
+    CVariant one(CVariant::VariantTypeObject);
+    if (!request.title.empty())
+      one["title"] = request.title;
+    if (!request.fileName.empty())
+      one["filename"] = request.fileName;
+    if (!request.crc32.empty())
+      one["crc32"] = request.crc32;
+    if (!request.md5.empty())
+      one["md5"] = request.md5;
+    if (!request.sha1.empty())
+      one["sha1"] = request.sha1;
+    if (!request.serial.empty())
+      one["serial"] = request.serial;
+    if (!request.raHash.empty())
+      one["rahash"] = request.raHash;
+    if (request.size > 0)
+      one["size"] = request.size;
+    if (!request.regions.empty())
+      one["regions"] = StringUtils::Join(request.regions, ",");
+    if (!request.languages.empty())
+      one["languages"] = StringUtils::Join(request.languages, ",");
+    if (request.year > 0)
+      one["year"] = request.year;
+    queries.push_back(std::move(one));
+  }
+  batch["queries"] = std::move(queries);
+
+  std::string json;
+  if (!CJSONVariantWriter::Write(batch, json, true))
+    return false;
+
+  const std::string file = CSpecialProtocol::TranslatePath(
+      "special://temp/gamescrape-" + StringUtils::CreateUUID() + ".json");
+  {
+    XFILE::CFile out;
+    if (!out.OpenForWrite(file, true) ||
+        out.Write(json.c_str(), json.size()) != static_cast<ssize_t>(json.size()))
+    {
+      CLog::Log(LOGWARNING, "GAME: Cannot write the batch for {}", m_addon->ID());
+      return false;
+    }
+  }
+
+  std::string url = BuildUrl("findmany", requests.front());
+  CURL batchUrl(url);
+  batchUrl.SetOption("batch", file);
+  // The first request's own identity would only confuse a batch
+  for (const char* key : {"title", "filename", "crc32", "md5", "sha1", "serial", "rahash", "size",
+                          "regions", "languages", "year"})
+    batchUrl.RemoveOption(key);
+
+  CFileItemList items;
+  const bool listed =
+      XFILE::CDirectory::GetDirectory(batchUrl.Get(), items, "", XFILE::DIR_FLAG_DEFAULTS);
+  XFILE::CFile::Delete(file);
+  if (!listed)
+  {
+    CLog::Log(LOGDEBUG, "GAME: {} does not answer batches; asking one file at a time",
+              m_addon->ID());
+    m_answersBatches = false;
+    return false;
+  }
+
+  bool understood = false;
+  answers.resize(requests.size());
+  for (const auto& item : items)
+  {
+    if (!item->GetProperty(PROPERTY_BATCH).asString().empty())
+    {
+      understood = true;
+      continue;
+    }
+
+    GameScrapeCandidate candidate;
+    int queryIndex = -1;
+    if (!ReadCandidate(*item, candidate, queryIndex))
+      continue;
+    if (queryIndex < 0 || queryIndex >= static_cast<int>(answers.size()))
+      continue;
+    answers[static_cast<size_t>(queryIndex)].emplace_back(std::move(candidate));
+  }
+
+  if (!understood)
+  {
+    CLog::Log(LOGDEBUG, "GAME: {} does not answer batches; asking one file at a time",
+              m_addon->ID());
+    m_answersBatches = false;
+    answers.clear();
+    return false;
+  }
+
+  for (auto& list : answers)
+  {
+    std::ranges::stable_sort(list, [](const auto& a, const auto& b) { return a.score > b.score; });
+  }
+  return true;
 }
 
 bool CGameScraper::GetDetails(const std::string& id,

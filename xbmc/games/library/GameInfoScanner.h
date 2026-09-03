@@ -122,6 +122,21 @@ private:
   const struct GameScrapeCandidate* ChooseCandidate(CGameScraper& scraper,
                                                     struct GameScrapeRequest& request,
                                                     std::vector<struct GameScrapeCandidate>& candidates);
+  CGameScraper* ScraperFor(const GamePathContent& content);
+
+  /*!
+   * \brief Ask the scraper about a folder's next hundred games at once
+   *
+   * A scan spends nearly all its time in the round trip to the add-on, so the
+   * files of a chunk are hashed and asked about together. What comes back is
+   * kept until those entries have been scanned. A scraper that cannot answer
+   * batches leaves the caches empty and each file is asked about on its own.
+   */
+  void Prefetch(const Entry* entries,
+                size_t count,
+                const GamePathContent& content,
+                const PlatformInfo& platform);
+
   std::string FolderHash(const CFileItemList& items) const;
   void ApplyLocalArt(const Entry& entry, CGameInfoTag& tag, KODI::ART::Artwork& art) const;
 
@@ -129,6 +144,8 @@ private:
   std::unique_ptr<CPlatformCatalogue> m_catalogue;
   std::map<std::string, std::unique_ptr<CGameScraper>> m_scrapers;
   std::string m_extensions;
+  std::map<std::string, GameFile> m_identities; // hashed ahead of the scan, by path
+  std::map<std::string, std::vector<struct GameScrapeCandidate>> m_prefetched;
   std::set<std::string> m_pathsToClean;
   int m_currentItem{0};
   int m_itemCount{0};

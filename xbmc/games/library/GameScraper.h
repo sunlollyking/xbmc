@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+class CFileItem;
+
 namespace ADDON
 {
 class CScraper;
@@ -124,6 +126,22 @@ public:
   std::vector<GameScrapeCandidate> Find(const GameScrapeRequest& request);
 
   /*!
+   * \brief Ask about many files in one call
+   *
+   * A scan spends its time in the round trip to the add-on, not in the
+   * lookup, so a full set is asked about in batches. The answer holds one
+   * list per request, in the order they were given.
+   *
+   * \return false when the scraper does not answer batches; the caller then
+   *         asks about each file on its own
+   */
+  bool FindMany(const std::vector<GameScrapeRequest>& requests,
+                std::vector<std::vector<GameScrapeCandidate>>& answers);
+
+  //! \brief Whether a batch was refused once already, so it is not tried again
+  bool AnswersBatches() const { return m_answersBatches; }
+
+  /*!
    * \brief Ask for everything about one candidate
    *
    * \param[out] details Filled with what the scraper knows; existing values
@@ -154,7 +172,10 @@ public:
                    std::map<std::string, std::vector<GameScrapeArt>>& art);
 
 private:
+  bool m_answersBatches{true};
+
   std::string BuildUrl(const std::string& action, const GameScrapeRequest& request) const;
+  static bool ReadCandidate(const CFileItem& item, GameScrapeCandidate& candidate, int& queryIndex);
   bool ReadDetails(const std::string& id,
                    const std::string& json,
                    CGameInfoTag& details,

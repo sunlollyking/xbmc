@@ -71,6 +71,34 @@ matches: **never guess**. A name match must be exact after normalisation
 (case, punctuation, whitespace and a leading article ignored); when several
 entries share the normalised title, return all of them so Kodi can decide.
 
+## `action=findmany`
+
+A scan of a full set spends nearly all its time in the round trip to the
+add-on, not in the lookup, so Kodi asks about a folder's games a hundred at a
+time.
+
+Query: `platform`, `platformids`, `pathSettings` and `batch=<path to a file>`.
+The file holds the queries, in the order they are to be answered:
+
+```json
+{"version": 1, "queries": [
+  {"title": "Sonic the Hedgehog 2", "filename": "Sonic 2 (World).md",
+   "crc32": "24ab4c3a", "size": 1048576, "regions": "World"},
+  {"title": "Streets of Rage", "filename": "Streets of Rage (USA, Europe).md"}
+]}
+```
+
+Answer with the same list items `find` uses, one per candidate, each
+candidate's JSON carrying `"query": <index into queries>`. Finish with one
+extra item whose property `gamelibrary.batch` holds
+`{"version": 1, "queries": <how many were read>}`: that is what tells Kodi the
+batch was understood, so an empty answer means nothing matched rather than
+"this scraper has no batches". A scraper that does not implement `findmany`
+should fail the directory listing or leave the marker out; Kodi then asks
+about each file on its own for the rest of the scan.
+
+Kodi deletes the file after the call.
+
 ## `action=getdetails`
 
 Query: `id=<candidate id>`, `platform`, `platformids`, and the same identity

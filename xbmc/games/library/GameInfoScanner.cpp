@@ -213,7 +213,28 @@ std::pair<CInfoScanner::ScanComplete, CInfoScanner::ContentFound> CGameInfoScann
   GamePathContent content;
   bool foundDirectly = false;
   if (!m_database.GetPathContent(strDirectory, content, foundDirectly) || !content.HasContent())
-    return {ScanComplete::Completed, ContentFound::None};
+  {
+    // A collection is usually one folder per platform under a folder that is
+    // itself no platform. Scanning that folder scans the ones inside it.
+    CFileItemList folders;
+    if (!XFILE::CDirectory::GetDirectory(strDirectory, folders, "",
+                                         XFILE::DIR_FLAG_NO_FILE_DIRS |
+                                             XFILE::DIR_FLAG_NO_FILE_INFO))
+      return {ScanComplete::Completed, ContentFound::None};
+
+    bool anyFound = false;
+    for (const auto& folder : folders)
+    {
+      if (!m_bRunning)
+        return {ScanComplete::Stopped, anyFound ? ContentFound::NewContentFound : ContentFound::None};
+      if (!folder->IsFolder())
+        continue;
+      const auto [complete, subFound] = DoScan(folder->GetPath());
+      anyFound = anyFound || subFound == ContentFound::NewContentFound;
+    }
+    return {m_bRunning ? ScanComplete::Completed : ScanComplete::Stopped,
+            anyFound ? ContentFound::NewContentFound : ContentFound::None};
+  }
 
   PlatformInfo platform;
   if (!m_database.GetPlatform(content.idPlatform, platform))
@@ -399,15 +420,31 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
     const std::vector<Entry> entries = GroupEntries(items, content.useFolderNames);
     m_itemCount = static_cast<int>(entries.size());
     m_currentItem = 0;
-    for (const Entry& entry : entries)
+
+    // Asked about a chunk at a time, so a full set is a few hundred calls
+    // rather than tens of thousands
+    constexpr size_t chunkSize = 100;
+    for (size_t start = 0; start < entries.size() && m_bRunning; start += chunkSize)
     {
-      if (!m_bRunning)
-        return found;
-      if (m_handle != nullptr)
-        m_handle->SetProgress(m_currentItem, m_itemCount);
-      ++m_currentItem;
-      found = ScanEntry(entry, content, platform) || found;
+      const size_t end = std::min(start + chunkSize, entries.size());
+      Prefetch(&entries[start], end - start, content, platform);
+
+      for (size_t i = start; i < end; ++i)
+      {
+        if (!m_bRunning)
+        {
+          m_identities.clear();
+          m_prefetched.clear();
+          return found;
+        }
+        if (m_handle != nullptr)
+          m_handle->SetProgress(m_currentItem, m_itemCount);
+        ++m_currentItem;
+        found = ScanEntry(entries[i], content, platform) || found;
+      }
     }
+    m_identities.clear();
+    m_prefetched.clear();
     if (m_bRunning)
       m_database.SetPathHash(folder, hash);
   }
@@ -531,6 +568,80 @@ bool CGameInfoScanner::RefreshGame(int idGame)
   return ok;
 }
 
+CGameScraper* CGameInfoScanner::ScraperFor(const GamePathContent& content)
+{
+  const std::string scraperId = content.scraper;
+  auto it = m_scrapers.find(scraperId);
+  if (it == m_scrapers.end())
+  {
+    std::unique_ptr<CGameScraper> created =
+        scraperId.empty() ? CGameScraper::CreateDefault() : CGameScraper::Create(scraperId);
+    if (!created && !scraperId.empty())
+    {
+      CLog::Log(LOGWARNING, "GAME: Scraper {} is not available; using the default", scraperId);
+      created = CGameScraper::CreateDefault();
+    }
+    if (created && !content.settings.empty())
+      created->SetPathSettings(content.settings);
+    it = m_scrapers.emplace(scraperId, std::move(created)).first;
+  }
+  return it->second.get();
+}
+
+void CGameInfoScanner::Prefetch(const Entry* entries,
+                                size_t count,
+                                const GamePathContent& content,
+                                const PlatformInfo& platform)
+{
+  m_identities.clear();
+  m_prefetched.clear();
+
+  CGameScraper* scraper = ScraperFor(content);
+  if (scraper == nullptr || !scraper->AnswersBatches())
+    return;
+
+  std::vector<GameScrapeRequest> requests;
+  std::vector<std::string> paths;
+  requests.reserve(count);
+  paths.reserve(count);
+
+  for (size_t i = 0; i < count && m_bRunning; ++i)
+  {
+    const Entry& entry = entries[i];
+    // A folder-per-game entry has to be opened to know what plays, and a game
+    // already in the library is not asked about again
+    if (entry.isFolder || entry.path.empty() || m_database.GetGameIdByFile(entry.path) > 0)
+      continue;
+
+    const ParsedGameName parsed = CGameNameParser::Parse(URIUtils::GetFileName(entry.path));
+    if (parsed.displayTitle.empty())
+      continue;
+
+    GameFile identity;
+    CGameFileIdentity::Identify(entry.path, identity, platform.media);
+
+    GameScrapeRequest request;
+    FillRequest(entry, parsed, identity, platform, request);
+
+    m_identities[entry.path] = std::move(identity);
+    paths.emplace_back(entry.path);
+    requests.emplace_back(std::move(request));
+  }
+
+  if (requests.empty() || !m_bRunning)
+    return;
+
+  std::vector<std::vector<GameScrapeCandidate>> answers;
+  if (!scraper->FindMany(requests, answers))
+  {
+    // The hashing was still worth keeping; only the lookups have to be redone
+    return;
+  }
+
+  for (size_t i = 0; i < paths.size() && i < answers.size(); ++i)
+    m_prefetched[paths[i]] = std::move(answers[i]);
+}
+
 bool CGameInfoScanner::ScanEntry(const Entry& entry,
                                  const GamePathContent& content,
                                  const PlatformInfo& platform,
@@ -574,7 +685,10 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     m_handle->SetText(platform.name + " - " + parsed.displayTitle);
 
   GameFile identity;
-  CGameFileIdentity::Identify(playPath, identity, platform.media);
+  if (const auto known = m_identities.find(playPath); known != m_identities.end())
+    identity = known->second;
+  else
+    CGameFileIdentity::Identify(playPath, identity, platform.media);
 
   CGameInfoTag tag;
   tag.SetTitle(parsed.displayTitle);
@@ -636,23 +750,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   }
 
   // Ask the scraper set for this folder, or the default one
-  CGameScraper* scraper = nullptr;
-  const std::string scraperId = content.scraper;
-  auto it = m_scrapers.find(scraperId);
-  if (it == m_scrapers.end())
-  {
-    std::unique_ptr<CGameScraper> created =
-        scraperId.empty() ? CGameScraper::CreateDefault() : CGameScraper::Create(scraperId);
-    if (!created && !scraperId.empty())
-    {
-      CLog::Log(LOGWARNING, "GAME: Scraper {} is not available; using the default", scraperId);
-      created = CGameScraper::CreateDefault();
-    }
-    if (created && !content.settings.empty())
-      created->SetPathSettings(content.settings);
-    it = m_scrapers.emplace(scraperId, std::move(created)).first;
-  }
-  scraper = it->second.get();
+  CGameScraper* scraper = ScraperFor(content);
 
   KODI::ART::Artwork art;
   MatchMethod matchedBy = sidecar ? MatchMethod::SIDECAR : MatchMethod::NONE;
@@ -663,7 +761,11 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     GameScrapeRequest request;
     FillRequest(entry, parsed, identity, platform, request);
 
-    std::vector<GameScrapeCandidate> candidates = scraper->Find(request);
+    std::vector<GameScrapeCandidate> candidates;
+    if (const auto asked = m_prefetched.find(playPath); asked != m_prefetched.end())
+      candidates = std::move(asked->second);
+    else
+      candidates = scraper->Find(request);
     const GameScrapeCandidate* chosen = nullptr;
     if (!candidates.empty())
     {
