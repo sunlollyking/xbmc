@@ -8,6 +8,7 @@
 
 #include "ReleasePolicy.h"
 
+#include "GameNameParser.h"
 #include "ServiceBroker.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -24,12 +25,18 @@ namespace
 std::vector<std::string> SplitRegions(const std::string& list)
 {
   std::vector<std::string> regions;
-  for (std::string code : StringUtils::Split(list, ','))
+  for (std::string name : StringUtils::Split(list, ','))
   {
-    StringUtils::Trim(code);
-    StringUtils::ToLower(code);
-    if (!code.empty() && std::ranges::find(regions, code) == regions.end())
-      regions.emplace_back(std::move(code));
+    StringUtils::Trim(name);
+    // What the user typed is matched against the names a file name gave, so a
+    // shorthand or a different spelling still finds its region
+    std::string lower = name;
+    StringUtils::ToLower(lower);
+    std::string canonical = CGameNameParser::RegionName(lower);
+    if (canonical.empty())
+      canonical = std::move(name);
+    if (!canonical.empty() && std::ranges::find(regions, canonical) == regions.end())
+      regions.emplace_back(std::move(canonical));
   }
   return regions;
 }
@@ -65,12 +72,12 @@ int CReleasePolicy::RegionRank(const GameRelease& release) const
   // The best-placed region a release covers; a release with no region sits
   // behind every listed one, and an unlisted region behind that
   int best = static_cast<int>(m_regionPriority.size()) + 1;
-  for (const std::string& code : release.regions)
+  for (const std::string& region : release.regions)
   {
-    const auto it = std::ranges::find(m_regionPriority, code);
+    const auto it = std::ranges::find(m_regionPriority, region);
     if (it != m_regionPriority.end())
       best = std::min(best, static_cast<int>(it - m_regionPriority.begin()));
-    else if (code == "wor")
+    else if (region == "World")
       best = std::min(best, static_cast<int>(m_regionPriority.size()));
   }
   if (release.regions.empty())

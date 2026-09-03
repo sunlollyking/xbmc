@@ -23,7 +23,7 @@ namespace GAME
  */
 constexpr const char* SETTING_GAMELIBRARY_SHOWDERIVEDGAMES = "gamelibrary.showderivedgames";
 constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY = "gamelibrary.regionpriority";
-constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY_DEFAULT = "eu,wor,us,jp";
+constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY_DEFAULT = "Europe,World,USA,Japan";
 constexpr const char* SETTING_GAMELIBRARY_PREFERRETAIL = "gamelibrary.preferretail";
 constexpr const char* SETTING_GAMELIBRARY_PREFERNEWESTREVISION = "gamelibrary.prefernewestrevision";
 constexpr const char* SETTING_GAMELIBRARY_PREFERVERIFIED = "gamelibrary.preferverified";
@@ -233,7 +233,7 @@ struct GameRelease
 {
   int id{-1};
   std::string title; // the title as this release names it
-  std::vector<std::string> regions; // lower-case region codes, most specific first
+  std::vector<std::string> regions; // full names, most specific first: "USA", "Europe"
   std::vector<std::string> languages; // lower-case ISO 639-1 codes
   std::string revision; // "Rev 1", "v1.1", empty for the first release
   ReleaseStatus status{ReleaseStatus::RETAIL};

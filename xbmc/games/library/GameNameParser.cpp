@@ -20,17 +20,48 @@ using namespace GAME;
 
 namespace
 {
-constexpr std::array<std::pair<std::string_view, std::string_view>, 39> regionNames{{
-    {"usa", "us"},       {"us", "us"},         {"u", "us"},          {"canada", "ca"},
-    {"europe", "eu"},    {"eu", "eu"},         {"e", "eu"},          {"japan", "jp"},
-    {"jp", "jp"},        {"j", "jp"},          {"world", "wor"},     {"w", "wor"},
-    {"asia", "asi"},     {"australia", "au"},  {"brazil", "br"},     {"china", "cn"},
-    {"france", "fr"},    {"germany", "de"},    {"italy", "it"},      {"spain", "es"},
-    {"netherlands", "nl"}, {"sweden", "se"},   {"korea", "kr"},      {"taiwan", "tw"},
-    {"hong kong", "hk"}, {"uk", "uk"},         {"united kingdom", "uk"}, {"russia", "ru"},
-    {"poland", "pl"},    {"finland", "fi"},    {"denmark", "dk"},    {"norway", "no"},
-    {"portugal", "pt"},  {"greece", "gr"},     {"israel", "il"},     {"mexico", "mx"},
-    {"argentina", "ar"}, {"scandinavia", "sc"}, {"unknown", "unk"},
+constexpr std::array<std::pair<std::string_view, std::string_view>, 41> regionNames{{
+    {"usa", "USA"},
+    {"us", "USA"},
+    {"u", "USA"},
+    {"canada", "Canada"},
+    {"europe", "Europe"},
+    {"eu", "Europe"},
+    {"e", "Europe"},
+    {"japan", "Japan"},
+    {"jp", "Japan"},
+    {"j", "Japan"},
+    {"world", "World"},
+    {"w", "World"},
+    {"asia", "Asia"},
+    {"australia", "Australia"},
+    {"brazil", "Brazil"},
+    {"china", "China"},
+    {"france", "France"},
+    {"germany", "Germany"},
+    {"italy", "Italy"},
+    {"spain", "Spain"},
+    {"netherlands", "Netherlands"},
+    {"sweden", "Sweden"},
+    {"korea", "Korea"},
+    {"taiwan", "Taiwan"},
+    {"hong kong", "Hong Kong"},
+    {"uk", "United Kingdom"},
+    {"united kingdom", "United Kingdom"},
+    {"russia", "Russia"},
+    {"poland", "Poland"},
+    {"finland", "Finland"},
+    {"denmark", "Denmark"},
+    {"norway", "Norway"},
+    {"portugal", "Portugal"},
+    {"greece", "Greece"},
+    {"israel", "Israel"},
+    {"india", "India"},
+    {"mexico", "Mexico"},
+    {"argentina", "Argentina"},
+    {"scandinavia", "Scandinavia"},
+    {"latin america", "Latin America"},
+    {"unknown", "Unknown"},
 }};
 
 constexpr std::array<std::string_view, 40> languageCodes{
@@ -67,10 +98,10 @@ bool AllRegions(const std::vector<std::string>& parts, std::vector<std::string>&
   codes.clear();
   for (const std::string& p : parts)
   {
-    const std::string code = CGameNameParser::RegionCode(Lower(p));
-    if (code.empty())
+    const std::string name = CGameNameParser::RegionName(Lower(p));
+    if (name.empty())
       return false;
-    codes.emplace_back(code);
+    codes.emplace_back(name);
   }
   return !codes.empty();
 }
@@ -145,12 +176,12 @@ Patterns& GetPatterns()
 }
 } // namespace
 
-std::string CGameNameParser::RegionCode(std::string_view region)
+std::string CGameNameParser::RegionName(std::string_view region)
 {
-  for (const auto& [name, code] : regionNames)
+  for (const auto& [alias, name] : regionNames)
   {
-    if (name == region)
-      return std::string(code);
+    if (alias == region)
+      return std::string(name);
   }
   return "";
 }

@@ -38,7 +38,7 @@ Query parameters (absent when unknown):
 | `serial` | disc serial normalised to upper-case letters and digits only (`SLUS00300`, `T14402M`) |
 | `rahash` | the RetroAchievements hash, when the platform has one |
 | `size` | the ROM data size in bytes |
-| `regions` | comma list of lower-case region codes parsed from the name (`us,eu`) |
+| `regions` | comma list of regions parsed from the name, in full (`USA,Europe`) |
 | `languages` | comma list of ISO 639-1 codes parsed from the name |
 | `year` | a year parsed from the name (TOSEC) |
 
@@ -92,11 +92,11 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "ageratings": [{"board": "ESRB", "value": "E", "descriptors": ""}],
   "uniqueids": {"libretro": "Sonic the Hedgehog 2 (World)"},
   "releases": [
-    {"title": "Sonic the Hedgehog 2 (World)", "regions": ["wor"], "languages": [],
+    {"title": "Sonic the Hedgehog 2 (World)", "regions": ["World"], "languages": [],
      "revision": "", "status": "retail", "licence": "licensed", "serial": "",
      "releasedate": "", "crc32": "24ab4c3a", "md5": "", "sha1": "", "size": 1048576}
   ],
-  "art": {"boxfront": [{"url": "https://...png", "region": "us"}],
+  "art": {"boxfront": [{"url": "https://...png", "region": "USA"}],
           "titlescreen": [{"url": "https://...png"}],
           "screenshot": [{"url": "https://...png"}]},
   "trailer": "",
@@ -108,9 +108,12 @@ Every key is optional except `version` and `title`. Words for `category`,
 `status` and `licence` are the ones in `GameLibraryTypes.cpp`:
 category `retail|hack|homebrew|demo|bios|application`; status
 `retail|beta|proto|sample|demo|alpha|kiosk|debug|program`; licence
-`licensed|unlicensed|aftermarket|homebrew|pirate`. Region codes are
-ScreenScraper's lower-case codes (`us eu jp wor asi au br kr cn fr de it es`
-...). Art type names are Kodi's: `boxfront boxback boxspine boxfull box3d cart
+`licensed|unlicensed|aftermarket|homebrew|pirate`. Regions are written in
+full, as No-Intro writes them: `USA`, `Europe`, `Japan`, `World`, `Asia`,
+`Australia`, `Brazil`, `Canada`, `China`, `France`, `Germany`, `Italy`,
+`Korea`, `Netherlands`, `Spain`, `Sweden`, `United Kingdom`, `Unknown` and
+the rest. A provider that speaks region codes translates them at its own
+edge. Art type names are Kodi's: `boxfront boxback boxspine boxfull box3d cart
 clearlogo marquee banner screenshot titlescreen fanart icon mix flyer map
 bezel`.
 

@@ -26,7 +26,7 @@ struct ParsedGameName
 {
   std::string title; // as written, tags removed: "Legend of Zelda, The"
   std::string displayTitle; // article restored: "The Legend of Zelda"
-  std::vector<std::string> regions; // lower-case codes
+  std::vector<std::string> regions; // full names, e.g. "USA", "Europe"
   std::vector<std::string> languages; // lower-case ISO 639-1
   std::string revision;
   ReleaseStatus status{ReleaseStatus::RETAIL};
@@ -70,9 +70,12 @@ public:
   static std::string DisplayTitle(std::string_view title);
 
   /*!
-   * \brief The lower-case code for a region as file names write it, or empty
+   * \brief The region a file name's tag names, written in full, or empty
+   *
+   * "USA", "Europe", "Japan", "World" and the rest, as No-Intro writes them,
+   * whatever spelling or abbreviation the tag used.
    */
-  static std::string RegionCode(std::string_view region);
+  static std::string RegionName(std::string_view region);
 };
 } // namespace GAME
 } // namespace KODI
