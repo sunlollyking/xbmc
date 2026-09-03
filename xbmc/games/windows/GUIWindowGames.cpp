@@ -211,6 +211,10 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35326); // "Default video filter"
       }
 
+      // A library game can be identified and described again
+      if (item->HasProperty("gameid") && !item->HasProperty("releaseid"))
+        buttons.Add(CONTEXT_BUTTON_REFRESH_THUMBS, 184); // "Refresh"
+
       // A release of a library game can be made the one that plays
       if (item->HasProperty("releaseid") && !item->GetProperty("isdefaultrelease").asBoolean())
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT, 35551); // "Set as default release"
@@ -270,6 +274,10 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
       }
       case CONTEXT_BUTTON_SCAN:
         CGameLibraryQueue::GetInstance().ScanLibrary(item->GetPath());
+        return true;
+      case CONTEXT_BUTTON_REFRESH_THUMBS:
+        CGameLibraryQueue::GetInstance().RefreshGame(
+            static_cast<int>(item->GetProperty("gameid").asInteger()));
         return true;
       case CONTEXT_BUTTON_SET_DEFAULT:
       {

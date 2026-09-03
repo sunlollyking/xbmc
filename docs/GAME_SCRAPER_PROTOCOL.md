@@ -52,6 +52,11 @@ candidate's title. Property `gamelibrary.candidate` holds:
  "platform": "megadrive", "score": 1.0, "matchedby": "hash"}
 ```
 
+A candidate may also carry the property `gamelibrary.details` holding the
+same JSON `getdetails` would answer with for it; Kodi then skips the
+`getdetails` call for that candidate. Do this when the details cost nothing
+extra, as with an offline catalogue.
+
 `matchedby` is one of `hash`, `serial`, `name`. `score` is 0..1; a hash or
 serial match is 1.0. Return candidates best first. Return nothing when nothing
 matches: **never guess**. A name match must be exact after normalisation

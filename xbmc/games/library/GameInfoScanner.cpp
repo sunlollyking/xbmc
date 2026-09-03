@@ -431,9 +431,51 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   return found;
 }
 
+bool CGameInfoScanner::RefreshGame(int idGame)
+{
+  if (!m_database.IsOpen() && !m_database.Open())
+    return false;
+  if (!m_catalogue)
+  {
+    m_catalogue = std::make_unique<CPlatformCatalogue>();
+    m_catalogue->Load();
+  }
+
+  CGameInfoTag game;
+  if (!m_database.GetGameInfo(idGame, game))
+    return false;
+  const GameRelease* release = game.GetDefaultRelease();
+  if (release == nullptr || release->files.empty())
+    return false;
+
+  const std::string playPath = release->files.front().path;
+  GamePathContent content;
+  bool foundDirectly = false;
+  if (!m_database.GetPathContent(URIUtils::GetDirectory(playPath), content, foundDirectly))
+    return false;
+  PlatformInfo platform;
+  if (!m_database.GetPlatform(content.idPlatform, platform))
+    return false;
+
+  Entry entry;
+  entry.path = playPath;
+  entry.folder = URIUtils::GetDirectory(playPath);
+  for (const GameFile& file : release->files)
+    entry.files.emplace_back(file.path);
+
+  m_bRunning = true;
+  const bool ok = ScanEntry(entry, content, platform, idGame);
+  m_bRunning = false;
+
+  CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+  return ok;
+}
+
 bool CGameInfoScanner::ScanEntry(const Entry& entry,
                                  const GamePathContent& content,
-                                 const PlatformInfo& platform)
+                                 const PlatformInfo& platform,
+                                 int refreshGameId)
 {
   std::string playPath = entry.path;
   std::vector<std::string> files = entry.files;
@@ -459,7 +501,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   if (playPath.empty())
     return false;
 
-  if (m_database.GetGameIdByFile(playPath) > 0)
+  if (refreshGameId <= 0 && m_database.GetGameIdByFile(playPath) > 0)
     return false;
 
   const std::string nameSource =
@@ -577,7 +619,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     {
       std::map<std::string, std::vector<GameScrapeArt>> offered;
       CGameInfoTag scraped;
-      if (scraper->GetDetails(chosen->id, request, scraped, offered))
+      if (scraper->GetDetails(*chosen, request, scraped, offered))
       {
         matchedBy = chosen->matchedBy;
         candidateId = chosen->id;
@@ -642,6 +684,30 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   }
 
   tag.SetMatchMethod(matchedBy);
+
+  // A refresh replaces what was scraped and keeps what the user and the disk gave
+  if (refreshGameId > 0)
+  {
+    CGameInfoTag existing;
+    if (!m_database.GetGameInfo(refreshGameId, existing))
+      return false;
+    tag.SetDatabaseId(refreshGameId);
+    tag.SetReleases(existing.GetReleases());
+    tag.SetDefaultReleaseId(existing.GetDefaultReleaseId());
+    tag.SetUserRating(existing.GetUserRating());
+    tag.SetFavourite(existing.IsFavourite());
+    tag.SetCompleted(existing.IsCompleted());
+    tag.SetDateAdded(existing.GetDateAdded());
+    tag.SetAchievements(existing.GetAchievementsTotal(), existing.GetAchievementsEarned(),
+                        existing.GetAchievementsHardcore());
+    tag.SetLastUnlock(existing.GetLastUnlock());
+    tag.SetTags(existing.GetTags());
+    KODI::ART::Artwork existingArt;
+    m_database.GetArtForItem(refreshGameId, MediaTypeGame, existingArt);
+    for (const auto& [type, url] : art)
+      existingArt[type] = url;
+    return m_database.SetDetailsForGame(tag, existingArt) > 0;
+  }
 
   // Another dump of a game already in the library becomes one of its releases
   int idGame = -1;

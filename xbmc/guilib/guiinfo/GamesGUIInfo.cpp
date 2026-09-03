@@ -290,9 +290,9 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           value = tag->GetRegion();
           return !value.empty();
         case LISTITEM_RELEASE_COUNT:
-          if (!tag->GetReleases().empty())
+          if (tag->GetReleaseCount() > 0)
           {
-            value = std::to_string(tag->GetReleases().size());
+            value = std::to_string(tag->GetReleaseCount());
             return true;
           }
           break;

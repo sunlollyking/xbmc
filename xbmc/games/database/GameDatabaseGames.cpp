@@ -426,6 +426,7 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   if (!uniqueIdType.empty())
     details.SetUniqueID(uniqueIdType, record->at(GAMEDB_UNIQUEID_VALUE).get_asString(), true);
 
+  details.SetReleaseCount(record->at(GAMEDB_RELEASE_COUNT).get_asInt());
   details.SetPlayCount(record->at(GAMEDB_PLAY_COUNT).get_asInt());
   details.SetLastPlayed(record->at(GAMEDB_LAST_PLAYED).get_asString());
 

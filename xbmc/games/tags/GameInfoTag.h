@@ -216,8 +216,14 @@ public:
    */
   ///@{
   const std::vector<GameRelease>& GetReleases() const { return m_releases; }
-  void SetReleases(const std::vector<GameRelease>& releases) { m_releases = releases; }
+  void SetReleases(const std::vector<GameRelease>& releases);
   const GameRelease* GetDefaultRelease() const;
+
+  /*!
+   * \brief How many releases the game has, known even when they are not loaded
+   */
+  int GetReleaseCount() const { return m_releaseCount; }
+  void SetReleaseCount(int count) { m_releaseCount = count; }
   ///@}
 
   /*!
@@ -308,6 +314,7 @@ private:
 
   // Releases
   std::vector<GameRelease> m_releases;
+  int m_releaseCount;
 
   // The user's own state
   int m_playCount;

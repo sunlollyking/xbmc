@@ -66,6 +66,29 @@ private:
   CGameInfoScanner*& m_slot;
 };
 
+class CGameLibraryRefreshJob : public CJob
+{
+public:
+  explicit CGameLibraryRefreshJob(int idGame) : m_idGame(idGame) {}
+
+  const char* GetType() const override { return "GameLibraryRefreshJob"; }
+
+  bool DoWork() override
+  {
+    CGameInfoScanner scanner;
+    return scanner.RefreshGame(m_idGame);
+  }
+
+  bool Equals(const CJob* job) const override
+  {
+    const auto* other = dynamic_cast<const CGameLibraryRefreshJob*>(job);
+    return other != nullptr && other->m_idGame == m_idGame;
+  }
+
+private:
+  int m_idGame;
+};
+
 class CGameLibraryCleaningJob : public CJob
 {
 public:
@@ -121,6 +144,14 @@ void CGameLibraryQueue::ScanLibrary(const std::string& directory, bool showProgr
     return;
   m_scanning = true;
   AddJob(new CGameLibraryScanningJob(directory, showProgress, m_scanner));
+}
+
+void CGameLibraryQueue::RefreshGame(int idGame)
+{
+  if (idGame <= 0)
+    return;
+  std::unique_lock lock(m_critical);
+  AddJob(new CGameLibraryRefreshJob(idGame));
 }
 
 void CGameLibraryQueue::StopLibraryScanning()

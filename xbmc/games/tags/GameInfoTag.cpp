@@ -70,6 +70,7 @@ void CGameInfoTag::Reset()
   m_strDefaultUniqueId.clear();
 
   m_releases.clear();
+  m_releaseCount = 0;
 
   m_playCount = 0;
   m_strLastPlayed.clear();
@@ -132,6 +133,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_strDefaultUniqueId = tag.m_strDefaultUniqueId;
 
     m_releases = tag.m_releases;
+    m_releaseCount = tag.m_releaseCount;
 
     m_playCount = tag.m_playCount;
     m_strLastPlayed = tag.m_strLastPlayed;
@@ -267,6 +269,12 @@ std::string CGameInfoTag::GetUniqueID(const std::string& type) const
   if (it == m_uniqueIds.end())
     return "";
   return it->second;
+}
+
+void CGameInfoTag::SetReleases(const std::vector<GameRelease>& releases)
+{
+  m_releases = releases;
+  m_releaseCount = static_cast<int>(releases.size());
 }
 
 const GameRelease* CGameInfoTag::GetDefaultRelease() const
@@ -513,6 +521,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   for (const auto& [type, id] : m_uniqueIds)
     value["uniqueid"][type] = id;
 
+  value["releasecount"] = m_releaseCount;
   value["releases"] = CVariant(CVariant::VariantTypeArray);
   for (const GameRelease& release : m_releases)
   {

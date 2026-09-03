@@ -63,6 +63,14 @@ public:
   void Stop();
 
   /*!
+   * \brief Identify and describe one library game again
+   *
+   * Its releases, files and the user's own state are kept; everything the
+   * scraper answers replaces what it answered before.
+   */
+  bool RefreshGame(int idGame);
+
+  /*!
    * \brief What the scanner learnt about one file, before it is stored
    */
   struct Entry
@@ -97,7 +105,10 @@ protected:
 private:
   void Process();
   bool ScanFolder(const std::string& folder, const GamePathContent& content, const PlatformInfo& platform);
-  bool ScanEntry(const Entry& entry, const GamePathContent& content, const PlatformInfo& platform);
+  bool ScanEntry(const Entry& entry,
+                 const GamePathContent& content,
+                 const PlatformInfo& platform,
+                 int refreshGameId = -1);
   std::string FolderHash(const CFileItemList& items) const;
   void ApplyLocalArt(const Entry& entry, CGameInfoTag& tag, KODI::ART::Artwork& art) const;
 

@@ -222,6 +222,8 @@ std::vector<GameScrapeCandidate> CGameScraper::Find(const GameScrapeRequest& req
     if (candidate.matchedBy == MatchMethod::NONE)
       candidate.matchedBy = MatchMethod::NAME;
 
+    candidate.details = item->GetProperty(PROPERTY_DETAILS).asString();
+
     if (!candidate.id.empty())
       candidates.emplace_back(std::move(candidate));
   }
@@ -243,9 +245,33 @@ bool CGameScraper::GetDetails(const std::string& id,
   if (!XFILE::CPluginDirectory::GetPluginResult(url.Get(), result, false))
     return false;
 
-  CVariant payload;
-  if (!ParsePayload(result, PROPERTY_DETAILS, payload))
+  return ReadDetails(id, result.GetProperty(PROPERTY_DETAILS).asString(), details, art);
+}
+
+bool CGameScraper::GetDetails(const GameScrapeCandidate& candidate,
+                              const GameScrapeRequest& request,
+                              CGameInfoTag& details,
+                              std::map<std::string, std::vector<GameScrapeArt>>& art)
+{
+  if (!candidate.details.empty() && ReadDetails(candidate.id, candidate.details, details, art))
+    return true;
+  return GetDetails(candidate.id, request, details, art);
+}
+
+bool CGameScraper::ReadDetails(const std::string& id,
+                               const std::string& json,
+                               CGameInfoTag& details,
+                               std::map<std::string, std::vector<GameScrapeArt>>& art)
+{
+  if (json.empty())
     return false;
+
+  CVariant payload;
+  if (!CJSONVariantParser::Parse(json, payload) || !payload.isObject())
+  {
+    CLog::Log(LOGERROR, "GAME: Scraper answered with unreadable details");
+    return false;
+  }
 
   if (payload["version"].asInteger() > PROTOCOL_VERSION)
   {

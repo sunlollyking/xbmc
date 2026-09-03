@@ -48,6 +48,11 @@ public:
   void StopLibraryScanning();
 
   /*!
+   * \brief Identify and describe one game again, in the background
+   */
+  void RefreshGame(int idGame);
+
+  /*!
    * \brief Remove what no longer exists on disk
    *
    * \param paths Limit the clean to these path IDs, or empty for everything

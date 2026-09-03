@@ -59,6 +59,7 @@ struct GameScrapeCandidate
   int year{0};
   float score{0.0f};
   MatchMethod matchedBy{MatchMethod::NONE};
+  std::string details; // the details payload, when the scraper sent it with the candidate
 };
 
 /*!
@@ -131,6 +132,15 @@ public:
                   std::map<std::string, std::vector<GameScrapeArt>>& art);
 
   /*!
+   * \brief Read everything about a candidate from a details payload the
+   *        scraper already sent
+   */
+  bool GetDetails(const GameScrapeCandidate& candidate,
+                  const GameScrapeRequest& request,
+                  CGameInfoTag& details,
+                  std::map<std::string, std::vector<GameScrapeArt>>& art);
+
+  /*!
    * \brief Ask about a platform
    */
   bool GetPlatform(const GameScrapeRequest& request,
@@ -139,6 +149,10 @@ public:
 
 private:
   std::string BuildUrl(const std::string& action, const GameScrapeRequest& request) const;
+  bool ReadDetails(const std::string& id,
+                   const std::string& json,
+                   CGameInfoTag& details,
+                   std::map<std::string, std::vector<GameScrapeArt>>& art);
 
   std::shared_ptr<ADDON::CScraper> m_addon;
 };
