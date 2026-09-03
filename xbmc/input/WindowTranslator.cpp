@@ -181,6 +181,8 @@ const CWindowTranslator::WindowMapByName CWindowTranslator::WindowMappingByName 
     {"gamecheats", WINDOW_DIALOG_GAME_CHEATS},
     {"gamemanual", WINDOW_GAME_MANUAL},
     {"gamemanuals", WINDOW_DIALOG_GAME_MANUALS},
+    {"gameleaderboards", WINDOW_DIALOG_GAME_LEADERBOARDS},
+    {"gameleaderboardentries", WINDOW_DIALOG_GAME_LEADERBOARD_ENTRIES},
     {"dialogselectvideo", WINDOW_DIALOG_SELECT_VIDEO_STREAM},
     {"dialogselectaudio", WINDOW_DIALOG_SELECT_AUDIO_STREAM},
     {"dialogselectsubtitle", WINDOW_DIALOG_SELECT_SUBTITLE_STREAM},

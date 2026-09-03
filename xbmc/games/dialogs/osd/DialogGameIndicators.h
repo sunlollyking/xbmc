@@ -10,7 +10,9 @@
 
 #include "guilib/GUIDialog.h"
 
-namespace KODI::GAME
+namespace KODI
+{
+namespace GAME
 {
 /*!
  * \ingroup games
@@ -22,14 +24,17 @@ namespace KODI::GAME
  *
  * \section indicator_why_a_dialog Why this is a dialog
  *
- * Where the game has its own plane, CGameWindowFullScreen stops marking itself
- * dirty each frame and CApplication then skips compositing the GUI layer while
- * nothing else dirties it, so a control there quietly becoming visible does not
- * bring the layer back. Opening a dialog does.
+ * These began as controls in the skin's fullscreen window, which never once
+ * appeared. Where the game has its own DRM plane - the direct-to-plane path
+ * every LibreELEC box takes - CGUIWindowFullScreen deliberately stops marking
+ * itself dirty each frame, and CApplication then skips compositing the GUI
+ * layer entirely while nothing else dirties it. A control quietly becoming
+ * visible was not enough to bring the layer back.
  *
- * While it is up this marks itself dirty each frame so the layer keeps being
- * composited, and it is only up while there is something to show, so the rest
- * of the session keeps the saving that optimisation exists for.
+ * Opening a dialog is, which is why notifications have always shown over games
+ * and these did not. While it is up this marks itself dirty each frame so the
+ * layer keeps being composited; it is only up while there is something to show,
+ * so the saving that optimisation exists for is kept the rest of the time.
  *
  * Modeless: the player is still playing, and must keep their input.
  */
@@ -43,15 +48,24 @@ public:
   void Process(unsigned int currentTime, CDirtyRegionList& dirtyregions) override;
 
   /*!
-   * \brief Open the indicators if the runtime has anything to show
+   * \brief Start listening for indicators worth showing
    *
-   * Safe to call from the game thread: opening is posted to the GUI thread,
-   * which is the only one allowed to do it. Closing is decided in Process(),
-   * which already runs there.
+   * Called once. Everything that changes an indicator reports to the runtime,
+   * and the runtime reports here, so a new indicator needs no wiring of its own.
+   */
+  static void Register();
+
+private:
+  /*!
+   * \brief Open the dialog if the runtime has something to show
+   *
+   * Only ever opens: closing is decided in Process, on the GUI thread. Deciding
+   * both from the game thread meant posting a close and then testing whether it
+   * had happened, which raced.
    */
   static void Show();
 
-private:
   static bool AnythingToShow();
 };
-} // namespace KODI::GAME
+} // namespace GAME
+} // namespace KODI
