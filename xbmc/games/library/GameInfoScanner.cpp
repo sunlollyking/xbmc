@@ -509,6 +509,11 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   {
     std::unique_ptr<CGameScraper> created =
         scraperId.empty() ? CGameScraper::CreateDefault() : CGameScraper::Create(scraperId);
+    if (!created && !scraperId.empty())
+    {
+      CLog::Log(LOGWARNING, "GAME: Scraper {} is not available; using the default", scraperId);
+      created = CGameScraper::CreateDefault();
+    }
     if (created && !content.settings.empty())
       created->SetPathSettings(content.settings);
     it = m_scrapers.emplace(scraperId, std::move(created)).first;
