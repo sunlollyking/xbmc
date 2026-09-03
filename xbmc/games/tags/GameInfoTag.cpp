@@ -464,6 +464,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["loaded"] = m_bLoaded;
   value["url"] = m_strURL;
   value["name"] = m_strTitle;
+  value["title"] = m_strTitle;
   value["platform"] = m_strPlatform;
   value["genres"] = m_genres;
   value["developer"] = m_strDeveloper;
@@ -490,6 +491,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["publishers"] = m_publishers;
   value["collections"] = m_collections;
   value["tags"] = m_tags;
+  value["players"] = m_playersMax;
   value["playersmin"] = m_playersMin;
   value["playersmax"] = m_playersMax;
   value["coop"] = m_coop;

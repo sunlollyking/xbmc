@@ -74,15 +74,13 @@
               "type": "integer",
               "minimum": 0,
               "required": true,
-              "description":
-                  "Bumped on backwards compatible additions/changes to the API definition"
+              "description": "Bumped on backwards compatible additions/changes to the API definition"
             },
             "patch": {
               "type": "integer",
               "minimum": 0,
               "required": true,
-              "description":
-                  "Bumped on any changes to the internal implementation but not to the API definition"
+              "description": "Bumped on any changes to the internal implementation but not to the API definition"
             }
           }
         }
@@ -241,8 +239,7 @@
   },
   "Player.Open": {
     "type": "method",
-    "description":
-        "Start playback of either the playlist with the given ID, a slideshow with the pictures from the given directory or a single file or an item from the database.",
+    "description": "Start playback of either the playlist with the given ID, a slideshow with the pictures from the given directory or a single file or an item from the database.",
     "transport": "Response",
     "permission": "ControlPlayback",
     "params": [
@@ -280,8 +277,7 @@
               "random": {
                 "type": "boolean",
                 "default": true,
-                "description":
-                    "Deprecated, use the shuffled property of the options parameter instead"
+                "description": "Deprecated, use the shuffled property of the options parameter instead"
               },
               "recursive": {
                 "type": "boolean",
@@ -612,8 +608,7 @@
         "type": [
           {
             "type": "number",
-            "description":
-                "The value should be a multiple of 0.025 in a range of +/-10 (the default range can be overridden by advancedsettings.xml).",
+            "description": "The value should be a multiple of 0.025 in a range of +/-10 (the default range can be overridden by advancedsettings.xml).",
             "required": true
           },
           {
@@ -799,8 +794,7 @@
   },
   "Player.Move": {
     "type": "method",
-    "description":
-        "If picture is zoomed move viewport left/right/up/down otherwise skip previous/next",
+    "description": "If picture is zoomed move viewport left/right/up/down otherwise skip previous/next",
     "transport": "Response",
     "permission": "ControlPlayback",
     "params": [
@@ -1288,8 +1282,7 @@
   },
   "Playlist.Insert": {
     "type": "method",
-    "description":
-        "Insert item(s) into playlist. Does not work for picture playlists (aka slideshows).",
+    "description": "Insert item(s) into playlist. Does not work for picture playlists (aka slideshows).",
     "transport": "Response",
     "permission": "ControlPlayback",
     "params": [
@@ -1325,8 +1318,7 @@
   },
   "Playlist.Remove": {
     "type": "method",
-    "description":
-        "Remove item from playlist. Does not work for picture playlists (aka slideshows).",
+    "description": "Remove item from playlist. Does not work for picture playlists (aka slideshows).",
     "transport": "Response",
     "permission": "ControlPlayback",
     "params": [
@@ -1359,8 +1351,7 @@
   },
   "Playlist.Swap": {
     "type": "method",
-    "description":
-        "Swap items in the playlist. Does not work for picture playlists (aka slideshows).",
+    "description": "Swap items in the playlist. Does not work for picture playlists (aka slideshows).",
     "transport": "Response",
     "permission": "ControlPlayback",
     "params": [
@@ -1442,8 +1433,7 @@
   },
   "Files.PrepareDownload": {
     "type": "method",
-    "description":
-        "Provides a way to download a given file (e.g. providing an URL to the real file location)",
+    "description": "Provides a way to download a given file (e.g. providing an URL to the real file location)",
     "transport": [
       "Response",
       "FileDownloadRedirect"
@@ -1478,8 +1468,7 @@
             "direct"
           ],
           "required": true,
-          "description":
-              "Direct mode allows using Files.Download whereas redirect mode requires the usage of a different protocol"
+          "description": "Direct mode allows using Files.Download whereas redirect mode requires the usage of a different protocol"
         }
       }
     }
@@ -1531,8 +1520,7 @@
       {
         "name": "limits",
         "$ref": "List.Limits",
-        "description":
-            "Limits are applied after getting the directory content thus retrieval is not faster when they are applied."
+        "description": "Limits are applied after getting the directory content thus retrieval is not faster when they are applied."
       }
     ],
     "returns": {
@@ -1600,8 +1588,7 @@
         "name": "media",
         "$ref": "Files.Media",
         "required": true,
-        "description":
-            "File type to update correct database. Currently only \"video\" is supported."
+        "description": "File type to update correct database. Currently only \"video\" is supported."
       },
       {
         "name": "playcount",
@@ -1649,16 +1636,14 @@
   },
   "AudioLibrary.GetArtists": {
     "type": "method",
-    "description":
-        "Retrieve all artists. For backward compatibility by default this implicitly does not include those that only contribute other roles, however absolutely all artists can be returned using allroles=true",
+    "description": "Retrieve all artists. For backward compatibility by default this implicitly does not include those that only contribute other roles, however absolutely all artists can be returned using allroles=true",
     "transport": "Response",
     "permission": "ReadData",
     "params": [
       {
         "name": "albumartistsonly",
         "$ref": "Optional.Boolean",
-        "description":
-            "Whether or not to only include album artists rather than the artists of only individual songs as well. If the parameter is not passed or is passed as null the GUI setting will be used"
+        "description": "Whether or not to only include album artists rather than the artists of only individual songs as well. If the parameter is not passed or is passed as null the GUI setting will be used"
       },
       {
         "name": "properties",
@@ -1681,8 +1666,7 @@
               "genreid": {
                 "$ref": "Library.Id",
                 "required": true,
-                "description":
-                    "Deprecated, use songgenreid. Filter for existence of songs with this genre"
+                "description": "Deprecated, use songgenreid. Filter for existence of songs with this genre"
               }
             },
             "additionalProperties": false
@@ -1734,8 +1718,7 @@
                 "type": "string",
                 "minLength": 1,
                 "required": true,
-                "description":
-                    "Deprecated, use songgenre. Filter for existence of songs with this genre"
+                "description": "Deprecated, use songgenre. Filter for existence of songs with this genre"
               }
             },
             "additionalProperties": false
@@ -1875,8 +1858,7 @@
         "name": "allroles",
         "type": "boolean",
         "default": false,
-        "description":
-            "Whether or not to include all artists irrespective of the role they contributed. When true it overrides any role filter value."
+        "description": "Whether or not to include all artists irrespective of the role they contributed. When true it overrides any role filter value."
       }
     ],
     "returns": {
@@ -1922,8 +1904,7 @@
   },
   "AudioLibrary.GetAlbums": {
     "type": "method",
-    "description":
-        "Retrieve all albums from specified artist (and role) or that has songs of the specified genre",
+    "description": "Retrieve all albums from specified artist (and role) or that has songs of the specified genre",
     "transport": "Response",
     "permission": "ReadData",
     "params": [
@@ -2060,8 +2041,7 @@
         "name": "allroles",
         "type": "boolean",
         "default": false,
-        "description":
-            "Whether or not to include all roles when filtering by artist, rather than the default of excluding other contributions. When true it overrides any role filter value."
+        "description": "Whether or not to include all roles when filtering by artist, rather than the default of excluding other contributions. When true it overrides any role filter value."
       }
     ],
     "returns": {
@@ -2260,15 +2240,13 @@
         "name": "includesingles",
         "type": "boolean",
         "default": true,
-        "description":
-            "Only songs from albums are returned when false, but overridden when singlesonly parameter is true"
+        "description": "Only songs from albums are returned when false, but overridden when singlesonly parameter is true"
       },
       {
         "name": "allroles",
         "type": "boolean",
         "default": false,
-        "description":
-            "Whether or not to include all roles when filtering by artist, rather than default of excluding other contributors. When true it overrides any role filter value."
+        "description": "Whether or not to include all roles when filtering by artist, rather than default of excluding other contributors. When true it overrides any role filter value."
       },
       {
         "name": "singlesonly",
@@ -4732,8 +4710,7 @@
       {
         "name": "status",
         "$ref": "Optional.String",
-        "description":
-            "Valid values: 'returning series', 'in production', 'planned', 'cancelled', 'ended'"
+        "description": "Valid values: 'returning series', 'in production', 'planned', 'cancelled', 'ended'"
       },
       {
         "name": "uniqueid",
@@ -5103,8 +5080,7 @@
         "type": "string",
         "required": "false",
         "default": "",
-        "description":
-            "Title to use for searching (instead of determining it from the item's filename/path)."
+        "description": "Title to use for searching (instead of determining it from the item's filename/path)."
       }
     ],
     "returns": "string"
@@ -5139,8 +5115,7 @@
         "type": "string",
         "required": "false",
         "default": "",
-        "description":
-            "Title to use for searching (instead of determining it from the item's filename/path)."
+        "description": "Title to use for searching (instead of determining it from the item's filename/path)."
       }
     ],
     "returns": "string"
@@ -5168,8 +5143,7 @@
         "type": "string",
         "required": "false",
         "default": "",
-        "description":
-            "Title to use for searching (instead of determining it from the item's filename/path)."
+        "description": "Title to use for searching (instead of determining it from the item's filename/path)."
       }
     ],
     "returns": "string"
@@ -5197,8 +5171,7 @@
         "type": "string",
         "required": "false",
         "default": "",
-        "description":
-            "Title to use for searching (instead of determining it from the item's filename/path)."
+        "description": "Title to use for searching (instead of determining it from the item's filename/path)."
       }
     ],
     "returns": "string"
@@ -5296,7 +5269,12 @@
         "name": "content",
         "type": "string",
         "required": true,
-        "enum": [ "movies", "tvshows", "musicvideos", "none" ],
+        "enum": [
+          "movies",
+          "tvshows",
+          "musicvideos",
+          "none"
+        ],
         "description": "Content type to bind, or \"none\" to clear the binding"
       },
       {
@@ -5339,7 +5317,11 @@
         "name": "clearmode",
         "type": "string",
         "default": "clear",
-        "enum": [ "clear", "exclude", "remove" ],
+        "enum": [
+          "clear",
+          "exclude",
+          "remove"
+        ],
         "description": "Only used when content is \"none\". \"clear\" unbinds the scraper, \"exclude\" also excludes the path from scanning, \"remove\" additionally deletes the items already scraped from it"
       },
       {
@@ -5428,8 +5410,643 @@
         "name": "directory",
         "type": "string",
         "default": "",
-        "description":
-            "Path to the directory to clean up; performs a global cleanup if not specified"
+        "description": "Path to the directory to clean up; performs a global cleanup if not specified"
+      }
+    ],
+    "returns": "string"
+  },
+  "GameLibrary.GetPlatforms": {
+    "type": "method",
+    "description": "Retrieve the platforms with games in the library",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "properties",
+        "$ref": "Game.Fields.Platform"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      },
+      {
+        "name": "all",
+        "type": "boolean",
+        "default": false,
+        "description": "Include platforms that have no games"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "$ref": "Game.Details.Platform"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetPlatformDetails": {
+    "type": "method",
+    "description": "Retrieve details about a platform",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "required": true
+      },
+      {
+        "name": "properties",
+        "$ref": "Game.Fields.Platform"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "platformdetails": {
+          "$ref": "Game.Details.Platform"
+        }
+      }
+    }
+  },
+  "GameLibrary.GetGames": {
+    "type": "method",
+    "description": "Retrieve all games, or the games matching a filter",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "properties",
+        "$ref": "Game.Fields.Game"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      },
+      {
+        "name": "filter",
+        "type": [
+          {
+            "type": "object",
+            "properties": {
+              "platformid": {
+                "$ref": "Library.Id",
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "genreid": {
+                "$ref": "Library.Id",
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "developerid": {
+                "$ref": "Library.Id",
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "publisherid": {
+                "$ref": "Library.Id",
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "collectionid": {
+                "$ref": "Library.Id",
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tagid": {
+                "$ref": "Library.Id",
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer",
+                "minimum": 0,
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "players": {
+                "type": "integer",
+                "minimum": 1,
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "region": {
+                "type": "string",
+                "minLength": 1,
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "minLength": 1,
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "list": {
+                "type": "string",
+                "enum": [
+                  "recentlyadded",
+                  "recentlyplayed",
+                  "neverplayed",
+                  "favourites",
+                  "completed",
+                  "multiplayer",
+                  "coop",
+                  "achievements",
+                  "inprogress",
+                  "hacks",
+                  "homebrew"
+                ],
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit the result, and a filter, to one platform"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "games": {
+          "type": "array",
+          "items": {
+            "$ref": "Game.Details.Game"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetGameDetails": {
+    "type": "method",
+    "description": "Retrieve details about a game, including its releases",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "gameid",
+        "$ref": "Library.Id",
+        "required": true
+      },
+      {
+        "name": "properties",
+        "$ref": "Game.Fields.Game"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "gamedetails": {
+          "$ref": "Game.Details.Game"
+        }
+      }
+    }
+  },
+  "GameLibrary.GetGenres": {
+    "type": "method",
+    "description": "Retrieve the genres in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetDevelopers": {
+    "type": "method",
+    "description": "Retrieve the developers in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "developers": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetPublishers": {
+    "type": "method",
+    "description": "Retrieve the publishers in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "publishers": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetCollections": {
+    "type": "method",
+    "description": "Retrieve the collections in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetTags": {
+    "type": "method",
+    "description": "Retrieve the tags in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetYears": {
+    "type": "method",
+    "description": "Retrieve the years in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "years": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetRegions": {
+    "type": "method",
+    "description": "Retrieve the regions in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.SetGameDetails": {
+    "type": "method",
+    "description": "Update the given game with the given details",
+    "transport": "Response",
+    "permission": "UpdateData",
+    "params": [
+      {
+        "name": "gameid",
+        "$ref": "Library.Id",
+        "required": true
+      },
+      {
+        "name": "userrating",
+        "$ref": "Optional.Integer"
+      },
+      {
+        "name": "favourite",
+        "$ref": "Optional.Boolean"
+      },
+      {
+        "name": "completed",
+        "$ref": "Optional.Boolean"
+      },
+      {
+        "name": "defaultreleaseid",
+        "$ref": "Optional.Integer"
+      }
+    ],
+    "returns": "string"
+  },
+  "GameLibrary.RefreshGame": {
+    "type": "method",
+    "description": "Identify and describe a game again",
+    "transport": "Response",
+    "permission": "UpdateData",
+    "params": [
+      {
+        "name": "gameid",
+        "$ref": "Library.Id",
+        "required": true
+      }
+    ],
+    "returns": "string"
+  },
+  "GameLibrary.RemoveGame": {
+    "type": "method",
+    "description": "Removes the given game from the library",
+    "transport": "Response",
+    "permission": "RemoveData",
+    "params": [
+      {
+        "name": "gameid",
+        "$ref": "Library.Id",
+        "required": true
+      }
+    ],
+    "returns": "string"
+  },
+  "GameLibrary.Scan": {
+    "type": "method",
+    "description": "Scans the game sources for new library items",
+    "transport": "Response",
+    "permission": "UpdateData",
+    "params": [
+      {
+        "name": "directory",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "name": "showdialogs",
+        "type": "boolean",
+        "default": true,
+        "description": "Whether or not to show the progress bar or any other GUI dialog"
+      }
+    ],
+    "returns": "string"
+  },
+  "GameLibrary.Clean": {
+    "type": "method",
+    "description": "Cleans the game library from non-existent items",
+    "transport": "Response",
+    "permission": "RemoveData",
+    "params": [
+      {
+        "name": "showdialogs",
+        "type": "boolean",
+        "default": true,
+        "description": "Whether or not to show the progress bar or any other GUI dialog"
       }
     ],
     "returns": "string"
@@ -5612,8 +6229,7 @@
           "both"
         ],
         "default": "composite",
-        "description":
-            "composite captures the full display output, video only the video frame, both writes two files, the video frame and the full composite, from the same rendered frame. Files are written asynchronously; the method acknowledges the request and does not wait for the write."
+        "description": "composite captures the full display output, video only the video frame, both writes two files, the video frame and the full composite, from the same rendered frame. Files are written asynchronously; the method acknowledges the request and does not wait for the write."
       }
     ],
     "returns": "string"
@@ -6051,8 +6667,7 @@
         "name": "starttime",
         "type": "string",
         "required": true,
-        "description":
-            "start of the time range, in the same format as PVR.Details.Broadcast.starttime"
+        "description": "start of the time range, in the same format as PVR.Details.Broadcast.starttime"
       },
       {
         "name": "endtime",
@@ -6146,8 +6761,7 @@
   },
   "PVR.AddTimer": {
     "type": "method",
-    "description":
-        "Adds a timer to record the given show one times or a timer rule to record all showings of the given show or adds a reminder timer or reminder timer rule",
+    "description": "Adds a timer to record the given show one times or a timer rule to record all showings of the given show or adds a reminder timer or reminder timer rule",
     "transport": "Response",
     "permission": "ControlPVR",
     "params": [
@@ -6189,8 +6803,7 @@
   },
   "PVR.ToggleTimer": {
     "type": "method",
-    "description":
-        "Creates or deletes a onetime timer or timer rule for a given show. If it exists, it will be deleted. If it does not exist, it will be created",
+    "description": "Creates or deletes a onetime timer or timer rule for a given show. If it exists, it will be deleted. If it does not exist, it will be created",
     "transport": "Response",
     "permission": "ControlPVR",
     "params": [
@@ -6310,8 +6923,7 @@
       {
         "name": "clientid",
         "$ref": "Library.Id",
-        "description":
-            "Specify a PVR client id to avoid UI dialog, optional in kodi 19, required in kodi 20"
+        "description": "Specify a PVR client id to avoid UI dialog, optional in kodi 19, required in kodi 20"
       }
     ],
     "returns": "string"
@@ -6512,8 +7124,7 @@
         "name": "done",
         "type": "boolean",
         "default": true,
-        "description":
-            "Whether this is the whole input or not (closes an open input dialog if true)."
+        "description": "Whether this is the whole input or not (closes an open input dialog if true)."
       }
     ],
     "returns": "string"
@@ -6657,8 +7268,7 @@
   },
   "Input.ShowPlayerProcessInfo": {
     "type": "method",
-    "description":
-        "Show player process information of the playing item, like video decoder, pixel format, pvr signal strength, ...",
+    "description": "Show player process information of the playing item, like video decoder, pixel format, pvr signal strength, ...",
     "transport": "Response",
     "permission": "Navigate",
     "params": [],

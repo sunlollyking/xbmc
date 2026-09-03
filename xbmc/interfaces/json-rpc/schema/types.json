@@ -914,8 +914,7 @@
       },
       {
         "type": "object",
-        "description":
-            "A tv episode has a title and may have an episode number, season number and the title of the show it belongs to.",
+        "description": "A tv episode has a title and may have an episode number, season number and the title of the show it belongs to.",
         "properties": {
           "type": {
             "$ref": "Notifications.Item.Type",
@@ -1315,8 +1314,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the (song)genreid/genre, roleid/role or sourceid fields will result in increased response times",
+      "description": "Requesting the (song)genreid/genre, roleid/role or sourceid fields will result in increased response times",
       "enum": [
         "instrument",
         "style",
@@ -1351,8 +1349,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the songgenres, artistid and/or sourceid fields will result in increased response times",
+      "description": "Requesting the songgenres, artistid and/or sourceid fields will result in increased response times",
       "enum": [
         "title",
         "description",
@@ -1398,8 +1395,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the genreid, artistid, albumartistid and/or sourceid fields will result in increased response times",
+      "description": "Requesting the genreid, artistid, albumartistid and/or sourceid fields will result in increased response times",
       "enum": [
         "title",
         "artist",
@@ -1862,8 +1858,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the cast, ratings, showlink, streamdetails, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the cast, ratings, showlink, streamdetails, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "genre",
@@ -1923,8 +1918,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the cast, ratings, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the cast, ratings, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "genre",
@@ -1983,8 +1977,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the cast, ratings, streamdetails, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the cast, ratings, streamdetails, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "plot",
@@ -2025,8 +2018,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the streamdetails, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the streamdetails, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "playcount",
@@ -2400,8 +2392,7 @@
       },
       "status": {
         "type": "string",
-        "description":
-            "Returns 'returning series', 'in production', 'planned', 'cancelled' or 'ended'"
+        "description": "Returns 'returning series', 'in production', 'planned', 'cancelled' or 'ended'"
       },
       "uniqueid": {
         "$ref": "Media.UniqueID"
@@ -3839,8 +3830,7 @@
       },
       "dynpath": {
         "type": "string",
-        "description":
-            "An experimental property for debug purposes, often same as mediapath but when different gives the actual file playing that should also be in file property"
+        "description": "An experimental property for debug purposes, often same as mediapath but when different gives the actual file playing that should also be in file property"
       },
       "isboxset": {
         "type": "boolean"
@@ -5148,5 +5138,317 @@
       "videos",
       "viewmodes"
     ]
+  },
+  "Game.Fields.Game": {
+    "extends": "Item.Fields.Base",
+    "items": {
+      "type": "string",
+      "enum": [
+        "title",
+        "sorttitle",
+        "originaltitle",
+        "overview",
+        "platform",
+        "platformid",
+        "platformslug",
+        "year",
+        "releasedate",
+        "developers",
+        "publishers",
+        "genres",
+        "collections",
+        "tags",
+        "players",
+        "playersmin",
+        "playersmax",
+        "coop",
+        "category",
+        "rating",
+        "votes",
+        "ratings",
+        "agerating",
+        "ageratings",
+        "uniqueid",
+        "releasecount",
+        "releases",
+        "playcount",
+        "lastplayed",
+        "dateadded",
+        "userrating",
+        "favourite",
+        "completed",
+        "achievementstotal",
+        "achievementsearned",
+        "achievementshardcore",
+        "matchedby",
+        "gameclient",
+        "trailer",
+        "manual",
+        "file",
+        "art",
+        "thumbnail",
+        "fanart"
+      ]
+    }
+  },
+  "Game.Rating": {
+    "type": "object",
+    "properties": {
+      "rating": {
+        "type": "number",
+        "required": true
+      },
+      "max": {
+        "type": "number"
+      },
+      "votes": {
+        "type": "integer"
+      },
+      "default": {
+        "type": "boolean"
+      }
+    }
+  },
+  "Game.Ratings": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "Game.Rating"
+    }
+  },
+  "Game.AgeRating": {
+    "type": "object",
+    "properties": {
+      "board": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string",
+        "required": true
+      },
+      "descriptors": {
+        "type": "string"
+      }
+    }
+  },
+  "Game.Details.Release": {
+    "type": "object",
+    "properties": {
+      "releaseid": {
+        "$ref": "Library.Id",
+        "required": true
+      },
+      "title": {
+        "type": "string"
+      },
+      "regions": {
+        "$ref": "Array.String"
+      },
+      "languages": {
+        "$ref": "Array.String"
+      },
+      "revision": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string"
+      },
+      "licence": {
+        "type": "string"
+      },
+      "default": {
+        "type": "boolean"
+      },
+      "files": {
+        "$ref": "Array.String"
+      }
+    }
+  },
+  "Game.Details.Game": {
+    "extends": "Media.Details.Base",
+    "properties": {
+      "gameid": {
+        "$ref": "Library.Id",
+        "required": true
+      },
+      "title": {
+        "type": "string"
+      },
+      "sorttitle": {
+        "type": "string"
+      },
+      "originaltitle": {
+        "type": "string"
+      },
+      "overview": {
+        "type": "string"
+      },
+      "platform": {
+        "type": "string"
+      },
+      "platformid": {
+        "$ref": "Library.Id"
+      },
+      "platformslug": {
+        "type": "string"
+      },
+      "year": {
+        "type": "integer"
+      },
+      "releasedate": {
+        "type": "string"
+      },
+      "developers": {
+        "$ref": "Array.String"
+      },
+      "publishers": {
+        "$ref": "Array.String"
+      },
+      "genres": {
+        "$ref": "Array.String"
+      },
+      "collections": {
+        "$ref": "Array.String"
+      },
+      "tags": {
+        "$ref": "Array.String"
+      },
+      "players": {
+        "type": "integer"
+      },
+      "playersmin": {
+        "type": "integer"
+      },
+      "playersmax": {
+        "type": "integer"
+      },
+      "coop": {
+        "type": "boolean"
+      },
+      "category": {
+        "type": "string"
+      },
+      "rating": {
+        "type": "number"
+      },
+      "votes": {
+        "type": "integer"
+      },
+      "ratings": {
+        "$ref": "Game.Ratings"
+      },
+      "agerating": {
+        "type": "string"
+      },
+      "ageratings": {
+        "type": "array",
+        "items": {
+          "$ref": "Game.AgeRating"
+        }
+      },
+      "uniqueid": {
+        "$ref": "Media.UniqueID"
+      },
+      "releasecount": {
+        "type": "integer"
+      },
+      "releases": {
+        "type": "array",
+        "items": {
+          "$ref": "Game.Details.Release"
+        }
+      },
+      "playcount": {
+        "type": "integer"
+      },
+      "lastplayed": {
+        "type": "string"
+      },
+      "dateadded": {
+        "type": "string"
+      },
+      "userrating": {
+        "type": "integer"
+      },
+      "favourite": {
+        "type": "boolean"
+      },
+      "completed": {
+        "type": "boolean"
+      },
+      "achievementstotal": {
+        "type": "integer"
+      },
+      "achievementsearned": {
+        "type": "integer"
+      },
+      "achievementshardcore": {
+        "type": "integer"
+      },
+      "matchedby": {
+        "type": "string"
+      },
+      "gameclient": {
+        "type": "string"
+      },
+      "trailer": {
+        "type": "string"
+      },
+      "manual": {
+        "type": "string"
+      },
+      "file": {
+        "type": "string"
+      },
+      "art": {
+        "$ref": "Media.Artwork"
+      }
+    }
+  },
+  "Game.Fields.Platform": {
+    "extends": "Item.Fields.Base",
+    "items": {
+      "type": "string",
+      "enum": [
+        "title",
+        "platformslug",
+        "manufacturer",
+        "platformtype",
+        "released",
+        "gamecount",
+        "art",
+        "thumbnail",
+        "fanart"
+      ]
+    }
+  },
+  "Game.Details.Platform": {
+    "extends": "Media.Details.Base",
+    "properties": {
+      "platformid": {
+        "$ref": "Library.Id",
+        "required": true
+      },
+      "title": {
+        "type": "string"
+      },
+      "platformslug": {
+        "type": "string"
+      },
+      "manufacturer": {
+        "type": "string"
+      },
+      "platformtype": {
+        "type": "string"
+      },
+      "released": {
+        "type": "integer"
+      },
+      "gamecount": {
+        "type": "integer"
+      },
+      "art": {
+        "$ref": "Media.Artwork"
+      }
+    }
   }
 }
