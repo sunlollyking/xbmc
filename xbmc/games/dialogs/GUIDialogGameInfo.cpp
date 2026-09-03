@@ -8,6 +8,8 @@
 
 #include "GUIDialogGameInfo.h"
 
+#include <array>
+
 #include "FileItem.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
@@ -34,7 +36,7 @@ constexpr int CONTROL_BTN_REFRESH = 6;
 constexpr int CONTROL_BTN_USERRATING = 7;
 constexpr int CONTROL_BTN_PLAY = 8;
 constexpr int CONTROL_BTN_FAVOURITE = 12;
-constexpr int CONTROL_BTN_COMPLETED = 13;
+constexpr int CONTROL_BTN_PLAY_STATE = 13;
 constexpr int CONTROL_BTN_GAME_CLIENT = 14;
 constexpr int CONTROL_BTN_VIDEO_FILTER = 15;
 
@@ -110,14 +112,22 @@ void CGUIDialogGameInfo::UpdateButtons()
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_RELEASES, inLibrary);
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_REFRESH, inLibrary);
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_FAVOURITE, inLibrary);
-  CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_COMPLETED, inLibrary);
+  CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_PLAY_STATE, inLibrary);
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_USERRATING, inLibrary);
 
   if (m_item && m_item->HasGameInfoTag())
   {
     const CGameInfoTag* tag = m_item->GetGameInfoTag();
     SET_CONTROL_LABEL(CONTROL_BTN_FAVOURITE, tag->IsFavourite() ? 14077 : 14076);
-    SET_CONTROL_LABEL(CONTROL_BTN_COMPLETED, tag->IsCompleted() ? 35559 : 35558);
+
+    // Where a video is watched or not, a game is not started, in progress or
+    // finished, and the button says which of the three it is
+    static constexpr std::array<int, 3> stateLabels{35572, 35573, 35574};
+    static constexpr std::array<const char*, 3> stateNames{"notstarted", "inprogress",
+                                                           "completed"};
+    const size_t state = static_cast<size_t>(PlayState(*tag));
+    SET_CONTROL_LABEL(CONTROL_BTN_PLAY_STATE, stateLabels[state]);
+    SetProperty("playstate", stateNames[state]);
   }
 }
 
@@ -143,8 +153,8 @@ bool CGUIDialogGameInfo::OnMessage(CGUIMessage& message)
         case CONTROL_BTN_FAVOURITE:
           OnFavourite();
           return true;
-        case CONTROL_BTN_COMPLETED:
-          OnCompleted();
+        case CONTROL_BTN_PLAY_STATE:
+          OnPlayState();
           return true;
         case CONTROL_BTN_USERRATING:
           OnUserRating();
@@ -212,18 +222,48 @@ void CGUIDialogGameInfo::OnFavourite()
   }
 }
 
-void CGUIDialogGameInfo::OnCompleted()
+CGUIDialogGameInfo::PlayStateValue CGUIDialogGameInfo::PlayState(const CGameInfoTag& tag)
+{
+  if (tag.IsCompleted())
+    return PlayStateValue::COMPLETED;
+  if (tag.GetPlayCount() > 0)
+    return PlayStateValue::IN_PROGRESS;
+  return PlayStateValue::NOT_STARTED;
+}
+
+void CGUIDialogGameInfo::OnPlayState()
 {
   if (!m_item || !m_item->HasProperty("gameid") || !m_item->HasGameInfoTag())
     return;
 
   CGameInfoTag* tag = m_item->GetGameInfoTag();
   CGameDatabase db;
-  if (db.Open() && db.SetCompleted(tag->GetDatabaseId(), !tag->IsCompleted()))
+  if (!db.Open())
+    return;
+
+  // The button moves to the next state, the way a watched flag is toggled but
+  // with the middle state a game needs
+  const int idGame = tag->GetDatabaseId();
+  switch (PlayState(*tag))
   {
-    tag->SetCompleted(!tag->IsCompleted());
-    UpdateButtons();
+    case PlayStateValue::NOT_STARTED:
+      if (db.SetPlayCount(idGame, 1))
+        tag->SetPlayCount(1);
+      break;
+    case PlayStateValue::IN_PROGRESS:
+      if (db.SetCompleted(idGame, true))
+        tag->SetCompleted(true);
+      break;
+    case PlayStateValue::COMPLETED:
+      if (db.SetCompleted(idGame, false) && db.SetPlayCount(idGame, 0))
+      {
+        tag->SetCompleted(false);
+        tag->SetPlayCount(0);
+      }
+      break;
   }
+
+  UpdateButtons();
 }
 
 void CGUIDialogGameInfo::OnUserRating()

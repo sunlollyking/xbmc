@@ -221,6 +221,9 @@ public:
   bool SetDefaultRelease(int idGame, int idRelease);
   bool SetFavourite(int idGame, bool favourite);
   bool SetCompleted(int idGame, bool completed);
+
+  //! \brief How often a game was played, over every file it has
+  bool SetPlayCount(int idGame, int count);
   bool SetUserRating(int idGame, int rating);
 
   /*!

@@ -537,6 +537,14 @@ bool CGameDatabase::SetFavourite(int idGame, bool favourite)
                                  favourite ? 1 : 0, idGame));
 }
 
+bool CGameDatabase::SetPlayCount(int idGame, int count)
+{
+  // The count lives with the files, as it does for a video's files
+  return ExecuteQuery(PrepareSQL("UPDATE files SET playCount = %i WHERE idRelease IN (SELECT "
+                                 "idRelease FROM gamerelease WHERE idGame = %i)",
+                                 count, idGame));
+}
+
 bool CGameDatabase::SetCompleted(int idGame, bool completed)
 {
   return ExecuteQuery(PrepareSQL("UPDATE game SET completed = %i WHERE idGame = %i",

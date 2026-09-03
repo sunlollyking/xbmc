@@ -18,6 +18,8 @@ namespace KODI
 {
 namespace GAME
 {
+class CGameInfoTag;
+
 /*!
  * \ingroup games
  *
@@ -26,8 +28,8 @@ namespace GAME
  *
  * The games counterpart of the video information dialog. The skin reads the
  * game through ListItem.*, and the buttons play it, refresh it, open its
- * releases, mark it a favourite or completed, rate it, and choose the
- * emulator and video filter it plays with.
+ * releases, mark it a favourite, move it between not started, in progress and
+ * completed, rate it, and choose the emulator and video filter it plays with.
  */
 class CGUIDialogGameInfo : public CGUIDialog
 {
@@ -63,7 +65,16 @@ private:
   void OnRefresh();
   void OnReleases();
   void OnFavourite();
-  void OnCompleted();
+  //! \brief The three states a game is in, as a video is watched or not
+  enum class PlayStateValue
+  {
+    NOT_STARTED = 0,
+    IN_PROGRESS = 1,
+    COMPLETED = 2,
+  };
+
+  static PlayStateValue PlayState(const CGameInfoTag& tag);
+  void OnPlayState();
   void OnUserRating();
   void OnGameClient();
   void OnVideoFilter();

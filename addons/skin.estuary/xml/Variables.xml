@@ -317,6 +317,11 @@
 		<value condition="!String.IsEmpty(ListItem.Art(tvshow.poster)) + !String.IsEqual(listitem.dbtype,season)">$INFO[ListItem.Art(tvshow.poster)]</value>
 		<value>$INFO[ListItem.Art(poster)]</value>
 	</variable>
+	<variable name="GamePlayStateColourVar">
+		<value condition="String.IsEqual(Window(gameinformation).Property(playstate),completed)">FF66BB6A</value>
+		<value condition="String.IsEqual(Window(gameinformation).Property(playstate),inprogress)">FFFFB300</value>
+		<value>D0FFFFFF</value>
+	</variable>
 	<variable name="GameInfoBoxVar">
 		<value condition="!String.IsEmpty(ListItem.Art(boxfront))">$INFO[ListItem.Art(boxfront)]</value>
 		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>

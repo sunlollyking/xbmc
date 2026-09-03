@@ -20226,7 +20226,23 @@ msgctxt "#35571"
 msgid "Manufacturer"
 msgstr ""
 
-#empty strings from id 35572 to 35999
+#. The three states a game can be in, shown on the game information dialog
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35572"
+msgid "Not started"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35573"
+msgid "In progress"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35574"
+msgid "Completed"
+msgstr ""
+
+#empty strings from id 35575 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

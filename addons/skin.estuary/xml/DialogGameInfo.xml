@@ -209,12 +209,30 @@
 						<param name="label" value="$LOCALIZE[14076]" />
 						<param name="visible" value="true" />
 					</include>
-					<include content="InfoDialogButton">
-						<param name="id" value="13" />
-						<param name="icon" value="icons/infodialogs/enabled.png" />
-						<param name="label" value="$LOCALIZE[35558]" />
-						<param name="visible" value="true" />
-					</include>
+					<control type="radiobutton" id="13">
+						<description>Not started, in progress or completed</description>
+						<width>264</width>
+						<height>142</height>
+						<align>center</align>
+						<aligny>top</aligny>
+						<texturefocus border="21" colordiffuse="button_focus">buttons/button-fo.png</texturefocus>
+						<texturenofocus border="21">buttons/button-nofo.png</texturenofocus>
+						<textoffsetx>22</textoffsetx>
+						<textoffsety>78</textoffsety>
+						<radioposx>108</radioposx>
+						<radioposy>16</radioposy>
+						<radiowidth>48</radiowidth>
+						<font>font12</font>
+						<textcolor>$VAR[GamePlayStateColourVar]</textcolor>
+						<focusedcolor>$VAR[GamePlayStateColourVar]</focusedcolor>
+						<hitrect x="21" y="21" w="245" h="100" />
+						<textureradioonfocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradioonfocus>
+						<textureradioonnofocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradioonnofocus>
+						<textureradioofffocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradioofffocus>
+						<textureradiooffnofocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradiooffnofocus>
+						<textureradiooffdisabled colordiffuse="disabled">icons/infodialogs/enabled.png</textureradiooffdisabled>
+						<textureradioondisabled colordiffuse="disabled">icons/infodialogs/enabled.png</textureradioondisabled>
+					</control>
 					<include content="InfoDialogButton">
 						<param name="id" value="7" />
 						<param name="icon" value="icons/infodialogs/rating.png" />
