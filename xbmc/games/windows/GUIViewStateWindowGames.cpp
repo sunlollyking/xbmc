@@ -12,6 +12,7 @@
 #include "FileItemList.h"
 #include "games/GameUtils.h"
 #include "guilib/WindowIDs.h"
+#include "playlists/PlayListFileItemClassify.h"
 #include "settings/MediaSourceSettings.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -35,10 +36,10 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     SetSortOrder(SortOrder::ASCENDING);
     SetViewAsControl(DEFAULT_VIEW_LIST);
   }
-  else if (URIUtils::IsProtocol(items.GetPath(), "gamedb") || items.GetContent() == "games" ||
-           items.GetContent() == "releases" || items.GetContent() == "platforms")
+  // The library, and a playlist whose results come from it. A folder of files
+  // is not either of those, even though its items are games too.
+  else if (URIUtils::IsProtocol(items.GetPath(), "gamedb") || PLAYLIST::IsSmartPlayList(items))
   {
-    // A smart playlist lists the library too, so it sorts and looks the same
     if (items.GetContent() == "games" || items.GetContent() == "releases")
     {
       AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Title, Year
