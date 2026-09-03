@@ -2913,6 +2913,28 @@
           <control type="toggle" />
         </setting>
       </group>
+      <group id="2" label="35543">
+        <setting id="gamelibrary.regionpriority" type="string" label="35552" help="35553">
+          <level>0</level>
+          <default>eu,wor,us,jp</default>
+          <control type="edit" format="string" />
+        </setting>
+        <setting id="gamelibrary.preferretail" type="boolean" label="35554" help="35557">
+          <level>1</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.prefernewestrevision" type="boolean" label="35555" help="35557">
+          <level>1</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.preferverified" type="boolean" label="35556" help="35557">
+          <level>1</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+      </group>
     </category>
   </section>
   <section id="system" label="13000" help="36349">

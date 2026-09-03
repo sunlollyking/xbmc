@@ -16,12 +16,14 @@
 #include "GameNameParser.h"
 #include "GameScraper.h"
 #include "PlatformCatalogue.h"
+#include "ReleasePolicy.h"
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "games/tags/GameInfoTag.h"
+#include "games/tags/GameInfoTagLoader.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
@@ -83,6 +85,17 @@ std::string ExtensionMask(const PlatformInfo& platform)
   if (!mask.empty())
     mask.pop_back();
   return mask;
+}
+
+bool SameRelease(const GameRelease& a, const GameRelease& b)
+{
+  auto sorted = [](std::vector<std::string> v)
+  {
+    std::ranges::sort(v);
+    return v;
+  };
+  return sorted(a.regions) == sorted(b.regions) && sorted(a.languages) == sorted(b.languages) &&
+         a.revision == b.revision && a.status == b.status && a.licence == b.licence;
 }
 
 std::vector<std::string> ReadM3U(const std::string& path)
@@ -501,6 +514,26 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     release.files.emplace_back(std::move(f));
   }
 
+  // A sidecar file beside the game says what it is; the scraper is not asked
+  bool sidecar = false;
+  {
+    CFileItem sidecarItem(playPath, false);
+    CGameInfoTag fromFile;
+    if (CGameInfoTagLoader::HasNFO(sidecarItem) && CGameInfoTagLoader::Load(sidecarItem, fromFile) &&
+        !fromFile.GetTitle().empty())
+    {
+      fromFile.SetPlatformId(platform.id);
+      fromFile.SetPlatformSlug(platform.slug);
+      fromFile.SetPlatform(platform.name);
+      if (fromFile.GetYear() == 0)
+        fromFile.SetYear(tag.GetYear());
+      if (fromFile.GetCategory() == GameCategory::RETAIL)
+        fromFile.SetCategory(tag.GetCategory());
+      tag = fromFile;
+      sidecar = true;
+    }
+  }
+
   // Ask the scraper set for this folder, or the default one
   CGameScraper* scraper = nullptr;
   const std::string scraperId = content.scraper;
@@ -521,10 +554,10 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   scraper = it->second.get();
 
   KODI::ART::Artwork art;
-  MatchMethod matchedBy = MatchMethod::NONE;
+  MatchMethod matchedBy = sidecar ? MatchMethod::SIDECAR : MatchMethod::NONE;
   std::string candidateId;
 
-  if (scraper != nullptr)
+  if (scraper != nullptr && !sidecar)
   {
     GameScrapeRequest request;
     FillRequest(entry, parsed, identity, platform, request);
@@ -624,7 +657,43 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     {
       std::vector<GameRelease> releases = existing.GetReleases();
       release.isDefault = false;
-      releases.emplace_back(release);
+
+      // Another dump of a release already known joins it rather than adding a
+      // release of its own; a verified dump goes first so it is what plays
+      auto same = std::ranges::find_if(releases, [&release](const GameRelease& known)
+                                       { return SameRelease(known, release); });
+      if (same != releases.end())
+      {
+        for (GameFile& file : release.files)
+        {
+          if (std::ranges::any_of(same->files, [&file](const GameFile& f) { return f.path == file.path; }))
+            continue;
+          if (release.dump == DumpStatus::VERIFIED && same->dump != DumpStatus::VERIFIED)
+            same->files.insert(same->files.begin(), file);
+          else
+            same->files.emplace_back(file);
+        }
+        if (release.dump == DumpStatus::VERIFIED)
+          same->dump = DumpStatus::VERIFIED;
+        if (same->serial.empty())
+          same->serial = release.serial;
+      }
+      else
+      {
+        releases.emplace_back(release);
+      }
+      // The policy decides which release plays unless the user already chose
+      if (existing.GetMatchMethod() != MatchMethod::MANUAL)
+      {
+        const int best = CReleasePolicy().PickDefault(releases);
+        if (best >= 0)
+        {
+          for (GameRelease& r : releases)
+            r.isDefault = false;
+          releases[static_cast<size_t>(best)].isDefault = true;
+          existing.SetDefaultReleaseId(releases[static_cast<size_t>(best)].id);
+        }
+      }
       existing.SetReleases(releases);
       if (existing.GetMatchMethod() == MatchMethod::NONE && matchedBy != MatchMethod::NONE)
       {

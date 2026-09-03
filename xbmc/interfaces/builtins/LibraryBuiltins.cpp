@@ -95,6 +95,14 @@ static int CleanLibrary(const std::vector<std::string>& params)
     else
       CLog::Log(LOGERROR, "CleanLibrary is not possible while scanning or cleaning");
   }
+  else if (StringUtils::EqualsNoCase(params[0], "games"))
+  {
+    auto& queue = KODI::GAME::CGameLibraryQueue::GetInstance();
+    if (!queue.IsScanningLibrary())
+      queue.CleanLibrary({}, userInitiated);
+    else
+      CLog::Log(LOGERROR, "CleanLibrary is not possible while scanning or cleaning");
+  }
   else if (StringUtils::EqualsNoCase(params[0], "music"))
   {
     if (!CMusicLibraryQueue::GetInstance().IsScanningLibrary())

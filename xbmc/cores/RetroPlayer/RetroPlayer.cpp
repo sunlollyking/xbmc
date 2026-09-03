@@ -233,6 +233,9 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
     RegisterWindowCallbacks();
     m_playbackControl = std::make_unique<CGUIPlaybackControl>(*this);
     m_callback.OnPlayBackStarted(fileCopy);
+
+    if (CGameDatabase library; library.Open())
+      library.MarkPlayed(fileCopy.GetPath());
     m_callback.OnAVStarted(fileCopy);
     if (!bStandalone)
       m_autoSave = std::make_unique<CRetroPlayerAutoSave>(*this, m_gameServices.GameSettings());

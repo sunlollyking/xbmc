@@ -22,6 +22,11 @@ namespace GAME
  * \brief Settings the library reads
  */
 constexpr const char* SETTING_GAMELIBRARY_SHOWDERIVEDGAMES = "gamelibrary.showderivedgames";
+constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY = "gamelibrary.regionpriority";
+constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY_DEFAULT = "eu,wor,us,jp";
+constexpr const char* SETTING_GAMELIBRARY_PREFERRETAIL = "gamelibrary.preferretail";
+constexpr const char* SETTING_GAMELIBRARY_PREFERNEWESTREVISION = "gamelibrary.prefernewestrevision";
+constexpr const char* SETTING_GAMELIBRARY_PREFERVERIFIED = "gamelibrary.preferverified";
 
 /*!
  * \ingroup games

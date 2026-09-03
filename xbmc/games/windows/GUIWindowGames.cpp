@@ -211,6 +211,10 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35326); // "Default video filter"
       }
 
+      // A release of a library game can be made the one that plays
+      if (item->HasProperty("releaseid") && !item->GetProperty("isdefaultrelease").asBoolean())
+        buttons.Add(CONTEXT_BUTTON_SET_DEFAULT, 35551); // "Set as default release"
+
       // A folder of games is given its platform, scraper, emulator and filter in one place
       if (item->IsFolder() && !m_vecItems->IsPlugin() && !URIUtils::IsProtocol(item->GetPath(), "gamedb"))
       {
@@ -267,6 +271,15 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
       case CONTEXT_BUTTON_SCAN:
         CGameLibraryQueue::GetInstance().ScanLibrary(item->GetPath());
         return true;
+      case CONTEXT_BUTTON_SET_DEFAULT:
+      {
+        CGameDatabase db;
+        if (db.Open() &&
+            db.SetDefaultRelease(static_cast<int>(item->GetProperty("gameid").asInteger()),
+                                 static_cast<int>(item->GetProperty("releaseid").asInteger())))
+          Refresh(true);
+        return true;
+      }
       case CONTEXT_BUTTON_INFO:
         CGUIDialogAddonInfo::ShowForItem(item);
         return true;

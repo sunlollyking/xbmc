@@ -37,7 +37,7 @@ bool ShowDerivedGames()
   return settings && settings->GetBool(SETTING_GAMELIBRARY_SHOWDERIVEDGAMES);
 }
 
-std::string ReleaseLabel(const GameRelease& release)
+std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& release)
 {
   std::vector<std::string> parts;
   if (!release.regions.empty())
@@ -51,7 +51,7 @@ std::string ReleaseLabel(const GameRelease& release)
   if (release.licence != Licence::LICENSED)
     parts.emplace_back(std::string(CGameLibraryTypes::ToString(release.licence)));
 
-  std::string label = release.title;
+  std::string label = gameTitle;
   if (!parts.empty())
     label += " (" + StringUtils::Join(parts, ") (") + ")";
   return label;
@@ -420,7 +420,7 @@ bool CGameDatabase::GetReleasesNav(const std::string& baseDir, CFileItemList& it
     if (release.files.empty())
       continue;
 
-    const auto item = std::make_shared<CFileItem>(ReleaseLabel(release));
+    const auto item = std::make_shared<CFileItem>(ReleaseLabel(game.GetTitle(), release));
     CGameInfoTag tag = game;
     tag.SetTitle(release.title.empty() ? game.GetTitle() : release.title);
     tag.SetRegion(StringUtils::Join(release.regions, ","));
