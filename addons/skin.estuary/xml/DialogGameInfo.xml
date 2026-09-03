@@ -29,21 +29,14 @@
 				<left>66</left>
 				<include>OpenClose_Left</include>
 				<control type="image">
-					<top>-16</top>
-					<left>-16</left>
-					<width>566</width>
-					<height>841</height>
-					<texture>colors/black.png</texture>
-					<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
-					<bordersize>20</bordersize>
-				</control>
-				<control type="image">
 					<depth>DepthContentPopout</depth>
 					<left>4</left>
 					<top>4</top>
 					<width>526</width>
 					<height>801</height>
 					<aspectratio align="center" aligny="center">keep</aspectratio>
+					<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+					<bordersize>20</bordersize>
 					<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
 				</control>
 			</control>
@@ -226,6 +219,18 @@
 						<param name="id" value="7" />
 						<param name="icon" value="icons/infodialogs/rating.png" />
 						<param name="label" value="$LOCALIZE[38023]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="14" />
+						<param name="icon" value="icons/infodialogs/play.png" />
+						<param name="label" value="$LOCALIZE[35510]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="15" />
+						<param name="icon" value="icons/infodialogs/play.png" />
+						<param name="label" value="$LOCALIZE[35326]" />
 						<param name="visible" value="true" />
 					</include>
 					<include content="InfoDialogButton">
