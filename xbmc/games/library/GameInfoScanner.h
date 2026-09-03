@@ -10,6 +10,7 @@
 
 #include "GameLibraryTypes.h"
 #include "InfoScanner.h"
+#include "GameScraper.h"
 #include "games/database/GameDatabase.h"
 
 #include <map>
@@ -63,6 +64,15 @@ public:
   void Stop();
 
   /*!
+   * \brief Whether the user is watching, and can be asked which game a file is
+   *
+   * A scan is never interactive: it takes the best candidate and marks the
+   * game as matched by name, for review afterwards. A refresh the user asked
+   * for is, and offers the candidates the way the video library does.
+   */
+  void SetInteractive(bool interactive) { m_interactive = interactive; }
+
+  /*!
    * \brief Identify and describe one library game again
    *
    * Its releases, files and the user's own state are kept; everything the
@@ -109,6 +119,9 @@ private:
                  const GamePathContent& content,
                  const PlatformInfo& platform,
                  int refreshGameId = -1);
+  const struct GameScrapeCandidate* ChooseCandidate(CGameScraper& scraper,
+                                                    struct GameScrapeRequest& request,
+                                                    std::vector<struct GameScrapeCandidate>& candidates);
   std::string FolderHash(const CFileItemList& items) const;
   void ApplyLocalArt(const Entry& entry, CGameInfoTag& tag, KODI::ART::Artwork& art) const;
 
@@ -119,6 +132,7 @@ private:
   std::set<std::string> m_pathsToClean;
   int m_currentItem{0};
   int m_itemCount{0};
+  bool m_interactive{false};
   int m_added{0};
   int m_identified{0};
 };

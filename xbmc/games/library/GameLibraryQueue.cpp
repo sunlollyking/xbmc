@@ -69,13 +69,17 @@ private:
 class CGameLibraryRefreshJob : public CJob
 {
 public:
-  explicit CGameLibraryRefreshJob(int idGame) : m_idGame(idGame) {}
+  CGameLibraryRefreshJob(int idGame, bool interactive)
+    : m_idGame(idGame), m_interactive(interactive)
+  {
+  }
 
   const char* GetType() const override { return "GameLibraryRefreshJob"; }
 
   bool DoWork() override
   {
     CGameInfoScanner scanner;
+    scanner.SetInteractive(m_interactive);
     return scanner.RefreshGame(m_idGame);
   }
 
@@ -87,6 +91,7 @@ public:
 
 private:
   int m_idGame;
+  bool m_interactive;
 };
 
 class CGameLibraryCleaningJob : public CJob
@@ -146,12 +151,12 @@ void CGameLibraryQueue::ScanLibrary(const std::string& directory, bool showProgr
   AddJob(new CGameLibraryScanningJob(directory, showProgress, m_scanner));
 }
 
-void CGameLibraryQueue::RefreshGame(int idGame)
+void CGameLibraryQueue::RefreshGame(int idGame, bool interactive)
 {
   if (idGame <= 0)
     return;
   std::unique_lock lock(m_critical);
-  AddJob(new CGameLibraryRefreshJob(idGame));
+  AddJob(new CGameLibraryRefreshJob(idGame, interactive));
 }
 
 void CGameLibraryQueue::StopLibraryScanning()

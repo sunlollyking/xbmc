@@ -183,7 +183,7 @@ void CGUIDialogGameInfo::OnRefresh()
   if (!m_item || !m_item->HasProperty("gameid"))
     return;
   CGameLibraryQueue::GetInstance().RefreshGame(
-      static_cast<int>(m_item->GetProperty("gameid").asInteger()));
+      static_cast<int>(m_item->GetProperty("gameid").asInteger()), true);
 }
 
 void CGUIDialogGameInfo::OnReleases()

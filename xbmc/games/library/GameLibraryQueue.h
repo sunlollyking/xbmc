@@ -49,8 +49,11 @@ public:
 
   /*!
    * \brief Identify and describe one game again, in the background
+   *
+   * \param interactive Whether the user is watching and may be asked which
+   *        game the file is when several catalogue entries share its title
    */
-  void RefreshGame(int idGame);
+  void RefreshGame(int idGame, bool interactive = false);
 
   /*!
    * \brief Remove what no longer exists on disk

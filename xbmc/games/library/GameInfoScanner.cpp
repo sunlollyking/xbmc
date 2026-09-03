@@ -24,6 +24,9 @@
 #include "filesystem/File.h"
 #include "games/tags/GameInfoTag.h"
 #include "games/tags/GameInfoTagLoader.h"
+#include "dialogs/GUIDialogSelect.h"
+#include "guilib/GUIKeyboardFactory.h"
+#include "utils/Variant.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
@@ -431,6 +434,47 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   return found;
 }
 
+const GameScrapeCandidate* CGameInfoScanner::ChooseCandidate(
+    CGameScraper& scraper, GameScrapeRequest& request, std::vector<GameScrapeCandidate>& candidates)
+{
+  auto* dialog =
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
+  if (dialog == nullptr)
+    return candidates.empty() ? nullptr : &candidates.front();
+
+  while (!candidates.empty())
+  {
+    dialog->Reset();
+    dialog->SetHeading(CVariant{35560}); // "Select game:"
+    dialog->SetUseDetails(true);
+    for (const GameScrapeCandidate& candidate : candidates)
+    {
+      CFileItem item(candidate.title);
+      item.SetLabel2(candidate.year > 0 ? std::to_string(candidate.year) : "");
+      dialog->Add(item);
+    }
+    dialog->EnableButton(true, 413); // "Manual"
+    dialog->Open();
+
+    const int selected = dialog->GetSelectedItem();
+    if (selected >= 0 && selected < static_cast<int>(candidates.size()))
+      return &candidates[static_cast<size_t>(selected)];
+
+    if (!dialog->IsButtonPressed())
+      return nullptr;
+
+    // The user would rather say what the game is called and look again
+    std::string title = request.title;
+    if (!CGUIKeyboardFactory::ShowAndGetInput(title, Localize(35561), false) || title.empty())
+      return nullptr;
+
+    request.title = title;
+    candidates = scraper.Find(request);
+  }
+
+  return nullptr;
+}
+
 bool CGameInfoScanner::RefreshGame(int idGame)
 {
   if (!m_database.IsOpen() && !m_database.Open())
@@ -604,15 +648,18 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     GameScrapeRequest request;
     FillRequest(entry, parsed, identity, platform, request);
 
-    const std::vector<GameScrapeCandidate> candidates = scraper->Find(request);
+    std::vector<GameScrapeCandidate> candidates = scraper->Find(request);
     const GameScrapeCandidate* chosen = nullptr;
     if (!candidates.empty())
     {
       const GameScrapeCandidate& best = candidates.front();
-      if (best.matchedBy == MatchMethod::HASH || best.matchedBy == MatchMethod::SERIAL)
+      if (best.matchedBy == MatchMethod::HASH || best.matchedBy == MatchMethod::SERIAL ||
+          candidates.size() == 1)
         chosen = &best;
-      else if (candidates.size() == 1)
-        chosen = &best;
+      else if (m_interactive)
+        chosen = ChooseCandidate(*scraper, request, candidates);
+      else
+        chosen = &best; // the provider put its best first; the game is marked matched by name
     }
 
     if (chosen != nullptr)
