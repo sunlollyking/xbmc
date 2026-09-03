@@ -606,29 +606,41 @@ int CGameDatabase::CleanDatabase(const std::set<int>& paths)
       return it->second;
     };
 
-    std::vector<int> missing;
-    std::string lastFolder;
-    bool lastFolderReachable = true;
+    // Read the whole list before looking at the disk: the reachability check
+    // queries the database itself, and a query while another is open loses
+    // the rows still to come
+    struct Row
+    {
+      int idFile{0};
+      std::string folder;
+      std::string fileName;
+    };
+    std::vector<Row> rows;
     if (m_pDS->query(sql))
     {
+      rows.reserve(static_cast<size_t>(m_pDS->num_rows()));
       while (!m_pDS->eof())
       {
-        const int idFile = m_pDS->fv(0).get_asInt();
-        const std::string folder = m_pDS->fv(1).get_asString();
-        const std::string fileName = m_pDS->fv(2).get_asString();
-
-        if (folder != lastFolder)
-        {
-          lastFolder = folder;
-          lastFolderReachable = RootReachable(folder);
-        }
-
-        if (lastFolderReachable && !XFILE::CFile::Exists(folder + fileName, false))
-          missing.push_back(idFile);
-
+        rows.emplace_back(Row{m_pDS->fv(0).get_asInt(), m_pDS->fv(1).get_asString(),
+                              m_pDS->fv(2).get_asString()});
         m_pDS->next();
       }
       m_pDS->close();
+    }
+
+    std::vector<int> missing;
+    std::string lastFolder;
+    bool lastFolderReachable = true;
+    for (const Row& row : rows)
+    {
+      if (row.folder != lastFolder)
+      {
+        lastFolder = row.folder;
+        lastFolderReachable = RootReachable(row.folder);
+      }
+
+      if (lastFolderReachable && !XFILE::CFile::Exists(row.folder + row.fileName, false))
+        missing.push_back(row.idFile);
     }
 
     BeginTransaction();
