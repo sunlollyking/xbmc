@@ -49,6 +49,7 @@ enum class ContentType
   MUSICVIDEOS,
   ALBUMS,
   ARTISTS,
+  GAMES,
   NONE,
 };
 
@@ -96,6 +97,14 @@ public:
    \sa SetPathSettings
    */
   std::string GetPathSettings();
+
+  /*! \brief Get the scraper settings for a particular path in the form of a JSON string
+   Loads the default and user settings (if not already loaded) and returns the user settings in the
+   form of an JSON string. It is used in Python scrapers.
+   \return a string containing the JSON settings
+   \sa SetPathSettings
+   */
+  std::string GetPathSettingsAsJSON();
 
   /*! \brief Clear any previously cached results for this scraper
    Any previously cached files are cleared if they have been cached for longer than the specified
@@ -163,14 +172,6 @@ private:
 
   std::string SearchStringEncoding() const
     { return m_parser.GetSearchStringEncoding(); }
-
-  /*! \brief Get the scraper settings for a particular path in the form of a JSON string
-   Loads the default and user settings (if not already loaded) and returns the user settings in the
-   form of an JSON string. It is used in Python scrapers.
-   \return a string containing the JSON settings
-   \sa SetPathSettings
-   */
-  std::string GetPathSettingsAsJSON();
 
   bool Load();
   std::vector<std::string> Run(const std::string& function,

@@ -16955,6 +16955,11 @@ msgctxt "#24187"
 msgid "Failed to initialise databases - exiting in {} seconds."
 msgstr ""
 
+#: xbmc/addons/addoninfo/AddonInfo.cpp
+msgctxt "#24188"
+msgid "Game information"
+msgstr ""
+
 #empty strings from id 24188 to 24990
 
 #. Used as error message in add-on browser when add-on repository data could not be downloaded
@@ -19958,6 +19963,161 @@ msgstr ""
 #: xbmc/games/GameUtils.cpp
 msgctxt "#35511"
 msgid "Current"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35520"
+msgid "Platforms"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35521"
+msgid "Developers"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35522"
+msgid "Publishers"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35523"
+msgid "Collections"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35524"
+msgid "Regions"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35525"
+msgid "Players"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35526"
+msgid "Age ratings"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35527"
+msgid "Categories"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35528"
+msgid "Recently added games"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35529"
+msgid "Recently played games"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35530"
+msgid "Never played"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35531"
+msgid "Completed"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35532"
+msgid "Multiplayer"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35533"
+msgid "Co-op"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35534"
+msgid "With achievements"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35535"
+msgid "In progress"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35536"
+msgid "Hacks"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35537"
+msgid "Homebrew"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35538"
+msgid "Game library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35539"
+msgid "Set platform"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35540"
+msgid "Scan to library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35541"
+msgid "Show hacks and homebrew"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35542"
+msgid "Include ROM hacks, fan games and homebrew in every list, rather than only under their own headings."
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35543"
+msgid "Releases"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35544"
+msgid "All games"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35545"
+msgid "Games library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35546"
+msgid "Scanning game library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35547"
+msgid "Cleaning game library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35548"
+msgid "The folder holds games for this platform. Games in subfolders are scanned too."
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35549"
+msgid "Platform"
+msgstr ""
+
+#: xbmc/addons/Scraper.cpp
+msgctxt "#35550"
+msgid "Games"
 msgstr ""
 
 #empty strings from id 35512 to 35999

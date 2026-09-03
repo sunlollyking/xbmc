@@ -48,6 +48,7 @@ public:
 private:
   mutable int m_libraryHasMusic;
   mutable int m_libraryHasMovies;
+  mutable int m_libraryHasGames;
   mutable int m_libraryHasTVShows;
   mutable int m_libraryHasMusicVideos;
   mutable int m_libraryHasMovieSets;

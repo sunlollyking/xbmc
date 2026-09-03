@@ -93,7 +93,7 @@
 						<description>Actions</description>
 						<include>MediaMenuLabelCommon</include>
 						<label>$LOCALIZE[31020]</label>
-						<visible>Control.IsVisible(621) | Control.IsVisible(624)</visible>
+						<visible>Control.IsVisible(621) | Control.IsVisible(624) | Control.IsVisible(625) | Control.IsVisible(626) | Control.IsVisible(627)</visible>
 					</control>
 					<control type="button" id="621">
 						<description>Get more</description>
@@ -107,6 +107,29 @@
 						<label>$LOCALIZE[10140]</label>
 						<onclick>Addon.OpenSettings($INFO[Container.PluginName])</onclick>
 						<visible>!String.IsEmpty(Container.PluginName)</visible>
+					</control>
+					<control type="button" id="625">
+						<description>Library</description>
+						<include>MediaMenuItemsCommon</include>
+						<label>$LOCALIZE[14022]</label>
+						<onclick>ActivateWindow(Games,library,return)</onclick>
+						<visible>!String.StartsWith(Container.FolderPath,gamedb://) + Library.HasContent(games)</visible>
+					</control>
+					<control type="button" id="626">
+						<description>Files</description>
+						<include>MediaMenuItemsCommon</include>
+						<label>$LOCALIZE[744]</label>
+						<onclick>ActivateWindow(Games,files,return)</onclick>
+						<visible>String.StartsWith(Container.FolderPath,gamedb://)</visible>
+					</control>
+					<control type="togglebutton" id="627">
+						<description>Update library</description>
+						<include>MediaMenuItemsCommon</include>
+						<label>$LOCALIZE[653]</label>
+						<onclick>UpdateLibrary(games)</onclick>
+						<visible>Library.HasContent(games) + !Container.Content(addons) + String.IsEmpty(Container.PluginName)</visible>
+						<altlabel>$LOCALIZE[13353]</altlabel>
+						<usealttexture>Library.IsScanningGames</usealttexture>
 					</control>
 					<include>MediaMenuNowPlaying</include>
 				</control>

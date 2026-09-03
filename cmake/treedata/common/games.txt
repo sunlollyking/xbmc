@@ -18,6 +18,7 @@ xbmc/games/database                games/database
 xbmc/games/dialogs                 games/dialogs
 xbmc/games/dialogs/disc            games/dialogs/disc
 xbmc/games/dialogs/osd             games/dialogs/osd
+xbmc/games/library                 games/library
 xbmc/games/manual                  games/manual
 xbmc/games/ports                   games/ports
 xbmc/games/ports/guicontrols       games/ports/guicontrols

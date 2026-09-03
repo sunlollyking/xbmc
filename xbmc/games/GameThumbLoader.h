@@ -8,6 +8,10 @@
 
 #pragma once
 
+#include "games/database/GameDatabase.h"
+
+#include <memory>
+
 #include "ThumbLoader.h"
 
 namespace KODI
@@ -33,6 +37,16 @@ public:
 
   // Implementation of CBackgroundInfoLoader
   bool LoadItemCached(CFileItem* item) override;
+  void OnLoaderFinish() override;
+
+  /*!
+   * \brief Attach the artwork the library holds for a game or platform
+   *
+   * Art found beside the file wins; the library fills in the types it lacks.
+   *
+   * \return True if any artwork was attached
+   */
+  bool LoadLibraryArt(CFileItem& item);
 
   /*!
    * \brief Attach the artwork sitting beside a game
@@ -43,6 +57,9 @@ public:
    * \return True if any artwork was attached
    */
   static bool LoadLocalArt(CFileItem& item);
+
+private:
+  std::unique_ptr<CGameDatabase> m_database;
 };
 } // namespace GAME
 } // namespace KODI

@@ -1,0 +1,2513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<platforms version="1">
+  <platform id="3do">
+    <name>3DO Interactive Multiplayer</name>
+    <sortname>3DO Interactive Multiplayer</sortname>
+    <manufacturer>Panasonic</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1993</released>
+    <discontinued>1995</discontinued>
+    <extensions>7z bin chd cue iso wav zip</extensions>
+    <alias>3DO</alias>
+    <alias>Panasonic 3DO Interactive Multiplayer</alias>
+    <alias>Panasonic 3DO</alias>
+    <alias>The 3DO Company - 3DO</alias>
+    <ids screenscraper="29" libretro="The 3DO Company - 3DO" retroachievements="43" esde="3do" launchbox="3DO Interactive Multiplayer" hyperspin="Panasonic 3DO"/>
+  </platform>
+  <platform id="archimedes">
+    <name>Acorn Archimedes</name>
+    <sortname>Acorn Archimedes</sortname>
+    <manufacturer>Acorn</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1987</released>
+    <extensions>1dd 360 7z adf adl adm ads apd arc bbc chd cqi cqm cue d77 d88 dfi dsd dsk hfe ima imd img ipf iso jfd mfi mfm msa scp ssd st td0 ufi zip</extensions>
+    <alias>Archimedes</alias>
+    <ids screenscraper="84" esde="archimedes" launchbox="Acorn Archimedes" hyperspin="Acorn Archimedes"/>
+  </platform>
+  <platform id="bbcmicro">
+    <name>Acorn BBC Micro</name>
+    <sortname>Acorn BBC Micro</sortname>
+    <manufacturer>Acorn</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1981</released>
+    <discontinued>1994</discontinued>
+    <extensions>7z adf adl bin csw dsd img m3u ssd uef zip</extensions>
+    <alias>BBC Micro</alias>
+    <alias>Acorn BBC Microcomputer System</alias>
+    <alias>BBC Microcomputer System</alias>
+    <alias>bbcmicro</alias>
+    <alias>Acorn Computers BBC Micro</alias>
+    <ids screenscraper="37" esde="bbcmicro" launchbox="BBC Microcomputer System" hyperspin="Acorn BBC Micro"/>
+  </platform>
+  <platform id="electron">
+    <name>Acorn Electron</name>
+    <sortname>Acorn Electron</sortname>
+    <manufacturer>Acorn</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1983</released>
+    <extensions>1dd 7z adf adl adm ads bbc bin cqi cqm csw d77 d88 dfi dsd dsk hfe imd img mfi mfm rom sdd ssd td0 uef wav zip</extensions>
+    <alias>Electron</alias>
+    <ids screenscraper="85" esde="electron" launchbox="Acorn Electron" hyperspin="Acorn Electron"/>
+  </platform>
+  <platform id="amstradcpc">
+    <name>Amstrad CPC</name>
+    <sortname>Amstrad CPC</sortname>
+    <manufacturer>Amstrad</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1983</released>
+    <discontinued>1990</discontinued>
+    <extensions>7z bin cdt cpc cpr dsk kcr m3u sna tap tar voc zip</extensions>
+    <alias>CPC</alias>
+    <alias>Amstrad CPC 464</alias>
+    <alias>Amstrad CPC 472</alias>
+    <alias>Amstrad CPC 664</alias>
+    <alias>Amstrad CPC 6128</alias>
+    <alias>Amstrad CPC 464 Plus</alias>
+    <alias>Amstrad CPC 6128 Plus</alias>
+    <alias>Amstrad CPC 464+</alias>
+    <alias>Amstrad CPC 6128+</alias>
+    <alias>Amstrad 464 Plus</alias>
+    <alias>Amstrad 6128 Plus</alias>
+    <alias>Amstrad 464+</alias>
+    <alias>Amstrad 6128+</alias>
+    <alias>CPC 464</alias>
+    <alias>CPC 472</alias>
+    <alias>CPC 664</alias>
+    <alias>CPC 6128</alias>
+    <alias>CPC 464 Plus</alias>
+    <alias>CPC 6128 Plus</alias>
+    <alias>CPC 464+</alias>
+    <alias>CPC 6128+</alias>
+    <alias>464 Plus</alias>
+    <alias>6128 Plus</alias>
+    <alias>464+</alias>
+    <alias>6128+</alias>
+    <alias>amstradcpc</alias>
+    <alias>Amstrad - CPC</alias>
+    <alias>Amstrad</alias>
+    <ids screenscraper="65" libretro="Amstrad - CPC" retroachievements="37" esde="amstradcpc" launchbox="Amstrad CPC" hyperspin="Amstrad CPC"/>
+  </platform>
+  <platform id="gx4000">
+    <name>Amstrad GX4000</name>
+    <sortname>Amstrad GX4000</sortname>
+    <manufacturer>Amstrad</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1990</released>
+    <discontinued>1991</discontinued>
+    <family>amstradcpc</family>
+    <extensions>7z bin cdt cpc cpr dsk kcr m3u sna tap tar voc zip</extensions>
+    <alias>GX4000</alias>
+    <alias>Amstrad GX-4000</alias>
+    <alias>GX-4000</alias>
+    <alias>Amstrad - GX4000</alias>
+    <ids screenscraper="87" libretro="Amstrad - GX4000" esde="gx4000" launchbox="Amstrad GX4000" hyperspin="Amstrad GX4000"/>
+  </platform>
+  <platform id="apple2">
+    <name>Apple II</name>
+    <sortname>Apple II</sortname>
+    <manufacturer>Apple</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1977</released>
+    <discontinued>1981</discontinued>
+    <extensions>7z do dsk nib po zip</extensions>
+    <alias>Apple II+</alias>
+    <alias>Apple IIC</alias>
+    <alias>Apple IIC+</alias>
+    <alias>Apple IIC Plus</alias>
+    <alias>Apple IIE</alias>
+    <alias>Apple 2</alias>
+    <alias>Apple 2+</alias>
+    <alias>Apple 2C</alias>
+    <alias>Apple 2C+</alias>
+    <alias>Apple 2C Plus</alias>
+    <alias>Apple 2E</alias>
+    <alias>Apple III</alias>
+    <alias>Apple 3</alias>
+    <alias>Apple I</alias>
+    <alias>Apple 1</alias>
+    <alias>apple2</alias>
+    <alias>Apple - II</alias>
+    <ids screenscraper="86" libretro="Apple - II" retroachievements="38" esde="apple2" launchbox="Apple II" hyperspin="Apple II"/>
+  </platform>
+  <platform id="apple2gs">
+    <name>Apple IIGS</name>
+    <sortname>Apple IIGS</sortname>
+    <manufacturer>Apple</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1986</released>
+    <discontinued>1992</discontinued>
+    <family>apple2</family>
+    <extensions>2mg 7z do dsk gsplus hdv nib po zip</extensions>
+    <alias>apple2gs</alias>
+    <alias>appleIIgs</alias>
+    <ids screenscraper="217" esde="apple2gs" launchbox="Apple IIGS"/>
+  </platform>
+  <platform id="macintosh">
+    <name>Apple Macintosh</name>
+    <sortname>Apple Macintosh</sortname>
+    <manufacturer>Apple</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1984</released>
+    <discontinued>2001</discontinued>
+    <extensions>dsk game img rom</extensions>
+    <alias>Mac OS</alias>
+    <alias>Apple Mac-OS</alias>
+    <alias>Apple Mac-OSX</alias>
+    <alias>Apple OS</alias>
+    <alias>Apple OSX</alias>
+    <alias>Mac-OSX</alias>
+    <alias>Mac-OS</alias>
+    <alias>OSX</alias>
+    <alias>macintosh</alias>
+    <alias>Apple Mac OS</alias>
+    <ids screenscraper="146" esde="macintosh" launchbox="Apple Mac OS"/>
+  </platform>
+  <platform id="arcade">
+    <name>Arcade</name>
+    <sortname>Arcade</sortname>
+    <manufacturer></manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <extensions>7z acgame arcadedef chd cmd gam iso lindbergh neo zip</extensions>
+    <alias>Mame</alias>
+    <alias>FBA</alias>
+    <alias>MESS</alias>
+    <alias>MAME4ALL</alias>
+    <alias>AdvanceMAME</alias>
+    <alias>AdvMAME</alias>
+    <alias>MAME-LibRetro</alias>
+    <alias>MAME-MAME4ALL</alias>
+    <alias>MAME-ADVMAME</alias>
+    <alias>FBA-LibRetro</alias>
+    <alias>fba_libretro</alias>
+    <alias>fbneo</alias>
+    <alias>dice</alias>
+    <alias>Final Burn Alpha</alias>
+    <alias>HBMAME</alias>
+    <alias>MiSFiT MAME</alias>
+    <alias>Multiple Arcade Machine Emulator</alias>
+    <alias>FinalBurn Alpha</alias>
+    <alias>FinalBurn Neo</alias>
+    <alias>FBNeo - Arcade Games</alias>
+    <ids screenscraper="75" libretro="MAME" retroachievements="27" esde="arcade" launchbox="arcade" hyperspin="Final Burn Alpha"/>
+  </platform>
+  <platform id="arduboy">
+    <name>Arduboy</name>
+    <sortname>Arduboy</sortname>
+    <manufacturer>Arduboy Inc</manufacturer>
+    <type>handheld</type>
+    <media>other</media>
+    <released>2015</released>
+    <extensions>7z arduboy hex zip</extensions>
+    <alias>Arduboy Miniature Game System</alias>
+    <alias>Arduboy Inc - Arduboy</alias>
+    <ids screenscraper="263" libretro="Arduboy Inc - Arduboy" retroachievements="71" esde="arduboy"/>
+  </platform>
+  <platform id="atari2600">
+    <name>Atari 2600</name>
+    <sortname>Atari 2600</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1977</released>
+    <discontinued>1992</discontinued>
+    <extensions>7z a26 bin rom zip</extensions>
+    <alias>Atari2600</alias>
+    <alias>A2600</alias>
+    <alias>2600</alias>
+    <alias>Atari - 2600</alias>
+    <ids screenscraper="26" libretro="Atari - 2600" retroachievements="25" esde="atari2600" launchbox="Atari 2600" hyperspin="Atari 2600"/>
+  </platform>
+  <platform id="atari5200">
+    <name>Atari 5200</name>
+    <sortname>Atari 5200</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1982</released>
+    <discontinued>1984</discontinued>
+    <extensions>7z a52 atr atx bin car cas cdm com rom xex xfd zip</extensions>
+    <alias>A5200</alias>
+    <alias>5200</alias>
+    <alias>atari5200</alias>
+    <alias>Atari - 5200</alias>
+    <ids screenscraper="40" libretro="Atari - 5200" retroachievements="50" esde="atari5200" launchbox="Atari 5200" hyperspin="Atari 5200"/>
+  </platform>
+  <platform id="atari7800">
+    <name>Atari 7800</name>
+    <sortname>Atari 7800</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1986</released>
+    <discontinued>1992</discontinued>
+    <extensions>7z a78 bin rom zip</extensions>
+    <alias>A7800</alias>
+    <alias>7800</alias>
+    <alias>atari7800</alias>
+    <alias>Atari 7800 ProSystem</alias>
+    <alias>Atari - 7800</alias>
+    <ids screenscraper="41" libretro="Atari - 7800" retroachievements="51" esde="atari7800" launchbox="Atari 7800" hyperspin="Atari 7800"/>
+  </platform>
+  <platform id="atari800">
+    <name>Atari 8-bit Family</name>
+    <sortname>Atari 8-bit Family</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1979</released>
+    <discontinued>1992</discontinued>
+    <extensions>7z a52 asm atr atr.gz atx bas bin car cas cdm com dcm rom xex xfd xfd.gz zip</extensions>
+    <alias>Atari 8bit</alias>
+    <alias>Atari 130XE</alias>
+    <alias>130XE</alias>
+    <alias>Atari 800XL</alias>
+    <alias>800XL</alias>
+    <alias>Atari 800XE</alias>
+    <alias>800XE</alias>
+    <alias>Atari 65XE</alias>
+    <alias>65XE</alias>
+    <alias>Atari 600XL</alias>
+    <alias>600XL</alias>
+    <alias>Atari 1200XL</alias>
+    <alias>1200XL</alias>
+    <alias>Atari XEGS</alias>
+    <alias>XEGS</alias>
+    <alias>Atari 800</alias>
+    <alias>Atari 400</alias>
+    <alias>A800</alias>
+    <alias>A400</alias>
+    <alias>atari800</alias>
+    <alias>Atari 8-Bit</alias>
+    <alias>atarixe</alias>
+    <alias>Atari XE</alias>
+    <alias>Atari - 8-bit Family</alias>
+    <alias>Atari 400 - 800</alias>
+    <ids screenscraper="43" libretro="Atari - 8-bit Family" esde="atari800" launchbox="Atari 800" hyperspin="Atari 8-Bit"/>
+  </platform>
+  <platform id="atarijaguar">
+    <name>Atari Jaguar</name>
+    <sortname>Atari Jaguar</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1993</released>
+    <discontinued>1996</discontinued>
+    <extensions>7z abs bigpimg bin cdi cof cue j64 jag prg rom zip</extensions>
+    <alias>Jaguar</alias>
+    <alias>atarijaguar</alias>
+    <alias>Atari - Jaguar</alias>
+    <ids screenscraper="27" libretro="Atari - Jaguar" retroachievements="17" esde="atarijaguar" launchbox="Atari Jaguar" hyperspin="Atari Jaguar"/>
+  </platform>
+  <platform id="atarijaguarcd">
+    <name>Atari Jaguar CD</name>
+    <sortname>Atari Jaguar CD</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1995</released>
+    <discontinued>1996</discontinued>
+    <family>atarijaguar</family>
+    <extensions>abs bigpimg bin ccd cdi cof cue img j64 jag nrg prg rom sub</extensions>
+    <alias>Jaguar CD</alias>
+    <alias>Atari Jaguar CD-Rom</alias>
+    <alias>Jaguar CD-Rom</alias>
+    <alias>atarijaguarcd</alias>
+    <ids screenscraper="171" retroachievements="77" esde="atarijaguarcd" launchbox="Atari Jaguar CD" hyperspin="Atari Jaguar CD"/>
+  </platform>
+  <platform id="atarilynx">
+    <name>Atari Lynx</name>
+    <sortname>Atari Lynx</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1989</released>
+    <discontinued>1995</discontinued>
+    <extensions>7z bin lnx lyx o zip</extensions>
+    <alias>Lynx</alias>
+    <alias>atarilynx</alias>
+    <alias>Atari - Lynx</alias>
+    <ids screenscraper="28" libretro="Atari - Lynx" retroachievements="13" esde="atarilynx" launchbox="Atari Lynx" hyperspin="Atari Lynx"/>
+  </platform>
+  <platform id="atarist">
+    <name>Atari ST</name>
+    <sortname>Atari ST</sortname>
+    <manufacturer>Atari</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1985</released>
+    <discontinued>1993</discontinued>
+    <extensions>7z ctr dim img ipf m3u msa raw rom st stx zip</extensions>
+    <alias>Atari STE</alias>
+    <alias>Atari 520 ST</alias>
+    <alias>Atari 1040 ST</alias>
+    <alias>520 ST</alias>
+    <alias>1040 ST</alias>
+    <alias>atarist</alias>
+    <alias>Atari - ST</alias>
+    <ids screenscraper="42" libretro="Atari - ST" retroachievements="36" esde="atarist" launchbox="Atari ST" hyperspin="Atari ST"/>
+  </platform>
+  <platform id="astrocde">
+    <name>Bally Astrocade</name>
+    <sortname>Bally Astrocade</sortname>
+    <manufacturer>Bally</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1977</released>
+    <discontinued>1985</discontinued>
+    <extensions>7z bin prg wav zip</extensions>
+    <alias>Astrocade</alias>
+    <alias>astrocde</alias>
+    <ids screenscraper="44" esde="astrocde" launchbox="Bally Astrocade" hyperspin="Bally Astrocade"/>
+  </platform>
+  <platform id="wonderswan">
+    <name>Bandai WonderSwan</name>
+    <sortname>Bandai WonderSwan</sortname>
+    <manufacturer>Bandai</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1999</released>
+    <discontinued>2003</discontinued>
+    <extensions>7z bin pc2 ws wsc zip</extensions>
+    <alias>WonderSwan</alias>
+    <alias>Bandai WSwan</alias>
+    <alias>WSwan</alias>
+    <alias>Bandai - WonderSwan</alias>
+    <alias>WSW</alias>
+    <ids screenscraper="45" libretro="Bandai - WonderSwan" retroachievements="53" esde="wonderswan" launchbox="WonderSwan" hyperspin="Bandai WonderSwan"/>
+  </platform>
+  <platform id="wonderswancolor">
+    <name>Bandai WonderSwan Color</name>
+    <sortname>Bandai WonderSwan Color</sortname>
+    <manufacturer>Bandai</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2000</released>
+    <discontinued>2003</discontinued>
+    <family>wonderswan</family>
+    <extensions>7z bin pc2 ws wsc zip</extensions>
+    <alias>WonderSwan Color</alias>
+    <alias>Bandai WSwan Color</alias>
+    <alias>WSwan Color</alias>
+    <alias>wonderswancolor</alias>
+    <alias>Bandai - WonderSwan Color</alias>
+    <ids screenscraper="46" libretro="Bandai - WonderSwan Color" esde="wonderswancolor" launchbox="WonderSwan Color" hyperspin="Bandai WonderSwan Color"/>
+  </platform>
+  <platform id="gamate">
+    <name>Bit Corporation Gamate</name>
+    <sortname>Bit Corporation Gamate</sortname>
+    <manufacturer>Bit Corporation</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1990</released>
+    <discontinued>1994</discontinued>
+    <extensions>7z bin gam zip</extensions>
+    <alias>Gamate</alias>
+    <ids screenscraper="266" esde="gamate"/>
+  </platform>
+  <platform id="cps1">
+    <name>Capcom Play System</name>
+    <sortname>Capcom Play System</sortname>
+    <manufacturer>Capcom</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>1988</released>
+    <discontinued>1995</discontinued>
+    <family>arcade</family>
+    <extensions>7z chd zip</extensions>
+    <alias>Capcom Play System 1</alias>
+    <alias>Capcom Play System I</alias>
+    <alias>CPS 1</alias>
+    <alias>CPS I</alias>
+    <alias>cps1</alias>
+    <alias>cps</alias>
+    <ids screenscraper="6" esde="cps1" launchbox="Capcom Play System" hyperspin="Capcom Play System"/>
+  </platform>
+  <platform id="cps2">
+    <name>Capcom Play System 2</name>
+    <sortname>Capcom Play System 2</sortname>
+    <manufacturer>Capcom</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>1993</released>
+    <discontinued>2004</discontinued>
+    <family>arcade</family>
+    <extensions>7z chd zip</extensions>
+    <alias>Capcom Play System II</alias>
+    <alias>CPS 2</alias>
+    <alias>CPS II</alias>
+    <alias>cps2</alias>
+    <ids screenscraper="7" esde="cps2" launchbox="Capcom Play System II" hyperspin="Capcom Play System II"/>
+  </platform>
+  <platform id="cps3">
+    <name>Capcom Play System 3</name>
+    <sortname>Capcom Play System 3</sortname>
+    <manufacturer>Capcom</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>1996</released>
+    <discontinued>1999</discontinued>
+    <family>arcade</family>
+    <extensions>7z ccd chd img sub zip</extensions>
+    <alias>Capcom Play System III</alias>
+    <alias>CPS 3</alias>
+    <alias>CPS III</alias>
+    <alias>cps3</alias>
+    <ids screenscraper="8" esde="cps3" launchbox="Capcom Play System III" hyperspin="Capcom Play System III"/>
+  </platform>
+  <platform id="loopy">
+    <name>Casio Loopy</name>
+    <sortname>Casio Loopy</sortname>
+    <manufacturer>Casio</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1995</released>
+    <extensions>bin</extensions>
+    <alias>Loopy</alias>
+    <alias>Casio - Loopy</alias>
+    <ids screenscraper="98" libretro="Casio - Loopy" launchbox="Casio Loopy" hyperspin="Casio Loopy"/>
+  </platform>
+  <platform id="pv1000">
+    <name>Casio PV-1000</name>
+    <sortname>Casio PV-1000</sortname>
+    <manufacturer>Casio</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1983</released>
+    <discontinued>1983</discontinued>
+    <extensions>7z bin zip</extensions>
+    <alias>PV-1000</alias>
+    <alias>pv1000</alias>
+    <alias>Casio - PV-1000</alias>
+    <ids screenscraper="74" libretro="Casio - PV-1000" esde="pv1000" launchbox="Casio PV-1000" hyperspin="Casio PV-1000"/>
+  </platform>
+  <platform id="adam">
+    <name>Coleco Adam</name>
+    <sortname>Coleco Adam</sortname>
+    <manufacturer>Coleco</manufacturer>
+    <type>computer</type>
+    <media>cartridge</media>
+    <released>1983</released>
+    <discontinued>1985</discontinued>
+    <extensions>1dd 7z bas bin col com cqi cqm d77 d88 ddp dfi dsk hfe imd img lbr mfi mfm rom td0 wav zip</extensions>
+    <alias>Adam</alias>
+    <ids screenscraper="89" esde="adam" launchbox="Coleco ADAM" hyperspin="Coleco ADAM"/>
+  </platform>
+  <platform id="colecovision">
+    <name>Coleco ColecoVision</name>
+    <sortname>Coleco ColecoVision</sortname>
+    <manufacturer>Coleco</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1982</released>
+    <discontinued>1985</discontinued>
+    <extensions>7z bin cas col cv dsk m3u mx1 mx2 myv ri rom sc sg zip</extensions>
+    <alias>Colecovision</alias>
+    <alias>Coleco - ColecoVision</alias>
+    <ids screenscraper="48" libretro="Coleco - ColecoVision" retroachievements="44" esde="colecovision" launchbox="ColecoVision" hyperspin="ColecoVision"/>
+  </platform>
+  <platform id="c64">
+    <name>Commodore 64</name>
+    <sortname>Commodore 64</sortname>
+    <manufacturer>Commodore</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1984</released>
+    <discontinued>1994</discontinued>
+    <extensions>7z arc ark bin c64 cmd crt d2m d4m d64 d6z d71 d7z d80 d81 d82 d8z dmp g41 g4z g64 g6z gz lnx m3u nbz nib p00 prg reu sda sfx t64 tap vfl vsf x64 x6z z64 zip</extensions>
+    <alias>C64</alias>
+    <alias>Commodore 128</alias>
+    <alias>Commodore - 64</alias>
+    <ids screenscraper="66" libretro="Commodore - 64" retroachievements="30" esde="c64" launchbox="Commodore 64" hyperspin="Commodore 64"/>
+  </platform>
+  <platform id="amiga">
+    <name>Commodore Amiga</name>
+    <sortname>Commodore Amiga</sortname>
+    <manufacturer>Commodore</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1985</released>
+    <discontinued>1994</discontinued>
+    <extensions>7z adf adz ccd chd cpio cue dms exe fdi hdf hdz ipf iso lha m3u mds nrg rom rp9 uae zip</extensions>
+    <alias>Amiga</alias>
+    <alias>Commodore Amiga 500</alias>
+    <alias>Commodore Amiga 1200</alias>
+    <alias>Commodore Amiga 600</alias>
+    <alias>Commodore Amiga 2000</alias>
+    <alias>Commodore Amiga 3000</alias>
+    <alias>Commodore Amiga 4000</alias>
+    <alias>Commodore Amiga 500+</alias>
+    <alias>Commodore Amiga 1000</alias>
+    <alias>Commodore A500</alias>
+    <alias>Commodore A1200</alias>
+    <alias>Commodore A600</alias>
+    <alias>Commodore A2000</alias>
+    <alias>Commodore A3000</alias>
+    <alias>Commodore A4000</alias>
+    <alias>Commodore A500+</alias>
+    <alias>Commodore A1000</alias>
+    <alias>Amiga 500</alias>
+    <alias>Amiga 1200</alias>
+    <alias>Amiga 600</alias>
+    <alias>Amiga 2000</alias>
+    <alias>Amiga 3000</alias>
+    <alias>Amiga 4000</alias>
+    <alias>Amiga 500+</alias>
+    <alias>Amiga 1000</alias>
+    <alias>A500</alias>
+    <alias>A1200</alias>
+    <alias>A600</alias>
+    <alias>A2000</alias>
+    <alias>A3000</alias>
+    <alias>A4000</alias>
+    <alias>A500+</alias>
+    <alias>A1000</alias>
+    <alias>amiga600</alias>
+    <alias>amiga1200</alias>
+    <alias>Commodore - Amiga</alias>
+    <ids screenscraper="64" libretro="Commodore - Amiga" retroachievements="35" esde="amiga" launchbox="Commodore Amiga" hyperspin="Commodore Amiga"/>
+  </platform>
+  <platform id="amigacd32">
+    <name>Commodore Amiga CD32</name>
+    <sortname>Commodore Amiga CD32</sortname>
+    <manufacturer>Commodore</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1993</released>
+    <discontinued>1994</discontinued>
+    <family>amiga</family>
+    <extensions>7z adf adz bin ccd cdt chd cue dms fdi hdf hdz img ipf iso lha m3u mds nrg rp9 sub uae zip</extensions>
+    <alias>Amiga CD32</alias>
+    <alias>amigacd32</alias>
+    <alias>Commodore - CD32</alias>
+    <ids screenscraper="130" libretro="Commodore - CD32" esde="amigacd32" launchbox="Commodore Amiga CD32" hyperspin="Commodore Amiga CD32"/>
+  </platform>
+  <platform id="cdtv">
+    <name>Commodore CDTV</name>
+    <sortname>Commodore CDTV</sortname>
+    <manufacturer>Commodore</manufacturer>
+    <type>computer</type>
+    <media>disc</media>
+    <released>1991</released>
+    <discontinued>1994</discontinued>
+    <family>amiga</family>
+    <extensions>7z adf adz bin ccd chd cue dms fdi hdf hdz img ipf iso lha m3u mds nrg rp9 uae wav zip</extensions>
+    <alias>Amiga CDTV</alias>
+    <alias>Commodore Amiga CDTV</alias>
+    <alias>Amliga CDTV</alias>
+    <alias>CDTV</alias>
+    <alias>amigacdtv</alias>
+    <alias>Commodore - CDTV</alias>
+    <ids screenscraper="129" libretro="Commodore - CDTV" esde="cdtv" launchbox="Commodore CDTV" hyperspin="Commodore CDTV"/>
+  </platform>
+  <platform id="pet">
+    <name>Commodore PET</name>
+    <sortname>Commodore PET</sortname>
+    <manufacturer>Commodore</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1977</released>
+    <discontinued>1982</discontinued>
+    <extensions>a0 b0 crt d64 d81 prg t64 tap</extensions>
+    <alias>PET</alias>
+    <alias>Commodore - PET</alias>
+    <ids screenscraper="240" libretro="Commodore - PET"/>
+  </platform>
+  <platform id="plus4">
+    <name>Commodore Plus/4</name>
+    <sortname>Commodore Plus/4</sortname>
+    <manufacturer>Commodore</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1984</released>
+    <discontinued>1985</discontinued>
+    <extensions>7z bin cmd crt d2m d4m d64 d6z d71 d7z d80 d81 d82 d8z g41 g4z g64 g6z gz lnx m3u nbz nib p00 prg t64 tap vfl vsf x64 x6z z64 zip</extensions>
+    <alias>Plus/4</alias>
+    <alias>Commodore 16</alias>
+    <alias>Commodore Minus/60</alias>
+    <alias>Minus/60</alias>
+    <alias>Commodore Plus 4</alias>
+    <alias>Commodore 16 &amp; Plus4</alias>
+    <alias>plus4</alias>
+    <alias>Commodore - Plus-4</alias>
+    <ids screenscraper="99" libretro="Commodore - Plus-4" esde="plus4" launchbox="Commodore Plus 4" hyperspin="Commodore 16 &amp; Plus4"/>
+  </platform>
+  <platform id="vic20">
+    <name>Commodore VIC-20</name>
+    <sortname>Commodore VIC-20</sortname>
+    <manufacturer>Commodore</manufacturer>
+    <type>computer</type>
+    <media>cartridge</media>
+    <released>1980</released>
+    <discontinued>1985</discontinued>
+    <extensions>7z a0 b0 bin cmd crt d2m d4m d64 d6z d71 d7z d80 d81 d82 d8z g41 g4z g64 g6z gz lnx m3u nbz nib p00 prg rom t64 tap vfl vsf x64 x6z zip</extensions>
+    <alias>Vic-20</alias>
+    <alias>vic20</alias>
+    <alias>Commodore - VIC-20</alias>
+    <ids screenscraper="73" libretro="Commodore - VIC-20" retroachievements="34" esde="vic20" launchbox="Commodore VIC-20" hyperspin="Commodore VIC-20"/>
+  </platform>
+  <platform id="megaduck">
+    <name>Creatronic Mega Duck</name>
+    <sortname>Creatronic Mega Duck</sortname>
+    <manufacturer>Creatronic</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1993</released>
+    <extensions>7z bin zip</extensions>
+    <alias>Mega Duck</alias>
+    <alias>Cougar Boy</alias>
+    <alias>megaduck</alias>
+    <ids screenscraper="90" retroachievements="69" esde="megaduck" launchbox="Mega Duck" hyperspin="Creatronic Mega Duck"/>
+  </platform>
+  <platform id="daphne">
+    <name>Daphne</name>
+    <sortname>Daphne</sortname>
+    <manufacturer></manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <family>arcade</family>
+    <extensions>7z daphne dirksimple m2v mmi ogg ogv singe zip</extensions>
+    <alias>Daphne Arcade LaserDisc Emulator</alias>
+    <alias>laserdisc</alias>
+    <alias>LaserDisc Games</alias>
+    <ids screenscraper="49" esde="daphne" launchbox="arcade" hyperspin="Daphne"/>
+  </platform>
+  <platform id="doom">
+    <name>Doom</name>
+    <sortname>Doom</sortname>
+    <manufacturer>id Software</manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <extensions>ipk3 iwad pk3 pk4 pwad wad</extensions>
+    <ids screenscraper="290" libretro="DOOM" esde="doom"/>
+  </platform>
+  <platform id="dragon32">
+    <name>Dragon 32/64</name>
+    <sortname>Dragon 32/64</sortname>
+    <manufacturer>Dragon Data</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1982</released>
+    <discontinued>1984</discontinued>
+    <extensions>7z asc bas cas ccc dmk dsk jvc os9 rom sna vdk wav zip</extensions>
+    <alias>Dragon 32</alias>
+    <alias>Dragon 64</alias>
+    <alias>dragon</alias>
+    <alias>dragon32</alias>
+    <alias>Dragon 32-64</alias>
+    <alias>Dragon Data Dragon</alias>
+    <alias>Dragon Data Dragon 32</alias>
+    <alias>tanodragon</alias>
+    <alias>Tano Dragon</alias>
+    <ids screenscraper="91" esde="dragon32" launchbox="Dragon 32-64" hyperspin="Dragon Data Dragon"/>
+  </platform>
+  <platform id="easyrpg">
+    <name>EasyRPG</name>
+    <sortname>EasyRPG</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <extensions>easyrpg ini zip</extensions>
+    <alias>EasyRPG Game Engine</alias>
+    <ids screenscraper="231" esde="easyrpg"/>
+  </platform>
+  <platform id="arcadia">
+    <name>Emerson Arcadia 2001</name>
+    <sortname>Emerson Arcadia 2001</sortname>
+    <manufacturer>Emerson</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1982</released>
+    <extensions>7z bin tvc zip</extensions>
+    <alias>Arcadia 2001</alias>
+    <alias>Emerson Radio Arcadia 2001</alias>
+    <alias>Emerson 2001</alias>
+    <alias>Advision Home Arcade</alias>
+    <alias>Bandai Arcadia</alias>
+    <alias>Tele-Fever</alias>
+    <alias>Leonardo</alias>
+    <alias>HMG-2650</alias>
+    <alias>Home Arcade Centre</alias>
+    <alias>Intercord XL 2000 System</alias>
+    <alias>Leisure-Vision</alias>
+    <alias>Tunix Home Arcade</alias>
+    <alias>Schmid TVG-2000</alias>
+    <alias>Tele-computer Cosmos</alias>
+    <alias>Intelligent Game MPT-03</alias>
+    <alias>Hanimex MPT-03</alias>
+    <alias>ITMC MPT-03</alias>
+    <alias>Dynavision</alias>
+    <alias>P.I.C Ekusera</alias>
+    <alias>Poppy MPT-03 Tele Computer Spiel</alias>
+    <alias>Prestige Video Computer Game MPT-03</alias>
+    <alias>Rowtron 2000</alias>
+    <alias>Rowtron Video Computer Game MPT-03</alias>
+    <alias>Soundic MPT-03</alias>
+    <alias>Tempest Video Computer Game</alias>
+    <alias>Tobby MPT-03</alias>
+    <alias>Tryom Video Game Center</alias>
+    <alias>GrandStand Video Master</alias>
+    <alias>UVI Compu-Game</alias>
+    <alias>Intervision 2001</alias>
+    <alias>Ormatu 2001</alias>
+    <alias>Sheen Home Video Centre 2001</alias>
+    <alias>Tele Brain</alias>
+    <alias>Palladium Video Computer Game</alias>
+    <alias>Polybrain Video Computer Game</alias>
+    <alias>Trakton Computer Video Game</alias>
+    <alias>arcadia</alias>
+    <alias>Emerson - Arcadia 2001</alias>
+    <ids screenscraper="94" libretro="Emerson - Arcadia 2001" retroachievements="73" esde="arcadia" launchbox="Emerson Arcadia 2001" hyperspin="Emerson Arcadia 2001"/>
+  </platform>
+  <platform id="adventurevision">
+    <name>Entex Adventure Vision</name>
+    <sortname>Entex Adventure Vision</sortname>
+    <manufacturer>Entex</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1982</released>
+    <discontinued>1983</discontinued>
+    <extensions>bin</extensions>
+    <alias>Adventure Vision</alias>
+    <alias>Entex - Adventure Vision</alias>
+    <ids screenscraper="78" libretro="Entex - Adventure Vision" launchbox="Entex Adventure Vision"/>
+  </platform>
+  <platform id="cassettevision">
+    <name>Epoch Cassette Vision</name>
+    <sortname>Epoch Cassette Vision</sortname>
+    <manufacturer>Epoch</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1981</released>
+    <discontinued>1984</discontinued>
+    <extensions>bin777 cart zip</extensions>
+    <alias>Cassette Vision</alias>
+    <alias>Yeno Cassette Vision</alias>
+    <alias>cassettevision</alias>
+    <alias>Epoch - Cassette Vision</alias>
+    <ids screenscraper="300" libretro="Epoch - Cassette Vision" retroachievements="54" launchbox="Epoch Cassette Vision" hyperspin="Epoch Cassette Vision"/>
+  </platform>
+  <platform id="scv">
+    <name>Epoch Super Cassette Vision</name>
+    <sortname>Epoch Super Cassette Vision</sortname>
+    <manufacturer>Epoch</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1984</released>
+    <extensions>0 7z bin cart zip</extensions>
+    <alias>Super Cassette Vision</alias>
+    <alias>Yeno Super Cassette Vision</alias>
+    <alias>scv</alias>
+    <alias>Epoch - Super Cassette Vision</alias>
+    <alias>Super CassetteVision</alias>
+    <ids screenscraper="67" libretro="Epoch - Super Cassette Vision" retroachievements="55" esde="scv" launchbox="Epoch Super Cassette Vision" hyperspin="Epoch Super Cassette Vision"/>
+  </platform>
+  <platform id="channelf">
+    <name>Fairchild Channel F</name>
+    <sortname>Fairchild Channel F</sortname>
+    <manufacturer>Fairchild</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1976</released>
+    <discontinued>1984</discontinued>
+    <extensions>7z bin chf zip</extensions>
+    <alias>Channel F</alias>
+    <alias>Fairchild Video Entertainment System</alias>
+    <alias>Fairchild VES</alias>
+    <alias>Video Entertainment System</alias>
+    <alias>VES</alias>
+    <alias>channelf</alias>
+    <alias>Fairchild - Channel F</alias>
+    <ids screenscraper="80" libretro="Fairchild - Channel F" retroachievements="57" esde="channelf" launchbox="Fairchild Channel F" hyperspin="Fairchild Channel F"/>
+  </platform>
+  <platform id="fmtowns">
+    <name>Fujitsu FM Towns</name>
+    <sortname>Fujitsu FM Towns</sortname>
+    <manufacturer>Fujitsu</manufacturer>
+    <type>computer</type>
+    <media>disc</media>
+    <released>1989</released>
+    <discontinued>1997</discontinued>
+    <extensions>2hd bin ccd cdr chd cue d77 d88 gdi h0 hdd hdi hdm iso m3u mdf mds rdd thd xdf</extensions>
+    <alias>FM Towns</alias>
+    <alias>fmtowns</alias>
+    <alias>marty</alias>
+    <alias>fmtmarty</alias>
+    <ids screenscraper="253" retroachievements="58" esde="fmtowns"/>
+  </platform>
+  <platform id="fm7">
+    <name>Fujitsu FM-7</name>
+    <sortname>Fujitsu FM-7</sortname>
+    <manufacturer>Fujitsu</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1982</released>
+    <extensions>1dd 7z cqi cqm d77 d88 dfi dsk hfe imd mfi mfm t77 td0 wav zip</extensions>
+    <alias>FM-7</alias>
+    <alias>Fujitsu Micro 7</alias>
+    <alias>FM-NEW 7</alias>
+    <alias>FM-77</alias>
+    <alias>FM-77AV</alias>
+    <alias>FM-8</alias>
+    <alias>fm7</alias>
+    <ids screenscraper="97" esde="fm7" launchbox="Fujitsu FM-7" hyperspin="Fujitsu FM-7"/>
+  </platform>
+  <platform id="supracan">
+    <name>Funtech Super A'Can</name>
+    <sortname>Funtech Super A'Can</sortname>
+    <manufacturer>Funtech</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1995</released>
+    <extensions>7z bin zip</extensions>
+    <alias>Super A'can</alias>
+    <alias>superacan</alias>
+    <alias>Funtech Super Acan</alias>
+    <alias>supracan</alias>
+    <alias>Funtech - Super Acan</alias>
+    <ids screenscraper="100" libretro="Funtech - Super Acan" esde="supracan" launchbox="Funtech Super Acan" hyperspin="Funtech Super Acan"/>
+  </platform>
+  <platform id="fpinball">
+    <name>Future Pinball</name>
+    <sortname>Future Pinball</sortname>
+    <manufacturer></manufacturer>
+    <type>pinball</type>
+    <media>other</media>
+    <extensions>fpt ftp</extensions>
+    <alias>fpinball</alias>
+    <ids screenscraper="199" esde="fpinball" hyperspin="Future Pinball"/>
+  </platform>
+  <platform id="gp32">
+    <name>GamePark GP32</name>
+    <sortname>GamePark GP32</sortname>
+    <manufacturer>GamePark</manufacturer>
+    <type>handheld</type>
+    <media>card</media>
+    <released>2001</released>
+    <extensions>fpk smc</extensions>
+    <alias>GP32</alias>
+    <alias>Game Park 32</alias>
+    <alias>GamePark 32</alias>
+    <alias>GamePark - GP32</alias>
+    <ids screenscraper="101" libretro="GamePark - GP32" hyperspin="GamePark 32"/>
+  </platform>
+  <platform id="vectrex">
+    <name>GCE Vectrex</name>
+    <sortname>GCE Vectrex</sortname>
+    <manufacturer>GCE</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1982</released>
+    <discontinued>1984</discontinued>
+    <extensions>7z bin gam vc vec zip</extensions>
+    <alias>Vectrex</alias>
+    <alias>GCE - Vectrex</alias>
+    <alias>vecx</alias>
+    <ids screenscraper="102" libretro="GCE - Vectrex" retroachievements="46" esde="vectrex" launchbox="GCE Vectrex" hyperspin="GCE Vectrex"/>
+  </platform>
+  <platform id="gmaster">
+    <name>Hartung Game Master</name>
+    <sortname>Hartung Game Master</sortname>
+    <manufacturer>Hartung</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1990</released>
+    <extensions>7z bin zip</extensions>
+    <alias>Game Master</alias>
+    <alias>Systema 2000</alias>
+    <alias>Super Game</alias>
+    <alias>Game Tronic</alias>
+    <alias>gmaster</alias>
+    <alias>Hartung - Game Master</alias>
+    <ids screenscraper="103" libretro="Hartung - Game Master" esde="gmaster" launchbox="Hartung Game Master"/>
+  </platform>
+  <platform id="zmachine">
+    <name>Infocom Z-Machine</name>
+    <sortname>Infocom Z-Machine</sortname>
+    <manufacturer>Infocom</manufacturer>
+    <type>virtual</type>
+    <media>other</media>
+    <extensions>dat z1 z2 z3 z4 z5 z6 z7 z8 zblorb zlb</extensions>
+    <alias>Z-Machine</alias>
+    <alias>zmachine</alias>
+    <alias>Infocom - Z-Machine</alias>
+    <ids screenscraper="215" libretro="Infocom - Z-Machine" esde="zmachine"/>
+  </platform>
+  <platform id="vc4000">
+    <name>Interton VC 4000</name>
+    <sortname>Interton VC 4000</sortname>
+    <manufacturer>Interton</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1978</released>
+    <discontinued>1983</discontinued>
+    <extensions></extensions>
+    <alias>VC 4000</alias>
+    <alias>Video Computer 4000</alias>
+    <alias>Interton - VC 4000</alias>
+    <ids screenscraper="281" libretro="Interton - VC 4000" retroachievements="74"/>
+  </platform>
+  <platform id="lowresnx">
+    <name>LowRes NX</name>
+    <sortname>LowRes NX</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <released>2020</released>
+    <extensions>nx</extensions>
+    <alias>lowresnx</alias>
+    <alias>LowRes NX Fantasy Console</alias>
+    <ids screenscraper="244" libretro="LowRes NX" esde="lowresnx"/>
+  </platform>
+  <platform id="lutro">
+    <name>Lutro</name>
+    <sortname>Lutro</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <released>2015</released>
+    <extensions>7z lua lutro zip</extensions>
+    <alias>Lutro Game Engine</alias>
+    <alias>LUA</alias>
+    <ids screenscraper="206" libretro="Lutro" esde="lutro"/>
+  </platform>
+  <platform id="odyssey2">
+    <name>Magnavox Odyssey 2</name>
+    <sortname>Magnavox Odyssey 2</sortname>
+    <manufacturer>Magnavox</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1978</released>
+    <extensions>7z bin zip</extensions>
+    <alias>Videopac G7000</alias>
+    <alias>Magnavox Odyssey²</alias>
+    <alias>Magnavox Odyssey2</alias>
+    <alias>Philips Videopac</alias>
+    <alias>Radiola Videopac</alias>
+    <alias>Schneider Videopac</alias>
+    <alias>Siera Videopac</alias>
+    <alias>Brandt Jopac</alias>
+    <alias>Continental Edision Jopac</alias>
+    <alias>Sabe Jopac</alias>
+    <alias>Philips Videopac G7000</alias>
+    <alias>Philips Videopac C52</alias>
+    <alias>Radiola Videopac Jet 25</alias>
+    <alias>Philips Videopac G7200</alias>
+    <alias>Radiola Videopac Jet 27</alias>
+    <alias>Schneider Videopac 7200</alias>
+    <alias>Philips Videopac N60</alias>
+    <alias>Philips Videopac+ G7400</alias>
+    <alias>Radiola Videopac Jet 47</alias>
+    <alias>Radiola Videopac Jet 74+</alias>
+    <alias>Brandt Japac JO7400</alias>
+    <alias>Continental Edison Jopac JO 1450</alias>
+    <alias>Philips Videopac C7420</alias>
+    <alias>Philips Videopac G7401</alias>
+    <alias>Radiola Videopac Jet 471</alias>
+    <alias>Radiola Videopac Jet 741+</alias>
+    <alias>Odyssey²</alias>
+    <alias>Odyssey2</alias>
+    <alias>Videopac</alias>
+    <alias>Jopac</alias>
+    <alias>Videopac C52</alias>
+    <alias>Videopac N60</alias>
+    <alias>Videopac Jet 25</alias>
+    <alias>Videopac G7200</alias>
+    <alias>Videopac Jet 27</alias>
+    <alias>Videopac 7200</alias>
+    <alias>Videopac+ G7400</alias>
+    <alias>Videopac Jet 47</alias>
+    <alias>Videopac Jet 74+</alias>
+    <alias>Japac JO 7400</alias>
+    <alias>Jopac JO 1450</alias>
+    <alias>Videopac C7420</alias>
+    <alias>Videopac G7401</alias>
+    <alias>Videopac Jet 471</alias>
+    <alias>Videopac Jet 741+</alias>
+    <alias>G7000</alias>
+    <alias>G7200</alias>
+    <alias>G7400</alias>
+    <alias>JO 7400</alias>
+    <alias>JO 1450</alias>
+    <alias>C7420</alias>
+    <alias>G7401</alias>
+    <alias>o2em</alias>
+    <alias>Philips Videopac Plus G7400</alias>
+    <alias>Magnavox - Odyssey2</alias>
+    <alias>Philips - Videopac+</alias>
+    <alias>Odyssey 2</alias>
+    <ids screenscraper="104" libretro="Magnavox - Odyssey2" retroachievements="23" esde="odyssey2" launchbox="Magnavox Odyssey 2" hyperspin="Magnavox Odyssey 2"/>
+  </platform>
+  <platform id="intellivision">
+    <name>Mattel Intellivision</name>
+    <sortname>Mattel Intellivision</sortname>
+    <manufacturer>Mattel</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1979</released>
+    <discontinued>1984</discontinued>
+    <extensions>7z bin int rom zip</extensions>
+    <alias>Intellivision</alias>
+    <alias>Mattel Intelliputer</alias>
+    <alias>Intelliputer</alias>
+    <alias>Mattel Intellivision II</alias>
+    <alias>Intellivision II</alias>
+    <alias>Mattel Intellivision 2</alias>
+    <alias>Intellivision 2</alias>
+    <alias>Mattel ECS</alias>
+    <alias>INTV III</alias>
+    <alias>INTV Super Pro System</alias>
+    <alias>Super Pro System</alias>
+    <alias>Mattel Electronics Intellivision</alias>
+    <alias>Mattel - Intellivision</alias>
+    <ids screenscraper="115" libretro="Mattel - Intellivision" retroachievements="45" esde="intellivision" launchbox="Mattel Intellivision" hyperspin="Mattel Intellivision"/>
+  </platform>
+  <platform id="samcoupe">
+    <name>MGT SAM Coupé</name>
+    <sortname>MGT SAM Coupé</sortname>
+    <manufacturer>MGT</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1959</released>
+    <discontinued>1995</discontinued>
+    <extensions>7z dsk mgt sad sbt zip</extensions>
+    <alias>SAM Coupé</alias>
+    <alias>samcoupe</alias>
+    <ids screenscraper="213" esde="samcoupe" launchbox="MGT SAM Coupé" hyperspin="MGT SAM Coupé"/>
+  </platform>
+  <platform id="msx">
+    <name>Microsoft MSX</name>
+    <sortname>Microsoft MSX</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1980</released>
+    <extensions>7z cas col di1 di2 dmk dsk fd1 fd2 m3u mx1 mx2 ogv ri rom sc sg wav xsa zip</extensions>
+    <alias>MSX</alias>
+    <alias>Microsoft MSX1</alias>
+    <alias>MSX1</alias>
+    <alias>Microsoft - MSX</alias>
+    <ids screenscraper="113" libretro="Microsoft - MSX" retroachievements="29" esde="msx" launchbox="Microsoft MSX" hyperspin="Microsoft MSX"/>
+  </platform>
+  <platform id="msxturbor">
+    <name>Microsoft MSX Turbo R</name>
+    <sortname>Microsoft MSX Turbo R</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1990</released>
+    <family>msx</family>
+    <extensions>7z cas col di1 di2 dmk dsk fd1 fd2 m3u mx1 mx2 ogv ri rom sc sg wav xsa zip</extensions>
+    <alias>MSX Turbo R</alias>
+    <alias>Microsoft MSX R Turbo</alias>
+    <alias>MSX-R Turbo</alias>
+    <alias>msxturbor</alias>
+    <ids screenscraper="118" esde="msxturbor" launchbox="Microsoft MSX" hyperspin="Microsoft MSX"/>
+  </platform>
+  <platform id="msx2">
+    <name>Microsoft MSX2</name>
+    <sortname>Microsoft MSX2</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1985</released>
+    <family>msx</family>
+    <extensions>7z cas col di1 di2 dmk dsk fd1 fd2 m3u mx1 mx2 ogv ri rom sc sg wav xsa zip</extensions>
+    <alias>MSX2</alias>
+    <alias>Microsoft - MSX2</alias>
+    <ids screenscraper="116" libretro="Microsoft - MSX2" esde="msx2" launchbox="Microsoft MSX2" hyperspin="Microsoft MSX2"/>
+  </platform>
+  <platform id="windows">
+    <name>Microsoft Windows</name>
+    <sortname>Microsoft Windows</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>computer</type>
+    <media>disc</media>
+    <released>2000</released>
+    <extensions></extensions>
+    <alias>PC Windows</alias>
+    <alias>Microsoft Windows XP</alias>
+    <alias>Microsoft Windows 2000</alias>
+    <alias>Microsoft Windows Vista</alias>
+    <alias>Microsoft Windows 7</alias>
+    <alias>Microsoft Windows 8</alias>
+    <alias>Microsoft Windows 8.1</alias>
+    <alias>Microsoft Windows 10</alias>
+    <alias>Windows</alias>
+    <alias>Windows XP</alias>
+    <alias>Windows 2000</alias>
+    <alias>Windows Vista</alias>
+    <alias>Windows 7</alias>
+    <alias>Windows 8</alias>
+    <alias>Windows 8.1</alias>
+    <alias>Windows 10</alias>
+    <alias>Win XP</alias>
+    <alias>Win 2000</alias>
+    <alias>Win Vista</alias>
+    <alias>Win 7</alias>
+    <alias>Win 8</alias>
+    <alias>Win 8.1</alias>
+    <alias>Win 10</alias>
+    <alias>WXP</alias>
+    <alias>W2000</alias>
+    <alias>W7</alias>
+    <alias>W8</alias>
+    <alias>W8.1</alias>
+    <alias>W10</alias>
+    <ids screenscraper="138" esde="windows" launchbox="Windows"/>
+  </platform>
+  <platform id="windows3x">
+    <name>Microsoft Windows 3.x</name>
+    <sortname>Microsoft Windows 3.x</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>computer</type>
+    <media>disc</media>
+    <released>1990</released>
+    <family>dos</family>
+    <extensions>7z bat bin com dll dosz exe img iso mdf zip</extensions>
+    <alias>PC Win3.xx</alias>
+    <alias>Microsoft Windows 3.1</alias>
+    <alias>Windows 3.1</alias>
+    <alias>Win 3.1</alias>
+    <alias>W3.1</alias>
+    <alias>Microsoft Windows 3.0</alias>
+    <alias>Windows 3.0</alias>
+    <alias>Win 3.0</alias>
+    <alias>W3.0</alias>
+    <alias>Windows 3.X</alias>
+    <alias>windows3x</alias>
+    <ids screenscraper="136" esde="windows3x" launchbox="Windows 3.X" hyperspin="Microsoft Windows 3.x"/>
+  </platform>
+  <platform id="windows9x">
+    <name>Microsoft Windows 9x</name>
+    <sortname>Microsoft Windows 9x</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1995</released>
+    <discontinued>1998</discontinued>
+    <family>dos</family>
+    <extensions>7z bat dosz zip</extensions>
+    <alias>PC Win9X</alias>
+    <alias>Microsoft Windows 95</alias>
+    <alias>Microsoft Windows 98</alias>
+    <alias>Microsoft Windows 98SE</alias>
+    <alias>Microsoft Windows 98SE2</alias>
+    <alias>Microsoft Windows Millenium</alias>
+    <alias>Windows 95</alias>
+    <alias>Windows 98</alias>
+    <alias>Windows 98SE</alias>
+    <alias>Windows 98SE2</alias>
+    <alias>Windows Millenium</alias>
+    <alias>Win 95</alias>
+    <alias>Win 98</alias>
+    <alias>Win 98SE</alias>
+    <alias>Win 98SE2</alias>
+    <alias>Win Millenium</alias>
+    <alias>W95</alias>
+    <alias>W98</alias>
+    <alias>W98SE</alias>
+    <alias>W98SE2</alias>
+    <alias>windows9x</alias>
+    <ids screenscraper="137" esde="windows9x"/>
+  </platform>
+  <platform id="xbox">
+    <name>Microsoft Xbox</name>
+    <sortname>Microsoft Xbox</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2001</released>
+    <discontinued>2008</discontinued>
+    <extensions>iso xiso</extensions>
+    <alias>Xbox</alias>
+    <alias>Microsoft - Xbox</alias>
+    <ids screenscraper="32" libretro="Microsoft - Xbox" retroachievements="22" esde="xbox" launchbox="Microsoft Xbox"/>
+  </platform>
+  <platform id="xbox360">
+    <name>Microsoft Xbox 360</name>
+    <sortname>Microsoft Xbox 360</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2005</released>
+    <discontinued>2016</discontinued>
+    <extensions>iso xex zar</extensions>
+    <alias>Xbox 360</alias>
+    <alias>xbox360</alias>
+    <ids screenscraper="33" esde="xbox360" launchbox="Microsoft Xbox 360"/>
+  </platform>
+  <platform id="xboxone">
+    <name>Microsoft Xbox One</name>
+    <sortname>Microsoft Xbox One</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2013</released>
+    <extensions>7z iso zip</extensions>
+    <alias>Xbox One</alias>
+    <alias>xboxone</alias>
+    <ids screenscraper="34" esde="xboxone" launchbox="Microsoft Xbox One"/>
+  </platform>
+  <platform id="dos">
+    <name>MS-DOS</name>
+    <sortname>MS-DOS</sortname>
+    <manufacturer>Microsoft</manufacturer>
+    <type>computer</type>
+    <media>disc</media>
+    <released>1981</released>
+    <extensions>7z bas bat bin com conf cue dat dosz dsk exe game gog ima img iso mdf wad z5 z8 zip</extensions>
+    <alias>PC Dos</alias>
+    <alias>Microsoft MS-DOS</alias>
+    <alias>Microsoft DOS</alias>
+    <alias>DOS</alias>
+    <alias>PC-DOS</alias>
+    <alias>PC</alias>
+    <alias>DosBox</alias>
+    <alias>eXoDos</alias>
+    <alias>Total DOS Collection</alias>
+    <alias>Total DOS</alias>
+    <alias>DOS (PC)</alias>
+    <alias>IBM PC</alias>
+    <ids screenscraper="135" libretro="DOS" retroachievements="26" esde="dos" launchbox="MS-Dos" hyperspin="Microsoft MS-DOS"/>
+  </platform>
+  <platform id="pcengine">
+    <name>NEC PC Engine</name>
+    <sortname>NEC PC Engine</sortname>
+    <manufacturer>NEC</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1987</released>
+    <discontinued>1994</discontinued>
+    <extensions>7z ccd chd cue img iso m3u pce rom sgx toc zip</extensions>
+    <alias>PC Engine</alias>
+    <alias>TurboGrafx-16</alias>
+    <alias>NEC TurboGrafx-16</alias>
+    <alias>pcengine</alias>
+    <alias>tg16</alias>
+    <alias>NEC - PC Engine - TurboGrafx 16</alias>
+    <alias>PCE</alias>
+    <ids screenscraper="31" libretro="NEC - PC Engine - TurboGrafx 16" retroachievements="8" esde="pcengine" launchbox="NEC TurboGrafx-16" hyperspin="NEC PC Engine"/>
+  </platform>
+  <platform id="pcenginecd">
+    <name>NEC PC Engine CD</name>
+    <sortname>NEC PC Engine CD</sortname>
+    <manufacturer>NEC</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1988</released>
+    <discontinued>1994</discontinued>
+    <family>pcengine</family>
+    <extensions>7z ccd chd cue img iso m3u pce sgx toc zip</extensions>
+    <alias>PC Engine CD-Rom</alias>
+    <alias>NEC PC Engine CD-Rom</alias>
+    <alias>PC Engine CD</alias>
+    <alias>pcenginecd</alias>
+    <alias>pce-cd</alias>
+    <alias>tg-cd</alias>
+    <alias>NEC PC Engine-CD</alias>
+    <alias>NEC TurboGrafx-CD</alias>
+    <alias>NEC - PC Engine CD - TurboGrafx-CD</alias>
+    <alias>NEC - TurboGrafx-CD</alias>
+    <ids screenscraper="114" libretro="NEC - PC Engine CD - TurboGrafx-CD" retroachievements="76" esde="pcenginecd" launchbox="NEC PC Engine-CD" hyperspin="NEC PC Engine-CD"/>
+  </platform>
+  <platform id="supergrafx">
+    <name>NEC PC Engine SuperGrafx</name>
+    <sortname>NEC PC Engine SuperGrafx</sortname>
+    <manufacturer>NEC</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1989</released>
+    <family>pcengine</family>
+    <extensions>7z ccd chd cue pce rom sgx zip</extensions>
+    <alias>PC Engine SuperGrafx</alias>
+    <alias>NEC SuperGrafx</alias>
+    <alias>SuperGrafx</alias>
+    <alias>NEC - PC Engine SuperGrafx</alias>
+    <ids screenscraper="105" libretro="NEC - PC Engine SuperGrafx" esde="supergrafx" launchbox="PC Engine SuperGrafx" hyperspin="NEC SuperGrafx"/>
+  </platform>
+  <platform id="pc88">
+    <name>NEC PC-8801</name>
+    <sortname>NEC PC-8801</sortname>
+    <manufacturer>NEC</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1981</released>
+    <extensions>88d cmt d88 m3u t88 u88</extensions>
+    <alias>pc88</alias>
+    <alias>NEC PC-8800 Series</alias>
+    <alias>NEC - PC-8001 - PC-8801</alias>
+    <alias>PC-8000/8800</alias>
+    <ids screenscraper="221" libretro="NEC - PC-8001 - PC-8801" retroachievements="47" esde="pc88"/>
+  </platform>
+  <platform id="pc98">
+    <name>NEC PC-9801</name>
+    <sortname>NEC PC-9801</sortname>
+    <manufacturer>NEC</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1982</released>
+    <extensions>2hd 7z 88d 98d cmd d88 d98 dup fdd fdi hdd hdi hdm hdn m3u nhd tfd thd xdf zip</extensions>
+    <alias>PC98</alias>
+    <alias>PC9801</alias>
+    <alias>NEC PC-9800 Series</alias>
+    <alias>NEC - PC-98</alias>
+    <alias>PC-9800</alias>
+    <ids screenscraper="208" libretro="NEC - PC-98" retroachievements="48" esde="pc98"/>
+  </platform>
+  <platform id="pcfx">
+    <name>NEC PC-FX</name>
+    <sortname>NEC PC-FX</sortname>
+    <manufacturer>NEC</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1994</released>
+    <extensions>7z bin ccd chd cue img m3u sub toc zip</extensions>
+    <alias>PC-FX</alias>
+    <alias>pcfx</alias>
+    <alias>NEC - PC-FX</alias>
+    <alias>PCXFX</alias>
+    <ids screenscraper="72" libretro="NEC - PC-FX" retroachievements="49" esde="pcfx" launchbox="NEC PC-FX" hyperspin="NEC PC-FX"/>
+  </platform>
+  <platform id="n3ds">
+    <name>Nintendo 3DS</name>
+    <sortname>Nintendo 3DS</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2011</released>
+    <discontinued>2020</discontinued>
+    <extensions>3ds 3dsx 7z app axf cci cxi elf z3dsx zcci zcxi zip</extensions>
+    <alias>3DS</alias>
+    <alias>2DS</alias>
+    <alias>n3ds</alias>
+    <alias>Nintendo - Nintendo 3DS</alias>
+    <ids screenscraper="17" libretro="Nintendo - Nintendo 3DS" retroachievements="62" esde="n3ds" launchbox="Nintendo 3DS"/>
+  </platform>
+  <platform id="n64">
+    <name>Nintendo 64</name>
+    <sortname>Nintendo 64</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1996</released>
+    <discontinued>2002</discontinued>
+    <extensions>7z bin d64 n64 ndd u1 v64 z64 zip</extensions>
+    <alias>n64</alias>
+    <alias>Nintendo - Nintendo 64</alias>
+    <ids screenscraper="14" libretro="Nintendo - Nintendo 64" retroachievements="2" esde="n64" launchbox="Nintendo 64" hyperspin="Nintendo 64"/>
+  </platform>
+  <platform id="n64dd">
+    <name>Nintendo 64DD</name>
+    <sortname>Nintendo 64DD</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>disk</media>
+    <released>1999</released>
+    <discontinued>2001</discontinued>
+    <family>n64</family>
+    <extensions>7z bin d64 n64 ndd u1 v64 z64 zip</extensions>
+    <alias>Nintendo 64 DD</alias>
+    <alias>N64 DD</alias>
+    <alias>64 DD</alias>
+    <alias>64dd</alias>
+    <alias>n64dd</alias>
+    <alias>Nintendo - Nintendo 64DD</alias>
+    <ids screenscraper="122" libretro="Nintendo - Nintendo 64DD" esde="n64dd" launchbox="Nintendo 64DD" hyperspin="Nintendo 64DD"/>
+  </platform>
+  <platform id="nds">
+    <name>Nintendo DS</name>
+    <sortname>Nintendo DS</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2004</released>
+    <discontinued>2013</discontinued>
+    <extensions>7z app bin dsi ids nds zip</extensions>
+    <alias>NDS</alias>
+    <alias>DS</alias>
+    <alias>Nintendo DSi</alias>
+    <alias>NDSi</alias>
+    <alias>DSi</alias>
+    <alias>Nintendo - Nintendo DS</alias>
+    <ids screenscraper="15" libretro="Nintendo - Nintendo DS" retroachievements="18" esde="nds" launchbox="Nintendo DS" hyperspin="Nintendo DS"/>
+  </platform>
+  <platform id="nes">
+    <name>Nintendo Entertainment System</name>
+    <sortname>Nintendo Entertainment System</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1983</released>
+    <discontinued>1995</discontinued>
+    <extensions>3dsen 7z bin fds fig nes unf unif zip</extensions>
+    <alias>NES</alias>
+    <alias>Famicom</alias>
+    <alias>Family Computer</alias>
+    <alias>Nintendo Famicom</alias>
+    <alias>Nintendo Family Computer</alias>
+    <alias>Nintendo - Nintendo Entertainment System</alias>
+    <ids screenscraper="3" libretro="Nintendo - Nintendo Entertainment System" retroachievements="7" esde="nes" launchbox="Nintendo Entertainment System" hyperspin="Nintendo Entertainment System"/>
+  </platform>
+  <platform id="fds">
+    <name>Nintendo Famicom Disk System</name>
+    <sortname>Nintendo Famicom Disk System</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>disk</media>
+    <released>1986</released>
+    <discontinued>2003</discontinued>
+    <family>nes</family>
+    <extensions>7z bin fds nes unf unif zip</extensions>
+    <alias>Family Computer Disk System</alias>
+    <alias>Nintendo Family Computer Disk System</alias>
+    <alias>Nintendo Famiri Konpyuta Disuku Shisutemu</alias>
+    <alias>Nintendo Famikom Disk System</alias>
+    <alias>Nintendo FDS</alias>
+    <alias>Nintendo FCDS</alias>
+    <alias>Nintendo FCD</alias>
+    <alias>Nintendo FKDS</alias>
+    <alias>Famicom Disk System</alias>
+    <alias>Famiri Konpyuta Disuku Shisutemu</alias>
+    <alias>Famikom Disk System</alias>
+    <alias>FDS</alias>
+    <alias>FCDS</alias>
+    <alias>FCD</alias>
+    <alias>FKDS</alias>
+    <alias>Nintendo - Family Computer Disk System</alias>
+    <ids screenscraper="106" libretro="Nintendo - Family Computer Disk System" retroachievements="81" esde="fds" launchbox="Nintendo Famicom Disk System" hyperspin="Nintendo Famicom Disk System"/>
+  </platform>
+  <platform id="gameandwatch">
+    <name>Nintendo Game &amp; Watch</name>
+    <sortname>Nintendo Game &amp; Watch</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>other</media>
+    <released>1980</released>
+    <discontinued>1991</discontinued>
+    <extensions>7z mgw zip</extensions>
+    <alias>Game &amp; Watch</alias>
+    <alias>Nintendo Game and Watch</alias>
+    <alias>Game and Watch</alias>
+    <alias>Nintendo Game'n'Watch</alias>
+    <alias>Game'n'Watch</alias>
+    <alias>G&amp;W</alias>
+    <alias>GW</alias>
+    <alias>gameandwatch</alias>
+    <alias>Electronic Handheld Games</alias>
+    <alias>Handheld Electronic Game</alias>
+    <ids screenscraper="52" libretro="Handheld Electronic Game" retroachievements="60" esde="gameandwatch" launchbox="Game &amp; Watch" hyperspin="Electronic Handheld Games"/>
+  </platform>
+  <platform id="gb">
+    <name>Nintendo Game Boy</name>
+    <sortname>Nintendo Game Boy</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1989</released>
+    <discontinued>2003</discontinued>
+    <extensions>7z bin bs cgb dmg gb gbc gbx sfc sgb smc zip</extensions>
+    <alias>Game Boy</alias>
+    <alias>Nintendo GB</alias>
+    <alias>GB</alias>
+    <alias>Nintendo - Game Boy</alias>
+    <alias>GameBoy</alias>
+    <ids screenscraper="9" libretro="Nintendo - Game Boy" retroachievements="4" esde="gb" launchbox="Nintendo Game Boy" hyperspin="Nintendo Game Boy"/>
+  </platform>
+  <platform id="gba">
+    <name>Nintendo Game Boy Advance</name>
+    <sortname>Nintendo Game Boy Advance</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2001</released>
+    <discontinued>2008</discontinued>
+    <extensions>7z agb bin cgb dmg gb gba gbc gbx sgb zip</extensions>
+    <alias>Game Boy Advance</alias>
+    <alias>Nintendo GameBoy Advance</alias>
+    <alias>GameBoy Advance</alias>
+    <alias>Nintendo GB Advance</alias>
+    <alias>Nintendo GBA</alias>
+    <alias>GB Advance</alias>
+    <alias>GBA</alias>
+    <alias>Nintendo - Game Boy Advance</alias>
+    <ids screenscraper="12" libretro="Nintendo - Game Boy Advance" retroachievements="5" esde="gba" launchbox="Nintendo Game Boy Advance" hyperspin="Nintendo Game Boy Advance"/>
+  </platform>
+  <platform id="gbc">
+    <name>Nintendo Game Boy Color</name>
+    <sortname>Nintendo Game Boy Color</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1998</released>
+    <discontinued>2003</discontinued>
+    <family>gb</family>
+    <extensions>7z bin bs cgb dmg gb gbc gbx sfc sgb smc zip</extensions>
+    <alias>Game Boy Color</alias>
+    <alias>Nintendo GB Color</alias>
+    <alias>Nintendo GBC</alias>
+    <alias>GB Color</alias>
+    <alias>GBC</alias>
+    <alias>Nintendo - Game Boy Color</alias>
+    <alias>GameBoy Color</alias>
+    <ids screenscraper="10" libretro="Nintendo - Game Boy Color" retroachievements="6" esde="gbc" launchbox="Nintendo Game Boy Color" hyperspin="Nintendo Game Boy Color"/>
+  </platform>
+  <platform id="gc">
+    <name>Nintendo GameCube</name>
+    <sortname>Nintendo GameCube</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2001</released>
+    <discontinued>2007</discontinued>
+    <extensions>7z ciso dff dol elf gcm gcz iso json m3u rvz tgc wad wbfs wia zip</extensions>
+    <alias>Gamecube</alias>
+    <alias>Nintendo Game Cube</alias>
+    <alias>Game Cube</alias>
+    <alias>Nintendo GC</alias>
+    <alias>NGC</alias>
+    <alias>GC</alias>
+    <alias>Nintendo - GameCube</alias>
+    <ids screenscraper="13" libretro="Nintendo - GameCube" retroachievements="16" esde="gc" launchbox="Nintendo GameCube" hyperspin="Nintendo GameCube"/>
+  </platform>
+  <platform id="pokemini">
+    <name>Nintendo Pokémon Mini</name>
+    <sortname>Nintendo Pokémon Mini</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2001</released>
+    <extensions>7z min zip</extensions>
+    <alias>Pokémon mini</alias>
+    <alias>Pokemon Mini</alias>
+    <alias>PokeMini</alias>
+    <alias>Nintendo - Pokemon Mini</alias>
+    <ids screenscraper="211" libretro="Nintendo - Pokemon Mini" retroachievements="24" esde="pokemini"/>
+  </platform>
+  <platform id="satellaview">
+    <name>Nintendo Satellaview</name>
+    <sortname>Nintendo Satellaview</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>download</media>
+    <released>1995</released>
+    <discontinued>2000</discontinued>
+    <family>snes</family>
+    <extensions>7z bml bs fig sfc smc st swc zip</extensions>
+    <alias>Satellaview</alias>
+    <alias>Nintendo BS-X</alias>
+    <alias>BS-X</alias>
+    <alias>Nintendo - Satellaview</alias>
+    <ids screenscraper="107" libretro="Nintendo - Satellaview" esde="satellaview" launchbox="Nintendo Satellaview" hyperspin="Nintendo Satellaview"/>
+  </platform>
+  <platform id="switch">
+    <name>Nintendo Switch</name>
+    <sortname>Nintendo Switch</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>2017</released>
+    <extensions>nca nro nso nsp xci</extensions>
+    <alias>Switch</alias>
+    <ids screenscraper="225" esde="switch" launchbox="Nintendo Switch"/>
+  </platform>
+  <platform id="virtualboy">
+    <name>Nintendo Virtual Boy</name>
+    <sortname>Nintendo Virtual Boy</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1995</released>
+    <discontinued>1996</discontinued>
+    <extensions>7z bin vb vboy zip</extensions>
+    <alias>Virtual Boy</alias>
+    <alias>Nintendo virtualboy</alias>
+    <alias>virtualboy</alias>
+    <alias>Nintendo vboy</alias>
+    <alias>vboy</alias>
+    <alias>Nintendo - Virtual Boy</alias>
+    <ids screenscraper="11" libretro="Nintendo - Virtual Boy" retroachievements="28" esde="virtualboy" launchbox="Nintendo Virtual Boy" hyperspin="Nintendo Virtual Boy"/>
+  </platform>
+  <platform id="wii">
+    <name>Nintendo Wii</name>
+    <sortname>Nintendo Wii</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2006</released>
+    <discontinued>2013</discontinued>
+    <extensions>7z ciso dff dol elf gcm gcz iso json m3u rvz tgc wad wbfs wia zip</extensions>
+    <alias>Wii</alias>
+    <alias>Nintendo - Wii</alias>
+    <alias>Nintendo - Wii (Digital)</alias>
+    <ids screenscraper="16" libretro="Nintendo - Wii" retroachievements="19" esde="wii" launchbox="Nintendo Wii" hyperspin="Nintendo Wii"/>
+  </platform>
+  <platform id="wiiu">
+    <name>Nintendo Wii U</name>
+    <sortname>Nintendo Wii U</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2012</released>
+    <discontinued>2017</discontinued>
+    <extensions>ciso elf iso rpx tmd wbfs wua wud wuhb wux</extensions>
+    <alias>Wii U</alias>
+    <alias>Nintendo WII-U</alias>
+    <alias>WII-U</alias>
+    <alias>wiiu</alias>
+    <ids screenscraper="18" retroachievements="20" esde="wiiu" launchbox="Nintendo Wii U" hyperspin="Nintendo Wii U"/>
+  </platform>
+  <platform id="ngage">
+    <name>Nokia N-Gage</name>
+    <sortname>Nokia N-Gage</sortname>
+    <manufacturer>Nokia</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2003</released>
+    <extensions>id ngage zip</extensions>
+    <alias>N-Gage</alias>
+    <alias>ngage</alias>
+    <ids screenscraper="30" retroachievements="61" esde="ngage" launchbox="Nokia N-Gage"/>
+  </platform>
+  <platform id="openbor">
+    <name>OpenBOR</name>
+    <sortname>OpenBOR</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>other</media>
+    <extensions>pak</extensions>
+    <alias>OpenBOR Game Engine</alias>
+    <ids screenscraper="214" esde="openbor" launchbox="OpenBOR" hyperspin="OpenBOR"/>
+  </platform>
+  <platform id="palm">
+    <name>Palm OS</name>
+    <sortname>Palm OS</sortname>
+    <manufacturer>Palm</manufacturer>
+    <type>computer</type>
+    <media>card</media>
+    <released>1995</released>
+    <discontinued>2007</discontinued>
+    <extensions>7z img pdb pqa prc zip</extensions>
+    <alias>palm</alias>
+    <alias>palmos</alias>
+    <ids screenscraper="219" esde="palm"/>
+  </platform>
+  <platform id="cdimono1">
+    <name>Philips CD-i</name>
+    <sortname>Philips CD-i</sortname>
+    <manufacturer>Philips</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1991</released>
+    <discontinued>1997</discontinued>
+    <extensions>bin chd cue iso nrg wav</extensions>
+    <alias>CD-i</alias>
+    <alias>cdi</alias>
+    <alias>cdimono1</alias>
+    <alias>Philips - CD-i</alias>
+    <ids screenscraper="133" libretro="Philips - CD-i" retroachievements="42" esde="cdimono1" launchbox="Philips CD-i" hyperspin="Philips CD-i"/>
+  </platform>
+  <platform id="pico8">
+    <name>PICO-8</name>
+    <sortname>PICO-8</sortname>
+    <manufacturer>Lexaloffle</manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <released>2014</released>
+    <extensions>p8 png</extensions>
+    <alias>pico8</alias>
+    <alias>PICO-8 Fantasy Console</alias>
+    <ids screenscraper="234" libretro="PICO-8" esde="pico8"/>
+  </platform>
+  <platform id="atomiswave">
+    <name>Sammy Atomiswave</name>
+    <sortname>Sammy Atomiswave</sortname>
+    <manufacturer>Sammy</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>2003</released>
+    <family>arcade</family>
+    <extensions>7z bin chd dat elf lst zip</extensions>
+    <alias>Atomiswave</alias>
+    <alias>Sammy Corporation Atomiswave</alias>
+    <ids screenscraper="53" libretro="Atomiswave" esde="atomiswave" launchbox="Sammy Atomiswave" hyperspin="Sammy Atomiswave"/>
+  </platform>
+  <platform id="scummvm">
+    <name>ScummVM</name>
+    <sortname>ScummVM</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>disc</media>
+    <extensions>residualvm scummvm svm</extensions>
+    <alias>ResidualVM</alias>
+    <alias>ScummVM Game Engine</alias>
+    <ids screenscraper="123" libretro="ScummVM" esde="scummvm" launchbox="ScummVM" hyperspin="ScummVM"/>
+  </platform>
+  <platform id="sega32x">
+    <name>Sega 32X</name>
+    <sortname>Sega 32X</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1994</released>
+    <discontinued>1996</discontinued>
+    <family>megadrive</family>
+    <extensions>32x 68k 7z bin ccd chd cue gen img iso m3u md smd sms sub wav zip</extensions>
+    <alias>Megadrive 32X</alias>
+    <alias>Sega Megadrive 32x</alias>
+    <alias>Sega Genesis 32x</alias>
+    <alias>Sega Mega 32x</alias>
+    <alias>Super 32x</alias>
+    <alias>Genesis 32x</alias>
+    <alias>32x</alias>
+    <alias>sega32x</alias>
+    <alias>Sega Mega Drive 32X</alias>
+    <alias>sega32xjp</alias>
+    <alias>Sega Super 32X</alias>
+    <alias>sega32xna</alias>
+    <alias>Sega - 32X</alias>
+    <ids screenscraper="19" libretro="Sega - 32X" retroachievements="10" esde="sega32x" launchbox="Sega 32X" hyperspin="Sega 32X"/>
+  </platform>
+  <platform id="dreamcast">
+    <name>Sega Dreamcast</name>
+    <sortname>Sega Dreamcast</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1998</released>
+    <discontinued>2004</discontinued>
+    <extensions>7z bin cdi chd cue dat elf gdi img iso lst m3u nrg raw xpm zip</extensions>
+    <alias>Dreamcast</alias>
+    <alias>Sega DC</alias>
+    <alias>DC</alias>
+    <alias>Sega - Dreamcast</alias>
+    <ids screenscraper="23" libretro="Sega - Dreamcast" retroachievements="40" esde="dreamcast" launchbox="Sega Dreamcast" hyperspin="Sega Dreamcast"/>
+  </platform>
+  <platform id="gamegear">
+    <name>Sega Game Gear</name>
+    <sortname>Sega Game Gear</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1990</released>
+    <discontinued>1997</discontinued>
+    <extensions>68k 7z bin bms chd col cue gen gg iso m3u md mdx rom sg sgd smd sms zip</extensions>
+    <alias>Game Gear</alias>
+    <alias>Sega GG</alias>
+    <alias>GG</alias>
+    <alias>gamegear</alias>
+    <alias>Sega - Game Gear</alias>
+    <ids screenscraper="21" libretro="Sega - Game Gear" retroachievements="15" esde="gamegear" launchbox="Sega Game Gear" hyperspin="Sega Game Gear"/>
+  </platform>
+  <platform id="mastersystem">
+    <name>Sega Master System</name>
+    <sortname>Sega Master System</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1985</released>
+    <discontinued>1996</discontinued>
+    <extensions>68k 7z bin bms chd col cue gen gg iso m3u md mdx rom sg sgd smd sms zip</extensions>
+    <alias>Master System</alias>
+    <alias>Sega Mark III</alias>
+    <alias>Sega Mark 3</alias>
+    <alias>SMS</alias>
+    <alias>mastersystem</alias>
+    <alias>mark3</alias>
+    <alias>Sega - Master System - Mark III</alias>
+    <ids screenscraper="2" libretro="Sega - Master System - Mark III" retroachievements="11" esde="mastersystem" launchbox="Sega Master System" hyperspin="Sega Master System"/>
+  </platform>
+  <platform id="megadrive">
+    <name>Sega Mega Drive</name>
+    <sortname>Sega Mega Drive</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1988</released>
+    <discontinued>1998</discontinued>
+    <extensions>32x 68k 7z bin bms chd cue gen gg iso m3u md mdx sg sgd smd sms zip</extensions>
+    <alias>Megadrive</alias>
+    <alias>Genesis</alias>
+    <alias>Sega Megadrive</alias>
+    <alias>Sega Genesis</alias>
+    <alias>Super Aladdin Boy</alias>
+    <alias>megadrivejp</alias>
+    <alias>Sega - Mega Drive - Genesis</alias>
+    <ids screenscraper="1" libretro="Sega - Mega Drive - Genesis" retroachievements="1" esde="megadrive" launchbox="Sega Genesis" hyperspin="Sega Genesis"/>
+  </platform>
+  <platform id="segacd">
+    <name>Sega Mega-CD</name>
+    <sortname>Sega Mega-CD</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1991</released>
+    <discontinued>1996</discontinued>
+    <family>megadrive</family>
+    <extensions>68k 7z bin bms ccd chd cue gen gg img iso m3u md mdx sg sgd smd sms sub wav zip</extensions>
+    <alias>Mega-CD</alias>
+    <alias>Sega CD</alias>
+    <alias>segacd</alias>
+    <alias>megacd</alias>
+    <alias>megacdjp</alias>
+    <alias>Sega - Mega-CD - Sega CD</alias>
+    <alias>Mega CD</alias>
+    <ids screenscraper="20" libretro="Sega - Mega-CD - Sega CD" retroachievements="9" esde="segacd" launchbox="Sega CD" hyperspin="Sega CD"/>
+  </platform>
+  <platform id="model2">
+    <name>Sega Model 2</name>
+    <sortname>Sega Model 2</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>1993</released>
+    <family>arcade</family>
+    <extensions>7z chd zip</extensions>
+    <alias>Model 2</alias>
+    <alias>Sega Model II</alias>
+    <alias>Model II</alias>
+    <alias>model2</alias>
+    <ids screenscraper="54" esde="model2" launchbox="Sega Model 2" hyperspin="Sega Model 2"/>
+  </platform>
+  <platform id="model3">
+    <name>Sega Model 3</name>
+    <sortname>Sega Model 3</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>1996</released>
+    <family>arcade</family>
+    <extensions>7z chd zip</extensions>
+    <alias>Model 3</alias>
+    <alias>Sega Model III</alias>
+    <alias>Model III</alias>
+    <alias>model3</alias>
+    <ids screenscraper="55" esde="model3" launchbox="Sega Model 3" hyperspin="Sega Model 3"/>
+  </platform>
+  <platform id="naomi">
+    <name>Sega NAOMI</name>
+    <sortname>Sega NAOMI</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>1998</released>
+    <family>arcade</family>
+    <extensions>7z bin chd dat elf gdi lst raw zip</extensions>
+    <alias>Naomi</alias>
+    <alias>Sega - Naomi</alias>
+    <ids screenscraper="56" libretro="Sega - Naomi" esde="naomi" launchbox="Sega Naomi" hyperspin="Sega Naomi"/>
+  </platform>
+  <platform id="naomi2">
+    <name>Sega NAOMI 2</name>
+    <sortname>Sega NAOMI 2</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>2000</released>
+    <family>arcade</family>
+    <extensions>7z bin chd dat elf gdi lst raw zip</extensions>
+    <alias>Naomi 2</alias>
+    <alias>naomi2</alias>
+    <alias>Sega - Naomi 2</alias>
+    <ids screenscraper="230" libretro="Sega - Naomi 2" esde="naomi2" launchbox="Sega Naomi 2"/>
+  </platform>
+  <platform id="naomigd">
+    <name>Sega NAOMI GD-ROM</name>
+    <sortname>Sega NAOMI GD-ROM</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>1999</released>
+    <family>arcade</family>
+    <extensions>7z bin chd dat elf gdi lst raw zip</extensions>
+    <alias>Naomi GD-ROM</alias>
+    <alias>Sega Naomi-GD</alias>
+    <alias>Naomi GD</alias>
+    <alias>naomigd</alias>
+    <ids screenscraper="227" esde="naomigd"/>
+  </platform>
+  <platform id="pico">
+    <name>Sega Pico</name>
+    <sortname>Sega Pico</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1993</released>
+    <discontinued>2005</discontinued>
+    <extensions>md</extensions>
+    <alias>pico</alias>
+    <alias>Sega - PICO</alias>
+    <ids screenscraper="250" libretro="Sega - PICO" retroachievements="68"/>
+  </platform>
+  <platform id="saturn">
+    <name>Sega Saturn</name>
+    <sortname>Sega Saturn</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1994</released>
+    <discontinued>2000</discontinued>
+    <extensions>7z bin ccd chd cue iso m3u mdf mds toc zip</extensions>
+    <alias>Saturn</alias>
+    <alias>saturnjp</alias>
+    <alias>Sega - Saturn</alias>
+    <ids screenscraper="22" libretro="Sega - Saturn" retroachievements="39" esde="saturn" launchbox="Sega Saturn" hyperspin="Sega Saturn"/>
+  </platform>
+  <platform id="sg-1000">
+    <name>Sega SG-1000</name>
+    <sortname>Sega SG-1000</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1983</released>
+    <discontinued>1985</discontinued>
+    <extensions>68k 7z bin bms chd cue gen gg iso m3u md mdx ri rom sg sgd smd sms zip</extensions>
+    <alias>SG-1000</alias>
+    <alias>Sega Game 1000</alias>
+    <alias>SG-1000 II</alias>
+    <alias>SG-1000 2</alias>
+    <alias>SC 3000</alias>
+    <alias>Othello Multivisio</alias>
+    <alias>sg1000</alias>
+    <alias>multivision</alias>
+    <alias>Othello Multivision</alias>
+    <alias>Sega - SG-1000</alias>
+    <ids screenscraper="109" libretro="Sega - SG-1000" retroachievements="33" esde="sg-1000" launchbox="Sega SG-1000" hyperspin="Sega SG-1000"/>
+  </platform>
+  <platform id="stv">
+    <name>Sega ST-V</name>
+    <sortname>Sega ST-V</sortname>
+    <manufacturer>Sega</manufacturer>
+    <type>arcade</type>
+    <media>cartridge</media>
+    <released>1994</released>
+    <discontinued>2001</discontinued>
+    <family>arcade</family>
+    <extensions>7z chd zip</extensions>
+    <alias>ST-V</alias>
+    <alias>stv</alias>
+    <alias>Sega Titan Video Game System</alias>
+    <ids screenscraper="69" esde="stv" launchbox="Sega ST-V" hyperspin="Sega ST-V"/>
+  </platform>
+  <platform id="x1">
+    <name>Sharp X1</name>
+    <sortname>Sharp X1</sortname>
+    <manufacturer>Sharp</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1982</released>
+    <discontinued>1988</discontinued>
+    <extensions>2d 2hd 7z 88d cmd d88 dup dx1 hdm tap tfd xdf zip</extensions>
+    <alias>X1</alias>
+    <alias>Sharp - X1</alias>
+    <ids screenscraper="220" libretro="Sharp - X1" retroachievements="64" esde="x1" launchbox="Sharp X1" hyperspin="Sharp X1"/>
+  </platform>
+  <platform id="x68000">
+    <name>Sharp X68000</name>
+    <sortname>Sharp X68000</sortname>
+    <manufacturer>Sharp</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1987</released>
+    <extensions>2hd 7z 88d cmd d88 dim dup hdf hdm img m3u xdf zip</extensions>
+    <alias>X68000</alias>
+    <alias>Sharp X68k</alias>
+    <alias>X68k</alias>
+    <alias>Sharp - X68000</alias>
+    <ids screenscraper="79" libretro="Sharp - X68000" retroachievements="52" esde="x68000" launchbox="Sharp X68000" hyperspin="Sharp X68000"/>
+  </platform>
+  <platform id="zxspectrum">
+    <name>Sinclair ZX Spectrum</name>
+    <sortname>Sinclair ZX Spectrum</sortname>
+    <manufacturer>Sinclair</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1982</released>
+    <extensions>7z csw dsk fdi gz img ipf mgt rom rzx scl slt sna sp szx tap trd tzx udi z80 zip</extensions>
+    <alias>ZX Spectrum</alias>
+    <alias>Sinclair ZX-Spectrum</alias>
+    <alias>ZX-Spectrum</alias>
+    <alias>zxspectrum</alias>
+    <alias>Sinclair - ZX Spectrum</alias>
+    <alias>Sinclair - ZX Spectrum +3</alias>
+    <alias>spectrum</alias>
+    <ids screenscraper="76" libretro="Sinclair - ZX Spectrum" retroachievements="59" esde="zxspectrum" launchbox="Sinclair ZX Spectrum" hyperspin="Sinclair ZX Spectrum"/>
+  </platform>
+  <platform id="zx81">
+    <name>Sinclair ZX81</name>
+    <sortname>Sinclair ZX81</sortname>
+    <manufacturer>Sinclair</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1981</released>
+    <extensions>7z c p tzx zip</extensions>
+    <alias>ZX81</alias>
+    <alias>Sinclair ZX-81</alias>
+    <alias>ZX-81</alias>
+    <alias>Sinclair - ZX 81</alias>
+    <ids screenscraper="77" libretro="Sinclair - ZX 81" retroachievements="31" esde="zx81" launchbox="Sinclair ZX-81" hyperspin="Sinclair ZX81"/>
+  </platform>
+  <platform id="neogeo">
+    <name>SNK Neo Geo</name>
+    <sortname>SNK Neo Geo</sortname>
+    <manufacturer>SNK</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1990</released>
+    <discontinued>2004</discontinued>
+    <extensions>7z chd neo zip</extensions>
+    <alias>Neo-Geo</alias>
+    <alias>SNK Neo-Geo</alias>
+    <alias>SNK Neo-Geo AES</alias>
+    <alias>Neo-Geo AES</alias>
+    <alias>SNK Neo-Geo MVS</alias>
+    <alias>Neo-Geo MVS</alias>
+    <alias>neogeo</alias>
+    <alias>SNK - Neo Geo</alias>
+    <alias>Neo Geo</alias>
+    <ids screenscraper="142" libretro="SNK - Neo Geo" esde="neogeo" launchbox="SNK Neo Geo" hyperspin="SNK Neo Geo"/>
+  </platform>
+  <platform id="neogeocd">
+    <name>SNK Neo Geo CD</name>
+    <sortname>SNK Neo Geo CD</sortname>
+    <manufacturer>SNK</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1994</released>
+    <extensions>bin ccd chd cue img iso</extensions>
+    <alias>Neo-Geo CD</alias>
+    <alias>SNK Neo-geo CD-Rom</alias>
+    <alias>Neo-geo CD-Rom</alias>
+    <alias>SNK Neo-geo CD</alias>
+    <alias>neogeocd</alias>
+    <alias>neogeocdjp</alias>
+    <alias>SNK - Neo Geo CD</alias>
+    <alias>Neo Geo CD</alias>
+    <ids screenscraper="70" libretro="SNK - Neo Geo CD" retroachievements="56" esde="neogeocd" launchbox="SNK Neo Geo CD" hyperspin="SNK Neo Geo CD"/>
+  </platform>
+  <platform id="ngp">
+    <name>SNK Neo Geo Pocket</name>
+    <sortname>SNK Neo Geo Pocket</sortname>
+    <manufacturer>SNK</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1998</released>
+    <discontinued>2001</discontinued>
+    <extensions>7z bin ngc ngp ngpc npc zip</extensions>
+    <alias>Neo-Geo Pocket</alias>
+    <alias>SNK Neo-Geo Pocket</alias>
+    <alias>SNK NGP</alias>
+    <alias>GP</alias>
+    <alias>ngp</alias>
+    <alias>SNK - Neo Geo Pocket</alias>
+    <alias>Neo Geo Pocket</alias>
+    <ids screenscraper="25" libretro="SNK - Neo Geo Pocket" retroachievements="14" esde="ngp" launchbox="SNK Neo Geo Pocket" hyperspin="SNK Neo Geo Pocket"/>
+  </platform>
+  <platform id="ngpc">
+    <name>SNK Neo Geo Pocket Color</name>
+    <sortname>SNK Neo Geo Pocket Color</sortname>
+    <manufacturer>SNK</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1999</released>
+    <discontinued>2000</discontinued>
+    <extensions>7z bin ngc ngp ngpc npc zip</extensions>
+    <alias>Neo-Geo Pocket Color</alias>
+    <alias>SNK Neo-geo Pocket Color</alias>
+    <alias>SNK Neo-geo PC</alias>
+    <alias>Neo-geo PC</alias>
+    <alias>SNK NGPC</alias>
+    <alias>NGPC</alias>
+    <alias>SNK - Neo Geo Pocket Color</alias>
+    <ids screenscraper="82" libretro="SNK - Neo Geo Pocket Color" esde="ngpc" launchbox="SNK Neo Geo Pocket Color" hyperspin="SNK Neo Geo Pocket Color"/>
+  </platform>
+  <platform id="solarus">
+    <name>Solarus</name>
+    <sortname>Solarus</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <released>2006</released>
+    <extensions>solarus</extensions>
+    <alias>Solarus Game Engine</alias>
+    <ids screenscraper="223" esde="solarus"/>
+  </platform>
+  <platform id="psx">
+    <name>Sony PlayStation</name>
+    <sortname>Sony PlayStation</sortname>
+    <manufacturer>Sony</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>1994</released>
+    <discontinued>2006</discontinued>
+    <extensions>7z bin cbn ccd chd cue ecm exe img iso m3u mdf mds minipsf pbp psexe psf toc z zip znx</extensions>
+    <alias>Playstation</alias>
+    <alias>Sony PSX</alias>
+    <alias>PSX</alias>
+    <alias>Sony PS One</alias>
+    <alias>PS One</alias>
+    <alias>Sony - PlayStation</alias>
+    <ids screenscraper="57" libretro="Sony - PlayStation" retroachievements="12" esde="psx" launchbox="Sony Playstation" hyperspin="Sony PlayStation"/>
+  </platform>
+  <platform id="ps2">
+    <name>Sony PlayStation 2</name>
+    <sortname>Sony PlayStation 2</sortname>
+    <manufacturer>Sony</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2000</released>
+    <discontinued>2013</discontinued>
+    <extensions>bin chd ciso cso cue dump elf gz img iso isz m3u mdf ngr nrg zso</extensions>
+    <alias>Playstation 2</alias>
+    <alias>Sony PS2</alias>
+    <alias>PS2</alias>
+    <alias>Sony Playstation II</alias>
+    <alias>Playstation II</alias>
+    <alias>Sony - PlayStation 2</alias>
+    <ids screenscraper="58" libretro="Sony - PlayStation 2" retroachievements="21" esde="ps2" launchbox="Sony Playstation 2" hyperspin="Sony PlayStation 2"/>
+  </platform>
+  <platform id="ps3">
+    <name>Sony PlayStation 3</name>
+    <sortname>Sony PlayStation 3</sortname>
+    <manufacturer>Sony</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2006</released>
+    <discontinued>2017</discontinued>
+    <extensions>iso ps3 ps3dir</extensions>
+    <alias>Playstation 3</alias>
+    <alias>Sony PS3</alias>
+    <alias>PS3</alias>
+    <alias>Sony Playstation III</alias>
+    <alias>Playstation III</alias>
+    <alias>Sony - PlayStation 3</alias>
+    <alias>Sony - PlayStation 3 (PSN)</alias>
+    <ids screenscraper="59" libretro="Sony - PlayStation 3" retroachievements="82" esde="ps3" launchbox="Sony Playstation 3"/>
+  </platform>
+  <platform id="ps4">
+    <name>Sony PlayStation 4</name>
+    <sortname>Sony PlayStation 4</sortname>
+    <manufacturer>Sony</manufacturer>
+    <type>console</type>
+    <media>disc</media>
+    <released>2013</released>
+    <discontinued>2026</discontinued>
+    <extensions>bin iso ps4</extensions>
+    <alias>Playstation 4</alias>
+    <alias>Sony PS4</alias>
+    <alias>PS4</alias>
+    <alias>Sony Playstation IV</alias>
+    <alias>Playstation IV</alias>
+    <ids screenscraper="60" esde="ps4" launchbox="Sony Playstation 4"/>
+  </platform>
+  <platform id="psp">
+    <name>Sony PlayStation Portable</name>
+    <sortname>Sony PlayStation Portable</sortname>
+    <manufacturer>Sony</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2004</released>
+    <discontinued>2014</discontinued>
+    <extensions>7z bin chd cso cue elf img iso pbp prx zip</extensions>
+    <alias>PSP</alias>
+    <alias>Sony PSP</alias>
+    <alias>Playstation Portable</alias>
+    <alias>Sony PS Portable</alias>
+    <alias>PS Portable</alias>
+    <alias>Sony - PlayStation Portable</alias>
+    <alias>Sony - PlayStation Portable (PSN)</alias>
+    <ids screenscraper="61" libretro="Sony - PlayStation Portable" retroachievements="41" esde="psp" launchbox="Sony PSP" hyperspin="Sony PSP"/>
+  </platform>
+  <platform id="psvita">
+    <name>Sony PlayStation Vita</name>
+    <sortname>Sony PlayStation Vita</sortname>
+    <manufacturer>Sony</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>2011</released>
+    <discontinued>2019</discontinued>
+    <extensions>iso psvita vpk</extensions>
+    <alias>PS Vita</alias>
+    <alias>Playstation Vita</alias>
+    <alias>Sony PS Vita</alias>
+    <alias>Sony Vita</alias>
+    <alias>Vita</alias>
+    <alias>psvita</alias>
+    <alias>Sony - PlayStation Vita</alias>
+    <ids screenscraper="62" libretro="Sony - PlayStation Vita" esde="psvita" launchbox="Sony Playstation Vita"/>
+  </platform>
+  <platform id="spectravideo">
+    <name>Spectravideo</name>
+    <sortname>Spectravideo</sortname>
+    <manufacturer>Spectravideo</manufacturer>
+    <type>computer</type>
+    <media>cartridge</media>
+    <released>1981</released>
+    <discontinued>1988</discontinued>
+    <extensions>7z bin cas col dsk m3u mx1 mx2 ri rom sc sg zip</extensions>
+    <alias>Spectravideo - SVI-318 - SVI-328</alias>
+    <ids screenscraper="218" libretro="Spectravideo - SVI-318 - SVI-328" esde="spectravideo" launchbox="Spectravideo"/>
+  </platform>
+  <platform id="snes">
+    <name>Super Nintendo Entertainment System</name>
+    <sortname>Super Nintendo Entertainment System</sortname>
+    <manufacturer>Nintendo</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1990</released>
+    <discontinued>2003</discontinued>
+    <extensions>7z bin bml bs bsx dx2 fig gd3 gd7 mgd sfc smc st swc zip</extensions>
+    <alias>Super Nintendo</alias>
+    <alias>SNES</alias>
+    <alias>Super Famicom</alias>
+    <alias>Nintendo super Famicom</alias>
+    <alias>Nintendo SNES (Super Nintendo)</alias>
+    <alias>snesna</alias>
+    <alias>sfc</alias>
+    <alias>Nintendo SFC (Super Famicom)</alias>
+    <alias>Nintendo - Super Nintendo Entertainment System</alias>
+    <ids screenscraper="4" libretro="Nintendo - Super Nintendo Entertainment System" retroachievements="3" esde="snes" launchbox="Super Nintendo Entertainment System" hyperspin="Nintendo Super Famicom"/>
+  </platform>
+  <platform id="type-x">
+    <name>Taito Type X</name>
+    <sortname>Taito Type X</sortname>
+    <manufacturer>Taito</manufacturer>
+    <type>arcade</type>
+    <media>other</media>
+    <released>2004</released>
+    <family>arcade</family>
+    <extensions>chd exe</extensions>
+    <alias>Type X</alias>
+    <alias>Taito Type X+</alias>
+    <alias>Taito Type X7</alias>
+    <alias>Taito Type-X²</alias>
+    <alias>Taito Type X² Satellite Terminal</alias>
+    <alias>Taito Type XZero</alias>
+    <alias>Taito Type X³</alias>
+    <alias>type-x</alias>
+    <ids screenscraper="112" esde="type-x" launchbox="Taito Type X" hyperspin="Taito Type X"/>
+  </platform>
+  <platform id="coco">
+    <name>Tandy TRS-80 Color Computer</name>
+    <sortname>Tandy TRS-80 Color Computer</sortname>
+    <manufacturer>Tandy</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1980</released>
+    <discontinued>1991</discontinued>
+    <extensions>asc bas cas ccc dmk dsk jvc os9 rom sna vdk wav</extensions>
+    <alias>TRS-80 Color Computer</alias>
+    <alias>Tandy TRS-80</alias>
+    <alias>Tandy TRS-80 CoCo</alias>
+    <alias>TRS-80 CoCo</alias>
+    <alias>CoCo</alias>
+    <alias>trs80coco</alias>
+    <alias>Tandy Color Computer</alias>
+    <ids screenscraper="144" esde="coco" launchbox="TRS-80 Color Computer" hyperspin="Tandy TRS-80 Color Computer"/>
+  </platform>
+  <platform id="oric">
+    <name>Tangerine Oric</name>
+    <sortname>Tangerine Oric</sortname>
+    <manufacturer>Tangerine</manufacturer>
+    <type>computer</type>
+    <media>disk</media>
+    <released>1982</released>
+    <discontinued>1988</discontinued>
+    <extensions>bas bin dsk ort tap wav</extensions>
+    <alias>Oric 1 / Atmos</alias>
+    <alias>Tangerince Oric Atmos</alias>
+    <alias>Tangerine Oric-1</alias>
+    <alias>Tangerine Oric-I</alias>
+    <alias>Oric Atmos</alias>
+    <alias>Oric-1</alias>
+    <alias>Oric-I</alias>
+    <alias>Eurêka Oric Atmos</alias>
+    <alias>Eurêka Oric Telestrat</alias>
+    <alias>Eurêka Oric Nova 64</alias>
+    <alias>Eurêka Oric Adresstal</alias>
+    <alias>Eurêka Telestrat</alias>
+    <alias>Eurêka Nova 64</alias>
+    <alias>Eurêka Adresstal</alias>
+    <alias>oric</alias>
+    <alias>Tangerine Computer Systems Oric</alias>
+    <ids screenscraper="131" retroachievements="32" esde="oric" launchbox="Oric Atmos" hyperspin="Tangerine Oric"/>
+  </platform>
+  <platform id="ti99">
+    <name>Texas Instruments TI-99/4A</name>
+    <sortname>Texas Instruments TI-99/4A</sortname>
+    <manufacturer>Texas Instruments</manufacturer>
+    <type>computer</type>
+    <media>cartridge</media>
+    <released>1981</released>
+    <discontinued>1983</discontinued>
+    <extensions>7z bin c ctg dsk g rpk zip</extensions>
+    <alias>TI-99/4A</alias>
+    <alias>Texas Instruments TI 99/4A</alias>
+    <alias>TI-99</alias>
+    <alias>ti994a</alias>
+    <alias>ti99</alias>
+    <alias>Texas Instruments TI-99</alias>
+    <ids screenscraper="205" esde="ti99" launchbox="Texas Instruments TI 99/4A"/>
+  </platform>
+  <platform id="moto">
+    <name>Thomson MO/TO</name>
+    <sortname>Thomson MO/TO</sortname>
+    <manufacturer>Thomson</manufacturer>
+    <type>computer</type>
+    <media>tape</media>
+    <released>1982</released>
+    <discontinued>1986</discontinued>
+    <extensions>7z fd k7 m5 m7 qd rom sap wav zip</extensions>
+    <alias>Thomson TO7</alias>
+    <alias>Thomson TO7-70</alias>
+    <alias>Thomson TO8</alias>
+    <alias>Thomson TO8D</alias>
+    <alias>Thomson TO9</alias>
+    <alias>Thomson TO9+</alias>
+    <alias>TO7</alias>
+    <alias>TO7-70</alias>
+    <alias>TO8</alias>
+    <alias>TO8D</alias>
+    <alias>TO9</alias>
+    <alias>TO9+</alias>
+    <alias>Thomson TO9 Plus</alias>
+    <alias>TO9 Plus</alias>
+    <alias>Thomson TO</alias>
+    <alias>Thomson MO5</alias>
+    <alias>Thomson MO5E</alias>
+    <alias>Thomson MO5NR</alias>
+    <alias>Thomson MO6</alias>
+    <alias>Olivetti Prodest PC128</alias>
+    <alias>MO5</alias>
+    <alias>MO5E</alias>
+    <alias>MO5NR</alias>
+    <alias>MO6</alias>
+    <alias>Thomson MO</alias>
+    <alias>moto</alias>
+    <alias>Thomson MO/TO Series</alias>
+    <alias>Thomson - MOTO</alias>
+    <ids screenscraper="141" libretro="Thomson - MOTO" retroachievements="66" esde="moto" launchbox="Thomson TO7"/>
+  </platform>
+  <platform id="tic80">
+    <name>TIC-80</name>
+    <sortname>TIC-80</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <released>2017</released>
+    <extensions>png tic</extensions>
+    <alias>tic80</alias>
+    <alias>TIC-80 Fantasy Computer</alias>
+    <ids screenscraper="222" libretro="TIC-80" retroachievements="65" esde="tic80"/>
+  </platform>
+  <platform id="gamecom">
+    <name>Tiger Game.com</name>
+    <sortname>Tiger Game.com</sortname>
+    <manufacturer>Tiger</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1997</released>
+    <discontinued>2000</discontinued>
+    <extensions>7z bin tgc zip</extensions>
+    <alias>Game.com</alias>
+    <alias>gamecom</alias>
+    <alias>Tiger Electronics Game.com</alias>
+    <alias>Tiger - Game.com</alias>
+    <ids screenscraper="121" libretro="Tiger - Game.com" esde="gamecom" hyperspin="Tiger Game.com"/>
+  </platform>
+  <platform id="uzebox">
+    <name>Uzebox</name>
+    <sortname>Uzebox</sortname>
+    <manufacturer>Belogic</manufacturer>
+    <type>console</type>
+    <media>other</media>
+    <released>2008</released>
+    <extensions>7z uze zip</extensions>
+    <alias>Uzebox Open Source Console</alias>
+    <ids screenscraper="216" libretro="Uzebox" retroachievements="80" esde="uzebox" launchbox="Uzebox" hyperspin="Uzebox"/>
+  </platform>
+  <platform id="vircon32">
+    <name>Vircon32</name>
+    <sortname>Vircon32</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>cartridge</media>
+    <released>2023</released>
+    <extensions>7z v32 zip</extensions>
+    <alias>Vircon32 Virtual Console</alias>
+    <ids screenscraper="272" libretro="Vircon32" esde="vircon32"/>
+  </platform>
+  <platform id="vpinball">
+    <name>Visual Pinball</name>
+    <sortname>Visual Pinball</sortname>
+    <manufacturer></manufacturer>
+    <type>pinball</type>
+    <media>other</media>
+    <extensions>vpt vpx</extensions>
+    <alias>vpinball</alias>
+    <ids screenscraper="198" esde="vpinball" hyperspin="Visual Pinball"/>
+  </platform>
+  <platform id="crvision">
+    <name>VTech CreatiVision</name>
+    <sortname>VTech CreatiVision</sortname>
+    <manufacturer>VTech</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>1981</released>
+    <discontinued>1986</discontinued>
+    <extensions>7z bin rom zip</extensions>
+    <alias>CreatiVision</alias>
+    <alias>crvision</alias>
+    <alias>VTech - CreatiVision</alias>
+    <ids screenscraper="241" libretro="VTech - CreatiVision" esde="crvision"/>
+  </platform>
+  <platform id="vsmile">
+    <name>VTech V.Smile</name>
+    <sortname>VTech V.Smile</sortname>
+    <manufacturer>VTech</manufacturer>
+    <type>console</type>
+    <media>cartridge</media>
+    <released>2004</released>
+    <discontinued>2010</discontinued>
+    <extensions>7z bin zip</extensions>
+    <alias>V.Smile</alias>
+    <alias>vsmile</alias>
+    <alias>VTech - V.Smile</alias>
+    <ids screenscraper="120" libretro="VTech - V.Smile" esde="vsmile"/>
+  </platform>
+  <platform id="wasm4">
+    <name>WASM-4</name>
+    <sortname>WASM-4</sortname>
+    <manufacturer></manufacturer>
+    <type>virtual</type>
+    <media>download</media>
+    <released>2021</released>
+    <extensions>7z wasm zip</extensions>
+    <alias>wasm</alias>
+    <alias>wasm4</alias>
+    <alias>WASM-4 Fantasy Console</alias>
+    <ids screenscraper="262" libretro="WASM-4" retroachievements="72" esde="wasm4"/>
+  </platform>
+  <platform id="supervision">
+    <name>Watara Supervision</name>
+    <sortname>Watara Supervision</sortname>
+    <manufacturer>Watara</manufacturer>
+    <type>handheld</type>
+    <media>cartridge</media>
+    <released>1992</released>
+    <extensions>7z bin sv zip</extensions>
+    <alias>supervision</alias>
+    <alias>Watara - Supervision</alias>
+    <alias>NEC - Supervision</alias>
+    <ids screenscraper="207" libretro="Watara - Supervision" retroachievements="63" esde="supervision" launchbox="Watara Supervision"/>
+  </platform>
+</platforms>

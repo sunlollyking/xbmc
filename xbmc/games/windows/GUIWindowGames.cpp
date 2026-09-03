@@ -20,7 +20,11 @@
 #include "dialogs/GUIDialogMediaSource.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "filesystem/FileDirectoryFactory.h"
+#include "filesystem/GameDatabaseDirectory.h"
 #include "games/GameUtils.h"
+#include "games/database/GameDatabase.h"
+#include "games/dialogs/GUIDialogGameContentSettings.h"
+#include "games/library/GameLibraryQueue.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
@@ -62,8 +66,24 @@ bool CGUIWindowGames::OnMessage(CGUIMessage& message)
       m_rootDir.AllowNonLocalSources(true); //! @todo
 
       // Is this the first time the window is opened?
-      if (m_vecItems->GetPath() == "?" && message.GetStringParam().empty())
-        message.SetStringParam(CMediaSourceSettings::GetInstance().GetDefaultSource("games"));
+      const std::string& destination = message.GetStringParam();
+      if (StringUtils::EqualsNoCase(destination, "files"))
+      {
+        message.SetStringParam("sources://games/");
+      }
+      else if (StringUtils::EqualsNoCase(destination, "library"))
+      {
+        message.SetStringParam("gamedb://platforms/");
+      }
+      else if (m_vecItems->GetPath() == "?" && destination.empty())
+      {
+        // The library, once it has anything in it; the files otherwise
+        CGameDatabase db;
+        if (db.Open() && db.HasContent())
+          message.SetStringParam("gamedb://platforms/");
+        else
+          message.SetStringParam(CMediaSourceSettings::GetInstance().GetDefaultSource("games"));
+      }
 
       //! @todo
       m_dlgProgress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(
@@ -184,10 +204,20 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
 
       // Offered on folders as well as games: setting one on a folder is the
       // point, and a game only overrides the folder it sits in
-      if (item->IsFolder() || CanPlay(*item))
+      // A game may override the emulator and video filter its folder chose
+      if (!item->IsFolder() && CanPlay(*item))
       {
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_EMULATOR, 35510); // "Default emulator"
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35326); // "Default video filter"
+      }
+
+      // A folder of games is given its platform, scraper, emulator and filter in one place
+      if (item->IsFolder() && !m_vecItems->IsPlugin() && !URIUtils::IsProtocol(item->GetPath(), "gamedb"))
+      {
+        buttons.Add(CONTEXT_BUTTON_SET_CONTENT, 20333); // "Set content"
+        CGameDatabase db;
+        if (db.Open() && db.GetPlatformIdForPath(item->GetPath()) > 0)
+          buttons.Add(CONTEXT_BUTTON_SCAN, 35540); // "Scan to library"
       }
 
       if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
@@ -226,6 +256,16 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         return true;
       case CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER:
         CGameUtils::ChooseAndSetDefaultVideoFilter(*item);
+        return true;
+      case CONTEXT_BUTTON_SET_CONTENT:
+      {
+        bool scanNow = false;
+        if (CGUIDialogGameContentSettings::Show(item->GetPath(), scanNow) && scanNow)
+          CGameLibraryQueue::GetInstance().ScanLibrary(item->GetPath());
+        return true;
+      }
+      case CONTEXT_BUTTON_SCAN:
+        CGameLibraryQueue::GetInstance().ScanLibrary(item->GetPath());
         return true;
       case CONTEXT_BUTTON_INFO:
         CGUIDialogAddonInfo::ShowForItem(item);
@@ -324,10 +364,17 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
   std::string label;
   if (items.GetLabel().empty())
   {
-    std::string source;
-    if (m_rootDir.IsSource(items.GetPath(), CMediaSourceSettings::GetInstance().GetSources("games"),
-                           &source))
-      label = std::move(source);
+    if (URIUtils::IsProtocol(items.GetPath(), "gamedb"))
+    {
+      label = XFILE::CGameDatabaseDirectory::GetLabel(items.GetPath());
+    }
+    else
+    {
+      std::string source;
+      if (m_rootDir.IsSource(items.GetPath(),
+                             CMediaSourceSettings::GetInstance().GetSources("games"), &source))
+        label = std::move(source);
+    }
   }
 
   if (!label.empty())

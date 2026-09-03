@@ -7911,7 +7911,7 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///
 /// -----------------------------------------------------------------------------
 // clang-format off
-constexpr std::array<InfoMap, 232> listitem_labels = {{
+constexpr std::array<InfoMap, 242> listitem_labels = {{
     {"thumb",                         LISTITEM_THUMB},
     {"icon",                          LISTITEM_ICON},
     {"actualicon",                    LISTITEM_ACTUAL_ICON},
@@ -8022,6 +8022,16 @@ constexpr std::array<InfoMap, 232> listitem_labels = {{
     {"trailer",                       LISTITEM_TRAILER},
     {"sortletter",                    LISTITEM_SORT_LETTER},
     {"tag",                           LISTITEM_TAG},
+    {"platform",                      LISTITEM_PLATFORM},
+    {"developer",                     LISTITEM_DEVELOPER},
+    {"publisher",                     LISTITEM_PUBLISHER},
+    {"players",                       LISTITEM_PLAYERS},
+    {"region",                        LISTITEM_REGION},
+    {"releasecount",                  LISTITEM_RELEASE_COUNT},
+    {"achievementstotal",             LISTITEM_ACHIEVEMENTS_TOTAL},
+    {"achievementsearned",            LISTITEM_ACHIEVEMENTS_EARNED},
+    {"gamecategory",                  LISTITEM_GAME_CATEGORY},
+    {"gameclient",                    LISTITEM_GAME_CLIENT},
     {"set",                           LISTITEM_SET},
     {"setid",                         LISTITEM_SETID},
     {"videocodec",                    LISTITEM_VIDEO_CODEC},
@@ -11377,6 +11387,8 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
         return LIBRARY_IS_SCANNING_VIDEO; //! @todo change to IsScanning(Video)
       else if (prop.Name() == "isscanningmusic")
         return LIBRARY_IS_SCANNING_MUSIC;
+      else if (prop.Name() == "isscanninggames")
+        return LIBRARY_IS_SCANNING_GAMES;
       else if (prop.Name() == "hascontent" && prop.num_params())
       {
         std::string content{prop.param(0)};
@@ -11391,6 +11403,8 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
           return LIBRARY_HAS_TVSHOWS;
         else if (content == "musicvideos")
           return LIBRARY_HAS_MUSICVIDEOS;
+        else if (content == "games")
+          return LIBRARY_HAS_GAMES;
         else if (content == "moviesets")
           return LIBRARY_HAS_MOVIE_SETS;
         else if (content == "singles")

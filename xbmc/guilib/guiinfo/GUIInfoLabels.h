@@ -536,7 +536,9 @@ constexpr uint32_t LIBRARY_HAS_COMPILATIONS          = 727;
 constexpr uint32_t LIBRARY_IS_SCANNING               = 728;
 constexpr uint32_t LIBRARY_IS_SCANNING_VIDEO         = 729;
 constexpr uint32_t LIBRARY_IS_SCANNING_MUSIC         = 730;
-// unused id 731 to 734
+constexpr uint32_t LIBRARY_HAS_GAMES                 = 731;
+constexpr uint32_t LIBRARY_IS_SCANNING_GAMES         = 732;
+// unused id 733 to 734
 constexpr uint32_t LIBRARY_HAS_ROLE                  = 735;
 constexpr uint32_t LIBRARY_HAS_BOXSETS               = 736;
 constexpr uint32_t LIBRARY_HAS_NODE                  = 737;
@@ -1078,6 +1080,16 @@ constexpr uint32_t LISTITEM_FIRST_AUDIO_LANGUAGE   = LISTITEM_START + 228;
 constexpr uint32_t LISTITEM_FIRST_SUBTITLE_LANGUAGE = LISTITEM_START + 229;
 constexpr uint32_t LISTITEM_FIRST_AUDIO_CODEC      = LISTITEM_START + 230;
 constexpr uint32_t LISTITEM_FIRST_AUDIO_CHANNELS   = LISTITEM_START + 231;
+constexpr uint32_t LISTITEM_PLATFORM                 = LISTITEM_START + 232;
+constexpr uint32_t LISTITEM_DEVELOPER                = LISTITEM_START + 233;
+constexpr uint32_t LISTITEM_PUBLISHER                = LISTITEM_START + 234;
+constexpr uint32_t LISTITEM_PLAYERS                  = LISTITEM_START + 235;
+constexpr uint32_t LISTITEM_REGION                   = LISTITEM_START + 236;
+constexpr uint32_t LISTITEM_RELEASE_COUNT            = LISTITEM_START + 237;
+constexpr uint32_t LISTITEM_ACHIEVEMENTS_TOTAL       = LISTITEM_START + 238;
+constexpr uint32_t LISTITEM_ACHIEVEMENTS_EARNED      = LISTITEM_START + 239;
+constexpr uint32_t LISTITEM_GAME_CATEGORY            = LISTITEM_START + 240;
+constexpr uint32_t LISTITEM_GAME_CLIENT              = LISTITEM_START + 241;
 
 constexpr int      LISTITEM_END                      = LISTITEM_START + 2500;
 

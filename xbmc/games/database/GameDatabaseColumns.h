@@ -1,0 +1,90 @@
+/*
+ *  Copyright (C) 2026 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
+ *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
+ */
+
+#pragma once
+
+namespace KODI
+{
+namespace GAME
+{
+/*!
+ * \ingroup games
+ *
+ * \brief The columns of game_view, in the order the view returns them
+ *
+ * The view is "game.*" followed by what it joins in, so the first block is
+ * the game table's own column order. A column added to the game table goes
+ * on the end of that table and is inserted here before GAMEDB_VIEW_FIRST;
+ * the view's own columns follow it and shift accordingly, which is safe
+ * because the view is recreated on every schema upgrade.
+ */
+enum GameDbViewColumn
+{
+  GAMEDB_ID = 0,
+  GAMEDB_PLATFORM_ID,
+  GAMEDB_TITLE,
+  GAMEDB_SORT_TITLE,
+  GAMEDB_TITLE_KEY,
+  GAMEDB_ORIGINAL_TITLE,
+  GAMEDB_OVERVIEW,
+  GAMEDB_RELEASE_DATE,
+  GAMEDB_YEAR,
+  GAMEDB_PLAYERS_MIN,
+  GAMEDB_PLAYERS_MAX,
+  GAMEDB_COOP,
+  GAMEDB_CATEGORY,
+  GAMEDB_PARENT_GAME_ID,
+  GAMEDB_DEFAULT_RELEASE_ID,
+  GAMEDB_DEFAULT_RATING_ID,
+  GAMEDB_DEFAULT_UNIQUEID_ID,
+  GAMEDB_USER_RATING,
+  GAMEDB_FAVOURITE,
+  GAMEDB_COMPLETED,
+  GAMEDB_HIDDEN,
+  GAMEDB_ACHIEVEMENTS_TOTAL,
+  GAMEDB_ACHIEVEMENTS_EARNED,
+  GAMEDB_ACHIEVEMENTS_HARDCORE,
+  GAMEDB_LAST_UNLOCK,
+  GAMEDB_MATCHED_BY,
+  GAMEDB_TRAILER,
+  GAMEDB_MANUAL,
+  GAMEDB_LAST_SCRAPED,
+  GAMEDB_DATE_ADDED,
+  GAMEDB_GENRES,
+  GAMEDB_DEVELOPERS,
+  GAMEDB_PUBLISHERS,
+  GAMEDB_COLLECTIONS,
+
+  GAMEDB_VIEW_FIRST,
+  GAMEDB_PLATFORM_SLUG = GAMEDB_VIEW_FIRST,
+  GAMEDB_PLATFORM_NAME,
+  GAMEDB_PLATFORM_SORT_NAME,
+  GAMEDB_RELEASE_TITLE,
+  GAMEDB_RELEASE_REGIONS,
+  GAMEDB_RELEASE_LANGUAGES,
+  GAMEDB_RELEASE_REVISION,
+  GAMEDB_RELEASE_STATUS,
+  GAMEDB_RELEASE_LICENCE,
+  GAMEDB_RELEASE_SERIAL,
+  GAMEDB_RATING_TYPE,
+  GAMEDB_RATING,
+  GAMEDB_RATING_MAX,
+  GAMEDB_VOTES,
+  GAMEDB_UNIQUEID_TYPE,
+  GAMEDB_UNIQUEID_VALUE,
+  GAMEDB_RELEASE_COUNT,
+  GAMEDB_PLAY_COUNT,
+  GAMEDB_LAST_PLAYED,
+  GAMEDB_FILE_ID,
+  GAMEDB_FILENAME,
+  GAMEDB_PATH,
+
+  GAMEDB_VIEW_COLUMN_COUNT,
+};
+} // namespace GAME
+} // namespace KODI

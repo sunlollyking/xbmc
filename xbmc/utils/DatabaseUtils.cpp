@@ -9,6 +9,7 @@
 #include "DatabaseUtils.h"
 
 #include "dbwrappers/dataset.h"
+#include "games/database/GameDatabaseColumns.h"
 #include "music/MusicDatabase.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
@@ -241,6 +242,46 @@ std::string DatabaseUtils::GetField(Field field, const MediaType &mediaType, Dat
     if (!result.empty())
       return result;
   }
+  else if (mediaType == MediaTypeGame)
+  {
+    if (field == Field::ID)
+      return "game_view.idGame";
+    else if (field == Field::TITLE)
+    {
+      if (queryPart == DatabaseQueryPart::ORDER_BY)
+        return "CASE WHEN length(game_view.sortTitle) > 0 THEN game_view.sortTitle ELSE "
+               "game_view.title END";
+      return "game_view.title";
+    }
+    else if (field == Field::SORT_TITLE)
+      return "game_view.sortTitle";
+    else if (field == Field::ORIGINAL_TITLE)
+      return "game_view.originalTitle";
+    else if (field == Field::PLOT)
+      return "game_view.overview";
+    else if (field == Field::YEAR)
+      return "game_view.year";
+    else if (field == Field::RATING)
+      return "game_view.rating";
+    else if (field == Field::VOTES)
+      return "game_view.votes";
+    else if (field == Field::USER_RATING)
+      return "game_view.userRating";
+    else if (field == Field::PLAYCOUNT)
+      return "game_view.playCount";
+    else if (field == Field::LAST_PLAYED)
+      return "game_view.lastPlayed";
+    else if (field == Field::DATE_ADDED)
+      return "game_view.dateAdded";
+    else if (field == Field::STUDIO)
+      return "game_view.platformName";
+    else if (field == Field::MPAA)
+      return "game_view.category";
+    else if (field == Field::FILENAME)
+      return "game_view.strFilename";
+    else if (field == Field::PATH)
+      return "game_view.strPath";
+  }
   else if (mediaType == MediaTypeMovie)
   {
     std::string result;
@@ -455,7 +496,8 @@ bool DatabaseUtils::GetSelectFields(const Fields &fields, const MediaType &media
 
   // add necessary fields to create the label
   if (mediaType == MediaTypeSong || mediaType == MediaTypeVideo || mediaType == MediaTypeVideoCollection ||
-      mediaType == MediaTypeMusicVideo || mediaType == MediaTypeMovie || mediaType == MediaTypeTvShow || mediaType == MediaTypeEpisode)
+      mediaType == MediaTypeMusicVideo || mediaType == MediaTypeMovie || mediaType == MediaTypeTvShow || mediaType == MediaTypeEpisode ||
+      mediaType == MediaTypeGame)
     sortFields.insert(Field::TITLE);
   if (mediaType == MediaTypeEpisode)
   {
@@ -873,6 +915,41 @@ int DatabaseUtils::GetField(Field field, const MediaType &mediaType, bool asInde
       // the first field is the item's ID and the second is the item's file ID
       index += 2;
     }
+  }
+  else if (mediaType == MediaTypeGame)
+  {
+    if (field == Field::ID)
+      return KODI::GAME::GAMEDB_ID;
+    else if (field == Field::TITLE)
+      return KODI::GAME::GAMEDB_TITLE;
+    else if (field == Field::SORT_TITLE)
+      return KODI::GAME::GAMEDB_SORT_TITLE;
+    else if (field == Field::ORIGINAL_TITLE)
+      return KODI::GAME::GAMEDB_ORIGINAL_TITLE;
+    else if (field == Field::PLOT)
+      return KODI::GAME::GAMEDB_OVERVIEW;
+    else if (field == Field::YEAR)
+      return KODI::GAME::GAMEDB_YEAR;
+    else if (field == Field::RATING)
+      return KODI::GAME::GAMEDB_RATING;
+    else if (field == Field::VOTES)
+      return KODI::GAME::GAMEDB_VOTES;
+    else if (field == Field::USER_RATING)
+      return KODI::GAME::GAMEDB_USER_RATING;
+    else if (field == Field::PLAYCOUNT)
+      return KODI::GAME::GAMEDB_PLAY_COUNT;
+    else if (field == Field::LAST_PLAYED)
+      return KODI::GAME::GAMEDB_LAST_PLAYED;
+    else if (field == Field::DATE_ADDED)
+      return KODI::GAME::GAMEDB_DATE_ADDED;
+    else if (field == Field::STUDIO)
+      return KODI::GAME::GAMEDB_PLATFORM_NAME;
+    else if (field == Field::MPAA)
+      return KODI::GAME::GAMEDB_CATEGORY;
+    else if (field == Field::FILENAME)
+      return KODI::GAME::GAMEDB_FILENAME;
+    else if (field == Field::PATH)
+      return KODI::GAME::GAMEDB_PATH;
   }
   else if (mediaType == MediaTypeMovie)
   {

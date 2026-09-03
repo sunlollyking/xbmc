@@ -14,6 +14,7 @@
 #include "guilib/WindowIDs.h"
 #include "settings/MediaSourceSettings.h"
 #include "utils/StringUtils.h"
+#include "utils/URIUtils.h"
 #include "view/ViewState.h"
 #include "view/ViewStateSettings.h"
 
@@ -33,6 +34,35 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     SetSortMethod(SortBy::LABEL);
     SetSortOrder(SortOrder::ASCENDING);
     SetViewAsControl(DEFAULT_VIEW_LIST);
+  }
+  else if (URIUtils::IsProtocol(items.GetPath(), "gamedb"))
+  {
+    if (items.GetContent() == "games" || items.GetContent() == "releases")
+    {
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Title, Year
+      AddSortMethod(SortBy::YEAR, 562, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+      AddSortMethod(SortBy::RATING, 563, LABEL_MASKS("%T", "%R", "%T", "%R"));
+      AddSortMethod(SortBy::USER_RATING, 38018, LABEL_MASKS("%T", "%r", "%T", "%r"));
+      AddSortMethod(SortBy::PLAYCOUNT, 567, LABEL_MASKS("%T", "%V", "%T", "%V"));
+      AddSortMethod(SortBy::LAST_PLAYED, 568, LABEL_MASKS("%T", "%p", "%T", "%p"));
+      AddSortMethod(SortBy::DATE_ADDED, 570, LABEL_MASKS("%T", "%a", "%T", "%a"));
+      AddSortMethod(SortBy::STUDIO, 35549, LABEL_MASKS("%T", "%U", "%T", "%U")); // Platform
+      SetSortMethod(SortBy::LABEL);
+    }
+    else
+    {
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%L", "%V", "%L", "%V")); // Label, count
+      SetSortMethod(SortBy::LABEL);
+    }
+    SetSortOrder(SortOrder::ASCENDING);
+
+    const CViewState* viewState = CViewStateSettings::GetInstance().Get("gameslibrary");
+    if (viewState)
+    {
+      SetSortMethod(viewState->m_sortDescription);
+      SetViewAsControl(viewState->m_viewMode);
+      SetSortOrder(viewState->m_sortDescription.sortOrder);
+    }
   }
   else
   {
@@ -84,5 +114,6 @@ std::vector<CMediaSource>& CGUIViewStateWindowGames::GetSources()
 
 void CGUIViewStateWindowGames::SaveViewState()
 {
-  SaveViewToDb(m_items.GetPath(), WINDOW_GAMES, CViewStateSettings::GetInstance().Get("games"));
+  const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb") ? "gameslibrary" : "games";
+  SaveViewToDb(m_items.GetPath(), WINDOW_GAMES, CViewStateSettings::GetInstance().Get(viewState));
 }

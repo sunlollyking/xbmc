@@ -9,6 +9,7 @@
 #include "LabelFormatter.h"
 
 #include "FileItem.h"
+#include "XBDateTime.h"
 #include "RegExp.h"
 #include "ServiceBroker.h"
 #include "StringUtils.h"
@@ -16,6 +17,7 @@
 #include "Util.h"
 #include "Variant.h"
 #include "addons/IAddon.h"
+#include "games/tags/GameInfoTag.h"
 #include "music/tags/MusicInfoTag.h"
 #include "pictures/PictureInfoTag.h"
 #include "resources/LocalizeStrings.h"
@@ -158,6 +160,7 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
   const CMusicInfoTag *music = item->GetMusicInfoTag();
   const CVideoInfoTag *movie = item->GetVideoInfoTag();
   const CPictureInfoTag *pic = item->GetPictureInfoTag();
+  const KODI::GAME::CGameInfoTag* game = item->HasGameInfoTag() ? item->GetGameInfoTag() : nullptr;
   std::string value;
   switch (mask.m_content)
   {
@@ -182,6 +185,8 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       value = music->GetTitle();
     if (movie && !movie->m_strTitle.empty())
       value = movie->m_strTitle;
+    if (game && !game->GetTitle().empty())
+      value = game->GetTitle();
     break;
   case 'Z':
     if (movie && !movie->m_strShowTitle.empty())
@@ -209,6 +214,8 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       else if (movie->HasYear())
         value = std::to_string(movie->GetYear());
     }
+    if (game && game->GetYear() > 0)
+      value = std::to_string(game->GetYear());
     break;
   case 'F': // filename
     value = CUtil::GetTitleFromPath(item->GetPath(), item->IsFolder() && !item->IsFileFolder());
@@ -260,6 +267,8 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       value = StringUtils::Format("{:.1f}", music->GetRating());
     else if (movie && movie->GetRating().rating != 0.f)
       value = StringUtils::Format("{:.1f}", movie->GetRating().rating);
+    else if (game && game->GetRating().rating != 0.f)
+      value = StringUtils::Format("{:.1f}", game->GetRating().rating);
     break;
   case 'C': // programs count
     value = std::to_string(item->GetProgramCount());
@@ -309,12 +318,16 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
     {// Studios
       value = StringUtils::Join(movie ->m_studio, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
     }
+    if (game && !game->GetPlatform().empty())
+      value = game->GetPlatform();
     break;
   case 'V': // Playcount
     if (music)
       value = std::to_string(music->GetPlayCount());
     if (movie)
       value = std::to_string(movie->GetPlayCount());
+    if (game)
+      value = std::to_string(game->GetPlayCount());
     break;
   case 'X': // Bitrate
     if (!item->IsFolder())
@@ -335,6 +348,13 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       value = movie->m_dateAdded.GetAsLocalizedDate();
     if (music && music->GetDateAdded().IsValid())
       value = music->GetDateAdded().GetAsLocalizedDate();
+    if (game && !game->GetDateAdded().empty())
+    {
+      CDateTime added;
+      added.SetFromDBDateTime(game->GetDateAdded());
+      if (added.IsValid())
+        value = added.GetAsLocalizedDate();
+    }
     break;
   case 'b': // Total number of discs
     if (music)
@@ -360,12 +380,21 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       value = movie->m_lastPlayed.GetAsLocalizedDate();
     if (music && music->GetLastPlayed().IsValid())
       value = music->GetLastPlayed().GetAsLocalizedDate();
+    if (game && !game->GetLastPlayed().empty())
+    {
+      CDateTime played;
+      played.SetFromDBDateTime(game->GetLastPlayed());
+      if (played.IsValid())
+        value = played.GetAsLocalizedDate();
+    }
     break;
   case 'r': // userrating
     if (movie && movie->m_iUserRating != 0)
       value = std::to_string(movie->m_iUserRating);
     if (music && music->GetUserrating() != 0)
       value = std::to_string(music->GetUserrating());
+    if (game && game->GetUserRating() != 0)
+      value = std::to_string(game->GetUserRating());
     break;
   case 't': // Date Taken
     if (pic && pic->GetDateTimeTaken().IsValid())

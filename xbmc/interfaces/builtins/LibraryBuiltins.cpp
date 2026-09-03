@@ -29,6 +29,7 @@
 #include "utils/StringUtils.h"
 #include "utils/log.h"
 #include "video/VideoDatabase.h"
+#include "games/library/GameLibraryQueue.h"
 #include "video/VideoLibraryQueue.h"
 
 using namespace KODI::MESSAGING;
@@ -332,6 +333,14 @@ static int UpdateLibrary(const std::vector<std::string>& params)
     else
       CVideoLibraryQueue::GetInstance().ScanLibrary(params.size() > 1 ? params[1] : "", false,
                                                     userInitiated);
+  }
+  else if (StringUtils::EqualsNoCase(params[0], "games"))
+  {
+    auto& queue = KODI::GAME::CGameLibraryQueue::GetInstance();
+    if (queue.IsScanningLibrary())
+      queue.StopLibraryScanning();
+    else
+      queue.ScanLibrary(params.size() > 1 ? params[1] : "", userInitiated);
   }
 
   return 0;

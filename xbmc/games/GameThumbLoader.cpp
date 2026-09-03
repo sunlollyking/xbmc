@@ -12,6 +12,7 @@
 #include "games/tags/GameInfoTagLoader.h"
 #include "utils/FileUtils.h"
 #include "utils/URIUtils.h"
+#include "utils/Variant.h"
 
 #include <array>
 #include <string>
@@ -108,6 +109,9 @@ bool CGameThumbLoader::LoadItemCached(CFileItem* item)
   if (!item->IsFolder())
     artLoaded |= LoadLocalArt(*item);
 
+  if (item->HasProperty("gameid") || item->HasProperty("platformid"))
+    artLoaded |= LoadLibraryArt(*item);
+
   // Asked before loading rather than after, because reading the tag creates one
   // on the item and anything carrying a game tag answers IsGame(). Most of a
   // listing is not games, and they must not start claiming to be.
@@ -176,4 +180,68 @@ bool CGameThumbLoader::LoadLocalArt(CFileItem& item)
   }
 
   return found;
+}
+
+bool CGameThumbLoader::LoadLibraryArt(CFileItem& item)
+{
+  if (!m_database)
+  {
+    m_database = std::make_unique<CGameDatabase>();
+    if (!m_database->Open())
+    {
+      m_database.reset();
+      return false;
+    }
+  }
+
+  int mediaId = -1;
+  const char* mediaType = nullptr;
+  if (item.HasProperty("gameid"))
+  {
+    mediaId = static_cast<int>(item.GetProperty("gameid").asInteger());
+    mediaType = MediaTypeGame;
+  }
+  else if (item.HasProperty("platformid"))
+  {
+    mediaId = static_cast<int>(item.GetProperty("platformid").asInteger());
+    mediaType = MediaTypeGamePlatform;
+  }
+  if (mediaId <= 0 || mediaType == nullptr)
+    return false;
+
+  KODI::ART::Artwork art;
+  if (!m_database->GetArtForItem(mediaId, mediaType, art))
+    return false;
+
+  bool found = false;
+  for (const auto& [type, url] : art)
+  {
+    if (!url.empty() && !item.HasArt(type))
+    {
+      item.SetArt(type, url);
+      found = true;
+    }
+  }
+
+  if (item.HasArt("boxfront") && !item.HasArt("poster"))
+    item.SetArt("poster", item.GetArt("boxfront"));
+  if (!item.HasArt("thumb"))
+  {
+    for (const char* fallback : {"boxfront", "clearlogo", "titlescreen", "screenshot"})
+    {
+      if (item.HasArt(fallback))
+      {
+        item.SetArt("thumb", item.GetArt(fallback));
+        break;
+      }
+    }
+  }
+
+  return found;
+}
+
+void CGameThumbLoader::OnLoaderFinish()
+{
+  m_database.reset();
+  CProgramThumbLoader::OnLoaderFinish();
 }

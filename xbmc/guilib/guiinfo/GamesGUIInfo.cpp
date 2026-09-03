@@ -9,6 +9,7 @@
 #include "guilib/guiinfo/GamesGUIInfo.h"
 
 #include "FileItem.h"
+#include "XBDateTime.h"
 #include "GUIInfoManager.h"
 #include "ServiceBroker.h"
 #include "Util.h"
@@ -23,6 +24,7 @@
 #include "games/cheats/CheatRuntime.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "games/library/GameLibraryTypes.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/guiinfo/GUIInfo.h"
@@ -164,6 +166,27 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case LISTITEM_GENRE:
     case LISTITEM_YEAR:
     case LISTITEM_STUDIO:
+    case LISTITEM_ORIGINALTITLE:
+    case LISTITEM_RATING:
+    case LISTITEM_VOTES:
+    case LISTITEM_USER_RATING:
+    case LISTITEM_PLAYCOUNT:
+    case LISTITEM_LASTPLAYED:
+    case LISTITEM_DATE_ADDED:
+    case LISTITEM_MPAA:
+    case LISTITEM_SET:
+    case LISTITEM_TAG:
+    case LISTITEM_TRAILER:
+    case LISTITEM_PLATFORM:
+    case LISTITEM_DEVELOPER:
+    case LISTITEM_PUBLISHER:
+    case LISTITEM_PLAYERS:
+    case LISTITEM_REGION:
+    case LISTITEM_RELEASE_COUNT:
+    case LISTITEM_ACHIEVEMENTS_TOTAL:
+    case LISTITEM_ACHIEVEMENTS_EARNED:
+    case LISTITEM_GAME_CATEGORY:
+    case LISTITEM_GAME_CLIENT:
     {
       // Const access, so asking does not create a tag on an item that has none
       if (item == nullptr || !item->HasGameInfoTag())
@@ -187,7 +210,111 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           }
           break;
         case LISTITEM_STUDIO:
-          value = tag->GetPublisher();
+        case LISTITEM_PUBLISHER:
+          value = tag->GetPublishers().empty() ? tag->GetPublisher()
+                                               : StringUtils::Join(tag->GetPublishers(), ", ");
+          return !value.empty();
+        case LISTITEM_DEVELOPER:
+          value = tag->GetDevelopers().empty() ? tag->GetDeveloper()
+                                               : StringUtils::Join(tag->GetDevelopers(), ", ");
+          return !value.empty();
+        case LISTITEM_ORIGINALTITLE:
+          value = tag->GetOriginalTitle();
+          return !value.empty();
+        case LISTITEM_RATING:
+          if (tag->GetRating().rating > 0.0f)
+          {
+            value = StringUtils::FormatNumber(tag->GetRating().rating);
+            return true;
+          }
+          break;
+        case LISTITEM_VOTES:
+          if (tag->GetRating().votes > 0)
+          {
+            value = std::to_string(tag->GetRating().votes);
+            return true;
+          }
+          break;
+        case LISTITEM_USER_RATING:
+          if (tag->GetUserRating() > 0)
+          {
+            value = std::to_string(tag->GetUserRating());
+            return true;
+          }
+          break;
+        case LISTITEM_PLAYCOUNT:
+          if (tag->GetPlayCount() > 0)
+          {
+            value = std::to_string(tag->GetPlayCount());
+            return true;
+          }
+          break;
+        case LISTITEM_LASTPLAYED:
+        case LISTITEM_DATE_ADDED:
+        {
+          CDateTime date;
+          date.SetFromDBDateTime(info.GetInfo() == LISTITEM_LASTPLAYED ? tag->GetLastPlayed()
+                                                                        : tag->GetDateAdded());
+          if (date.IsValid())
+          {
+            value = date.GetAsLocalizedDate();
+            return true;
+          }
+          break;
+        }
+        case LISTITEM_MPAA:
+          value = tag->GetAgeRating();
+          return !value.empty();
+        case LISTITEM_SET:
+          value = tag->GetCollections().empty() ? "" : tag->GetCollections().front();
+          return !value.empty();
+        case LISTITEM_TAG:
+          value = StringUtils::Join(tag->GetTags(), ", ");
+          return !value.empty();
+        case LISTITEM_TRAILER:
+          value = tag->GetTrailer();
+          return !value.empty();
+        case LISTITEM_PLATFORM:
+          value = tag->GetPlatform();
+          return !value.empty();
+        case LISTITEM_PLAYERS:
+          if (tag->GetPlayersMax() > 0)
+          {
+            value = tag->GetPlayersMin() > 0 && tag->GetPlayersMin() < tag->GetPlayersMax()
+                        ? StringUtils::Format("{}-{}", tag->GetPlayersMin(), tag->GetPlayersMax())
+                        : std::to_string(tag->GetPlayersMax());
+            return true;
+          }
+          break;
+        case LISTITEM_REGION:
+          value = tag->GetRegion();
+          return !value.empty();
+        case LISTITEM_RELEASE_COUNT:
+          if (!tag->GetReleases().empty())
+          {
+            value = std::to_string(tag->GetReleases().size());
+            return true;
+          }
+          break;
+        case LISTITEM_ACHIEVEMENTS_TOTAL:
+          if (tag->HasAchievements())
+          {
+            value = std::to_string(tag->GetAchievementsTotal());
+            return true;
+          }
+          break;
+        case LISTITEM_ACHIEVEMENTS_EARNED:
+          if (tag->HasAchievements())
+          {
+            value = std::to_string(tag->GetAchievementsEarned());
+            return true;
+          }
+          break;
+        case LISTITEM_GAME_CATEGORY:
+          value = std::string(CGameLibraryTypes::ToString(tag->GetCategory()));
+          return !value.empty();
+        case LISTITEM_GAME_CLIENT:
+          value = tag->GetGameClient();
           return !value.empty();
         default:
           break;
