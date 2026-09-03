@@ -305,6 +305,25 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
     }
 
     m_pDS->close();
+
+    // The art comes with the listing, so a home widget or any other control
+    // that never runs a thumb loader still shows the covers
+    std::vector<int> ids;
+    ids.reserve(static_cast<size_t>(items.Size()));
+    for (const auto& item : items)
+      ids.emplace_back(static_cast<int>(item->GetProperty("gameid").asInteger()));
+
+    std::map<int, KODI::ART::Artwork> art;
+    if (GetArtForItems(ids, MediaTypeGame, art))
+    {
+      for (const auto& item : items)
+      {
+        const auto found = art.find(static_cast<int>(item->GetProperty("gameid").asInteger()));
+        if (found != art.end())
+          item->SetArt(found->second);
+      }
+    }
+
     items.SetContent("games");
     return true;
   }

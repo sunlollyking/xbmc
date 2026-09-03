@@ -8,6 +8,7 @@
 
 #include "GameDatabase.h"
 #include "dbwrappers/dataset.h"
+#include "utils/StringUtils.h"
 #include "utils/log.h"
 
 using namespace KODI;
@@ -83,11 +84,72 @@ bool CGameDatabase::GetArtForItem(int mediaId, const MediaType& mediaType, KODI:
       }
       m_pDS->close();
     }
+    AddDefaultArt(art);
     return !art.empty();
   }
   catch (...)
   {
     CLog::Log(LOGERROR, "GAME: Failed to read art for {} {}", mediaType, mediaId);
+  }
+  return false;
+}
+
+void CGameDatabase::AddDefaultArt(KODI::ART::Artwork& art)
+{
+  // A game is sold in a box, so its front is the picture; skins ask for a
+  // thumb or a poster, and both mean the same picture here
+  const auto front = art.find("boxfront");
+  if (front == art.end() || front->second.empty())
+    return;
+  for (const char* alias : {"thumb", "poster"})
+  {
+    if (art.find(alias) == art.end())
+      art[alias] = front->second;
+  }
+}
+
+bool CGameDatabase::GetArtForItems(const std::vector<int>& mediaIds,
+                                   const MediaType& mediaType,
+                                   std::map<int, KODI::ART::Artwork>& art)
+{
+  if (mediaIds.empty())
+    return true;
+
+  try
+  {
+    // In chunks, because a library can hold tens of thousands of games
+    constexpr size_t chunkSize = 500;
+    for (size_t start = 0; start < mediaIds.size(); start += chunkSize)
+    {
+      const size_t end = std::min(start + chunkSize, mediaIds.size());
+      std::vector<std::string> ids;
+      ids.reserve(end - start);
+      for (size_t i = start; i < end; ++i)
+        ids.emplace_back(std::to_string(mediaIds[i]));
+
+      const std::string sql =
+          PrepareSQL("SELECT media_id, type, url FROM art WHERE media_type = '%s' AND media_id IN (",
+                     mediaType.c_str()) +
+          StringUtils::Join(ids, ",") + ")";
+
+      if (!m_pDS->query(sql))
+        continue;
+      while (!m_pDS->eof())
+      {
+        art[m_pDS->fv(0).get_asInt()][m_pDS->fv(1).get_asString()] = m_pDS->fv(2).get_asString();
+        m_pDS->next();
+      }
+      m_pDS->close();
+    }
+
+    for (auto& [id, one] : art)
+      AddDefaultArt(one);
+
+    return true;
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: Failed to read art for {} items", mediaIds.size());
   }
   return false;
 }
