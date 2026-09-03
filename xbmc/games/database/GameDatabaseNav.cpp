@@ -15,6 +15,7 @@
 #include "dbwrappers/dataset.h"
 #include "games/library/GameDbUrl.h"
 #include "games/tags/GameInfoTag.h"
+#include "playlists/SmartPlayList.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/DatabaseUtils.h"
@@ -23,6 +24,8 @@
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
+
+#include <set>
 
 using namespace KODI;
 using namespace GAME;
@@ -173,11 +176,45 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendWhere("game_view.category = 'homebrew'");
     derivedShown = true;
   }
+  else if (list == "needsattention")
+  {
+    // Nothing named it, or only its title did; the unnamed are worth seeing first
+    filter.AppendWhere("game_view.matchedBy IN ('', 'name')");
+    filter.AppendOrder("game_view.matchedBy, game_view.sortTitle");
+    derivedShown = true;
+  }
 
   if (!derivedShown)
     filter.AppendWhere("game_view.category IN ('retail', 'demo')");
 
   filter.AppendWhere("game_view.hidden = 0");
+
+  // A smart playlist arrives as JSON on the path and adds its own rules
+  for (const char* key : {"xsp", "filter"})
+  {
+    const CVariant* value = option(key);
+    if (value == nullptr)
+      continue;
+
+    PLAYLIST::CSmartPlaylist xsp;
+    if (!xsp.LoadFromJson(value->asString()))
+      return false;
+    if (!xsp.IsGameType())
+      continue;
+
+    std::set<std::string, std::less<>> playlists;
+    filter.AppendWhere(xsp.GetWhereClause(*this, playlists));
+
+    if (xsp.GetLimit() > 0)
+      sorting.limitEnd = xsp.GetLimit();
+    if (xsp.GetOrder() != SortBy::NONE)
+      sorting.sortBy = xsp.GetOrder();
+    if (xsp.GetOrderDirection() != SortOrder::NONE)
+      sorting.sortOrder = xsp.GetOrderDirection();
+    if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+            CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING))
+      sorting.sortAttributes = SortAttributeIgnoreArticle;
+  }
 
   return true;
 }

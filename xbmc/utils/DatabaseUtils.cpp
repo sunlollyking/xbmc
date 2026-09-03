@@ -281,6 +281,24 @@ std::string DatabaseUtils::GetField(Field field, const MediaType &mediaType, Dat
       return "game_view.strFilename";
     else if (field == Field::PATH)
       return "game_view.strPath";
+    else if (field == Field::PLATFORM)
+      return "game_view.platformName";
+    else if (field == Field::DEVELOPER)
+      return "game_view.developers";
+    else if (field == Field::PLAYERS)
+      return "game_view.playersMax";
+    else if (field == Field::REGION)
+      return "game_view.releaseRegions";
+    else if (field == Field::FAVOURITE)
+      return "game_view.favourite";
+    else if (field == Field::COMPLETED)
+      return "game_view.completed";
+    else if (field == Field::HAS_ACHIEVEMENTS)
+      return "game_view.achievementsTotal";
+    else if (field == Field::SET)
+      return "game_view.collections";
+    else if (field == Field::TAG)
+      return "game_view.idGame";
   }
   else if (mediaType == MediaTypeMovie)
   {
@@ -950,6 +968,14 @@ int DatabaseUtils::GetField(Field field, const MediaType &mediaType, bool asInde
       return KODI::GAME::GAMEDB_FILENAME;
     else if (field == Field::PATH)
       return KODI::GAME::GAMEDB_PATH;
+    else if (field == Field::PLATFORM)
+      return KODI::GAME::GAMEDB_PLATFORM_NAME;
+    else if (field == Field::DEVELOPER)
+      return KODI::GAME::GAMEDB_DEVELOPERS;
+    else if (field == Field::PLAYERS)
+      return KODI::GAME::GAMEDB_PLAYERS_MAX;
+    else if (field == Field::REGION)
+      return KODI::GAME::GAMEDB_RELEASE_REGIONS;
   }
   else if (mediaType == MediaTypeMovie)
   {

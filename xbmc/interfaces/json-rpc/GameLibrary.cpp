@@ -48,6 +48,7 @@ void FillPlatformItem(CFileItem& item, const PlatformInfo& platform)
   tag->SetPlatform(platform.name);
   tag->SetPlatformId(platform.id);
   tag->SetPlatformSlug(platform.slug);
+  tag->SetDatabaseId(platform.id);
   tag->SetLoaded(true);
   item.SetProperty("manufacturer", platform.manufacturer);
   item.SetProperty("platformtype", std::string(CGameLibraryTypes::ToString(platform.type)));

@@ -165,6 +165,7 @@ public:
   static void DeleteVideoDatabaseDirectoryCache();
   static std::string MusicPlaylistsLocation();
   static std::string VideoPlaylistsLocation();
+  static std::string GamePlaylistsLocation();
 
   static void GetSkinThemes(std::vector<std::string>& vecTheme);
   static void GetRecursiveListing(const std::string& strPath, CFileItemList& items, const std::string& strMask, unsigned int flags = 0 /* DIR_FLAG_DEFAULTS */);

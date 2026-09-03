@@ -5622,7 +5622,8 @@
                   "achievements",
                   "inprogress",
                   "hacks",
-                  "homebrew"
+                  "homebrew",
+                  "needsattention"
                 ],
                 "required": true
               }

@@ -59,6 +59,13 @@ struct TranslateField
 // clang-format off
 static const auto fields = std::array{
   TranslateField{ "none",              Field::NONE,                       TEXT_FIELD,     nullptr,                              false, 231 },
+  TranslateField{ "platform",          Field::PLATFORM,                   TEXT_FIELD,     nullptr,                              true,  35549 },
+  TranslateField{ "developer",         Field::DEVELOPER,                  TEXT_FIELD,     nullptr,                              true,  35521 },
+  TranslateField{ "players",           Field::PLAYERS,                    NUMERIC_FIELD,  StringValidation::IsPositiveInteger,  false, 35525 },
+  TranslateField{ "region",            Field::REGION,                     TEXT_FIELD,     nullptr,                              true,  35524 },
+  TranslateField{ "favourite",         Field::FAVOURITE,                  BOOLEAN_FIELD,  nullptr,                              false, 1036 },
+  TranslateField{ "completed",         Field::COMPLETED,                  BOOLEAN_FIELD,  nullptr,                              false, 35531 },
+  TranslateField{ "hasachievements",   Field::HAS_ACHIEVEMENTS,           BOOLEAN_FIELD,  nullptr,                              false, 35534 },
   TranslateField{ "filename",          Field::FILENAME,                   TEXT_FIELD,     nullptr,                              false, 561 },
   TranslateField{ "path",              Field::PATH,                       TEXT_FIELD,     nullptr,                              true,  573 },
   TranslateField{ "album",             Field::ALBUM,                      TEXT_FIELD,     nullptr,                              true,  558 },
@@ -466,6 +473,17 @@ std::vector<Field> CSmartPlaylistRule::GetFields(const std::string &type)
     };
     isVideo = true;
   }
+  else if (type == "games")
+  {
+    fields = {
+        Field::TITLE,      Field::ORIGINAL_TITLE, Field::PLOT,        Field::PLATFORM,
+        Field::GENRE,      Field::YEAR,           Field::DEVELOPER,   Field::STUDIO,
+        Field::SET,        Field::TAG,            Field::REGION,      Field::PLAYERS,
+        Field::MPAA,       Field::RATING,         Field::USER_RATING, Field::VOTES,
+        Field::PLAYCOUNT,  Field::LAST_PLAYED,    Field::DATE_ADDED,  Field::FILENAME,
+        Field::PATH,       Field::FAVOURITE,      Field::COMPLETED,   Field::HAS_ACHIEVEMENTS,
+    };
+  }
   else if (type == "musicvideos")
   {
     fields = {
@@ -531,6 +549,15 @@ std::vector<SortBy> CSmartPlaylistRule::GetOrders(const std::string& type)
                                     SortBy::USER_RATING,
                                     SortBy::BPM,
                                 });
+  }
+  else if (type == "games")
+  {
+    orders = {
+        SortBy::NONE,       SortBy::LABEL,      SortBy::TITLE,     SortBy::YEAR,
+        SortBy::GENRE,      SortBy::STUDIO,     SortBy::RATING,    SortBy::USER_RATING,
+        SortBy::PLAYCOUNT,  SortBy::LAST_PLAYED, SortBy::DATE_ADDED, SortBy::FILE,
+        SortBy::PATH,       SortBy::RANDOM,
+    };
   }
   else if (type == "albums")
   {
@@ -652,6 +679,13 @@ std::vector<Field> CSmartPlaylistRule::GetGroups(const std::string &type)
         Field::YEAR,    Field::DIRECTOR, Field::STUDIO, Field::TAG,
     };
   }
+  else if (type == "games")
+  {
+    groups = {
+        Field::UNKNOWN, Field::NONE,      Field::SET,    Field::PLATFORM, Field::GENRE,
+        Field::YEAR,    Field::DEVELOPER, Field::STUDIO, Field::TAG,
+    };
+  }
 
   return groups;
 }
@@ -724,6 +758,14 @@ std::string CSmartPlaylistRule::GetBooleanQuery(const std::string &negate, const
     else if (m_field == static_cast<int>(Field::HAS_VIDEO_VERSIONS) ||
              m_field == static_cast<int>(Field::HAS_VIDEO_EXTRAS))
       return negate + GetField(m_field, strType);
+  }
+  else if (strType == "games")
+  {
+    if (m_field == static_cast<int>(Field::FAVOURITE) ||
+        m_field == static_cast<int>(Field::COMPLETED))
+      return negate + GetField(m_field, strType);
+    if (m_field == static_cast<int>(Field::HAS_ACHIEVEMENTS))
+      return negate + " " + GetField(m_field, strType) + " > 0";
   }
   else if (strType == "episodes")
   {
@@ -1003,6 +1045,41 @@ std::string CSmartPlaylistRule::FormatWhereClause(const std::string &negate, con
     else if (m_field == static_cast<int>(Field::TAG))
       query = negate + FormatLinkQuery("tag", "tag", MediaTypeMovie,
                                        GetField(static_cast<int>(Field::ID), strType), parameter);
+  }
+  else if (strType == "games")
+  {
+    table = "game_view";
+
+    // The library's link tables carry a game id rather than a media type, so
+    // the video helper does not fit
+    auto gameLink = [this, &negate, &parameter, &strType](const char* linkTable,
+                                                          const char* idColumn,
+                                                          const char* lookupTable)
+    {
+      return negate + " EXISTS (SELECT 1 FROM " + linkTable + " JOIN " + lookupTable + " ON " +
+             lookupTable + "." + idColumn + " = " + linkTable + "." + idColumn + " WHERE " +
+             linkTable + ".idGame = " + GetField(static_cast<int>(Field::ID), strType) + " AND " +
+             lookupTable + ".name" + parameter + ")";
+    };
+
+    if (m_field == static_cast<int>(Field::GENRE))
+      query = gameLink("genre_link", "idGenre", "genre");
+    else if (m_field == static_cast<int>(Field::TAG))
+      query = gameLink("tag_link", "idTag", "tag");
+    else if (m_field == static_cast<int>(Field::SET))
+      query = gameLink("collection_link", "idCollection", "collection");
+    else if (m_field == static_cast<int>(Field::DEVELOPER))
+      query = gameLink("developer_link", "idCompany", "company");
+    else if (m_field == static_cast<int>(Field::STUDIO))
+      query = gameLink("publisher_link", "idCompany", "company");
+    else if (m_field == static_cast<int>(Field::REGION))
+      query = negate + " EXISTS (SELECT 1 FROM gamerelease JOIN release_region ON "
+                       "release_region.idRelease = gamerelease.idRelease JOIN region ON "
+                       "region.idRegion = release_region.idRegion WHERE gamerelease.idGame = " +
+              GetField(static_cast<int>(Field::ID), strType) + " AND region.code" + parameter + ")";
+    else if (m_field == static_cast<int>(Field::LAST_PLAYED) ||
+             m_field == static_cast<int>(Field::DATE_ADDED))
+      query = FormatNullableDate(GetField(m_field, strType), m_operator, parameter);
   }
   else if (strType == "musicvideos")
   {
@@ -1612,6 +1689,16 @@ bool CSmartPlaylist::IsVideoType() const
   return IsVideoType(m_playlistType);
 }
 
+bool CSmartPlaylist::IsGameType() const
+{
+  return IsGameType(m_playlistType);
+}
+
+bool CSmartPlaylist::IsGameType(const std::string& type)
+{
+  return type == "games";
+}
+
 bool CSmartPlaylist::IsMusicType() const
 {
   return IsMusicType(m_playlistType);
@@ -1646,6 +1733,8 @@ std::string CSmartPlaylist::GetSaveLocation() const
     return "mixed";
   if (IsMusicType())
     return "music";
+  if (IsGameType())
+    return "games";
   // all others are video
   return "video";
 }

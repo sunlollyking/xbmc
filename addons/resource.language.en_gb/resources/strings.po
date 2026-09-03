@@ -20132,7 +20132,7 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35553"
-msgid "Region codes in order of preference, separated by commas, such as eu,wor,us,jp. When a game has several releases, the first region listed here plays."
+msgid "Regions in order of preference, separated by commas, such as Europe, World, USA, Japan. When a game has several releases, the one from the first region listed here plays."
 msgstr ""
 
 #: xbmc/games/library
@@ -20165,7 +20165,62 @@ msgctxt "#35559"
 msgid "Mark as not completed"
 msgstr ""
 
-#empty strings from id 35512 to 35999
+#: xbmc/games/library/GameInfoScanner.cpp
+msgctxt "#35560"
+msgid "Select game:"
+msgstr ""
+
+#: xbmc/games/library/GameInfoScanner.cpp
+msgctxt "#35561"
+msgid "Enter the game name"
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35562"
+msgid "Needs attention"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35563"
+msgid "game"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35564"
+msgid "games"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35565"
+msgid "Game"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35566"
+msgid "platform"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35567"
+msgid "platforms"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35568"
+msgid "release"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35569"
+msgid "releases"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35570"
+msgid "Release"
+msgstr ""
+
+#empty strings from id 35571 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

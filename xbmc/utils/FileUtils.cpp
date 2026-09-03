@@ -134,6 +134,8 @@ bool CFileUtils::RemoteAccessAllowed(const std::string &strPath)
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "special://videoplaylists"))
     return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "special://gameplaylists"))
+    return true;
   else if (StringUtils::StartsWithNoCase(realPath, "special://skin"))
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "special://profile/addon_data"))

@@ -118,6 +118,7 @@ void CProfileManager::OnSettingsLoaded()
   CDirectory::Create(URIUtils::AddFileToFolder(strDir,"music"));
   CDirectory::Create(URIUtils::AddFileToFolder(strDir,"video"));
   CDirectory::Create(URIUtils::AddFileToFolder(strDir,"mixed"));
+  CDirectory::Create(URIUtils::AddFileToFolder(strDir, "games"));
 }
 
 void CProfileManager::OnSettingsSaved() const

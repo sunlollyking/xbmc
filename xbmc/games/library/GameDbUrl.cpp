@@ -57,8 +57,9 @@ const std::vector<std::string_view> facetNames{
 };
 
 const std::vector<std::string_view> listNames{
-    "recentlyadded", "recentlyplayed", "neverplayed",  "favourites", "completed", "multiplayer",
-    "coop",          "achievements",   "inprogress",   "hacks",      "homebrew",
+    "recentlyadded", "recentlyplayed", "neverplayed", "favourites",     "completed",
+    "multiplayer",   "coop",           "achievements", "inprogress",    "hacks",
+    "homebrew",      "needsattention",
 };
 
 bool IsList(std::string_view segment)
@@ -127,6 +128,9 @@ bool CGameDbUrl::parse()
   m_node = GameDbNode::OVERVIEW;
   m_itemType = "overview";
   m_list.clear();
+
+  // Whatever the path carries as a query, a smart playlist among it
+  AddOptions(m_url.GetOptions());
 
   // The first segment is what CURL would take for a host name
   std::string path = m_url.Get();
@@ -217,16 +221,5 @@ bool CGameDbUrl::parse()
 
 bool CGameDbUrl::validateOption(const std::string& key, const CVariant& value)
 {
-  if (!CDbUrl::validateOption(key, value))
-    return false;
-
-  // A path segment stands in for these, so they are not accepted as options
-  static const std::array<std::string_view, 3> reserved{"platformid", "gameid", "list"};
-  for (std::string_view r : reserved)
-  {
-    if (key == r && m_node == GameDbNode::NONE)
-      return false;
-  }
-
-  return true;
+  return CDbUrl::validateOption(key, value);
 }

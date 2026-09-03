@@ -19,6 +19,7 @@
 #include "dialogs/GUIDialogContextMenu.h"
 #include "dialogs/GUIDialogMediaSource.h"
 #include "dialogs/GUIDialogProgress.h"
+#include "dialogs/GUIDialogSmartPlaylistEditor.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/GameDatabaseDirectory.h"
 #include "games/GameUtils.h"
@@ -33,6 +34,8 @@
 #include "media/MediaLockState.h"
 #include "playlists/PlayListFileItemClassify.h"
 #include "playlists/PlayListTypes.h"
+#include "resources/LocalizeStrings.h"
+#include "resources/ResourcesComponent.h"
 #include "settings/MediaSourceSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -181,7 +184,8 @@ bool CGUIWindowGames::OnClick(int iItem, const std::string& player /* = "" */)
   CFileItemPtr item = m_vecItems->Get(iItem);
   if (item)
   {
-    if (!item->IsFolder())
+    // A playlist is opened, not played
+    if (!item->IsFolder() && !PLAYLIST::IsSmartPlayList(*item) && !PLAYLIST::IsPlayList(*item))
     {
       PlayGame(*item);
       return true;
@@ -217,6 +221,10 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_EMULATOR, 35510); // "Default emulator"
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35326); // "Default video filter"
       }
+
+      // A smart playlist is edited where it is listed, as video and music do
+      if (PLAYLIST::IsSmartPlayList(*item) || PLAYLIST::IsSmartPlayList(*m_vecItems))
+        buttons.Add(CONTEXT_BUTTON_EDIT_SMART_PLAYLIST, 586); // "Edit smart playlist"
 
       // A library game has an information dialog and can be described again
       if (item->HasProperty("gameid") && !item->HasProperty("releaseid"))
@@ -287,7 +295,7 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         return true;
       case CONTEXT_BUTTON_REFRESH_THUMBS:
         CGameLibraryQueue::GetInstance().RefreshGame(
-            static_cast<int>(item->GetProperty("gameid").asInteger()));
+            static_cast<int>(item->GetProperty("gameid").asInteger()), true);
         return true;
       case CONTEXT_BUTTON_SET_DEFAULT:
       {
@@ -307,6 +315,15 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         else
           CGUIDialogAddonInfo::ShowForItem(item);
         return true;
+      case CONTEXT_BUTTON_EDIT_SMART_PLAYLIST:
+      {
+        // The path is copied because opening the editor destroys our items
+        const std::string playlist =
+            PLAYLIST::IsSmartPlayList(*item) ? item->GetPath() : m_vecItems->GetPath();
+        if (CGUIDialogSmartPlaylistEditor::EditPlaylist(playlist, "games"))
+          Refresh(true);
+        return true;
+      }
       case CONTEXT_BUTTON_DELETE:
         OnDeleteItem(itemNumber);
         return true;
@@ -398,6 +415,16 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
   }
 
   // Set label
+  if (URIUtils::PathEquals(items.GetPath(), "special://gameplaylists/", true))
+  {
+    const auto newPlaylist = std::make_shared<CFileItem>("newsmartplaylist://games", false);
+    newPlaylist->SetLabel(
+        CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(21437));
+    newPlaylist->SetArt("icon", "DefaultAddSource.png");
+    newPlaylist->SetLabelPreformatted(true);
+    items.Add(newPlaylist);
+  }
+
   std::string label;
   if (items.GetLabel().empty())
   {

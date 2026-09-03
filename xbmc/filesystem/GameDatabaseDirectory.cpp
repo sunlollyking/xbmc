@@ -30,7 +30,7 @@ using namespace XFILE;
 namespace
 {
 // Each entry an overview node lists, and the string it is labelled with
-constexpr std::array<std::pair<std::string_view, int>, 22> overviewChildren{{
+constexpr std::array<std::pair<std::string_view, int>, 23> overviewChildren{{
     {"titles", 35544},
     {"genres", 135},
     {"years", 652},
@@ -53,6 +53,7 @@ constexpr std::array<std::pair<std::string_view, int>, 22> overviewChildren{{
     {"inprogress", 35535},
     {"hacks", 35536},
     {"homebrew", 35537},
+    {"needsattention", 35562},
 }};
 
 std::string Localize(int id)
@@ -115,6 +116,15 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         item->SetPath(base + std::string(segment) + "/");
         item->SetFolder(true);
         items.Add(item);
+      }
+
+      if (!dbUrl.HasPlatform())
+      {
+        // The saved lists live in the profile, not in the library
+        const auto playlists = std::make_shared<CFileItem>(Localize(136));
+        playlists->SetPath("special://gameplaylists/");
+        playlists->SetFolder(true);
+        items.Add(playlists);
       }
       items.SetContent("");
       return true;
