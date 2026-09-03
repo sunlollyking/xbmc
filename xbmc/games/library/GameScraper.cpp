@@ -188,6 +188,9 @@ std::string CGameScraper::BuildUrl(const std::string& action, const GameScrapeRe
   if (request.year > 0)
     url.SetOption("year", std::to_string(request.year));
 
+  if (request.bulk)
+    url.SetOption("bulk", "1");
+
   const std::string settings = m_addon->GetPathSettingsAsJSON();
   url.SetOption("pathSettings", settings.empty() ? "{}" : settings);
 
@@ -451,6 +454,17 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetTrailer(payload["trailer"].asString());
   if (payload.isMember("manual"))
     details.SetManual(payload["manual"].asString());
+
+  // How many achievements a game has, where the source knows. What a player
+  // has earned is not a scraper's to say, so only the total is taken.
+  if (payload.isMember("achievements"))
+  {
+    const CVariant& achievements = payload["achievements"];
+    const int total = static_cast<int>(achievements["total"].asInteger());
+    if (total > 0)
+      details.SetAchievements(total, details.GetAchievementsEarned(),
+                              details.GetAchievementsHardcore());
+  }
 
   if (payload["ratings"].isObject())
   {

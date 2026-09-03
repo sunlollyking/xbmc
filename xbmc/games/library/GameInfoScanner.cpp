@@ -706,6 +706,7 @@ void CGameInfoScanner::Prefetch(const Entry* entries,
 
     GameScrapeRequest request;
     FillRequest(entry, parsed, identity, platform, request);
+    request.bulk = true;
 
     m_identities[entry.path] = std::move(identity);
     paths.emplace_back(entry.path);
@@ -851,6 +852,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   {
     GameScrapeRequest request;
     FillRequest(entry, parsed, identity, platform, request);
+    // A refresh a person asked for may use every source; a scan may not
+    request.bulk = !m_interactive && refreshGameId <= 0;
 
     std::vector<GameScrapeCandidate> candidates;
     if (const auto asked = m_prefetched.find(playPath); asked != m_prefetched.end())

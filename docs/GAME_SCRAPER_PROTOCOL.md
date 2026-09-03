@@ -135,6 +135,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "art": {"boxfront": [{"url": "https://...png", "region": "USA"}],
           "titlescreen": [{"url": "https://...png"}],
           "screenshot": [{"url": "https://...png"}]},
+  "achievements": {"total": 82, "points": 1045},
   "trailer": "",
   "manual": ""
 }

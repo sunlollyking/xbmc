@@ -66,6 +66,9 @@ public:
    */
   static std::string ReadDiscSerial(const std::string& trackPath);
 
+  //! \brief The serial a disc header holds, once the header has been found
+  static std::string SerialFromHeader(const std::string& data, size_t at, int console);
+
   /*!
    * \brief The first data track named by a cue sheet or GDI file, or empty
    */

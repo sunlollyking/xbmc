@@ -13,7 +13,7 @@
     <alias>Panasonic 3DO Interactive Multiplayer</alias>
     <alias>Panasonic 3DO</alias>
     <alias>The 3DO Company - 3DO</alias>
-    <ids screenscraper="29" libretro="The 3DO Company - 3DO" retroachievements="43" esde="3do" launchbox="3DO Interactive Multiplayer" hyperspin="Panasonic 3DO"/>
+    <ids regvault="3do" screenscraper="29" libretro="The 3DO Company - 3DO" retroachievements="43" esde="3do" launchbox="3DO Interactive Multiplayer" hyperspin="Panasonic 3DO"/>
   </platform>
   <platform id="archimedes">
     <name>Acorn Archimedes</name>
@@ -90,7 +90,7 @@
     <alias>amstradcpc</alias>
     <alias>Amstrad - CPC</alias>
     <alias>Amstrad</alias>
-    <ids screenscraper="65" libretro="Amstrad - CPC" retroachievements="37" esde="amstradcpc" launchbox="Amstrad CPC" hyperspin="Amstrad CPC"/>
+    <ids regvault="amstradcpc" screenscraper="65" libretro="Amstrad - CPC" retroachievements="37" esde="amstradcpc" launchbox="Amstrad CPC" hyperspin="Amstrad CPC"/>
   </platform>
   <platform id="gx4000">
     <name>Amstrad GX4000</name>
@@ -106,7 +106,7 @@
     <alias>Amstrad GX-4000</alias>
     <alias>GX-4000</alias>
     <alias>Amstrad - GX4000</alias>
-    <ids screenscraper="87" libretro="Amstrad - GX4000" esde="gx4000" launchbox="Amstrad GX4000" hyperspin="Amstrad GX4000"/>
+    <ids regvault="gx4000" screenscraper="87" libretro="Amstrad - GX4000" esde="gx4000" launchbox="Amstrad GX4000" hyperspin="Amstrad GX4000"/>
   </platform>
   <platform id="apple2">
     <name>Apple II</name>
@@ -134,7 +134,7 @@
     <alias>Apple 1</alias>
     <alias>apple2</alias>
     <alias>Apple - II</alias>
-    <ids screenscraper="86" libretro="Apple - II" retroachievements="38" esde="apple2" launchbox="Apple II" hyperspin="Apple II"/>
+    <ids regvault="apple2" screenscraper="86" libretro="Apple - II" retroachievements="38" esde="apple2" launchbox="Apple II" hyperspin="Apple II"/>
   </platform>
   <platform id="apple2gs">
     <name>Apple IIGS</name>
@@ -198,7 +198,7 @@
     <alias>FinalBurn Alpha</alias>
     <alias>FinalBurn Neo</alias>
     <alias>FBNeo - Arcade Games</alias>
-    <ids screenscraper="75" libretro="MAME" retroachievements="27" esde="arcade" launchbox="arcade" hyperspin="Final Burn Alpha"/>
+    <ids regvault="mame" screenscraper="75" libretro="MAME" retroachievements="27" esde="arcade" launchbox="arcade" hyperspin="Final Burn Alpha"/>
   </platform>
   <platform id="arduboy">
     <name>Arduboy</name>
@@ -225,7 +225,7 @@
     <alias>A2600</alias>
     <alias>2600</alias>
     <alias>Atari - 2600</alias>
-    <ids screenscraper="26" libretro="Atari - 2600" retroachievements="25" esde="atari2600" launchbox="Atari 2600" hyperspin="Atari 2600"/>
+    <ids regvault="atari2600" screenscraper="26" libretro="Atari - 2600" retroachievements="25" esde="atari2600" launchbox="Atari 2600" hyperspin="Atari 2600"/>
   </platform>
   <platform id="atari5200">
     <name>Atari 5200</name>
@@ -240,7 +240,7 @@
     <alias>5200</alias>
     <alias>atari5200</alias>
     <alias>Atari - 5200</alias>
-    <ids screenscraper="40" libretro="Atari - 5200" retroachievements="50" esde="atari5200" launchbox="Atari 5200" hyperspin="Atari 5200"/>
+    <ids regvault="atari5200" screenscraper="40" libretro="Atari - 5200" retroachievements="50" esde="atari5200" launchbox="Atari 5200" hyperspin="Atari 5200"/>
   </platform>
   <platform id="atari7800">
     <name>Atari 7800</name>
@@ -256,7 +256,7 @@
     <alias>atari7800</alias>
     <alias>Atari 7800 ProSystem</alias>
     <alias>Atari - 7800</alias>
-    <ids screenscraper="41" libretro="Atari - 7800" retroachievements="51" esde="atari7800" launchbox="Atari 7800" hyperspin="Atari 7800"/>
+    <ids regvault="atari7800" screenscraper="41" libretro="Atari - 7800" retroachievements="51" esde="atari7800" launchbox="Atari 7800" hyperspin="Atari 7800"/>
   </platform>
   <platform id="atari800">
     <name>Atari 8-bit Family</name>
@@ -292,7 +292,7 @@
     <alias>Atari XE</alias>
     <alias>Atari - 8-bit Family</alias>
     <alias>Atari 400 - 800</alias>
-    <ids screenscraper="43" libretro="Atari - 8-bit Family" esde="atari800" launchbox="Atari 800" hyperspin="Atari 8-Bit"/>
+    <ids regvault="atari800" screenscraper="43" libretro="Atari - 8-bit Family" esde="atari800" launchbox="Atari 800" hyperspin="Atari 8-Bit"/>
   </platform>
   <platform id="atarijaguar">
     <name>Atari Jaguar</name>
@@ -306,7 +306,7 @@
     <alias>Jaguar</alias>
     <alias>atarijaguar</alias>
     <alias>Atari - Jaguar</alias>
-    <ids screenscraper="27" libretro="Atari - Jaguar" retroachievements="17" esde="atarijaguar" launchbox="Atari Jaguar" hyperspin="Atari Jaguar"/>
+    <ids regvault="jaguar" screenscraper="27" libretro="Atari - Jaguar" retroachievements="17" esde="atarijaguar" launchbox="Atari Jaguar" hyperspin="Atari Jaguar"/>
   </platform>
   <platform id="atarijaguarcd">
     <name>Atari Jaguar CD</name>
@@ -322,7 +322,7 @@
     <alias>Atari Jaguar CD-Rom</alias>
     <alias>Jaguar CD-Rom</alias>
     <alias>atarijaguarcd</alias>
-    <ids screenscraper="171" retroachievements="77" esde="atarijaguarcd" launchbox="Atari Jaguar CD" hyperspin="Atari Jaguar CD"/>
+    <ids regvault="jaguarcd" screenscraper="171" retroachievements="77" esde="atarijaguarcd" launchbox="Atari Jaguar CD" hyperspin="Atari Jaguar CD"/>
   </platform>
   <platform id="atarilynx">
     <name>Atari Lynx</name>
@@ -336,7 +336,7 @@
     <alias>Lynx</alias>
     <alias>atarilynx</alias>
     <alias>Atari - Lynx</alias>
-    <ids screenscraper="28" libretro="Atari - Lynx" retroachievements="13" esde="atarilynx" launchbox="Atari Lynx" hyperspin="Atari Lynx"/>
+    <ids regvault="lynx" screenscraper="28" libretro="Atari - Lynx" retroachievements="13" esde="atarilynx" launchbox="Atari Lynx" hyperspin="Atari Lynx"/>
   </platform>
   <platform id="atarist">
     <name>Atari ST</name>
@@ -354,7 +354,7 @@
     <alias>1040 ST</alias>
     <alias>atarist</alias>
     <alias>Atari - ST</alias>
-    <ids screenscraper="42" libretro="Atari - ST" retroachievements="36" esde="atarist" launchbox="Atari ST" hyperspin="Atari ST"/>
+    <ids regvault="atarist" screenscraper="42" libretro="Atari - ST" retroachievements="36" esde="atarist" launchbox="Atari ST" hyperspin="Atari ST"/>
   </platform>
   <platform id="astrocde">
     <name>Bally Astrocade</name>
@@ -383,7 +383,7 @@
     <alias>WSwan</alias>
     <alias>Bandai - WonderSwan</alias>
     <alias>WSW</alias>
-    <ids screenscraper="45" libretro="Bandai - WonderSwan" retroachievements="53" esde="wonderswan" launchbox="WonderSwan" hyperspin="Bandai WonderSwan"/>
+    <ids regvault="wonderswan" screenscraper="45" libretro="Bandai - WonderSwan" retroachievements="53" esde="wonderswan" launchbox="WonderSwan" hyperspin="Bandai WonderSwan"/>
   </platform>
   <platform id="wonderswancolor">
     <name>Bandai WonderSwan Color</name>
@@ -400,7 +400,7 @@
     <alias>WSwan Color</alias>
     <alias>wonderswancolor</alias>
     <alias>Bandai - WonderSwan Color</alias>
-    <ids screenscraper="46" libretro="Bandai - WonderSwan Color" esde="wonderswancolor" launchbox="WonderSwan Color" hyperspin="Bandai WonderSwan Color"/>
+    <ids regvault="wonderswancolor" screenscraper="46" libretro="Bandai - WonderSwan Color" esde="wonderswancolor" launchbox="WonderSwan Color" hyperspin="Bandai WonderSwan Color"/>
   </platform>
   <platform id="gamate">
     <name>Bit Corporation Gamate</name>
@@ -513,7 +513,7 @@
     <extensions>7z bin cas col cv dsk m3u mx1 mx2 myv ri rom sc sg zip</extensions>
     <alias>Colecovision</alias>
     <alias>Coleco - ColecoVision</alias>
-    <ids screenscraper="48" libretro="Coleco - ColecoVision" retroachievements="44" esde="colecovision" launchbox="ColecoVision" hyperspin="ColecoVision"/>
+    <ids regvault="colecovision" screenscraper="48" libretro="Coleco - ColecoVision" retroachievements="44" esde="colecovision" launchbox="ColecoVision" hyperspin="ColecoVision"/>
   </platform>
   <platform id="c64">
     <name>Commodore 64</name>
@@ -527,7 +527,7 @@
     <alias>C64</alias>
     <alias>Commodore 128</alias>
     <alias>Commodore - 64</alias>
-    <ids screenscraper="66" libretro="Commodore - 64" retroachievements="30" esde="c64" launchbox="Commodore 64" hyperspin="Commodore 64"/>
+    <ids regvault="c64" screenscraper="66" libretro="Commodore - 64" retroachievements="30" esde="c64" launchbox="Commodore 64" hyperspin="Commodore 64"/>
   </platform>
   <platform id="amiga">
     <name>Commodore Amiga</name>
@@ -574,7 +574,7 @@
     <alias>amiga600</alias>
     <alias>amiga1200</alias>
     <alias>Commodore - Amiga</alias>
-    <ids screenscraper="64" libretro="Commodore - Amiga" retroachievements="35" esde="amiga" launchbox="Commodore Amiga" hyperspin="Commodore Amiga"/>
+    <ids regvault="amiga" screenscraper="64" libretro="Commodore - Amiga" retroachievements="35" esde="amiga" launchbox="Commodore Amiga" hyperspin="Commodore Amiga"/>
   </platform>
   <platform id="amigacd32">
     <name>Commodore Amiga CD32</name>
@@ -589,7 +589,7 @@
     <alias>Amiga CD32</alias>
     <alias>amigacd32</alias>
     <alias>Commodore - CD32</alias>
-    <ids screenscraper="130" libretro="Commodore - CD32" esde="amigacd32" launchbox="Commodore Amiga CD32" hyperspin="Commodore Amiga CD32"/>
+    <ids regvault="amigacd32" screenscraper="130" libretro="Commodore - CD32" esde="amigacd32" launchbox="Commodore Amiga CD32" hyperspin="Commodore Amiga CD32"/>
   </platform>
   <platform id="cdtv">
     <name>Commodore CDTV</name>
@@ -653,7 +653,7 @@
     <alias>Vic-20</alias>
     <alias>vic20</alias>
     <alias>Commodore - VIC-20</alias>
-    <ids screenscraper="73" libretro="Commodore - VIC-20" retroachievements="34" esde="vic20" launchbox="Commodore VIC-20" hyperspin="Commodore VIC-20"/>
+    <ids regvault="vic20" screenscraper="73" libretro="Commodore - VIC-20" retroachievements="34" esde="vic20" launchbox="Commodore VIC-20" hyperspin="Commodore VIC-20"/>
   </platform>
   <platform id="megaduck">
     <name>Creatronic Mega Duck</name>
@@ -827,7 +827,7 @@
     <alias>VES</alias>
     <alias>channelf</alias>
     <alias>Fairchild - Channel F</alias>
-    <ids screenscraper="80" libretro="Fairchild - Channel F" retroachievements="57" esde="channelf" launchbox="Fairchild Channel F" hyperspin="Fairchild Channel F"/>
+    <ids regvault="channelf" screenscraper="80" libretro="Fairchild - Channel F" retroachievements="57" esde="channelf" launchbox="Fairchild Channel F" hyperspin="Fairchild Channel F"/>
   </platform>
   <platform id="fmtowns">
     <name>Fujitsu FM Towns</name>
@@ -912,7 +912,7 @@
     <alias>Vectrex</alias>
     <alias>GCE - Vectrex</alias>
     <alias>vecx</alias>
-    <ids screenscraper="102" libretro="GCE - Vectrex" retroachievements="46" esde="vectrex" launchbox="GCE Vectrex" hyperspin="GCE Vectrex"/>
+    <ids regvault="vectrex" screenscraper="102" libretro="GCE - Vectrex" retroachievements="46" esde="vectrex" launchbox="GCE Vectrex" hyperspin="GCE Vectrex"/>
   </platform>
   <platform id="gmaster">
     <name>Hartung Game Master</name>
@@ -954,7 +954,7 @@
     <alias>VC 4000</alias>
     <alias>Video Computer 4000</alias>
     <alias>Interton - VC 4000</alias>
-    <ids screenscraper="281" libretro="Interton - VC 4000" retroachievements="74"/>
+    <ids regvault="vc4000" screenscraper="281" libretro="Interton - VC 4000" retroachievements="74"/>
   </platform>
   <platform id="lowresnx">
     <name>LowRes NX</name>
@@ -1045,7 +1045,7 @@
     <alias>Magnavox - Odyssey2</alias>
     <alias>Philips - Videopac+</alias>
     <alias>Odyssey 2</alias>
-    <ids screenscraper="104" libretro="Magnavox - Odyssey2" retroachievements="23" esde="odyssey2" launchbox="Magnavox Odyssey 2" hyperspin="Magnavox Odyssey 2"/>
+    <ids regvault="odyssey2" screenscraper="104" libretro="Magnavox - Odyssey2" retroachievements="23" esde="odyssey2" launchbox="Magnavox Odyssey 2" hyperspin="Magnavox Odyssey 2"/>
   </platform>
   <platform id="intellivision">
     <name>Mattel Intellivision</name>
@@ -1069,7 +1069,7 @@
     <alias>Super Pro System</alias>
     <alias>Mattel Electronics Intellivision</alias>
     <alias>Mattel - Intellivision</alias>
-    <ids screenscraper="115" libretro="Mattel - Intellivision" retroachievements="45" esde="intellivision" launchbox="Mattel Intellivision" hyperspin="Mattel Intellivision"/>
+    <ids regvault="intellivision" screenscraper="115" libretro="Mattel - Intellivision" retroachievements="45" esde="intellivision" launchbox="Mattel Intellivision" hyperspin="Mattel Intellivision"/>
   </platform>
   <platform id="samcoupe">
     <name>MGT SAM Coupé</name>
@@ -1096,7 +1096,7 @@
     <alias>Microsoft MSX1</alias>
     <alias>MSX1</alias>
     <alias>Microsoft - MSX</alias>
-    <ids screenscraper="113" libretro="Microsoft - MSX" retroachievements="29" esde="msx" launchbox="Microsoft MSX" hyperspin="Microsoft MSX"/>
+    <ids regvault="msx" screenscraper="113" libretro="Microsoft - MSX" retroachievements="29" esde="msx" launchbox="Microsoft MSX" hyperspin="Microsoft MSX"/>
   </platform>
   <platform id="msxturbor">
     <name>Microsoft MSX Turbo R</name>
@@ -1124,7 +1124,7 @@
     <extensions>7z cas col di1 di2 dmk dsk fd1 fd2 m3u mx1 mx2 ogv ri rom sc sg wav xsa zip</extensions>
     <alias>MSX2</alias>
     <alias>Microsoft - MSX2</alias>
-    <ids screenscraper="116" libretro="Microsoft - MSX2" esde="msx2" launchbox="Microsoft MSX2" hyperspin="Microsoft MSX2"/>
+    <ids regvault="msx2" screenscraper="116" libretro="Microsoft - MSX2" esde="msx2" launchbox="Microsoft MSX2" hyperspin="Microsoft MSX2"/>
   </platform>
   <platform id="windows">
     <name>Microsoft Windows</name>
@@ -1231,7 +1231,7 @@
     <extensions>iso xiso</extensions>
     <alias>Xbox</alias>
     <alias>Microsoft - Xbox</alias>
-    <ids screenscraper="32" libretro="Microsoft - Xbox" retroachievements="22" esde="xbox" launchbox="Microsoft Xbox"/>
+    <ids regvault="xbox" screenscraper="32" libretro="Microsoft - Xbox" retroachievements="22" esde="xbox" launchbox="Microsoft Xbox"/>
   </platform>
   <platform id="xbox360">
     <name>Microsoft Xbox 360</name>
@@ -1244,7 +1244,7 @@
     <extensions>iso xex zar</extensions>
     <alias>Xbox 360</alias>
     <alias>xbox360</alias>
-    <ids screenscraper="33" esde="xbox360" launchbox="Microsoft Xbox 360"/>
+    <ids regvault="xbox360" screenscraper="33" esde="xbox360" launchbox="Microsoft Xbox 360"/>
   </platform>
   <platform id="xboxone">
     <name>Microsoft Xbox One</name>
@@ -1278,7 +1278,7 @@
     <alias>Total DOS</alias>
     <alias>DOS (PC)</alias>
     <alias>IBM PC</alias>
-    <ids screenscraper="135" libretro="DOS" retroachievements="26" esde="dos" launchbox="MS-Dos" hyperspin="Microsoft MS-DOS"/>
+    <ids regvault="dos" screenscraper="135" libretro="DOS" retroachievements="26" esde="dos" launchbox="MS-Dos" hyperspin="Microsoft MS-DOS"/>
   </platform>
   <platform id="pcengine">
     <name>NEC PC Engine</name>
@@ -1296,7 +1296,7 @@
     <alias>tg16</alias>
     <alias>NEC - PC Engine - TurboGrafx 16</alias>
     <alias>PCE</alias>
-    <ids screenscraper="31" libretro="NEC - PC Engine - TurboGrafx 16" retroachievements="8" esde="pcengine" launchbox="NEC TurboGrafx-16" hyperspin="NEC PC Engine"/>
+    <ids regvault="pcengine" screenscraper="31" libretro="NEC - PC Engine - TurboGrafx 16" retroachievements="8" esde="pcengine" launchbox="NEC TurboGrafx-16" hyperspin="NEC PC Engine"/>
   </platform>
   <platform id="pcenginecd">
     <name>NEC PC Engine CD</name>
@@ -1318,7 +1318,7 @@
     <alias>NEC TurboGrafx-CD</alias>
     <alias>NEC - PC Engine CD - TurboGrafx-CD</alias>
     <alias>NEC - TurboGrafx-CD</alias>
-    <ids screenscraper="114" libretro="NEC - PC Engine CD - TurboGrafx-CD" retroachievements="76" esde="pcenginecd" launchbox="NEC PC Engine-CD" hyperspin="NEC PC Engine-CD"/>
+    <ids regvault="pcenginecd" screenscraper="114" libretro="NEC - PC Engine CD - TurboGrafx-CD" retroachievements="76" esde="pcenginecd" launchbox="NEC PC Engine-CD" hyperspin="NEC PC Engine-CD"/>
   </platform>
   <platform id="supergrafx">
     <name>NEC PC Engine SuperGrafx</name>
@@ -1333,7 +1333,7 @@
     <alias>NEC SuperGrafx</alias>
     <alias>SuperGrafx</alias>
     <alias>NEC - PC Engine SuperGrafx</alias>
-    <ids screenscraper="105" libretro="NEC - PC Engine SuperGrafx" esde="supergrafx" launchbox="PC Engine SuperGrafx" hyperspin="NEC SuperGrafx"/>
+    <ids regvault="supergrafx" screenscraper="105" libretro="NEC - PC Engine SuperGrafx" esde="supergrafx" launchbox="PC Engine SuperGrafx" hyperspin="NEC SuperGrafx"/>
   </platform>
   <platform id="pc88">
     <name>NEC PC-8801</name>
@@ -1362,7 +1362,7 @@
     <alias>NEC PC-9800 Series</alias>
     <alias>NEC - PC-98</alias>
     <alias>PC-9800</alias>
-    <ids screenscraper="208" libretro="NEC - PC-98" retroachievements="48" esde="pc98"/>
+    <ids regvault="pc98" screenscraper="208" libretro="NEC - PC-98" retroachievements="48" esde="pc98"/>
   </platform>
   <platform id="pcfx">
     <name>NEC PC-FX</name>
@@ -1376,7 +1376,7 @@
     <alias>pcfx</alias>
     <alias>NEC - PC-FX</alias>
     <alias>PCXFX</alias>
-    <ids screenscraper="72" libretro="NEC - PC-FX" retroachievements="49" esde="pcfx" launchbox="NEC PC-FX" hyperspin="NEC PC-FX"/>
+    <ids regvault="pcfx" screenscraper="72" libretro="NEC - PC-FX" retroachievements="49" esde="pcfx" launchbox="NEC PC-FX" hyperspin="NEC PC-FX"/>
   </platform>
   <platform id="n3ds">
     <name>Nintendo 3DS</name>
@@ -1404,7 +1404,7 @@
     <extensions>7z bin d64 n64 ndd u1 v64 z64 zip</extensions>
     <alias>n64</alias>
     <alias>Nintendo - Nintendo 64</alias>
-    <ids screenscraper="14" libretro="Nintendo - Nintendo 64" retroachievements="2" esde="n64" launchbox="Nintendo 64" hyperspin="Nintendo 64"/>
+    <ids regvault="n64" screenscraper="14" libretro="Nintendo - Nintendo 64" retroachievements="2" esde="n64" launchbox="Nintendo 64" hyperspin="Nintendo 64"/>
   </platform>
   <platform id="n64dd">
     <name>Nintendo 64DD</name>
@@ -1439,7 +1439,7 @@
     <alias>NDSi</alias>
     <alias>DSi</alias>
     <alias>Nintendo - Nintendo DS</alias>
-    <ids screenscraper="15" libretro="Nintendo - Nintendo DS" retroachievements="18" esde="nds" launchbox="Nintendo DS" hyperspin="Nintendo DS"/>
+    <ids regvault="nds" screenscraper="15" libretro="Nintendo - Nintendo DS" retroachievements="18" esde="nds" launchbox="Nintendo DS" hyperspin="Nintendo DS"/>
   </platform>
   <platform id="nes">
     <name>Nintendo Entertainment System</name>
@@ -1456,7 +1456,7 @@
     <alias>Nintendo Famicom</alias>
     <alias>Nintendo Family Computer</alias>
     <alias>Nintendo - Nintendo Entertainment System</alias>
-    <ids screenscraper="3" libretro="Nintendo - Nintendo Entertainment System" retroachievements="7" esde="nes" launchbox="Nintendo Entertainment System" hyperspin="Nintendo Entertainment System"/>
+    <ids regvault="nes" screenscraper="3" libretro="Nintendo - Nintendo Entertainment System" retroachievements="7" esde="nes" launchbox="Nintendo Entertainment System" hyperspin="Nintendo Entertainment System"/>
   </platform>
   <platform id="fds">
     <name>Nintendo Famicom Disk System</name>
@@ -1484,7 +1484,7 @@
     <alias>FCD</alias>
     <alias>FKDS</alias>
     <alias>Nintendo - Family Computer Disk System</alias>
-    <ids screenscraper="106" libretro="Nintendo - Family Computer Disk System" retroachievements="81" esde="fds" launchbox="Nintendo Famicom Disk System" hyperspin="Nintendo Famicom Disk System"/>
+    <ids regvault="famicomdisk" screenscraper="106" libretro="Nintendo - Family Computer Disk System" retroachievements="81" esde="fds" launchbox="Nintendo Famicom Disk System" hyperspin="Nintendo Famicom Disk System"/>
   </platform>
   <platform id="gameandwatch">
     <name>Nintendo Game &amp; Watch</name>
@@ -1521,7 +1521,7 @@
     <alias>GB</alias>
     <alias>Nintendo - Game Boy</alias>
     <alias>GameBoy</alias>
-    <ids screenscraper="9" libretro="Nintendo - Game Boy" retroachievements="4" esde="gb" launchbox="Nintendo Game Boy" hyperspin="Nintendo Game Boy"/>
+    <ids regvault="gb" screenscraper="9" libretro="Nintendo - Game Boy" retroachievements="4" esde="gb" launchbox="Nintendo Game Boy" hyperspin="Nintendo Game Boy"/>
   </platform>
   <platform id="gba">
     <name>Nintendo Game Boy Advance</name>
@@ -1540,7 +1540,7 @@
     <alias>GB Advance</alias>
     <alias>GBA</alias>
     <alias>Nintendo - Game Boy Advance</alias>
-    <ids screenscraper="12" libretro="Nintendo - Game Boy Advance" retroachievements="5" esde="gba" launchbox="Nintendo Game Boy Advance" hyperspin="Nintendo Game Boy Advance"/>
+    <ids regvault="gba" screenscraper="12" libretro="Nintendo - Game Boy Advance" retroachievements="5" esde="gba" launchbox="Nintendo Game Boy Advance" hyperspin="Nintendo Game Boy Advance"/>
   </platform>
   <platform id="gbc">
     <name>Nintendo Game Boy Color</name>
@@ -1559,7 +1559,7 @@
     <alias>GBC</alias>
     <alias>Nintendo - Game Boy Color</alias>
     <alias>GameBoy Color</alias>
-    <ids screenscraper="10" libretro="Nintendo - Game Boy Color" retroachievements="6" esde="gbc" launchbox="Nintendo Game Boy Color" hyperspin="Nintendo Game Boy Color"/>
+    <ids regvault="gbc" screenscraper="10" libretro="Nintendo - Game Boy Color" retroachievements="6" esde="gbc" launchbox="Nintendo Game Boy Color" hyperspin="Nintendo Game Boy Color"/>
   </platform>
   <platform id="gc">
     <name>Nintendo GameCube</name>
@@ -1577,7 +1577,7 @@
     <alias>NGC</alias>
     <alias>GC</alias>
     <alias>Nintendo - GameCube</alias>
-    <ids screenscraper="13" libretro="Nintendo - GameCube" retroachievements="16" esde="gc" launchbox="Nintendo GameCube" hyperspin="Nintendo GameCube"/>
+    <ids regvault="gamecube" screenscraper="13" libretro="Nintendo - GameCube" retroachievements="16" esde="gc" launchbox="Nintendo GameCube" hyperspin="Nintendo GameCube"/>
   </platform>
   <platform id="pokemini">
     <name>Nintendo Pokémon Mini</name>
@@ -1591,7 +1591,7 @@
     <alias>Pokemon Mini</alias>
     <alias>PokeMini</alias>
     <alias>Nintendo - Pokemon Mini</alias>
-    <ids screenscraper="211" libretro="Nintendo - Pokemon Mini" retroachievements="24" esde="pokemini"/>
+    <ids regvault="pokemini" screenscraper="211" libretro="Nintendo - Pokemon Mini" retroachievements="24" esde="pokemini"/>
   </platform>
   <platform id="satellaview">
     <name>Nintendo Satellaview</name>
@@ -1607,7 +1607,7 @@
     <alias>Nintendo BS-X</alias>
     <alias>BS-X</alias>
     <alias>Nintendo - Satellaview</alias>
-    <ids screenscraper="107" libretro="Nintendo - Satellaview" esde="satellaview" launchbox="Nintendo Satellaview" hyperspin="Nintendo Satellaview"/>
+    <ids regvault="satellaview" screenscraper="107" libretro="Nintendo - Satellaview" esde="satellaview" launchbox="Nintendo Satellaview" hyperspin="Nintendo Satellaview"/>
   </platform>
   <platform id="switch">
     <name>Nintendo Switch</name>
@@ -1635,7 +1635,7 @@
     <alias>Nintendo vboy</alias>
     <alias>vboy</alias>
     <alias>Nintendo - Virtual Boy</alias>
-    <ids screenscraper="11" libretro="Nintendo - Virtual Boy" retroachievements="28" esde="virtualboy" launchbox="Nintendo Virtual Boy" hyperspin="Nintendo Virtual Boy"/>
+    <ids regvault="virtualboy" screenscraper="11" libretro="Nintendo - Virtual Boy" retroachievements="28" esde="virtualboy" launchbox="Nintendo Virtual Boy" hyperspin="Nintendo Virtual Boy"/>
   </platform>
   <platform id="wii">
     <name>Nintendo Wii</name>
@@ -1649,7 +1649,7 @@
     <alias>Wii</alias>
     <alias>Nintendo - Wii</alias>
     <alias>Nintendo - Wii (Digital)</alias>
-    <ids screenscraper="16" libretro="Nintendo - Wii" retroachievements="19" esde="wii" launchbox="Nintendo Wii" hyperspin="Nintendo Wii"/>
+    <ids regvault="wii" screenscraper="16" libretro="Nintendo - Wii" retroachievements="19" esde="wii" launchbox="Nintendo Wii" hyperspin="Nintendo Wii"/>
   </platform>
   <platform id="wiiu">
     <name>Nintendo Wii U</name>
@@ -1664,7 +1664,7 @@
     <alias>Nintendo WII-U</alias>
     <alias>WII-U</alias>
     <alias>wiiu</alias>
-    <ids screenscraper="18" retroachievements="20" esde="wiiu" launchbox="Nintendo Wii U" hyperspin="Nintendo Wii U"/>
+    <ids regvault="wiiu" screenscraper="18" retroachievements="20" esde="wiiu" launchbox="Nintendo Wii U" hyperspin="Nintendo Wii U"/>
   </platform>
   <platform id="ngage">
     <name>Nokia N-Gage</name>
@@ -1714,7 +1714,7 @@
     <alias>cdi</alias>
     <alias>cdimono1</alias>
     <alias>Philips - CD-i</alias>
-    <ids screenscraper="133" libretro="Philips - CD-i" retroachievements="42" esde="cdimono1" launchbox="Philips CD-i" hyperspin="Philips CD-i"/>
+    <ids regvault="cdi" screenscraper="133" libretro="Philips - CD-i" retroachievements="42" esde="cdimono1" launchbox="Philips CD-i" hyperspin="Philips CD-i"/>
   </platform>
   <platform id="pico8">
     <name>PICO-8</name>
@@ -1739,7 +1739,7 @@
     <extensions>7z bin chd dat elf lst zip</extensions>
     <alias>Atomiswave</alias>
     <alias>Sammy Corporation Atomiswave</alias>
-    <ids screenscraper="53" libretro="Atomiswave" esde="atomiswave" launchbox="Sammy Atomiswave" hyperspin="Sammy Atomiswave"/>
+    <ids regvault="atomiswave" screenscraper="53" libretro="Atomiswave" esde="atomiswave" launchbox="Sammy Atomiswave" hyperspin="Sammy Atomiswave"/>
   </platform>
   <platform id="scummvm">
     <name>ScummVM</name>
@@ -1775,7 +1775,7 @@
     <alias>Sega Super 32X</alias>
     <alias>sega32xna</alias>
     <alias>Sega - 32X</alias>
-    <ids screenscraper="19" libretro="Sega - 32X" retroachievements="10" esde="sega32x" launchbox="Sega 32X" hyperspin="Sega 32X"/>
+    <ids regvault="sega32x" screenscraper="19" libretro="Sega - 32X" retroachievements="10" esde="sega32x" launchbox="Sega 32X" hyperspin="Sega 32X"/>
   </platform>
   <platform id="dreamcast">
     <name>Sega Dreamcast</name>
@@ -1790,7 +1790,7 @@
     <alias>Sega DC</alias>
     <alias>DC</alias>
     <alias>Sega - Dreamcast</alias>
-    <ids screenscraper="23" libretro="Sega - Dreamcast" retroachievements="40" esde="dreamcast" launchbox="Sega Dreamcast" hyperspin="Sega Dreamcast"/>
+    <ids regvault="dreamcast" screenscraper="23" libretro="Sega - Dreamcast" retroachievements="40" esde="dreamcast" launchbox="Sega Dreamcast" hyperspin="Sega Dreamcast"/>
   </platform>
   <platform id="gamegear">
     <name>Sega Game Gear</name>
@@ -1806,7 +1806,7 @@
     <alias>GG</alias>
     <alias>gamegear</alias>
     <alias>Sega - Game Gear</alias>
-    <ids screenscraper="21" libretro="Sega - Game Gear" retroachievements="15" esde="gamegear" launchbox="Sega Game Gear" hyperspin="Sega Game Gear"/>
+    <ids regvault="gamegear" screenscraper="21" libretro="Sega - Game Gear" retroachievements="15" esde="gamegear" launchbox="Sega Game Gear" hyperspin="Sega Game Gear"/>
   </platform>
   <platform id="mastersystem">
     <name>Sega Master System</name>
@@ -1824,7 +1824,7 @@
     <alias>mastersystem</alias>
     <alias>mark3</alias>
     <alias>Sega - Master System - Mark III</alias>
-    <ids screenscraper="2" libretro="Sega - Master System - Mark III" retroachievements="11" esde="mastersystem" launchbox="Sega Master System" hyperspin="Sega Master System"/>
+    <ids regvault="mastersystem" screenscraper="2" libretro="Sega - Master System - Mark III" retroachievements="11" esde="mastersystem" launchbox="Sega Master System" hyperspin="Sega Master System"/>
   </platform>
   <platform id="megadrive">
     <name>Sega Mega Drive</name>
@@ -1842,7 +1842,7 @@
     <alias>Super Aladdin Boy</alias>
     <alias>megadrivejp</alias>
     <alias>Sega - Mega Drive - Genesis</alias>
-    <ids screenscraper="1" libretro="Sega - Mega Drive - Genesis" retroachievements="1" esde="megadrive" launchbox="Sega Genesis" hyperspin="Sega Genesis"/>
+    <ids regvault="megadrive" screenscraper="1" libretro="Sega - Mega Drive - Genesis" retroachievements="1" esde="megadrive" launchbox="Sega Genesis" hyperspin="Sega Genesis"/>
   </platform>
   <platform id="segacd">
     <name>Sega Mega-CD</name>
@@ -1861,7 +1861,7 @@
     <alias>megacdjp</alias>
     <alias>Sega - Mega-CD - Sega CD</alias>
     <alias>Mega CD</alias>
-    <ids screenscraper="20" libretro="Sega - Mega-CD - Sega CD" retroachievements="9" esde="segacd" launchbox="Sega CD" hyperspin="Sega CD"/>
+    <ids regvault="segacd" screenscraper="20" libretro="Sega - Mega-CD - Sega CD" retroachievements="9" esde="segacd" launchbox="Sega CD" hyperspin="Sega CD"/>
   </platform>
   <platform id="model2">
     <name>Sega Model 2</name>
@@ -1904,7 +1904,7 @@
     <extensions>7z bin chd dat elf gdi lst raw zip</extensions>
     <alias>Naomi</alias>
     <alias>Sega - Naomi</alias>
-    <ids screenscraper="56" libretro="Sega - Naomi" esde="naomi" launchbox="Sega Naomi" hyperspin="Sega Naomi"/>
+    <ids regvault="naomi" screenscraper="56" libretro="Sega - Naomi" esde="naomi" launchbox="Sega Naomi" hyperspin="Sega Naomi"/>
   </platform>
   <platform id="naomi2">
     <name>Sega NAOMI 2</name>
@@ -1960,7 +1960,7 @@
     <alias>Saturn</alias>
     <alias>saturnjp</alias>
     <alias>Sega - Saturn</alias>
-    <ids screenscraper="22" libretro="Sega - Saturn" retroachievements="39" esde="saturn" launchbox="Sega Saturn" hyperspin="Sega Saturn"/>
+    <ids regvault="saturn" screenscraper="22" libretro="Sega - Saturn" retroachievements="39" esde="saturn" launchbox="Sega Saturn" hyperspin="Sega Saturn"/>
   </platform>
   <platform id="sg-1000">
     <name>Sega SG-1000</name>
@@ -2009,7 +2009,7 @@
     <extensions>2d 2hd 7z 88d cmd d88 dup dx1 hdm tap tfd xdf zip</extensions>
     <alias>X1</alias>
     <alias>Sharp - X1</alias>
-    <ids screenscraper="220" libretro="Sharp - X1" retroachievements="64" esde="x1" launchbox="Sharp X1" hyperspin="Sharp X1"/>
+    <ids regvault="sharpx1" screenscraper="220" libretro="Sharp - X1" retroachievements="64" esde="x1" launchbox="Sharp X1" hyperspin="Sharp X1"/>
   </platform>
   <platform id="x68000">
     <name>Sharp X68000</name>
@@ -2023,7 +2023,7 @@
     <alias>Sharp X68k</alias>
     <alias>X68k</alias>
     <alias>Sharp - X68000</alias>
-    <ids screenscraper="79" libretro="Sharp - X68000" retroachievements="52" esde="x68000" launchbox="Sharp X68000" hyperspin="Sharp X68000"/>
+    <ids regvault="x68000" screenscraper="79" libretro="Sharp - X68000" retroachievements="52" esde="x68000" launchbox="Sharp X68000" hyperspin="Sharp X68000"/>
   </platform>
   <platform id="zxspectrum">
     <name>Sinclair ZX Spectrum</name>
@@ -2040,7 +2040,7 @@
     <alias>Sinclair - ZX Spectrum</alias>
     <alias>Sinclair - ZX Spectrum +3</alias>
     <alias>spectrum</alias>
-    <ids screenscraper="76" libretro="Sinclair - ZX Spectrum" retroachievements="59" esde="zxspectrum" launchbox="Sinclair ZX Spectrum" hyperspin="Sinclair ZX Spectrum"/>
+    <ids regvault="zxspectrum" screenscraper="76" libretro="Sinclair - ZX Spectrum" retroachievements="59" esde="zxspectrum" launchbox="Sinclair ZX Spectrum" hyperspin="Sinclair ZX Spectrum"/>
   </platform>
   <platform id="zx81">
     <name>Sinclair ZX81</name>
@@ -2074,7 +2074,7 @@
     <alias>neogeo</alias>
     <alias>SNK - Neo Geo</alias>
     <alias>Neo Geo</alias>
-    <ids screenscraper="142" libretro="SNK - Neo Geo" esde="neogeo" launchbox="SNK Neo Geo" hyperspin="SNK Neo Geo"/>
+    <ids regvault="neogeo" screenscraper="142" libretro="SNK - Neo Geo" esde="neogeo" launchbox="SNK Neo Geo" hyperspin="SNK Neo Geo"/>
   </platform>
   <platform id="neogeocd">
     <name>SNK Neo Geo CD</name>
@@ -2092,7 +2092,7 @@
     <alias>neogeocdjp</alias>
     <alias>SNK - Neo Geo CD</alias>
     <alias>Neo Geo CD</alias>
-    <ids screenscraper="70" libretro="SNK - Neo Geo CD" retroachievements="56" esde="neogeocd" launchbox="SNK Neo Geo CD" hyperspin="SNK Neo Geo CD"/>
+    <ids regvault="neogeocd" screenscraper="70" libretro="SNK - Neo Geo CD" retroachievements="56" esde="neogeocd" launchbox="SNK Neo Geo CD" hyperspin="SNK Neo Geo CD"/>
   </platform>
   <platform id="ngp">
     <name>SNK Neo Geo Pocket</name>
@@ -2110,7 +2110,7 @@
     <alias>ngp</alias>
     <alias>SNK - Neo Geo Pocket</alias>
     <alias>Neo Geo Pocket</alias>
-    <ids screenscraper="25" libretro="SNK - Neo Geo Pocket" retroachievements="14" esde="ngp" launchbox="SNK Neo Geo Pocket" hyperspin="SNK Neo Geo Pocket"/>
+    <ids regvault="ngp" screenscraper="25" libretro="SNK - Neo Geo Pocket" retroachievements="14" esde="ngp" launchbox="SNK Neo Geo Pocket" hyperspin="SNK Neo Geo Pocket"/>
   </platform>
   <platform id="ngpc">
     <name>SNK Neo Geo Pocket Color</name>
@@ -2128,7 +2128,7 @@
     <alias>SNK NGPC</alias>
     <alias>NGPC</alias>
     <alias>SNK - Neo Geo Pocket Color</alias>
-    <ids screenscraper="82" libretro="SNK - Neo Geo Pocket Color" esde="ngpc" launchbox="SNK Neo Geo Pocket Color" hyperspin="SNK Neo Geo Pocket Color"/>
+    <ids regvault="ngpc" screenscraper="82" libretro="SNK - Neo Geo Pocket Color" esde="ngpc" launchbox="SNK Neo Geo Pocket Color" hyperspin="SNK Neo Geo Pocket Color"/>
   </platform>
   <platform id="solarus">
     <name>Solarus</name>
@@ -2156,7 +2156,7 @@
     <alias>Sony PS One</alias>
     <alias>PS One</alias>
     <alias>Sony - PlayStation</alias>
-    <ids screenscraper="57" libretro="Sony - PlayStation" retroachievements="12" esde="psx" launchbox="Sony Playstation" hyperspin="Sony PlayStation"/>
+    <ids regvault="psx" screenscraper="57" libretro="Sony - PlayStation" retroachievements="12" esde="psx" launchbox="Sony Playstation" hyperspin="Sony PlayStation"/>
   </platform>
   <platform id="ps2">
     <name>Sony PlayStation 2</name>
@@ -2173,7 +2173,7 @@
     <alias>Sony Playstation II</alias>
     <alias>Playstation II</alias>
     <alias>Sony - PlayStation 2</alias>
-    <ids screenscraper="58" libretro="Sony - PlayStation 2" retroachievements="21" esde="ps2" launchbox="Sony Playstation 2" hyperspin="Sony PlayStation 2"/>
+    <ids regvault="ps2" screenscraper="58" libretro="Sony - PlayStation 2" retroachievements="21" esde="ps2" launchbox="Sony Playstation 2" hyperspin="Sony PlayStation 2"/>
   </platform>
   <platform id="ps3">
     <name>Sony PlayStation 3</name>
@@ -2191,7 +2191,7 @@
     <alias>Playstation III</alias>
     <alias>Sony - PlayStation 3</alias>
     <alias>Sony - PlayStation 3 (PSN)</alias>
-    <ids screenscraper="59" libretro="Sony - PlayStation 3" retroachievements="82" esde="ps3" launchbox="Sony Playstation 3"/>
+    <ids regvault="ps3" screenscraper="59" libretro="Sony - PlayStation 3" retroachievements="82" esde="ps3" launchbox="Sony Playstation 3"/>
   </platform>
   <platform id="ps4">
     <name>Sony PlayStation 4</name>
@@ -2225,7 +2225,7 @@
     <alias>PS Portable</alias>
     <alias>Sony - PlayStation Portable</alias>
     <alias>Sony - PlayStation Portable (PSN)</alias>
-    <ids screenscraper="61" libretro="Sony - PlayStation Portable" retroachievements="41" esde="psp" launchbox="Sony PSP" hyperspin="Sony PSP"/>
+    <ids regvault="psp" screenscraper="61" libretro="Sony - PlayStation Portable" retroachievements="41" esde="psp" launchbox="Sony PSP" hyperspin="Sony PSP"/>
   </platform>
   <platform id="psvita">
     <name>Sony PlayStation Vita</name>
@@ -2243,7 +2243,7 @@
     <alias>Vita</alias>
     <alias>psvita</alias>
     <alias>Sony - PlayStation Vita</alias>
-    <ids screenscraper="62" libretro="Sony - PlayStation Vita" esde="psvita" launchbox="Sony Playstation Vita"/>
+    <ids regvault="psvita" screenscraper="62" libretro="Sony - PlayStation Vita" esde="psvita" launchbox="Sony Playstation Vita"/>
   </platform>
   <platform id="spectravideo">
     <name>Spectravideo</name>
@@ -2275,7 +2275,7 @@
     <alias>sfc</alias>
     <alias>Nintendo SFC (Super Famicom)</alias>
     <alias>Nintendo - Super Nintendo Entertainment System</alias>
-    <ids screenscraper="4" libretro="Nintendo - Super Nintendo Entertainment System" retroachievements="3" esde="snes" launchbox="Super Nintendo Entertainment System" hyperspin="Nintendo Super Famicom"/>
+    <ids regvault="snes" screenscraper="4" libretro="Nintendo - Super Nintendo Entertainment System" retroachievements="3" esde="snes" launchbox="Super Nintendo Entertainment System" hyperspin="Nintendo Super Famicom"/>
   </platform>
   <platform id="type-x">
     <name>Taito Type X</name>
@@ -2422,7 +2422,7 @@
     <alias>gamecom</alias>
     <alias>Tiger Electronics Game.com</alias>
     <alias>Tiger - Game.com</alias>
-    <ids screenscraper="121" libretro="Tiger - Game.com" esde="gamecom" hyperspin="Tiger Game.com"/>
+    <ids regvault="gamecom" screenscraper="121" libretro="Tiger - Game.com" esde="gamecom" hyperspin="Tiger Game.com"/>
   </platform>
   <platform id="uzebox">
     <name>Uzebox</name>
@@ -2468,7 +2468,7 @@
     <alias>CreatiVision</alias>
     <alias>crvision</alias>
     <alias>VTech - CreatiVision</alias>
-    <ids screenscraper="241" libretro="VTech - CreatiVision" esde="crvision"/>
+    <ids regvault="creativision" screenscraper="241" libretro="VTech - CreatiVision" esde="crvision"/>
   </platform>
   <platform id="vsmile">
     <name>VTech V.Smile</name>
@@ -2482,7 +2482,7 @@
     <alias>V.Smile</alias>
     <alias>vsmile</alias>
     <alias>VTech - V.Smile</alias>
-    <ids screenscraper="120" libretro="VTech - V.Smile" esde="vsmile"/>
+    <ids regvault="vsmile" screenscraper="120" libretro="VTech - V.Smile" esde="vsmile"/>
   </platform>
   <platform id="wasm4">
     <name>WASM-4</name>
@@ -2508,6 +2508,6 @@
     <alias>supervision</alias>
     <alias>Watara - Supervision</alias>
     <alias>NEC - Supervision</alias>
-    <ids screenscraper="207" libretro="Watara - Supervision" retroachievements="63" esde="supervision" launchbox="Watara Supervision"/>
+    <ids regvault="supervision" screenscraper="207" libretro="Watara - Supervision" retroachievements="63" esde="supervision" launchbox="Watara Supervision"/>
   </platform>
 </platforms>

@@ -40,6 +40,9 @@ constexpr std::string_view SATURN_MAGIC = "SEGA SEGASATURN";
 constexpr std::string_view MEGACD_MAGIC = "SEGADISCSYSTEM";
 constexpr std::string_view DREAMCAST_MAGIC = "SEGA SEGAKATANA";
 
+//! How far into a disc image its header is looked for before giving up
+constexpr uint64_t MAX_DISC_SCAN = 2ULL * 1024 * 1024 * 1024;
+
 bool HasExtension(const std::string& path, const auto& extensions)
 {
   const std::string ext = StringUtils::ToLower(URIUtils::GetExtension(path));
@@ -134,38 +137,82 @@ std::string CGameFileIdentity::FirstTrack(const std::string& sheetPath)
   return "";
 }
 
-std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath)
+std::string CGameFileIdentity::SerialFromHeader(const std::string& data, size_t at, int console)
 {
-  const std::string head = ReadHead(trackPath, DISC_HEADER_SIZE);
-  if (head.empty())
-    return "";
-
-  // The system area sits at the start of the first track, possibly behind a
-  // 16-byte raw sector header
-  const std::string_view start(head.data(), std::min<size_t>(head.size(), 0x200));
-
-  if (const size_t at = start.find(SATURN_MAGIC); at != std::string_view::npos && at <= 0x10)
-    return NormaliseSerial(HeaderField(head, at + 0x20, 0x10));
-
-  if (const size_t at = start.find(DREAMCAST_MAGIC); at != std::string_view::npos && at <= 0x10)
-    return NormaliseSerial(HeaderField(head, at + 0x40, 0x0A));
-
-  if (const size_t at = start.find(MEGACD_MAGIC); at != std::string_view::npos && at <= 0x10)
+  // 0: Dreamcast, 1: Saturn, 2: Mega-CD
+  if (console == 0)
   {
-    std::string serial = HeaderField(head, at + 0x180, 0x10);
-    if (serial.starts_with("GM "))
-      serial.erase(0, 3);
-    const size_t suffix = serial.find("-00");
-    if (suffix != std::string::npos)
-      serial.erase(suffix);
+    // "MK-51171" or "T40201N", sometimes with a second field after a space
+    std::string serial = HeaderField(data, at + 0x40, 0x10);
+    const size_t space = serial.find(' ');
+    if (space != std::string::npos)
+      serial.erase(space);
     return NormaliseSerial(serial);
   }
 
-  // PlayStation: BOOT = cdrom:\SLUS_003.00;1 in SYSTEM.CNF
-  CRegExp re(true);
-  if (re.RegComp("BOOT\\s*=\\s*cdrom:\\\\?([A-Z]{4})[_-]?([0-9]{3})\\.?([0-9]{2})") &&
-      re.RegFind(head) >= 0)
-    return NormaliseSerial(re.GetMatch(1) + re.GetMatch(2) + re.GetMatch(3));
+  if (console == 1)
+    return NormaliseSerial(HeaderField(data, at + 0x20, 0x10));
+
+  std::string serial = HeaderField(data, at + 0x180, 0x10);
+  if (serial.starts_with("GM "))
+    serial.erase(0, 3);
+  const size_t suffix = serial.find("-00");
+  if (suffix != std::string::npos)
+    serial.erase(suffix);
+  return NormaliseSerial(serial);
+}
+
+std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath)
+{
+  XFILE::CFile file;
+  if (!file.Open(trackPath, XFILE::READ_NO_CACHE))
+    return "";
+
+  // The system area sits at the start of a plain track, but a container such
+  // as DiscJuggler's puts the data track wherever it lands: measured on real
+  // images, anywhere from 1 MB to 460 MB in. So the file is read through until
+  // the header appears and reading stops the moment it does, which is no
+  // dearer than the hashing this replaces and usually far cheaper.
+  static constexpr std::array<std::pair<std::string_view, int>, 3> magics{{
+      {DREAMCAST_MAGIC, 0},
+      {SATURN_MAGIC, 1},
+      {MEGACD_MAGIC, 2},
+  }};
+
+  // Enough of the last chunk is kept for a header that straddles the join
+  static constexpr size_t OVERLAP = 0x400;
+
+  std::vector<char> buffer(CHUNK_SIZE);
+  std::string window;
+  uint64_t read = 0;
+
+  while (read < MAX_DISC_SCAN)
+  {
+    const ssize_t n = file.Read(buffer.data(), buffer.size());
+    if (n <= 0)
+      break;
+    read += static_cast<uint64_t>(n);
+    window.append(buffer.data(), static_cast<size_t>(n));
+
+    for (const auto& [magic, console] : magics)
+    {
+      const size_t at = window.find(magic);
+      if (at == std::string::npos)
+        continue;
+      const std::string serial = SerialFromHeader(window, at, console);
+      if (!serial.empty())
+        return serial;
+    }
+
+    // PlayStation names itself in text rather than in a header
+    CRegExp re(true);
+    if (re.RegComp("BOOT\\s*=\\s*cdrom:\\\\?([A-Z]{4})[_-]?([0-9]{3})\\.?([0-9]{2})") &&
+        re.RegFind(window) >= 0)
+      return NormaliseSerial(re.GetMatch(1) + re.GetMatch(2) + re.GetMatch(3));
+
+    if (window.size() > OVERLAP)
+      window.erase(0, window.size() - OVERLAP);
+  }
 
   return "";
 }
@@ -257,13 +304,13 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
     if (HasExtension(path, archiveExtensions))
       return HashArchive(path, file);
 
+    // A disc is known by the serial printed in its own header. Hashing the
+    // container matches nothing: the catalogues key discs by serial, and every
+    // rip of one game differs by however it was made.
     if (media == MediaFormat::DISC || file.size > MAX_HASH_SIZE)
     {
-      if (HasExtension(path, trackExtensions) || file.size > MAX_HASH_SIZE)
-      {
-        file.serial = ReadDiscSerial(path);
-        return !file.serial.empty();
-      }
+      file.serial = ReadDiscSerial(path);
+      return !file.serial.empty();
     }
 
     return HashWhole(path, file);
