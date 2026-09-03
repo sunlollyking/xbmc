@@ -49,8 +49,16 @@ candidate's title. Property `gamelibrary.candidate` holds:
 
 ```json
 {"id": "<provider id>", "title": "Sonic the Hedgehog 2", "year": 1992,
- "platform": "megadrive", "score": 1.0, "matchedby": "hash"}
+ "platform": "megadrive", "score": 1.0, "matchedby": "hash",
+ "subtitle": "Sonic The Hedgehog 2 (World)", "regions": ["World"],
+ "provider": "libretro", "thumb": "https://..."}
 ```
+
+`subtitle`, `regions`, `provider` and `thumb` are optional and exist for one
+reason: when several candidates share a title, a person has to be able to tell
+them apart in the selection dialog. Send the catalogue's own name for the entry
+as `subtitle`, the regions it covers written in full, and an image if one is
+free to give.
 
 A candidate may also carry the property `gamelibrary.details` holding the
 same JSON `getdetails` would answer with for it; Kodi then skips the

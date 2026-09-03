@@ -60,6 +60,12 @@ struct GameScrapeCandidate
   float score{0.0f};
   MatchMethod matchedBy{MatchMethod::NONE};
   std::string details; // the details payload, when the scraper sent it with the candidate
+
+  // What tells two candidates of the same title apart, when a person has to pick
+  std::string subtitle; // the catalogue's own name, e.g. "Sonic 2 (USA, Europe) (Rev A)"
+  std::vector<std::string> regions;
+  std::string provider; // which source answered
+  std::string thumb; // an image to show beside the title
 };
 
 /*!

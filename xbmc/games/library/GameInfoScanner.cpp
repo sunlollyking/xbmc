@@ -450,7 +450,22 @@ const GameScrapeCandidate* CGameInfoScanner::ChooseCandidate(
     for (const GameScrapeCandidate& candidate : candidates)
     {
       CFileItem item(candidate.title);
-      item.SetLabel2(candidate.year > 0 ? std::to_string(candidate.year) : "");
+
+      // Two entries often share a title, so the line under it has to be what
+      // separates them: the year, where it was sold, and the catalogue's own name
+      std::vector<std::string> parts;
+      if (candidate.year > 0)
+        parts.emplace_back(std::to_string(candidate.year));
+      if (!candidate.regions.empty())
+        parts.emplace_back(StringUtils::Join(candidate.regions, ", "));
+      if (!candidate.subtitle.empty() && candidate.subtitle != candidate.title)
+        parts.emplace_back(candidate.subtitle);
+      if (!candidate.provider.empty())
+        parts.emplace_back(candidate.provider);
+      item.SetLabel2(StringUtils::Join(parts, "  ·  "));
+
+      if (!candidate.thumb.empty())
+        item.SetArt("thumb", candidate.thumb);
       dialog->Add(item);
     }
     dialog->EnableButton(true, 413); // "Manual"

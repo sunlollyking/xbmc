@@ -222,6 +222,13 @@ std::vector<GameScrapeCandidate> CGameScraper::Find(const GameScrapeRequest& req
     if (candidate.matchedBy == MatchMethod::NONE)
       candidate.matchedBy = MatchMethod::NAME;
 
+    candidate.subtitle = payload["subtitle"].asString();
+    candidate.regions = Strings(payload["regions"]);
+    if (candidate.regions.empty() && payload["regions"].isString())
+      candidate.regions = StringUtils::Split(payload["regions"].asString(), ",");
+    candidate.provider = payload["provider"].asString();
+    candidate.thumb = payload["thumb"].asString();
+
     candidate.details = item->GetProperty(PROPERTY_DETAILS).asString();
 
     if (!candidate.id.empty())
