@@ -291,7 +291,8 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           }
           break;
         case LISTITEM_REGION:
-          value = tag->GetRegion();
+          // Stored as a list; read as a sentence
+          value = StringUtils::Join(StringUtils::Split(tag->GetRegion(), ","), ", ");
           return !value.empty();
         case LISTITEM_RELEASE_COUNT:
           if (tag->GetReleaseCount() > 0)

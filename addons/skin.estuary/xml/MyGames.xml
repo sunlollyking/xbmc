@@ -42,13 +42,13 @@
 						<font>font36_title</font>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
-					<control type="textbox">
+					<control type="textbox" id="15510">
 						<left>30</left>
 						<top>240</top>
 						<width>525</width>
 						<bottom>100</bottom>
 						<visible>!ListItem.IsCollection</visible>
-						<label>$INFO[ListItem.Tagline,[I],[/I][CR][CR]]$INFO[ListItem.Plot][CR][CR]</label>
+						<label>$INFO[ListItem.Tagline,[I],[/I][CR][CR]]$VAR[ListBoxInfoVar][CR][CR]</label>
 						<autoscroll delay="10000" time="3000" repeat="10000">Skin.HasSetting(autoscroll)</autoscroll>
 					</control>
 					<control type="textbox">
@@ -61,7 +61,7 @@
 						<font>font27</font>
 						<textcolor>80FFFFFF</textcolor>
 						<label>$LOCALIZE[19055]</label>
-						<visible>String.IsEmpty(Listitem.Plot) + String.IsEmpty(Listitem.Tagline) + !ListItem.IsCollection + !ListItem.IsParentFolder</visible>
+						<visible>String.IsEmpty(Control.GetLabel(15510)) + !ListItem.IsCollection + !ListItem.IsParentFolder</visible>
 					</control>
 					<control type="group">
 						<left>20</left>

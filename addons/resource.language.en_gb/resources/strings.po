@@ -20220,7 +20220,13 @@ msgctxt "#35570"
 msgid "Release"
 msgstr ""
 
-#empty strings from id 35571 to 35999
+#. Label of the company that made a games platform, shown in the games library
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35571"
+msgid "Manufacturer"
+msgstr ""
+
+#empty strings from id 35572 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

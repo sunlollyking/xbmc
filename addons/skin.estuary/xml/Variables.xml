@@ -117,6 +117,8 @@
 		<value>$INFO[ListItem.Label2]</value>
 	</variable>
 	<variable name="PlotTextBoxVar">
+		<value condition="Container.Content(games) | Container.Content(releases)">$VAR[GameListInfoVar]</value>
+		<value condition="Container.Content(platforms)">$VAR[PlatformListInfoVar]</value>
 		<value condition="!String.IsEmpty(ListItem.PlotOutline)">$INFO[ListItem.PlotOutline]</value>
 		<value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
 		<value condition="String.IsEqual(ListItem.DBType,season)">$INFO[Container.ShowPlot]</value>
@@ -156,12 +158,20 @@
 		<value condition="ListItem.IsParentFolder">special://skin/extras/home-images/movie.jpg</value>
 		<value>$INFO[ListItem.Art(fanart)]</value>
 	</variable>
+	<variable name="GameListInfoVar">
+		<value>$INFO[ListItem.Platform,[COLOR button_focus]$LOCALIZE[35549]: [/COLOR],[CR]]$INFO[ListItem.Year,[COLOR button_focus]$LOCALIZE[345]: [/COLOR],[CR]]$INFO[ListItem.Genre,[COLOR button_focus]$LOCALIZE[515]: [/COLOR],[CR]]$INFO[ListItem.Developer,[COLOR button_focus]$LOCALIZE[35328]: [/COLOR],[CR]]$INFO[ListItem.Publisher,[COLOR button_focus]$LOCALIZE[35327]: [/COLOR],[CR]]$INFO[ListItem.Players,[COLOR button_focus]$LOCALIZE[35525]: [/COLOR],[CR]]$INFO[ListItem.Region,[COLOR button_focus]$LOCALIZE[20026]: [/COLOR],[CR]]$INFO[ListItem.Plot,[CR],]</value>
+	</variable>
+	<variable name="PlatformListInfoVar">
+		<value>$INFO[ListItem.Property(manufacturer),[COLOR button_focus]$LOCALIZE[35571]: [/COLOR],[CR]]$INFO[ListItem.Property(released),[COLOR button_focus]$LOCALIZE[345]: [/COLOR],[CR]]$INFO[ListItem.Property(gamecount),[COLOR button_focus]$LOCALIZE[35550]: [/COLOR],[CR]]$INFO[ListItem.Plot,[CR],]</value>
+	</variable>
 	<variable name="ListBoxInfoVar">
 		<value condition="String.IsEqual(Container.FolderPath,addons://outdated/) + !String.IsEmpty(ListItem.Addonnews)">$INFO[ListItem.Addonnews]</value>
 		<value condition="Container.Content(addons)">$INFO[ListItem.AddonDescription]</value>
 		<value condition="String.IsEqual(listitem.dbtype,album)">$INFO[ListItem.Property(album_description)]</value>
 		<value condition="String.IsEqual(listitem.dbtype,musicvideo) | String.IsEqual(listitem.dbtype,video)">$INFO[ListItem.Genre,[COLOR button_focus]$LOCALIZE[515]: [/COLOR],[CR]]$INFO[ListItem.Plot]</value>
 		<value condition="String.IsEqual(listitem.dbtype,artist)">$INFO[ListItem.Property(artist_description)]</value>
+		<value condition="Container.Content(games) | Container.Content(releases)">$VAR[GameListInfoVar]</value>
+		<value condition="Container.Content(platforms)">$VAR[PlatformListInfoVar]</value>
 		<value condition="!String.IsEmpty(ListItem.PlotOutline)">$INFO[ListItem.PlotOutline]</value>
 		<value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
 		<value condition="String.IsEqual(ListItem.DBType,season)">$INFO[Container.ShowPlot]</value>
