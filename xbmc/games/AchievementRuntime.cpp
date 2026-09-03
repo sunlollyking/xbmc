@@ -22,6 +22,11 @@ void CAchievementRuntime::Clear()
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_state = AchievementState{};
+
+  // The leaderboards belong to the game that just went away too, and a stale
+  // selection would point the entries dialog at nothing
+  m_leaderboards = LeaderboardState{};
+  m_selectedLeaderboard = 0;
 }
 
 AchievementState CAchievementRuntime::GetState() const
@@ -95,64 +100,58 @@ std::string CAchievementRuntime::GetRichPresence() const
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_state.richPresence;
 }
+
 unsigned int CAchievementRuntime::GetTotalAchievements() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_state.totalAchievements;
 }
+
 unsigned int CAchievementRuntime::GetUnlockedAchievements() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_state.unlockedAchievements;
 }
 
-std::string CAchievementRuntime::GetTrackedAchievementTitle() const
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-  const ProgressIndicator* best = BestProgressIndicator();
-  return best != nullptr ? best->title : std::string{};
-}
-
-std::string CAchievementRuntime::GetTrackedAchievementProgress() const
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-  const ProgressIndicator* best = BestProgressIndicator();
-  return best != nullptr ? best->measuredProgress : std::string{};
-}
-
-std::string CAchievementRuntime::GetTrackedAchievementBadge() const
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-  const ProgressIndicator* best = BestProgressIndicator();
-  return best != nullptr ? best->badgeUrl : std::string{};
-}
-
-float CAchievementRuntime::GetTrackedAchievementPercent() const
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-  const ProgressIndicator* best = BestProgressIndicator();
-  return best != nullptr ? best->measuredPercent : 0.0f;
-}
-
-const ProgressIndicator* CAchievementRuntime::BestProgressIndicator() const
-{
-  // Whichever is closest to being earned, so the corner holds the achievement
-  // about to unlock rather than whichever of them ticked last.
-  const auto& indicators = m_state.progressIndicators;
-  const auto best = std::max_element(indicators.begin(), indicators.end(),
-                                     [](const ProgressIndicator& a, const ProgressIndicator& b)
-                                     { return a.measuredPercent < b.measuredPercent; });
-
-  return best != indicators.end() ? &(*best) : nullptr;
-}
-
-void CAchievementRuntime::SetProgressIndicator(const ProgressIndicator& indicator, bool active)
+void CAchievementRuntime::SetChallenge(const AchievementChallenge& challenge, bool active)
 {
   {
     std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto it = std::find_if(m_state.challenges.begin(), m_state.challenges.end(),
+                           [&challenge](const AchievementChallenge& existing)
+                           { return existing.id == challenge.id; });
+
+    if (active)
+    {
+      // The runtime can re-announce an attempt that is already showing
+      if (it == m_state.challenges.end())
+        m_state.challenges.emplace_back(challenge);
+    }
+    else if (it != m_state.challenges.end())
+    {
+      m_state.challenges.erase(it);
+    }
+  }
+
+  NotifyIndicatorsChanged();
+}
+
+std::vector<AchievementChallenge> CAchievementRuntime::GetChallenges() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_state.challenges;
+}
+
+void CAchievementRuntime::SetProgressIndicator(const AchievementProgressIndicator& indicator,
+                                               bool active)
+{
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     auto& indicators = m_state.progressIndicators;
     auto it = std::find_if(indicators.begin(), indicators.end(),
-                           [&indicator](const ProgressIndicator& existing)
+                           [&indicator](const AchievementProgressIndicator& existing)
                            { return existing.id == indicator.id; });
 
     if (active)
@@ -175,52 +174,145 @@ void CAchievementRuntime::SetProgressIndicator(const ProgressIndicator& indicato
       indicators.erase(it);
     }
   }
+
+  NotifyIndicatorsChanged();
 }
 
-std::string CAchievementRuntime::GetChallengeAchievementTitle() const
+AchievementProgressIndicator CAchievementRuntime::GetProgressIndicator() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  return m_state.challenges.empty() ? std::string{} : m_state.challenges.front().title;
+
+  const auto& indicators = m_state.progressIndicators;
+
+  // Whichever is closest to being earned. A game counting two things at once
+  // used to hand the single slot back and forth between them every few
+  // milliseconds, so neither could be read.
+  const auto best = std::max_element(
+      indicators.begin(), indicators.end(),
+      [](const AchievementProgressIndicator& a, const AchievementProgressIndicator& b)
+      { return a.measuredPercent < b.measuredPercent; });
+
+  return (best != indicators.end()) ? *best : AchievementProgressIndicator{};
 }
 
-std::string CAchievementRuntime::GetChallengeAchievementBadge() const
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-  return m_state.challenges.empty() ? std::string{} : m_state.challenges.front().badgeUrl;
-}
-
-void CAchievementRuntime::SetChallengeIndicator(const ChallengeIndicator& indicator, bool active)
+void CAchievementRuntime::SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active)
 {
   {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto& challenges = m_state.challenges;
-    auto it = std::find_if(challenges.begin(), challenges.end(),
-                           [&indicator](const ChallengeIndicator& existing)
-                           { return existing.id == indicator.id; });
+
+    auto it = std::find_if(m_leaderboards.trackers.begin(), m_leaderboards.trackers.end(),
+                           [&tracker](const LeaderboardTracker& existing)
+                           { return existing.id == tracker.id; });
 
     if (active)
     {
-      // The runtime can re-announce an attempt that is already showing
-      if (it == challenges.end())
-        challenges.emplace_back(indicator);
+      // Show and update are the same thing here: an attempt already on screen is
+      // given its new value rather than added twice
+      if (it != m_leaderboards.trackers.end())
+        it->display = tracker.display;
+      else
+        m_leaderboards.trackers.emplace_back(tracker);
     }
-    else if (indicator.id == 0)
+    else if (it != m_leaderboards.trackers.end())
     {
-      // The runtime sends no achievement with a hide, so an id of zero means
-      // every attempt has ended
-      challenges.clear();
-    }
-    else if (it != challenges.end())
-    {
-      challenges.erase(it);
+      m_leaderboards.trackers.erase(it);
     }
   }
+
+  NotifyIndicatorsChanged();
 }
 
-bool CAchievementRuntime::HasIndicators() const
+std::vector<LeaderboardTracker> CAchievementRuntime::GetLeaderboardTrackers() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  return !m_state.challenges.empty() || !m_state.progressIndicators.empty();
+  return m_leaderboards.trackers;
 }
 
+void CAchievementRuntime::SetLeaderboardState(const LeaderboardState& state)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_leaderboards = state;
+}
 
+LeaderboardState CAchievementRuntime::GetLeaderboardState() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_leaderboards;
+}
+
+bool CAchievementRuntime::SetLeaderboardEntries(unsigned int leaderboardId,
+                                                const std::vector<LeaderboardEntry>& entries)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  for (LeaderboardInfo& leaderboard : m_leaderboards.leaderboards)
+  {
+    if (leaderboard.id != leaderboardId)
+      continue;
+
+    leaderboard.entries = entries;
+    return true;
+  }
+
+  // The game changed while the standings were being fetched
+  return false;
+}
+
+bool CAchievementRuntime::SetLeaderboardStanding(unsigned int leaderboardId,
+                                                 unsigned int rank,
+                                                 const std::string& score,
+                                                 unsigned int totalEntries)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  for (LeaderboardInfo& leaderboard : m_leaderboards.leaderboards)
+  {
+    if (leaderboard.id != leaderboardId)
+      continue;
+
+    leaderboard.playerRank = rank;
+    leaderboard.playerScore = score;
+    if (totalEntries > 0)
+      leaderboard.totalEntries = totalEntries;
+
+    // The standings that were fetched no longer include this submission, and
+    // guessing where it slots in would be wrong as often as right
+    leaderboard.entries.clear();
+
+    return true;
+  }
+
+  // The game changed between submitting and the server answering
+  return false;
+}
+
+void CAchievementRuntime::SetSelectedLeaderboard(unsigned int leaderboardId)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_selectedLeaderboard = leaderboardId;
+}
+
+unsigned int CAchievementRuntime::GetSelectedLeaderboard() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_selectedLeaderboard;
+}
+
+void CAchievementRuntime::SetIndicatorCallback(std::function<void()> callback)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_indicatorCallback = std::move(callback);
+}
+
+void CAchievementRuntime::NotifyIndicatorsChanged()
+{
+  std::function<void()> callback;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    callback = m_indicatorCallback;
+  }
+
+  // Outside the lock: what this calls reads the state straight back
+  if (callback)
+    callback();
+}

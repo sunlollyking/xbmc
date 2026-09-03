@@ -10,6 +10,7 @@
 
 #include "XBDateTime.h"
 
+#include <functional>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -25,28 +26,6 @@ struct AchievementProgress
   unsigned int id{0};
   float measuredPercent{0.0f};
   std::string measuredProgress;
-};
-
-/*!
- * \brief The achievement the player is working towards, as the runtime chose it
- */
-struct ProgressIndicator
-{
-  unsigned int id{0};
-  std::string title;
-  std::string badgeUrl;
-  std::string measuredProgress;
-  float measuredPercent{0.0f};
-};
-
-/*!
- * \brief The achievement the player is inside an attempt at
- */
-struct ChallengeIndicator
-{
-  unsigned int id{0};
-  std::string title;
-  std::string badgeUrl;
 };
 
 struct AchievementInfo
@@ -88,6 +67,125 @@ struct AchievementInfo
   std::string measuredProgress;
 };
 
+/*!
+ * \brief An achievement the player is currently attempting
+ *
+ * RetroAchievements calls these "challenge indicators". They appear while an
+ * achievement's trigger is primed and disappear when the attempt ends, whether
+ * or not it was earned.
+ */
+struct AchievementChallenge
+{
+  unsigned int id{0};
+  std::string title;
+  std::string badgeUrl;
+};
+
+/*!
+ * \brief One row of a leaderboard's standings
+ */
+struct LeaderboardEntry
+{
+  unsigned int rank{0};
+  std::string username;
+
+  //! Already formatted by the server for this leaderboard's unit - seconds,
+  //! points, frames - so it is shown as given rather than interpreted
+  std::string score;
+
+  //! When it was submitted, as sent. Kept raw so that both the date and how
+  //! long ago it was can be worked out at display time, in the player's own
+  //! locale rather than the one that fetched it.
+  std::time_t submitted{0};
+
+  //! True for the signed-in player's own row, so the skin can pick it out
+  bool isPlayer{false};
+};
+
+/*!
+ * \brief A scored challenge within a game
+ */
+struct LeaderboardInfo
+{
+  unsigned int id{0};
+  std::string title;
+  std::string description;
+
+  //! How the server encodes this leaderboard's values - TIME, SCORE, FIXED2
+  //! and so on. Needed because the scores arrive as raw integers and only
+  //! this says whether 9000 means 9000 points or 2:30.00.
+  std::string format;
+
+  //! Whether a smaller value ranks higher, as it does for a time trial
+  bool lowerIsBetter{false};
+
+  unsigned int totalEntries{0};
+
+  //! Where the player stands, or 0 if they have never submitted
+  unsigned int playerRank{0};
+  std::string playerScore;
+
+  std::string topUsername;
+  std::string topScore;
+
+  //! Filled in only once the standings have been fetched for this one, which
+  //! happens when the player opens it rather than when the game loads
+  std::vector<LeaderboardEntry> entries;
+};
+
+/*!
+ * \brief How far along a measured achievement is
+ *
+ * Some achievements are measured rather than simply locked or unlocked -
+ * "collect 180 rings" - and the runtime reports progress while the player works
+ * towards one. Distinct from AchievementChallenge, which says an attempt is
+ * live without saying how far through it is.
+ */
+struct AchievementProgressIndicator
+{
+  unsigned int id{0};
+  std::string title;
+  std::string badgeUrl;
+
+  //! How far along, already formatted by the client - "13/180" - so it is shown
+  //! as given rather than interpreted
+  std::string measuredProgress;
+
+  //! The same as a percentage, so a skin can draw a bar without parsing the text
+  float measuredPercent{0.0f};
+};
+
+/*!
+ * \brief A leaderboard attempt in progress
+ *
+ * While an attempt runs the client publishes a live value - the lap time so
+ * far, the score so far - for the skin to show in a corner.
+ */
+struct LeaderboardTracker
+{
+  //! Identifies the tracker, not the leaderboard. Two leaderboards measuring
+  //! the same thing share one, so this cannot be used to look a leaderboard up.
+  unsigned int id{0};
+
+  //! The value as it stands, already formatted by the client for this
+  //! leaderboard's unit, so it is shown as given rather than interpreted
+  std::string display;
+};
+
+/*!
+ * \brief The leaderboards of the loaded game
+ */
+struct LeaderboardState
+{
+  std::string gameTitle;
+  std::vector<LeaderboardInfo> leaderboards;
+
+  //! Usually empty, and rarely more than one at a time
+  std::vector<LeaderboardTracker> trackers;
+
+  bool loaded{false};
+};
+
 struct AchievementState
 {
   std::string gameTitle;
@@ -96,20 +194,24 @@ struct AchievementState
   unsigned int unlockedAchievements{0};
   std::string richPresence;
   std::vector<AchievementInfo> achievements;
+  bool loaded{false};
+
+  /*!
+   * \brief Achievements the player is currently attempting
+   *
+   * Usually empty, and rarely more than one or two at a time.
+   */
+  std::vector<AchievementChallenge> challenges;
 
   /*!
    * \brief The measured achievements being worked towards
    *
-   * More than one can be counting at once -- a game will happily track balloons
-   * popped and time survived together -- and the runtime announces each
+   * More than one can be counting at once - a game will happily track rings
+   * collected and time survived together - and the runtime announces each
    * separately. Kept as a set so that one does not overwrite another; which of
    * them is worth a corner indicator is decided on the way out.
    */
-  std::vector<ProgressIndicator> progressIndicators;
-
-  //! \brief The achievements being attempted, for the same reason
-  std::vector<ChallengeIndicator> challenges;
-  bool loaded{false};
+  std::vector<AchievementProgressIndicator> progressIndicators;
 };
 
 /*!
@@ -169,48 +271,119 @@ public:
   //@{
   unsigned int GetTotalAchievements() const;
   unsigned int GetUnlockedAchievements() const;
-
-  /*!
-   * \brief The achievement the player is working towards
-   *
-   * The achievement runtime picks it and says when to show and hide it, so this
-   * is empty whenever nothing should be on screen.
-   */
-  std::string GetTrackedAchievementTitle() const;
-  std::string GetTrackedAchievementProgress() const;
-  std::string GetTrackedAchievementBadge() const;
-  float GetTrackedAchievementPercent() const;
   //@}
 
   /*!
-   * \brief Add, update or remove a measured achievement
+   * \brief Add or remove an achievement from the list being attempted
    *
-   * An id of zero with \p active false means everything counting has stopped,
-   * which is what the runtime sends with a hide.
+   * \param challenge The achievement
+   * \param active True while the attempt is live, false once it has ended
    */
-  void SetProgressIndicator(const ProgressIndicator& indicator, bool active);
-
-  //! \brief The achievement the player is inside an attempt at
-  std::string GetChallengeAchievementTitle() const;
-  std::string GetChallengeAchievementBadge() const;
+  void SetChallenge(const AchievementChallenge& challenge, bool active);
 
   /*!
-   * \brief Add or remove an achievement being attempted
-   *
-   * An id of zero with \p active false means every attempt has ended, which is
-   * what the runtime sends with a hide.
+   * \brief Get the achievements currently being attempted
    */
-  void SetChallengeIndicator(const ChallengeIndicator& indicator, bool active);
+  std::vector<AchievementChallenge> GetChallenges() const;
 
-  bool HasIndicators() const;
+  /*!
+   * \brief Show or hide how far along a measured achievement is
+   *
+   * Published to the runtime rather than raised as a notification, for the same
+   * reason as the challenge indicator: this updates many times a second while
+   * the player works towards one.
+   */
+  void SetProgressIndicator(const AchievementProgressIndicator& indicator, bool active);
+
+  /*!
+   * \brief The measured achievement worth showing, if any
+   *
+   * The one closest to completion, so that what is on screen is the one about
+   * to be earned rather than whichever happened to tick last.
+   */
+  AchievementProgressIndicator GetProgressIndicator() const;
+
+  /*!
+   * \brief Show or hide a leaderboard attempt's live value
+   *
+   * Published to the runtime rather than raised as a notification: an attempt
+   * updates many times a second, which belongs in an on-screen indicator the
+   * skin can show and hide.
+   */
+  void SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active);
+
+  std::vector<LeaderboardTracker> GetLeaderboardTrackers() const;
+
+  /*!
+   * \brief Replace the leaderboards of the loaded game
+   */
+  void SetLeaderboardState(const LeaderboardState& state);
+
+  /*!
+   * \brief Get a copy of the leaderboards, including their standings
+   */
+  LeaderboardState GetLeaderboardState() const;
+
+  /*!
+   * \brief Store the standings fetched for one leaderboard
+   *
+   * Kept on the runtime rather than in the dialog so that reopening a
+   * leaderboard already looked at costs nothing.
+   *
+   * \return False if that leaderboard is not in the loaded game
+   */
+  bool SetLeaderboardEntries(unsigned int leaderboardId,
+                             const std::vector<LeaderboardEntry>& entries);
+
+  /*!
+   * \brief Record where the player now stands after a submission
+   *
+   * The server answers a submission with the new standing, which is the same
+   * thing the leaderboards list shows. Writing it back means the list is right
+   * without asking for it again.
+   *
+   * \return False if the game changed before the answer arrived
+   */
+  bool SetLeaderboardStanding(unsigned int leaderboardId,
+                              unsigned int rank,
+                              const std::string& score,
+                              unsigned int totalEntries);
+
+  /*!
+   * \brief Which leaderboard the entries dialog should show
+   *
+   * Passed this way rather than as a window parameter because the entries
+   * dialog is opened from the list by the skin, which has no way to hand over
+   * anything but a window id.
+   */
+  void SetSelectedLeaderboard(unsigned int leaderboardId);
+
+  unsigned int GetSelectedLeaderboard() const;
+
+  /*!
+   * \brief Be told when anything an on-screen indicator shows has changed
+   *
+   * Set once by whatever draws them. Every indicator the runtime holds reports
+   * through here, so one added later is announced without its author having to
+   * remember to wire it up.
+   *
+   * Called on whichever thread made the change, which is the game's.
+   */
+  void SetIndicatorCallback(std::function<void()> callback);
 
 private:
-  //! \brief The measured achievement closest to being earned, called under the lock
-  const ProgressIndicator* BestProgressIndicator() const;
+  //! Tell whoever draws the indicators that one of them moved
+  void NotifyIndicatorsChanged();
 
   mutable std::mutex m_mutex;
-  AchievementState m_state;
 
+  //! Whatever draws the on-screen indicators, told whenever one changes. Held
+  //! rather than called directly so the runtime keeps knowing nothing about the
+  //! GUI, and invoked outside the lock so it may read back safely.
+  std::function<void()> m_indicatorCallback;
+  AchievementState m_state;
+  LeaderboardState m_leaderboards;
+  unsigned int m_selectedLeaderboard{0};
 };
 
 } // namespace KODI::GAME
