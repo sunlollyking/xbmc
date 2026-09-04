@@ -15,11 +15,11 @@
 #include "filesystem/File.h"
 #include "utils/Digest.h"
 #include "utils/RegExp.h"
-#include "utils/Crc32.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
+#include <zlib.h>
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -223,7 +223,9 @@ bool CGameFileIdentity::HashWhole(const std::string& path, GameFile& file)
   if (!in.Open(path, XFILE::READ_NO_CACHE))
     return false;
 
-  Crc32 crc;
+  // The catalogues key ROMs by the CRC-32 that PKZIP and the No-Intro sets use.
+  // Kodi's own Crc32 is the non-reflected variant and matches none of them.
+  uLong crc = crc32(0UL, nullptr, 0);
   KODI::UTILITY::CDigest md5(KODI::UTILITY::CDigest::Type::MD5);
   std::vector<char> buffer(CHUNK_SIZE);
   uint64_t total = 0;
@@ -235,7 +237,7 @@ bool CGameFileIdentity::HashWhole(const std::string& path, GameFile& file)
       return false;
     if (n == 0)
       break;
-    crc.Compute(buffer.data(), static_cast<size_t>(n));
+    crc = crc32(crc, reinterpret_cast<const Bytef*>(buffer.data()), static_cast<uInt>(n));
     md5.Update(buffer.data(), static_cast<size_t>(n));
     total += static_cast<uint64_t>(n);
     if (total > MAX_HASH_SIZE)

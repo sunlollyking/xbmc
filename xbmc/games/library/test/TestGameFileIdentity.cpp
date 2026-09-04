@@ -27,6 +27,10 @@ namespace
 // asks it not to, and nothing ever deletes that copy.
 constexpr auto ARCHIVE = "xbmc/games/library/test/identity.zip";
 
+// The CRC-32 that PKZIP stores and the ROM catalogues index by
+constexpr auto MEMBER_CRC32 = "eeea5a12";
+constexpr auto MEMBER_MD5 = "6835177061dbf19a6a4436a16dbb6cd7";
+constexpr uint64_t MEMBER_SIZE = 6 * 1024 * 1024;
 
 std::vector<std::string> TempFileNames()
 {
@@ -42,6 +46,18 @@ std::vector<std::string> TempFileNames()
   return names;
 }
 } // namespace
+
+TEST(TestGameFileIdentity, HashesTheGameInsideAnArchive)
+{
+  GameFile file;
+  ASSERT_TRUE(
+      CGameFileIdentity::Identify(XBMC_REF_FILE_PATH(ARCHIVE), file, MediaFormat::CARTRIDGE));
+
+  // The hash is of the member, not of the archive around it
+  EXPECT_EQ(file.crc32, MEMBER_CRC32);
+  EXPECT_EQ(file.md5, MEMBER_MD5);
+  EXPECT_EQ(file.size, MEMBER_SIZE);
+}
 
 TEST(TestGameFileIdentity, ReadsAnArchivedGameWithoutExtractingIt)
 {
