@@ -13,9 +13,9 @@
 #include "URL.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
-#include "utils/Crc32.h"
 #include "utils/Digest.h"
 #include "utils/RegExp.h"
+#include "utils/Crc32.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -271,9 +271,16 @@ bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
   if (!best || best->GetSize() > static_cast<int64_t>(MAX_HASH_SIZE))
     return false;
 
+  // Stream the member through the decompressor rather than letting the zip
+  // backend copy it whole into special://temp first, which it does for anything
+  // deflated over 4 MB and never cleans up. Hashing is one pass front to back,
+  // so nothing here needs to seek.
+  CURL memberUrl(best->GetPath());
+  memberUrl.SetOptions("?cache=no");
+
   GameFile member;
   member.size = static_cast<uint64_t>(best->GetSize());
-  if (!HashWhole(best->GetPath(), member))
+  if (!HashWhole(memberUrl.Get(), member))
     return false;
 
   file.crc32 = member.crc32;

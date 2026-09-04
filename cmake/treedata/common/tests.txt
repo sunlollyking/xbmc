@@ -16,6 +16,7 @@ xbmc/games/controllers/test       test/games/controllers
 xbmc/games/dialogs/disc/test      test/games/dialogs/disc
 xbmc/games/test                   test/games
 xbmc/games/tags/test              test/games/tags
+xbmc/games/library/test           test/games/library
 xbmc/guilib/test                  test/guilib
 xbmc/imagefiles/test              test/imagefiles
 xbmc/input/keyboard/test          test/input/keyboard
