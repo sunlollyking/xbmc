@@ -1138,10 +1138,6 @@
           <level>2</level>
           <control type="button" format="action" />
         </setting>
-        <setting id="gamelibrary.refreshprogress" type="action" label="35629" help="35630">
-          <level>2</level>
-          <control type="button" format="action" />
-        </setting>
         <setting id="gamelibrary.export" type="action" label="14248" help="35632">
           <level>2</level>
           <control type="button" format="action" />
@@ -2976,15 +2972,16 @@
           <default>true</default>
           <control type="toggle" />
         </setting>
+        <setting id="gamesachievements.refreshprogress" type="action" label="35629" help="35630">
+          <level>0</level>
+          <control type="button" format="action" />
+        </setting>
         <setting id="gamesachievements.encore" type="boolean" label="35374" help="35375">
           <level>0</level>
           <default>false</default>
           <control type="toggle" />
         </setting>
       </group>
-    </category>
-    <category id="gamelibrary" label="35538" help="35538">
-      
     </category>
   </section>
   <section id="system" label="13000" help="36349">

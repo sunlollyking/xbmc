@@ -346,8 +346,6 @@ void CMediaSettings::OnSettingAction(const std::shared_ptr<const CSetting>& sett
     if (HELPERS::ShowYesNoDialogText(CVariant{313}, CVariant{333}) == DialogResponse::CHOICE_YES)
       KODI::GAME::CGameLibraryQueue::GetInstance().CleanLibrary({}, true);
   }
-  else if (settingId == CSettings::SETTING_GAMELIBRARY_REFRESHPROGRESS)
-    KODI::GAME::CGameLibraryQueue::GetInstance().RefreshAchievementProgress();
   else if (settingId == CSettings::SETTING_GAMELIBRARY_EXPORT)
     CBuiltins::GetInstance().Execute("exportlibrary(games)");
   else if (settingId == CSettings::SETTING_GAMELIBRARY_IMPORT)

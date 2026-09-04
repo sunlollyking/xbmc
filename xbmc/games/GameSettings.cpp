@@ -8,14 +8,15 @@
 
 #include "GameSettings.h"
 
-#include "games/manual/ManualCache.h"
-
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "events/EventLog.h"
 #include "events/NotificationEvent.h"
 #include "filesystem/CurlFile.h"
 #include "filesystem/File.h"
+#include "games/library/GameLibraryQueue.h"
+#include "games/manual/ManualCache.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
 #include "settings/Settings.h"
@@ -47,6 +48,8 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.passw
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
+const std::string SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS =
+    "gamesachievements.refreshprogress";
 const std::string SETTING_GAMES_CLEAR_MANUAL_CACHE = "gamesgeneral.clearmanualcache";
 
 constexpr auto LOGIN_TO_RETRO_ACHIEVEMENTS_URL =
@@ -73,7 +76,7 @@ CGameSettings::CGameSettings()
       {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ENABLERUNAHEAD,
        SETTING_GAMES_RUNAHEADFRAMES, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
-       SETTING_GAMES_CLEAR_MANUAL_CACHE});
+       SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS, SETTING_GAMES_CLEAR_MANUAL_CACHE});
 
   // On startup reset logged-in flag if token is missing
   const std::string token = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
@@ -162,6 +165,19 @@ void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setti
 
   if (setting->GetId() == SETTING_GAMES_CLEAR_MANUAL_CACHE)
     CManualCache::GetInstance().Clear();
+  else if (setting->GetId() == SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS)
+  {
+    // The count belongs to an account, so there is nothing to ask for until
+    // there is one signed in
+    if (!GetAchievementsLoggedIn())
+    {
+      const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, strings.Get(35264),
+                                            strings.Get(35635));
+      return;
+    }
+    CGameLibraryQueue::GetInstance().RefreshAchievementProgress();
+  }
 }
 
 void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& setting)
