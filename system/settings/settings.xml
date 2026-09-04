@@ -2961,6 +2961,16 @@
           </constraints>
           <control type="edit" format="string"/>
         </setting>
+        <setting id="gamesachievements.apikey" type="string" label="35636" help="35637">
+          <level>0</level>
+          <default></default>
+          <constraints>
+            <allowempty>true</allowempty>
+          </constraints>
+          <control type="edit" format="string">
+            <hidden>true</hidden>
+          </control>
+        </setting>
         <setting id="gamesachievements.loggedin" type="boolean" label="35268" help="35269">
           <visible>true</visible>
           <level>0</level>

@@ -20555,6 +20555,17 @@ msgctxt "#35635"
 msgid "Sign in to RetroAchievements first"
 msgstr ""
 
+#: system/settings/settings.xml
+msgctxt "#35636"
+msgid "Web API key"
+msgstr ""
+
+#. Description of setting with label #35636 "Web API key"
+#: system/settings/settings.xml
+msgctxt "#35637"
+msgid "The key the scraper reads your achievements with, from the \"Keys\" section of your control panel on the RetroAchievements website. It is not the password above: that signs you in to play, while this reads the catalogue. Keep it as private as a password."
+msgstr ""
+
 #empty strings from id 35604 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp

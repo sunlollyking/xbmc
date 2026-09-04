@@ -88,6 +88,16 @@ private:
                         std::string token) const;
   bool IsAccountVerified(const std::string& username, const std::string& token) const;
 
+  /*!
+   * \brief Tell the game scrapers who the person is
+   *
+   * The scrapers read achievements with the same account, so a person says it
+   * once here rather than again in every scraper's own settings. A field left
+   * empty here leaves the scraper's own alone, so anyone driving a scraper
+   * directly still can.
+   */
+  void ShareAchievementCredentials() const;
+
   // Construction parameters
   std::shared_ptr<CSettings> m_settings;
 };

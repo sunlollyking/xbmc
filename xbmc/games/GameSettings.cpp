@@ -10,6 +10,9 @@
 
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "addons/AddonManager.h"
+#include "addons/IAddon.h"
+#include "addons/addoninfo/AddonType.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "events/EventLog.h"
 #include "events/NotificationEvent.h"
@@ -48,8 +51,13 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.passw
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
+const std::string SETTING_GAMES_ACHIEVEMENTS_API_KEY = "gamesachievements.apikey";
 const std::string SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS =
     "gamesachievements.refreshprogress";
+
+//! What the scraper add-ons call the same two credentials
+constexpr const char* SCRAPER_SETTING_USERNAME = "ra_username";
+constexpr const char* SCRAPER_SETTING_API_KEY = "ra_api_key";
 const std::string SETTING_GAMES_CLEAR_MANUAL_CACHE = "gamesgeneral.clearmanualcache";
 
 constexpr auto LOGIN_TO_RETRO_ACHIEVEMENTS_URL =
@@ -76,7 +84,13 @@ CGameSettings::CGameSettings()
       {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ENABLERUNAHEAD,
        SETTING_GAMES_RUNAHEADFRAMES, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
-       SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS, SETTING_GAMES_CLEAR_MANUAL_CACHE});
+       SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
+       SETTING_GAMES_CLEAR_MANUAL_CACHE});
+
+  // A person should say who they are once. The scrapers keep fields of their
+  // own so they still work for anyone driving them directly, but while these
+  // are filled in they are what the scrapers are told
+  ShareAchievementCredentials();
 
   // On startup reset logged-in flag if token is missing
   const std::string token = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
@@ -158,6 +172,29 @@ std::string CGameSettings::GetRAToken() const
   return m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
 }
 
+void CGameSettings::ShareAchievementCredentials() const
+{
+  const std::string username = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_USERNAME);
+  const std::string apiKey = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_API_KEY);
+  if (username.empty() && apiKey.empty())
+    return;
+
+  ADDON::VECADDONS scrapers;
+  if (!CServiceBroker::GetAddonMgr().GetAddons(scrapers, ADDON::AddonType::SCRAPER_GAMES))
+    return;
+
+  for (const ADDON::AddonPtr& scraper : scrapers)
+  {
+    bool changed = false;
+    if (!username.empty())
+      changed |= scraper->UpdateSettingString(SCRAPER_SETTING_USERNAME, username);
+    if (!apiKey.empty())
+      changed |= scraper->UpdateSettingString(SCRAPER_SETTING_API_KEY, apiKey);
+    if (changed)
+      scraper->SaveSettings();
+  }
+}
+
 void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setting)
 {
   if (setting == nullptr)
@@ -186,6 +223,10 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
     return;
 
   const std::string& settingId = setting->GetId();
+
+  if (settingId == SETTING_GAMES_ACHIEVEMENTS_USERNAME ||
+      settingId == SETTING_GAMES_ACHIEVEMENTS_API_KEY)
+    ShareAchievementCredentials();
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
       settingId == SETTING_GAMES_ENABLERUNAHEAD || settingId == SETTING_GAMES_RUNAHEADFRAMES)
