@@ -9,6 +9,8 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "GameDatabase.h"
+
+#include "games/tags/GameInfoTag.h"
 #include "XBDateTime.h"
 #include "dbwrappers/dataset.h"
 #include "games/library/GameDbUrl.h"
@@ -107,6 +109,19 @@ void CGameDatabase::GetPlatformFromRecord(PlatformInfo& platform)
   platform.dateAdded = m_pDS->fv("dateAdded").get_asString();
   platform.lastScraped = m_pDS->fv("lastScraped").get_asString();
   platform.gameCount = m_pDS->fv("gameCount").get_asInt();
+}
+
+bool CGameDatabase::SetPlatformDetails(const PlatformInfo& platform)
+{
+  if (platform.id <= 0)
+    return false;
+
+  return ExecuteQuery(PrepareSQL(
+      "UPDATE platform SET name = '%s', manufacturer = '%s', released = %i, discontinued = %i, "
+      "overview = '%s', lastScraped = '%s' WHERE idPlatform = %i",
+      platform.name.c_str(), platform.manufacturer.c_str(), platform.released,
+      platform.discontinued, platform.overview.c_str(),
+      CDateTime::GetCurrentDateTime().GetAsDBDateTime().c_str(), platform.id));
 }
 
 bool CGameDatabase::SetPlatformDefaults(int idPlatform,
@@ -222,6 +237,8 @@ bool CGameDatabase::GetPlatformsNav(const std::string& baseDir,
     item->SetProperty("gamecount", platform.gameCount);
     item->SetProperty("released", platform.released);
     item->SetProperty("platformtype", std::string(CGameLibraryTypes::ToString(platform.type)));
+    if (!platform.overview.empty())
+      item->GetGameInfoTag()->SetOverview(platform.overview);
     item->SetLabel2(std::to_string(platform.gameCount));
 
     KODI::ART::Artwork art;

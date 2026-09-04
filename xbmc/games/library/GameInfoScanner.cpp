@@ -9,6 +9,7 @@
 #include "GameInfoScanner.h"
 
 #include "FileItem.h"
+#include "XBDateTime.h"
 #include "GUIInfoManager.h"
 #include "GUIUserMessages.h"
 #include "FileItemList.h"
@@ -58,6 +59,9 @@ constexpr std::array<const char*, 8> commonExtensions{"zip", "7z", "cue", "gdi",
 constexpr std::array<const char*, 3> sheetExtensions{".cue", ".gdi", ".m3u"};
 //! What names a set of discs rather than being one of them
 constexpr std::array<const char*, 1> playlistExtensions{".m3u"};
+
+//! How many further pictures of one kind a game keeps, beyond the first
+constexpr int MAX_EXTRA_ART = 3;
 constexpr std::array<const char*, 4> trackExtensions{".bin", ".img", ".raw", ".wav"};
 
 std::string Localize(int id)
@@ -490,6 +494,8 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
     }
   }
 
+  ScrapePlatform(content, platform);
+
   // A collection curated by another front end arrives with a gamelist.xml,
   // and what a person already corrected there is better than a scrape
   m_gameList.clear();
@@ -660,6 +666,42 @@ bool CGameInfoScanner::RefreshGame(int idGame)
   return ok;
 }
 
+void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const PlatformInfo& platform)
+{
+  if (platform.id <= 0 || !DownloadsAllowed())
+    return;
+
+  // Once is enough: a machine's own description and pictures do not change,
+  // and a person can ask for them again from the platform itself
+  if (!platform.lastScraped.empty())
+    return;
+
+  CGameScraper* scraper = ScraperFor(content);
+  if (scraper == nullptr)
+    return;
+
+  GameScrapeRequest request;
+  request.platformSlug = platform.slug;
+  request.platformIds = platform.providerIds;
+  request.bulk = true;
+
+  PlatformInfo scraped = platform;
+  std::map<std::string, std::vector<GameScrapeArt>> art;
+  if (!scraper->GetPlatform(request, scraped, art))
+    return;
+
+  scraped.id = platform.id;
+  m_database.SetPlatformDetails(scraped);
+
+  for (const auto& [type, pieces] : art)
+  {
+    if (!pieces.empty() && !pieces.front().url.empty())
+      m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type, pieces.front().url);
+  }
+
+  CLog::Log(LOGINFO, "GAME: Described {} with {} picture(s)", platform.name, art.size());
+}
+
 bool CGameInfoScanner::DownloadsAllowed()
 {
   const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
@@ -775,8 +817,19 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   if (playPath.empty())
     return false;
 
-  if (refreshGameId <= 0 && m_database.GetGameIdByFile(playPath) > 0)
-    return false;
+  if (refreshGameId <= 0)
+  {
+    const int known = m_database.GetGameIdByFile(playPath);
+    if (known > 0)
+    {
+      // A scan that was interrupted, or that ran while the internet was away,
+      // leaves games nothing has described. The next scan finishes them rather
+      // than walking past, which is what makes a stopped scan resumable.
+      if (!DownloadsAllowed() || !m_database.GetLastScraped(known).empty())
+        return false;
+      refreshGameId = known;
+    }
+  }
 
   const std::string nameSource =
       entry.isFolder ? URIUtils::GetFileName(URIUtils::GetDirectory(entry.folder + "x"))
@@ -958,6 +1011,19 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
             }
           }
           art[type] = pick->url;
+
+          // A source that offers several of a kind, as IGDB does with
+          // screenshots, keeps them all: "screenshot", then "screenshot1" and
+          // on, which is how Kodi numbers extra artwork elsewhere
+          int extra = 0;
+          for (const GameScrapeArt& piece : pieces)
+          {
+            if (piece.url == pick->url || piece.url.empty())
+              continue;
+            if (++extra > MAX_EXTRA_ART)
+              break;
+            art[type + std::to_string(extra)] = piece.url;
+          }
         }
         ++m_identified;
       }
@@ -1013,6 +1079,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   }
 
   tag.SetMatchMethod(matchedBy);
+  if (!candidateId.empty() || sidecar || matchedBy == MatchMethod::GAMELIST)
+    tag.SetLastScraped(CDateTime::GetCurrentDateTime().GetAsDBDateTime());
 
   // A refresh replaces what was scraped and keeps what the user and the disk gave
   if (refreshGameId > 0)

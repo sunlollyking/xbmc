@@ -14,6 +14,7 @@
 #include <atomic>
 #include <memory>
 #include <set>
+#include <vector>
 #include <string>
 
 namespace KODI
@@ -54,6 +55,14 @@ public:
    *        game the file is when several catalogue entries share its title
    */
   void RefreshGame(int idGame, bool interactive = false);
+
+  /*!
+   * \brief Describe a list of games again
+   *
+   * For the games a catalogue could not name when they were scanned: asking
+   * again later is how they are picked up once a catalogue has learnt them.
+   */
+  void RefreshGames(std::vector<int> games);
 
   /*!
    * \brief Remove what no longer exists on disk

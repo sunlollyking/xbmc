@@ -163,6 +163,9 @@ public:
    */
   int AddPlatform(const PlatformInfo& platform);
 
+  //! \brief Store what a scraper said about a platform
+  bool SetPlatformDetails(const PlatformInfo& platform);
+
   /*!
    * \brief What a platform's games play with unless a game says otherwise
    *
@@ -172,6 +175,9 @@ public:
   bool SetPlatformDefaults(int idPlatform,
                            const std::string& gameClient,
                            const std::string& videoFilter);
+
+  //! \brief When a scraper last described a game, or empty if none has
+  std::string GetLastScraped(int idGame);
 
   //! \brief The platform of the game a file belongs to, or -1
   int GetPlatformIdForGame(const std::string& path);

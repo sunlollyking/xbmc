@@ -97,8 +97,9 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           details.IsFavourite() ? 1 : 0, details.IsCompleted() ? 1 : 0,
           details.IsHidden() ? 1 : 0, details.GetAchievementsTotal(), details.GetAchievementsEarned(),
           details.GetAchievementsHardcore(), details.GetLastUnlock().c_str(), matchedBy.c_str(),
-          details.GetTrailer().c_str(), details.GetManual().c_str(), Now().c_str(),
-          genres.c_str(), developers.c_str(), publishers.c_str(), collections.c_str(), idGame));
+          details.GetTrailer().c_str(), details.GetManual().c_str(),
+          details.GetLastScraped().c_str(), genres.c_str(), developers.c_str(), publishers.c_str(),
+          collections.c_str(), idGame));
     }
     else
     {
@@ -121,9 +122,9 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           details.IsHidden() ? 1 : 0, details.GetAchievementsTotal(),
           details.GetAchievementsEarned(), details.GetAchievementsHardcore(),
           details.GetLastUnlock().c_str(), matchedBy.c_str(),
-          details.GetTrailer().c_str(), details.GetManual().c_str(), Now().c_str(),
-          dateAdded.c_str(), genres.c_str(), developers.c_str(), publishers.c_str(),
-          collections.c_str()));
+          details.GetTrailer().c_str(), details.GetManual().c_str(),
+          details.GetLastScraped().c_str(), dateAdded.c_str(), genres.c_str(), developers.c_str(),
+          publishers.c_str(), collections.c_str()));
       idGame = static_cast<int>(m_pDS->lastinsertid());
     }
 
@@ -323,6 +324,11 @@ void CGameDatabase::LoadUniqueIds(int idGame, CGameInfoTag& details)
     details.SetUniqueIDs(ids, defaultType);
 }
 
+std::string CGameDatabase::GetLastScraped(int idGame)
+{
+  return GetSingleValue(PrepareSQL("SELECT lastScraped FROM game WHERE idGame = %i", idGame));
+}
+
 std::vector<std::string> CGameDatabase::GetDiscsForFile(const std::string& path)
 {
   std::vector<std::string> discs;
@@ -481,6 +487,7 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   details.SetFavourite(record->at(GAMEDB_FAVOURITE).get_asBool());
   details.SetCompleted(record->at(GAMEDB_COMPLETED).get_asBool());
   details.SetHidden(record->at(GAMEDB_HIDDEN).get_asBool());
+  details.SetLastScraped(record->at(GAMEDB_LAST_SCRAPED).get_asString());
   details.SetAchievements(record->at(GAMEDB_ACHIEVEMENTS_TOTAL).get_asInt(),
                           record->at(GAMEDB_ACHIEVEMENTS_EARNED).get_asInt(),
                           record->at(GAMEDB_ACHIEVEMENTS_HARDCORE).get_asInt());

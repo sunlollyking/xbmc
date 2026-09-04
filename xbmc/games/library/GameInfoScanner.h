@@ -125,6 +125,9 @@ private:
                                                     std::vector<struct GameScrapeCandidate>& candidates);
   CGameScraper* ScraperFor(const GamePathContent& content);
 
+  //! \brief Describe the machine itself, once, with its own pictures
+  void ScrapePlatform(const GamePathContent& content, const PlatformInfo& platform);
+
   //! \brief Whether the library may ask the internet, or reads what is on this disk
   static bool DownloadsAllowed();
 

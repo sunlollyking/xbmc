@@ -249,6 +249,16 @@ public:
   bool IsHidden() const { return m_hidden; }
   void SetHidden(bool hidden) { m_hidden = hidden; }
 
+  /*!
+   * \brief When a scraper last described this game, or empty
+   *
+   * Empty means the game is in the library but nothing has described it: the
+   * library was built offline, or the internet was away when it was scanned.
+   * A later scan finishes the job rather than skipping the file.
+   */
+  const std::string& GetLastScraped() const { return m_strLastScraped; }
+  void SetLastScraped(const std::string& when) { m_strLastScraped = when; }
+
   bool IsCompleted() const { return m_completed; }
   void SetCompleted(bool completed) { m_completed = completed; }
 
@@ -327,6 +337,7 @@ private:
   int m_userRating;
   bool m_favourite;
   bool m_hidden{false};
+  std::string m_strLastScraped;
   bool m_completed;
   int m_achievementsTotal;
   int m_achievementsEarned;

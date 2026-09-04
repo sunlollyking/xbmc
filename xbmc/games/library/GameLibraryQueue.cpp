@@ -24,6 +24,7 @@
 #include "resources/ResourcesComponent.h"
 #include "threads/SingleLock.h"
 #include "utils/Variant.h"
+#include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "utils/log.h"
 
 #include <mutex>
@@ -94,6 +95,48 @@ private:
   bool m_interactive;
 };
 
+/*!
+ * \brief Describe a list of games again, one after another
+ *
+ * What a catalogue does not know today it may know next month, so a person can
+ * point at a shelf of games nothing described and ask again. The work shows a
+ * progress dialog because it is a scan in all but name.
+ */
+class CGameLibraryRefreshManyJob : public CJob
+{
+public:
+  explicit CGameLibraryRefreshManyJob(std::vector<int> games) : m_games(std::move(games)) {}
+
+  const char* GetType() const override { return "GameLibraryRefreshManyJob"; }
+
+  bool DoWork() override
+  {
+    CGUIDialogExtendedProgressBar* dialog =
+        CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogExtendedProgressBar>(
+            WINDOW_DIALOG_EXT_PROGRESS);
+    CGUIDialogProgressBarHandle* handle =
+        dialog != nullptr ? dialog->GetHandle(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35540)) : nullptr;
+
+    CGameInfoScanner scanner;
+    int done = 0;
+    for (const int idGame : m_games)
+    {
+      if (handle != nullptr)
+        handle->SetProgress(done, static_cast<int>(m_games.size()));
+      scanner.RefreshGame(idGame);
+      ++done;
+    }
+
+    if (handle != nullptr)
+      handle->MarkFinished();
+    CLog::Log(LOGINFO, "GAME: Asked again about {} games", done);
+    return true;
+  }
+
+private:
+  std::vector<int> m_games;
+};
+
 class CGameLibraryCleaningJob : public CJob
 {
 public:
@@ -157,6 +200,14 @@ void CGameLibraryQueue::RefreshGame(int idGame, bool interactive)
     return;
   std::unique_lock lock(m_critical);
   AddJob(new CGameLibraryRefreshJob(idGame, interactive));
+}
+
+void CGameLibraryQueue::RefreshGames(std::vector<int> games)
+{
+  if (games.empty())
+    return;
+  std::unique_lock lock(m_critical);
+  AddJob(new CGameLibraryRefreshManyJob(std::move(games)));
 }
 
 void CGameLibraryQueue::StopLibraryScanning()

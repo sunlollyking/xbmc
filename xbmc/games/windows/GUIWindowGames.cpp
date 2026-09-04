@@ -20,6 +20,7 @@
 #include "dialogs/GUIDialogMediaSource.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
+#include "filesystem/Directory.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/GameDatabaseDirectory.h"
 #include "games/GameUtils.h"
@@ -225,6 +226,11 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
       if (PLAYLIST::IsSmartPlayList(*item) || PLAYLIST::IsSmartPlayList(*m_vecItems))
         buttons.Add(CONTEXT_BUTTON_EDIT_SMART_PLAYLIST, 586); // "Edit smart playlist"
 
+      // A shelf of the library can be described again, which is how games a
+      // catalogue did not know when they were scanned are picked up later
+      if (item->IsFolder() && URIUtils::IsProtocol(item->GetPath(), "gamedb"))
+        buttons.Add(CONTEXT_BUTTON_REFRESH_THUMBS, 184); // "Refresh"
+
       // A library game has an information dialog and can be described again
       if (item->HasProperty("gameid") && !item->HasProperty("releaseid"))
       {
@@ -293,9 +299,30 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         CGameLibraryQueue::GetInstance().ScanLibrary(item->GetPath());
         return true;
       case CONTEXT_BUTTON_REFRESH_THUMBS:
-        CGameLibraryQueue::GetInstance().RefreshGame(
-            static_cast<int>(item->GetProperty("gameid").asInteger()), true);
+      {
+        if (item->HasProperty("gameid"))
+        {
+          CGameLibraryQueue::GetInstance().RefreshGame(
+              static_cast<int>(item->GetProperty("gameid").asInteger()), true);
+          return true;
+        }
+
+        // A folder of the library: every game under it, asked about again
+        CFileItemList games;
+        if (XFILE::CDirectory::GetDirectory(item->GetPath(), games, "", XFILE::DIR_FLAG_DEFAULTS))
+        {
+          std::vector<int> ids;
+          for (const auto& game : games)
+          {
+            const int idGame = static_cast<int>(game->GetProperty("gameid").asInteger());
+            if (idGame > 0)
+              ids.emplace_back(idGame);
+          }
+          if (!ids.empty())
+            CGameLibraryQueue::GetInstance().RefreshGames(std::move(ids));
+        }
         return true;
+      }
       case CONTEXT_BUTTON_SET_DEFAULT:
       {
         CGameDatabase db;
