@@ -80,7 +80,7 @@ void NotifyBlockedByHardcore(uint32_t featureStringId)
   // "Hardcore mode", "{0:s} is not available" - the mode heads the toast so the
   // longest feature name still fits the notification's fixed width
   CGUIDialogKaiToast::QueueNotification(
-      CGUIDialogKaiToast::Info, strings.Get(35301),
+      CGUIDialogKaiToast::Info, strings.Get(35700),
       StringUtils::Format(strings.Get(35305), strings.Get(featureStringId)), TOAST_DISPLAY_TIME_MS);
 }
 } // namespace
@@ -188,7 +188,7 @@ void CReversiblePlayback::SetSpeed(double speedFactor)
     if (speedFactor > 0.0 && speedFactor < 1.0)
     {
       CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Refusing to slow down in hardcore mode");
-      NotifyBlockedByHardcore(35310); // "Slow motion"
+      NotifyBlockedByHardcore(35701); // "Slow motion"
       m_gameLoop.SetSpeed(1.0);
       return;
     }
