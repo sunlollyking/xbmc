@@ -103,10 +103,15 @@ bool CGameThumbLoader::LoadItemCached(CFileItem* item)
   if (item == nullptr || item->IsParentFolder())
     return false;
 
-  // Handles the folder art a platform carries, and the .tbn a game may have
-  bool artLoaded = CProgramThumbLoader::LoadItemCached(item);
+  // A node of the library is a query, not a directory, so nothing sits beside
+  // it to hold art or an NFO. Asking anyway makes the VFS log a line about a
+  // protocol it cannot open, twice per node, every time a listing is drawn.
+  const bool isLibraryNode = URIUtils::IsProtocol(item->GetPath(), "gamedb");
 
-  if (!item->IsFolder())
+  // Handles the folder art a platform carries, and the .tbn a game may have
+  bool artLoaded = !isLibraryNode && CProgramThumbLoader::LoadItemCached(item);
+
+  if (!isLibraryNode && !item->IsFolder())
     artLoaded |= LoadLocalArt(*item);
 
   if (item->HasProperty("gameid") || item->HasProperty("platformid"))
@@ -115,7 +120,7 @@ bool CGameThumbLoader::LoadItemCached(CFileItem* item)
   // Asked before loading rather than after, because reading the tag creates one
   // on the item and anything carrying a game tag answers IsGame(). Most of a
   // listing is not games, and they must not start claiming to be.
-  if (!CGameInfoTagLoader::HasNFO(*item))
+  if (isLibraryNode || !CGameInfoTagLoader::HasNFO(*item))
     return artLoaded;
 
   return item->LoadGameTag() || artLoaded;
