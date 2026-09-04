@@ -53,7 +53,6 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_HARDCORE = "gamesachievements.hardc
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_INDICATOR = "gamesachievements.challengeindicator";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
-const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_API_KEY = "gamesachievements.apikey";
 const std::string SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS =
     "gamesachievements.refreshprogress";

@@ -23,7 +23,7 @@ namespace GAME
 
 // Shared with the GUI info provider, which reads it without game services
 constexpr auto SETTING_GAMES_ACHIEVEMENTS_ONSCREEN_INDICATORS =
-    "gamesachievements.onscreenindicators";
+    "gamesachievements.challengeindicator";
 
 /*!
  * \ingroup games
@@ -96,9 +96,6 @@ public:
   bool GetAchievementsLoggedIn() const;
 
   bool GetAchievementsOnScreenIndicators() const;
-
-  //! \brief Whether achievements already earned should be earnable again
-  bool GetAchievementsEncore() const;
 
   /*!
    * \brief Record whether the player is logged in to RetroAchievements

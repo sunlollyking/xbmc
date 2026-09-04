@@ -1,0 +1,112 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  0%] Built target build-crossguid
+[  0%] Built target build-JsonSchemaBuilder
+[  0%] Built target build-poppler
+[  1%] Performing build step for 'buildtexturepacker'
+[  1%] Built target build-ffmpeg
+[  2%] Built target build-utfcpp
+[  2%] Built target build-libdvdcss
+[  2%] Built target wrapper
+[  2%] Built target compileinfo
+Generating xbmc.json/addon.xml
+[  2%] Built target generate-wayland-extra-protocols
+[  2%] Built target gen_system_addons
+[100%] Built target TexturePacker
+[  3%] Built target sse4
+[  3%] No install step for 'buildtexturepacker'
+[  3%] Built target retroplayer_messages
+[  3%] Built target generate_json_header
+[  3%] Completed 'buildtexturepacker'
+[  7%] Built target upnp
+[  8%] Built target build-libdvdread
+[  8%] Built target build-taglib
+[  8%] Built target wrapper.def
+[  8%] Built target build-libdvdnav
+[  8%] Built target buildtexturepacker
+[  8%] Built target wrap_libdvdnav
+[  8%] Copying files into build tree
+[  8%] Built target rp-process-gbm
+[  8%] Built target network_httprequesthandlers_python
+[ 10%] Built target processGBM
+[ 10%] Built target windowing_gbm
+[ 11%] Built target windowing_gbm_drm
+[ 11%] Built target processWayland
+[ 11%] Built target rp-process-wayland
+[ 11%] Built target export-files
+[ 12%] Built target cores
+[ 12%] Built target dllloader
+[ 13%] Built target audioengine
+[ 13%] Built target externalplayer
+[ 13%] Built target dllexports
+[ 13%] Built target exports_utils
+[ 15%] Built target windowing_WAYLAND
+[ 15%] Built target paplayer
+[ 15%] Built target playercorefactory
+[ 15%] Built target events_windows
+[ 16%] Built target bluray
+[ 16%] Built target events
+[ 17%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/AddonsDirectory.cpp.o
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNode.cpp.o
+[ 18%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/CacheStrategy.cpp.o
+[ 18%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/AudioBookFileDirectory.cpp.o
+[ 18%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeAlbum.cpp.o
+[ 18%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeAlbumRecentlyAdded.cpp.o
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeEpisodes.cpp.o
+[ 18%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/CircularCache.cpp.o
+In file included from /home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:13,
+                 from /home/chris/xbmc-hcmerge/xbmc/filesystem/AddonsDirectory.cpp:25:
+/home/chris/xbmc-hcmerge/xbmc/addons/kodi-dev-kit/include/kodi/addon-instance/Game.h:1124:22: error: ‘virtual GAME_ERROR kodi::addon::CInstanceGame::RCSetEncoreModeEnabled(bool)’ cannot be overloaded with ‘virtual GAME_ERROR kodi::addon::CInstanceGame::RCSetEncoreModeEnabled(bool)’
+ 1124 |   virtual GAME_ERROR RCSetEncoreModeEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
+      |                      ^~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/addons/kodi-dev-kit/include/kodi/addon-instance/Game.h:1025:22: note: previous declaration ‘virtual GAME_ERROR kodi::addon::CInstanceGame::RCSetEncoreModeEnabled(bool)’
+ 1025 |   virtual GAME_ERROR RCSetEncoreModeEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
+      |                      ^~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/addons/kodi-dev-kit/include/kodi/addon-instance/Game.h:1951:28: error: ‘static GAME_ERROR kodi::addon::CInstanceGame::ADDON_RCSetEncoreModeEnabled(const AddonInstance_Game*, bool)’ cannot be overloaded with ‘static GAME_ERROR kodi::addon::CInstanceGame::ADDON_RCSetEncoreModeEnabled(const AddonInstance_Game*, bool)’
+ 1951 |   inline static GAME_ERROR ADDON_RCSetEncoreModeEnabled(const AddonInstance_Game* instance,
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/addons/kodi-dev-kit/include/kodi/addon-instance/Game.h:1901:28: note: previous declaration ‘static GAME_ERROR kodi::addon::CInstanceGame::ADDON_RCSetEncoreModeEnabled(const AddonInstance_Game*, bool)’
+ 1901 |   inline static GAME_ERROR ADDON_RCSetEncoreModeEnabled(const AddonInstance_Game* instance,
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [build/filesystem/CMakeFiles/filesystem.dir/build.make:79: build/filesystem/CMakeFiles/filesystem.dir/AddonsDirectory.cpp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeGrouped.cpp.o
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeInProgressTvShows.cpp.o
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeMovieAssetTypes.cpp.o
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeMovieAssets.cpp.o
+[ 18%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeAlbumRecentlyAddedSong.cpp.o
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeMoviesOverview.cpp.o
+make[1]: *** [CMakeFiles/Makefile2:9153: build/filesystem/CMakeFiles/filesystem.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeMusicVideosOverview.cpp.o
+[ 18%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeOverview.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeAlbumRecentlyPlayed.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeRecentlyAddedEpisodes.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeRecentlyAddedMovies.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeRecentlyAddedMusicVideos.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeRoot.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeSeasons.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeTitleMovies.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeAlbumRecentlyPlayedSong.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeTitleMusicVideos.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeTitleTvShows.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeAlbumTop100.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/DirectoryNodeTvShowsOverview.cpp.o
+[ 20%] Building CXX object build/filesystem/videodatabase/CMakeFiles/videodatabasedirectory.dir/QueryParams.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeAlbumTop100Song.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeArtist.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeDiscs.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNode.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeGrouped.cpp.o
+[ 20%] Linking CXX static library videodatabasedirectory.a
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeOverview.cpp.o
+[ 20%] Built target videodatabasedirectory
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeRoot.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeSingles.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeSong.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeSongTop100.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/DirectoryNodeTop100.cpp.o
+[ 20%] Building CXX object build/filesystem/musicdatabase/CMakeFiles/musicdatabasedirectory.dir/QueryParams.cpp.o
+[ 20%] Linking CXX static library musicdatabasedirectory.a
+[ 20%] Built target musicdatabasedirectory
+make: *** [Makefile:146: all] Error 2
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'

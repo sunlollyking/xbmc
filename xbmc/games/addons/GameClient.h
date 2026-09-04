@@ -252,7 +252,6 @@ public:
    * The account is held by Kodi, which owns the settings it is entered in.
    */
   bool SetRetroAchievementsCredentials(const std::string& username, const std::string& token);
-  bool SetEncoreModeEnabled(bool enabled);
 
   /*!
    * \brief Hand the client a cheat to apply, or take one away
@@ -302,13 +301,6 @@ public:
    * data: the client has to know the machine state jumped either way.
    */
   bool DeserializeAchievements(const uint8_t* data, size_t size);
-
-  /*!
-   * \brief Give the client the RetroAchievements account to sign in with
-   *
-   * The account is held by Kodi, which owns the settings it is entered in.
-   */
-  bool SetRetroAchievementsCredentials(const std::string& username, const std::string& token);
 
   /*!
    * \brief Tell the client which achievement modes are in force

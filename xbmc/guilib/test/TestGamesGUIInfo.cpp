@@ -214,7 +214,7 @@ TEST_F(TestGamesGUIInfo, ShowsTheAchievementTheRuntimeIndicated)
   CAchievementRuntime achievementRuntime;
   achievementRuntime.SetState(MakeAchievementState());
 
-  ProgressIndicator indicator;
+  AchievementProgressIndicator indicator;
   indicator.id = 3;
   indicator.title = "Collect 180 rings";
   indicator.badgeUrl = "https://example.invalid/badge.png";
@@ -248,11 +248,11 @@ TEST_F(TestGamesGUIInfo, ShowsTheAchievementBeingAttempted)
   CAchievementRuntime achievementRuntime;
   achievementRuntime.SetState(MakeAchievementState());
 
-  ChallengeIndicator indicator;
+  AchievementChallenge indicator;
   indicator.id = 5;
   indicator.title = "Beat Lavos without dying";
   indicator.badgeUrl = "https://example.invalid/badge.png";
-  achievementRuntime.SetChallengeIndicator(indicator, true);
+  achievementRuntime.SetChallenge(indicator, true);
 
   CGamesGUIInfo gamesGUIInfo{achievementRuntime};
 
@@ -271,13 +271,13 @@ TEST_F(TestGamesGUIInfo, ShowsNothingOnceTheAttemptEnds)
   CAchievementRuntime achievementRuntime;
   achievementRuntime.SetState(MakeAchievementState());
 
-  ChallengeIndicator indicator;
+  AchievementChallenge indicator;
   indicator.id = 5;
   indicator.title = "Beat Lavos without dying";
-  achievementRuntime.SetChallengeIndicator(indicator, true);
+  achievementRuntime.SetChallenge(indicator, true);
 
   // The runtime names no achievement when an attempt ends
-  achievementRuntime.SetChallengeIndicator({}, false);
+  achievementRuntime.SetChallenge({}, false);
 
   CGamesGUIInfo gamesGUIInfo{achievementRuntime};
 
@@ -292,7 +292,7 @@ TEST_F(TestGamesGUIInfo, ShowsNothingOnceTheIndicatorIsCleared)
   CAchievementRuntime achievementRuntime;
   achievementRuntime.SetState(MakeAchievementState());
 
-  ProgressIndicator indicator;
+  AchievementProgressIndicator indicator;
   indicator.id = 3;
   indicator.title = "Collect 180 rings";
   indicator.measuredProgress = "130/180";
@@ -318,13 +318,13 @@ TEST_F(TestGamesGUIInfo, ShowsTheClosestOfTwoAchievementsCountingAtOnce)
   CAchievementRuntime achievementRuntime;
   achievementRuntime.SetState(MakeAchievementState());
 
-  ProgressIndicator behind;
+  AchievementProgressIndicator behind;
   behind.id = 4;
   behind.title = "Trip Pop Pro";
   behind.measuredProgress = "1/25";
   behind.measuredPercent = 4.0f;
 
-  ProgressIndicator ahead;
+  AchievementProgressIndicator ahead;
   ahead.id = 5;
   ahead.title = "Orange Ace";
   ahead.measuredProgress = "18/20";

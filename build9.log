@@ -1,0 +1,965 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  1%] Built target build-ffmpeg
+[  1%] Built target build-crossguid
+[  1%] Built target build-JsonSchemaBuilder
+[  1%] Performing build step for 'buildtexturepacker'
+[  1%] Built target build-poppler
+[  1%] Built target wrapper
+[  1%] Built target build-libdvdcss
+[  2%] Built target build-utfcpp
+[  2%] Built target compileinfo
+[  2%] Built target generate-wayland-extra-protocols
+[  2%] Built target gen_system_addons
+Generating xbmc.json/addon.xml
+[100%] Built target TexturePacker
+[  3%] Built target sse4
+[  3%] Built target retroplayer_messages
+[  7%] Built target upnp
+[  7%] No install step for 'buildtexturepacker'
+[  8%] Built target build-libdvdread
+[  8%] Completed 'buildtexturepacker'
+[  8%] Built target generate_json_header
+[  8%] Built target build-taglib
+[  8%] Built target build-libdvdnav
+[  8%] Built target wrapper.def
+[  8%] Built target buildtexturepacker
+[  8%] Built target rp-process-gbm
+[  8%] Copying files into build tree
+[ 10%] Built target processGBM
+[ 10%] Built target network_httprequesthandlers_python
+[ 10%] Built target windowing_gbm
+[ 10%] Built target rp-process-wayland
+[ 11%] Built target windowing_gbm_drm
+[ 11%] Built target processWayland
+[ 12%] Built target windowing_WAYLAND
+[ 13%] Built target cores
+[ 13%] Built target dllloader
+[ 13%] Built target export-files
+[ 15%] Built target audioengine
+[ 15%] Built target exports_utils
+[ 15%] Built target dllexports
+[ 15%] Built target externalplayer
+[ 15%] Built target paplayer
+[ 15%] Built target playercorefactory
+[ 15%] Built target events
+[ 15%] Built target events_windows
+[ 16%] Built target bluray
+[ 17%] Built target videodatabasedirectory
+[ 17%] Built target games
+[ 17%] Built target gameaddons
+[ 18%] Built target musicdatabasedirectory
+[ 23%] Built target filesystem
+[ 23%] Built target gamecheevos
+[ 23%] Built target game_addon_streams
+[ 23%] Built target gamediscs
+[ 23%] Built target gameinput
+[ 25%] Built target games_agents_input
+[ 25%] Built target games_cheats
+[ 25%] Built target games_agents_windows
+[ 25%] Built target games_controller_dialogs
+[ 25%] Built target games_controller
+[ 25%] Built target games_controller_input
+[ 26%] Built target games_controller_guicontrols
+[ 26%] Built target games_controller_listproviders
+[ 27%] Built target games_controller_types
+[ 27%] Built target games_controller_windows
+[ 27%] Built target games_database
+[ 28%] Built target gamedialogs
+[ 28%] Built target game_disc_dialog
+[ 30%] Built target gameosddialogs
+[ 30%] Built target games_manual
+[ 31%] Built target games_ports_input
+[ 31%] Built target games_ports_guicontrols
+[ 32%] Built target games_library
+[ 32%] Built target games_ports_types
+[ 32%] Built target games_ports_windows
+[ 32%] Built target gametags
+[ 32%] Built target gameswindows
+[ 32%] Built target input
+[ 32%] Built target input_actions
+[ 33%] Built target input_joystick
+[ 33%] Built target input_joystick_dialogs
+[ 33%] Built target input_joystick_generic
+[ 33%] Built target input_keyboard_generic
+[ 35%] Built target input_keyboard
+[ 35%] Built target input_joystick_mapping
+[ 35%] Built target input_keymaps
+[ 35%] Built target input_keymaps_generic
+[ 35%] Built target input_keymaps_remote
+[ 36%] Built target input_keymaps_keyboard
+[ 36%] Built target input_mouse
+[ 36%] Built target input_keymaps_joysticks
+[ 36%] Built target input_keymaps_touch
+[ 36%] Built target input_mouse_generic
+[ 36%] Built target interfaces
+[ 37%] Built target generic_interface
+[ 37%] Built target info_interface
+[ 37%] Built target interfaces_builtins
+[ 37%] Built target media
+[ 38%] Built target drm
+[ 40%] Built target music
+[ 41%] Built target jsonrpc_interface
+[ 41%] Built target music_dialogs
+[ 41%] Built target music_infoscanner
+[ 41%] Built target music_jobs
+[ 42%] Built target network
+[ 43%] Built target music_tags
+[ 45%] Built target network_websockets
+[ 45%] Built target music_windows
+[ 45%] Built target peripherals
+[ 45%] Built target peripheral_bus_virtual
+[ 45%] Built target peripherals_bus
+[ 45%] Built target peripherals_addons
+[ 46%] Built target peripherals_devices
+[ 46%] Built target peripherals_dialogs
+[ 46%] Built target peripherals_events
+[ 46%] Built target profiles
+[ 46%] Built target profiles_dialogs
+[ 46%] Built target profiles_windows
+[ 47%] Built target pvr
+[ 47%] Built target pvr_addons
+[ 48%] Built target pvr_epg
+[ 48%] Built target pvr_filesystem
+[ 50%] Built target pvr_channels
+[ 50%] Built target pvr_dialogs
+[ 50%] Built target pvr_guilib_guiinfo
+[ 51%] Built target pvr_guilib
+[ 51%] Built target pvr_providers
+[ 52%] Built target pvr_timers
+[ 52%] Built target pvr_recordings
+[ 52%] Built target pvr_settings
+[ 52%] Built target pvr_utils
+[ 52%] Built target rp_audio
+[ 52%] Built target pvr_windows
+[ 53%] Built target retroplayer
+[ 55%] Built target rp-buffers
+[ 55%] Built target retroplayer_guibridge
+[ 55%] Built target rp-buffers-video
+[ 55%] Built target retroplayer_guiplayback
+[ 55%] Built target retroplayer_guiwindows
+[ 55%] Built target retroplayer_guicontrols
+[ 56%] Built target rp-process
+[ 56%] Built target retroplayer_playback
+[ 56%] Built target rp-videorenderers
+[ 56%] Built target rp-rendering
+[ 56%] Built target retroplayer_savestates
+[ 56%] Built target rp-shaders
+[ 56%] Built target retroplayer_streams
+[ 56%] Built target retroplayer_memory
+[ 57%] Built target settings
+[ 57%] Built target settings_dialogs
+[ 57%] Built target settings_windows
+[ 58%] Built target addons
+[ 60%] Built target settings_lib
+[ 60%] Built target addons_addoninfo
+[ 62%] Built target xbmc
+[ 63%] Built target addons_gui
+[ 63%] Built target addons_gui_skin
+[ 63%] Built target addons_binary-addons
+[ 63%] Built target addons_interfaces_gui
+[ 63%] Built target addons_interfaces
+[ 63%] Built target addons_interfaces_gui_dialogs
+[ 63%] Built target addons_settings
+[ 65%] Built target addons_interfaces_gui_controls
+[ 65%] Built target commons
+[ 65%] Built target dbwrappers
+[ 65%] Built target favourites
+[ 65%] Built target application
+[ 66%] Built target dialogs
+[ 66%] Built target guilib_announcement_handlers
+[ 66%] Built target guilib_listproviders
+[ 67%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GamesGUIInfo.cpp.o
+[ 68%] Built target jobs
+[ 68%] Built target imagefiles
+[ 68%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/MusicGUIInfo.cpp.o
+[ 68%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/PicturesGUIInfo.cpp.o
+[ 68%] Built target messaging
+[ 68%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/PlayerGUIInfo.cpp.o
+[ 72%] Built target guilib
+[ 72%] Built target messagingHelpers
+[ 73%] Built target pictures
+[ 73%] Built target pictures_metadata
+[ 73%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/SkinGUIInfo.cpp.o
+[ 73%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/SystemGUIInfo.cpp.o
+[ 73%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/VideoGUIInfo.cpp.o
+[ 73%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/VisualisationGUIInfo.cpp.o
+[ 73%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/WeatherGUIInfo.cpp.o
+[ 73%] Building CXX object build/platform/CMakeFiles/platform_common.dir/Environment.cpp.o
+[ 73%] Building CXX object build/platform/CMakeFiles/platform_common.dir/xbmc.cpp.o
+[ 73%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayList.cpp.o
+[ 73%] Building CXX object build/powermanagement/CMakeFiles/powermanagement.dir/DPMSSupport.cpp.o
+[ 73%] Linking CXX static library platform_common.a
+[ 73%] Built target platform_common
+[ 73%] Building CXX object build/programs/CMakeFiles/programs.dir/GUIViewStatePrograms.cpp.o
+[ 73%] Building CXX object build/powermanagement/CMakeFiles/powermanagement.dir/IPowerSyscall.cpp.o
+[ 73%] Linking CXX static library guilib_guiinfo.a
+[ 73%] Building CXX object build/powermanagement/CMakeFiles/powermanagement.dir/PowerManager.cpp.o
+[ 73%] Built target guilib_guiinfo
+[ 73%] Building CXX object build/programs/CMakeFiles/programs.dir/GUIWindowPrograms.cpp.o
+[ 73%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListASX.cpp.o
+[ 73%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListB4S.cpp.o
+[ 73%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListFactory.cpp.o
+[ 73%] Linking CXX static library programs.a
+[ 73%] Built target programs
+[ 73%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListFileItemClassify.cpp.o
+[ 75%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListM3U.cpp.o
+[ 75%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListPLS.cpp.o
+[ 75%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListRAM.cpp.o
+[ 75%] Linking CXX static library powermanagement.a
+[ 75%] Built target powermanagement
+[ 75%] Building CXX object build/rendering/CMakeFiles/rendering.dir/RenderSystem.cpp.o
+[ 75%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListURL.cpp.o
+[ 75%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListWPL.cpp.o
+[ 75%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListXML.cpp.o
+[ 75%] Building CXX object build/rendering/CMakeFiles/rendering.dir/GLExtensions.cpp.o
+[ 75%] Building CXX object build/rendering_capture/CMakeFiles/rendering_capture.dir/CaptureBlit.cpp.o
+[ 75%] Building CXX object build/rendering/CMakeFiles/rendering.dir/MatrixGL.cpp.o
+[ 75%] Building CXX object build/resources/CMakeFiles/resources.dir/LocalizeStrings.cpp.o
+[ 75%] Building CXX object build/playlists/CMakeFiles/playlists.dir/PlayListXSPF.cpp.o
+[ 76%] Linking CXX static library rendering.a
+[ 76%] Built target rendering
+[ 76%] Building CXX object build/storage/CMakeFiles/storage.dir/AutorunMediaJob.cpp.o
+[ 76%] Building CXX object build/rendering_capture/CMakeFiles/rendering_capture.dir/CaptureConvert.cpp.o
+[ 76%] Building CXX object build/playlists/CMakeFiles/playlists.dir/SmartPlayList.cpp.o
+[ 76%] Building CXX object build/rendering_capture/CMakeFiles/rendering_capture.dir/CaptureHandle.cpp.o
+[ 76%] Building CXX object build/rendering_capture/CMakeFiles/rendering_capture.dir/CaptureMetadata.cpp.o
+[ 76%] Building CXX object build/resources/CMakeFiles/resources.dir/ResourcesComponent.cpp.o
+[ 76%] Building CXX object build/storage/CMakeFiles/storage.dir/MediaManager.cpp.o
+[ 76%] Linking CXX static library resources.a
+[ 76%] Built target resources
+[ 76%] Building CXX object build/threads/CMakeFiles/threads.dir/Event.cpp.o
+[ 76%] Building CXX object build/storage/CMakeFiles/storage.dir/cdioSupport.cpp.o
+[ 76%] Building CXX object build/rendering_capture/CMakeFiles/rendering_capture.dir/CaptureReadback.cpp.o
+[ 76%] Building CXX object build/threads/CMakeFiles/threads.dir/Thread.cpp.o
+[ 76%] Building CXX object build/rendering_capture/CMakeFiles/rendering_capture.dir/CaptureService.cpp.o
+[ 76%] Building CXX object build/playlists/CMakeFiles/playlists.dir/SmartPlaylistFileItemListModifier.cpp.o
+[ 76%] Building CXX object build/storage/CMakeFiles/storage.dir/DetectDVDType.cpp.o
+[ 76%] Linking CXX static library playlists.a
+[ 76%] Linking CXX static library rendering_capture.a
+[ 76%] Built target rendering_capture
+[ 76%] Building CXX object build/utils/CMakeFiles/utils.dir/ActorProtocol.cpp.o
+[ 76%] Built target playlists
+[ 76%] Building CXX object build/threads/CMakeFiles/threads.dir/Timer.cpp.o
+[ 76%] Building CXX object build/utils/CMakeFiles/utils.dir/AlarmClock.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/AliasShortcutUtils.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/Archive.cpp.o
+[ 77%] Linking CXX static library threads.a
+[ 77%] Built target threads
+[ 77%] Building CXX object build/utils_guilib/CMakeFiles/utils_guilib.dir/GUIBuiltinsUtils.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/ArtUtils.cpp.o
+[ 77%] Linking CXX static library storage.a
+[ 77%] Built target storage
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/Bcp47.cpp.o
+[ 77%] Building CXX object build/utils_guilib/CMakeFiles/utils_guilib.dir/GUIContentUtils.cpp.o
+[ 77%] Building CXX object build/utils_i18n_Bcp47Registry/CMakeFiles/utils_i18n_Bcp47Registry.dir/RegistryRecordProvider.cpp.o
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/Bcp47Formatter.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/Base64.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/BitstreamConverter.cpp.o
+[ 77%] Linking CXX static library utils_guilib.a
+[ 77%] Built target utils_guilib
+[ 77%] Building CXX object build/view/CMakeFiles/view.dir/GUIViewControl.cpp.o
+[ 77%] Building CXX object build/utils_i18n_Bcp47Registry/CMakeFiles/utils_i18n_Bcp47Registry.dir/SubTagLoader.cpp.o
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/Bcp47Parser.cpp.o
+[ 77%] Building CXX object build/utils_i18n_Bcp47Registry/CMakeFiles/utils_i18n_Bcp47Registry.dir/SubTagRegistryFile.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/BitstreamReader.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/BitstreamStats.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/BooleanLogic.cpp.o
+[ 77%] Building CXX object build/view/CMakeFiles/view.dir/GUIViewState.cpp.o
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/Iso3166_1.cpp.o
+[ 77%] Building CXX object build/utils_i18n_Bcp47Registry/CMakeFiles/utils_i18n_Bcp47Registry.dir/SubTagRegistryManager.cpp.o
+[ 77%] Building CXX object build/utils_i18n_Bcp47Registry/CMakeFiles/utils_i18n_Bcp47Registry.dir/SubTagRegistryTypes.cpp.o
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/Iso639.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/CharArrayParser.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/CharsetConverter.cpp.o
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/Iso639_1.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/CharsetDetection.cpp.o
+[ 77%] Building CXX object build/view/CMakeFiles/view.dir/ViewDatabase.cpp.o
+[ 77%] Linking CXX static library utils_i18n_Bcp47Registry.a
+[ 77%] Built target utils_i18n_Bcp47Registry
+[ 77%] Building CXX object build/weather/CMakeFiles/weather.dir/GUIWindowWeather.cpp.o
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/Iso639_2.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/ColorUtils.cpp.o
+[ 77%] Building CXX object build/view/CMakeFiles/view.dir/ViewStateSettings.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/ContentUtils.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/CPUInfo.cpp.o
+[ 77%] Building CXX object build/utils_i18n/CMakeFiles/utils_i18n.dir/ListFormatter.cpp.o
+[ 77%] Building CXX object build/weather/CMakeFiles/weather.dir/WeatherJob.cpp.o
+[ 77%] Linking CXX static library utils_i18n.a
+[ 77%] Linking CXX static library view.a
+[ 77%] Built target utils_i18n
+[ 77%] Building CXX object build/windowing/CMakeFiles/windowing.dir/GraphicContext.cpp.o
+[ 77%] Built target view
+[ 77%] Building CXX object build/windowing/CMakeFiles/windowing.dir/OSScreenSaver.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/Crc32.cpp.o
+[ 77%] Building CXX object build/windowing/CMakeFiles/windowing.dir/Resolution.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/CSSUtils.cpp.o
+[ 77%] Building CXX object build/utils/CMakeFiles/utils.dir/DatabaseUtils.cpp.o
+[ 77%] Building CXX object build/windowing/CMakeFiles/windowing.dir/WindowSystemFactory.cpp.o
+[ 77%] Building CXX object build/weather/CMakeFiles/weather.dir/WeatherManager.cpp.o
+[ 77%] Building CXX object build/windowing/CMakeFiles/windowing.dir/WinSystem.cpp.o
+[ 77%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIMediaWindow.cpp.o
+[ 78%] Building CXX object build/weather/CMakeFiles/weather.dir/WeatherPropertyHelper.cpp.o
+[ 78%] Building CXX object build/utils/CMakeFiles/utils.dir/Digest.cpp.o
+[ 78%] Building CXX object build/weather/CMakeFiles/weather.dir/WeatherTokenLocalizer.cpp.o
+[ 78%] Linking CXX static library windowing.a
+[ 78%] Built target windowing
+[ 78%] Building CXX object build/video/CMakeFiles/video.dir/Bookmark.cpp.o
+[ 78%] Building CXX object build/utils/CMakeFiles/utils.dir/DiscsUtils.cpp.o
+[ 78%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogAudioSettings.cpp.o
+[ 78%] Building CXX object build/video/CMakeFiles/video.dir/ContextMenus.cpp.o
+[ 78%] Linking CXX static library weather.a
+[ 78%] Built target weather
+[ 78%] Building CXX object build/video/CMakeFiles/video.dir/FilenameAttributes.cpp.o
+[ 78%] Building CXX object build/utils/CMakeFiles/utils.dir/EndianSwap.cpp.o
+[ 78%] Building CXX object build/utils/CMakeFiles/utils.dir/EmbeddedArt.cpp.o
+[ 78%] Building CXX object build/utils/CMakeFiles/utils.dir/EpisodeUtils.cpp.o
+[ 78%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowDebugInfo.cpp.o
+[ 78%] Building CXX object build/video/CMakeFiles/video.dir/GUIViewStateVideo.cpp.o
+[ 78%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogFullScreenInfo.cpp.o
+[ 78%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogSubtitles.cpp.o
+[ 80%] Building CXX object build/video/CMakeFiles/video.dir/PlayerController.cpp.o
+[ 80%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowFileManager.cpp.o
+[ 80%] Building CXX object build/utils/CMakeFiles/utils.dir/ExecString.cpp.o
+[ 80%] Building CXX object build/video/CMakeFiles/video.dir/PlayerControllerActions.cpp.o
+[ 80%] Building CXX object build/utils/CMakeFiles/utils.dir/FileExtensionProvider.cpp.o
+[ 81%] Building CXX object build/utils/CMakeFiles/utils.dir/Fanart.cpp.o
+[ 81%] Building CXX object build/video/CMakeFiles/video.dir/SetInfoTag.cpp.o
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogSubtitleSettings.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowHome.cpp.o
+[ 82%] Building CXX object build/video/CMakeFiles/video.dir/Teletext.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowLoginScreen.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp: In function ‘std::string {anonymous}::GetExtensions(CCriticalSection&, std::shared_ptr<const std::__cxx11::basic_string<char> >&, std::function<std::__cxx11::basic_string<char>()>)’:
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:99:39: warning: ‘std::shared_ptr<_Tp> std::atomic_load_explicit(const shared_ptr<_Tp>*, memory_order) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+   99 |   auto tmp = std::atomic_load_explicit(&cache, std::memory_order_acquire);
+      |              ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/15/memory:83,
+                 from /home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.h:14,
+                 from /home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:9:
+/usr/include/c++/15/bits/shared_ptr_atomic.h:133:5: note: declared here
+  133 |     atomic_load_explicit(const shared_ptr<_Tp>* __p, memory_order)
+      |     ^~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:106:36: warning: ‘std::shared_ptr<_Tp> std::atomic_load_explicit(const shared_ptr<_Tp>*, memory_order) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  106 |     tmp = std::atomic_load_explicit(&cache, std::memory_order_relaxed);
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:133:5: note: declared here
+  133 |     atomic_load_explicit(const shared_ptr<_Tp>* __p, memory_order)
+      |     ^~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:110:33: warning: ‘void std::atomic_store_explicit(shared_ptr<_Tp>*, shared_ptr<_Tp>, memory_order) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  110 |       std::atomic_store_explicit(&cache, tmp, std::memory_order_release);
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:173:5: note: declared here
+  173 |     atomic_store_explicit(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r,
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp: In member function ‘void CFileExtensionProvider::SetAddonExtensions(ADDON::AddonType)’:
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:348:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  348 |     std::atomic_store(&m_musicExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:349:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  349 |     std::atomic_store(&m_pictureExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:350:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  350 |     std::atomic_store(&m_fileFolderExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:378:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  378 |     std::atomic_store(&m_musicExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:379:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  379 |     std::atomic_store(&m_pictureExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:380:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  380 |     std::atomic_store(&m_subtitlesExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:381:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  381 |     std::atomic_store(&m_videoExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:382:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  382 |     std::atomic_store(&m_archiveExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:383:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  383 |     std::atomic_store(&m_compoundArchiveExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:384:22: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  384 |     std::atomic_store(&m_fileFolderExtensions, {});
+      |     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp: In member function ‘void CFileExtensionProvider::OnAdvancedSettingsLoaded()’:
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:418:20: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  418 |   std::atomic_store(&m_discStubExtensions, {});
+      |   ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:419:20: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  419 |   std::atomic_store(&m_musicExtensions, {});
+      |   ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:420:20: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  420 |   std::atomic_store(&m_pictureExtensions, {});
+      |   ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:421:20: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  421 |   std::atomic_store(&m_subtitlesExtensions, {});
+      |   ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:422:20: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  422 |   std::atomic_store(&m_videoExtensions, {});
+      |   ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:423:20: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  423 |   std::atomic_store(&m_archiveExtensions, {});
+      |   ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/utils/FileExtensionProvider.cpp:424:20: warning: ‘void std::atomic_store(shared_ptr<_Tp>*, shared_ptr<_Tp>) [with _Tp = const __cxx11::basic_string<char>]’ is deprecated: use 'std::atomic<std::shared_ptr<T>>' instead [-Wdeprecated-declarations]
+  424 |   std::atomic_store(&m_compoundArchiveExtensions, {});
+      |   ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/15/bits/shared_ptr_atomic.h:183:5: note: declared here
+  183 |     atomic_store(shared_ptr<_Tp>* __p, shared_ptr<_Tp> __r)
+      |     ^~~~~~~~~~~~
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/FileOperationJob.cpp.o
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogTeletext.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowPointer.cpp.o
+[ 82%] Building CXX object build/video/CMakeFiles/video.dir/VideoDatabase.cpp.o
+[ 82%] Building CXX object build/video/CMakeFiles/video.dir/VideoDatabaseDDL.cpp.o
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogVideoBookmarks.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/FileUtils.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowScreensaver.cpp.o
+[ 82%] Building CXX object build/video/guilib/CMakeFiles/video_guilib.dir/VideoActionProcessorBase.cpp.o
+[ 82%] Building CXX object build/video/guilib/CMakeFiles/video_guilib.dir/VideoGUIUtils.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowScreensaverDim.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/FontUtils.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowSplash.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/GpuInfo.cpp.o
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogVideoInfo.cpp.o
+[ 82%] Building CXX object build/video/guilib/CMakeFiles/video_guilib.dir/VideoPlayActionProcessor.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/GroupUtils.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowStartup.cpp.o
+[ 82%] Building CXX object build/windows/CMakeFiles/windows.dir/GUIWindowSystemInfo.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/HDRUtils.cpp.o
+[ 82%] Building CXX object build/video/guilib/CMakeFiles/video_guilib.dir/VideoSelectActionProcessor.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/HevcSei.cpp.o
+[ 82%] Building CXX object build/video/guilib/CMakeFiles/video_guilib.dir/VideoStreamSelectHelper.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/HTMLUtil.cpp.o
+[ 82%] Linking CXX static library windows.a
+[ 82%] Built target windows
+[ 82%] Building CXX object build/video/jobs/CMakeFiles/video_jobs.dir/VideoLibraryCleaningJob.cpp.o
+[ 82%] Building CXX object build/video/jobs/CMakeFiles/video_jobs.dir/VideoLibraryJob.cpp.o
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogVideoManager.cpp.o
+[ 82%] Linking CXX static library video_guilib.a
+[ 82%] Built target video_guilib
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogVideoManagerExtras.cpp.o
+[ 82%] Building CXX object build/video/jobs/CMakeFiles/video_jobs.dir/VideoLibraryMarkWatchedJob.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/HttpHeader.cpp.o
+[ 82%] Building CXX object build/video/CMakeFiles/video.dir/VideoDatabaseMigration.cpp.o
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogVideoManagerVersions.cpp.o
+[ 82%] Building CXX object build/video/jobs/CMakeFiles/video_jobs.dir/VideoLibraryProgressJob.cpp.o
+[ 82%] Building CXX object build/video/jobs/CMakeFiles/video_jobs.dir/VideoLibraryRefreshingJob.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/HttpParser.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/HttpRangeUtils.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/HttpResponse.cpp.o
+[ 82%] Building CXX object build/utils/CMakeFiles/utils.dir/InfoLoader.cpp.o
+[ 82%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogVideoOSD.cpp.o
+[ 83%] Building CXX object build/video/tags/CMakeFiles/video_tags.dir/SetInfoTagLoaderFactory.cpp.o
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoDbUrl.cpp.o
+[ 83%] Building CXX object build/video/jobs/CMakeFiles/video_jobs.dir/VideoLibraryScanningJob.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/JSONVariantParser.cpp.o
+[ 83%] Building CXX object build/video/tags/CMakeFiles/video_tags.dir/SetTagLoaderNFO.cpp.o
+[ 83%] Building CXX object build/video/dialogs/CMakeFiles/video_dialogs.dir/GUIDialogVideoSettings.cpp.o
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoEmbeddedImageFileLoader.cpp.o
+[ 83%] Building CXX object build/video/jobs/CMakeFiles/video_jobs.dir/VideoLibraryResetResumePointJob.cpp.o
+[ 83%] Building CXX object build/video/tags/CMakeFiles/video_tags.dir/VideoTagExtractionHelper.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/JSONVariantWriter.cpp.o
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoFileItemClassify.cpp.o
+[ 83%] Linking CXX static library video_jobs.a
+[ 83%] Built target video_jobs
+[ 83%] Building CXX object build/video/tags/CMakeFiles/video_tags.dir/VideoInfoTagLoaderFactory.cpp.o
+[ 83%] Building CXX object build/video/tags/CMakeFiles/video_tags.dir/VideoTagLoaderFFmpeg.cpp.o
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoGeneratedImageFileLoader.cpp.o
+[ 83%] Linking CXX static library video_dialogs.a
+[ 83%] Built target video_dialogs
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/LabelFormatter.cpp.o
+[ 83%] Building CXX object build/video/windows/CMakeFiles/video_windows.dir/GUIWindowFullScreen.cpp.o
+[ 83%] Building CXX object build/video/windows/CMakeFiles/video_windows.dir/GUIWindowVideoBase.cpp.o
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoInfoDownloader.cpp.o
+[ 83%] Building CXX object build/video/tags/CMakeFiles/video_tags.dir/VideoTagLoaderNFO.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/LangCodeExpander.cpp.o
+[ 83%] Building CXX object build/video/windows/CMakeFiles/video_windows.dir/GUIWindowVideoNav.cpp.o
+[ 83%] Building CXX object build/video/tags/CMakeFiles/video_tags.dir/VideoTagLoaderPlugin.cpp.o
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoInfoScanner.cpp.o
+[ 83%] Building CXX object build/video/windows/CMakeFiles/video_windows.dir/GUIWindowVideoPlaylist.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/LanguageTag.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/LegacyPathTranslation.cpp.o
+[ 83%] Building CXX object build/video/windows/CMakeFiles/video_windows.dir/VideoFileItemListModifier.cpp.o
+[ 83%] Linking CXX static library video_tags.a
+[ 83%] Built target video_tags
+[ 83%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/AudioSinkAE.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/Locale.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/Buffers/CMakeFiles/videoplayer-buffers.dir/VideoBuffer.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/DVDClock.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/log.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/Buffers/CMakeFiles/videoplayer-buffers.dir/DmaBufIdentity.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/Buffers/CMakeFiles/videoplayer-buffers.dir/DmaBufIdentityCache.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/DVDDemuxSPU.cpp.o
+[ 83%] Linking CXX static library video_windows.a
+[ 83%] Built target video_windows
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoInfoTag.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/Buffers/CMakeFiles/videoplayer-buffers.dir/VideoBufferDMA.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/DVDFileInfo.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/Mime.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/Buffers/CMakeFiles/videoplayer-buffers.dir/VideoBufferDRMPRIME.cpp.o
+[ 83%] Building CXX object build/video/CMakeFiles/video.dir/VideoItemArtworkHandler.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/Buffers/CMakeFiles/videoplayer-buffers.dir/VideoBufferPoolDMA.cpp.o
+[ 83%] Building CXX object build/utils/CMakeFiles/utils.dir/MovingSpeed.cpp.o
+[ 83%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/DVDMessage.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/Mp4ChplReader.cpp.o
+[ 85%] Linking CXX static library videoplayer-buffers.a
+[ 85%] Built target videoplayer-buffers
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/CMakeFiles/dvdcodecs.dir/DVDCodecUtils.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/DVDMessageQueue.cpp.o
+[ 85%] Building CXX object build/video/CMakeFiles/video.dir/VideoLibraryQueue.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/Observer.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/CMakeFiles/dvdcodecs.dir/DVDFactoryCodec.cpp.o
+[ 85%] Building CXX object build/video/CMakeFiles/video.dir/VideoStreamSelect.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/POUtils.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/DVDOverlayContainer.cpp.o
+[ 85%] Building CXX object build/video/CMakeFiles/video.dir/VideoThumbLoader.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/PlayerUtils.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/DVDStreamInfo.cpp.o
+[ 85%] Linking CXX static library dvdcodecs.a
+[ 85%] Built target dvdcodecs
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/audio/CMakeFiles/dvdaudiocodecs.dir/DVDAudioCodecFFmpeg.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/RecentlyAddedJob.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl.cpp.o
+[ 85%] Building CXX object build/video/CMakeFiles/video.dir/VideoUtils.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/audio/CMakeFiles/dvdaudiocodecs.dir/DVDAudioCodecPassthrough.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl/EdlParserFactory.cpp.o
+[ 85%] Building CXX object build/video/CMakeFiles/video.dir/ViewModeSettings.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl/EdlParsers/BeyondTVParser.cpp.o
+[ 85%] Linking CXX static library dvdaudiocodecs.a
+[ 85%] Built target dvdaudiocodecs
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/RegExp.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl/EdlParsers/ComskipParser.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/RingBuffer.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/RssManager.cpp.o
+[ 85%] Linking CXX static library video.a
+[ 85%] Built target video
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl/EdlParsers/EdlFileParser.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/DVDOverlayCodec.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl/EdlParsers/MultipleEpisodeEdlParser.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/RssReader.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/DVDOverlayCodecFFmpeg.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/ProgressJob.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl/EdlParsers/PvrEdlParser.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/Edl/EdlParsers/VideoReDoParser.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/video/CMakeFiles/dvdvideocodecs.dir/AddonVideoCodec.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/DVDOverlayCodecSSA.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/SaveFileStateJob.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/PTSTracker.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/DVDOverlayCodecText.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/video/CMakeFiles/dvdvideocodecs.dir/DVDVideoCodec.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/ScraperParser.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoPlayer.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/DVDOverlayCodecCCText.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/video/CMakeFiles/dvdvideocodecs.dir/DVDVideoCodecFFmpeg.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/video/CMakeFiles/dvdvideocodecs.dir/DVDVideoPPFFmpeg.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/DVDOverlayCodecTX3G.cpp.o
+[ 85%] Building CXX object build/utils/CMakeFiles/utils.dir/ScraperUrl.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/video/CMakeFiles/dvdvideocodecs.dir/DVDVideoCodecDRMPRIME.cpp.o
+[ 85%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/OverlayCodecWebVTT.cpp.o
+[ 86%] Building C object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/contrib/cc_decoder.c.o
+[ 86%] Building CXX object build/cores/VideoPlayer/codecs/overlay/CMakeFiles/dvdoverlaycodecs.dir/contrib/cc_decoder708.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DemuxMultiSource.cpp.o
+[ 86%] Linking CXX static library dvdoverlaycodecs.a
+[ 86%] Built target dvdoverlaycodecs
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemux.cpp.o
+[ 86%] Linking CXX static library dvdvideocodecs.a
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/Screenshot.cpp.o
+[ 86%] Built target dvdvideocodecs
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxBXA.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxCC.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxCC/CCBitstreamParserFactory.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxCC/H264AnnexBBitstreamParser.cpp.o
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/SortUtils.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxCC/H264AVCCBitstreamParser.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/BlurayStateSerializer.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxCC/H264CCBitstreamParser.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoPlayerAudio.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDFactoryInputStream.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxCC/MPEG2CCBitstreamParser.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxCDDA.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDFactorySubtitle.cpp.o
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/Speed.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoPlayerAudioID3.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxClient.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDInputStream.cpp.o
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/StreamDetails.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoPlayerRadioRDS.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDInputStreamFFmpeg.cpp.o
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/StreamUtils.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxFFmpeg.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleLineCollection.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleParserMicroDVD.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDInputStreamFile.cpp.o
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/StringUtils.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoPlayerSubtitle.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleParserMPL2.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDInputStreamMemory.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleParserSami.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDInputStreamNavigator.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoPlayerTeletext.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxUtils.cpp.o
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/StringValidation.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleParserSubrip.cpp.o
+[ 86%] Building CXX object build/utils/CMakeFiles/utils.dir/SystemInfo.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDDemuxVobsub.cpp.o
+[ 86%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleParserVplayer.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoPlayerVideo.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDStateSerializer.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleStream.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/demuxers/CMakeFiles/dvddemuxers.dir/DVDFactoryDemuxer.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/InputStreamAddon.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitlesLibass.cpp.o
+[ 87%] Building CXX object build/utils/CMakeFiles/utils.dir/Temperature.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/CMakeFiles/VideoPlayer.dir/VideoReferenceClock.cpp.o
+[ 87%] Linking CXX static library dvddemuxers.a
+[ 87%] Built target dvddemuxers
+[ 87%] Building CXX object build/utils/CMakeFiles/utils.dir/TextSearch.cpp.o
+[ 87%] Building CXX object build/utils/CMakeFiles/utils.dir/TimeUtils.cpp.o
+[ 87%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleParserSSA.cpp.o
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/URIUtils.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/InputStreamMultiSource.cpp.o
+[ 88%] Linking CXX static library VideoPlayer.a
+[ 88%] Built target VideoPlayer
+[ 88%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleTagMicroDVD.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/DVDSubtitleTagSami.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/SubtitleParserWebVTT.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/subtitles/CMakeFiles/dvdsubtitles.dir/SubtitlesAdapter.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/InputStreamPVRBase.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/subtitles/webvtt/CMakeFiles/subtitles_webvtt.dir/WebVTTHandler.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/subtitles/webvtt/CMakeFiles/subtitles_webvtt.dir/WebVTTISOHandler.cpp.o
+[ 88%] Linking CXX static library dvdsubtitles.a
+[ 88%] Built target dvdsubtitles
+[ 88%] Building CXX object build/cores/VideoPlayer/process/CMakeFiles/process.dir/ProcessInfo.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/InputStreamPVRChannel.cpp.o
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/UrlOptions.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/InputStreamPVRRecording.cpp.o
+[ 88%] Linking CXX static library process.a
+[ 88%] Built target process
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/BaseRenderer.cpp.o
+[ 88%] Linking CXX static library subtitles_webvtt.a
+[ 88%] Building CXX object build/cores/VideoPlayer/inputstreams/CMakeFiles/dvdinputstreams.dir/DVDInputStreamBluray.cpp.o
+[ 88%] Built target subtitles_webvtt
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/Utf8Utils.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/hwdec/CMakeFiles/videorenderers_hwdec.dir/RendererDRMPRIME.cpp.o
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/Variant.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/ColorManager.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/shaders/CMakeFiles/videoshaders.dir/ConvolutionKernels.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/shaders/CMakeFiles/videoshaders.dir/ConversionMatrix.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/hwdec/CMakeFiles/videorenderers_hwdec.dir/VideoLayerBridgeDRMPRIME.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/shaders/CMakeFiles/videoshaders.dir/ToneMappers.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/shaders/CMakeFiles/videoshaders.dir/VideoFilterShaderGLES.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/OverlayRenderer.cpp.o
+[ 88%] Linking CXX static library dvdinputstreams.a
+[ 88%] Built target dvdinputstreams
+[ 88%] Building CXX object build/cores/RetroPlayer/shaders/gles/CMakeFiles/rp-shaders-gles.dir/ShaderGLES.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/hwdec/CMakeFiles/videorenderers_hwdec.dir/RendererDRMPRIMEGLES.cpp.o
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/VC1BitstreamParser.cpp.o
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/Vector.cpp.o
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/XBMCTinyXML.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/shaders/CMakeFiles/videoshaders.dir/YUV2RGBShaderGLES.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/OverlayRendererUtil.cpp.o
+[ 88%] Building CXX object build/cores/RetroPlayer/shaders/gles/CMakeFiles/rp-shaders-gles.dir/ShaderLutGLES.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/hwdec/CMakeFiles/videorenderers_hwdec.dir/DRMPRIMECaptureGLES.cpp.o
+[ 88%] Building CXX object build/utils/CMakeFiles/utils.dir/XBMCTinyXML2.cpp.o
+[ 88%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/RenderFactory.cpp.o
+[ 90%] Building CXX object build/cores/RetroPlayer/shaders/gles/CMakeFiles/rp-shaders-gles.dir/ShaderPresetGLES.cpp.o
+[ 90%] Linking CXX static library videoshaders.a
+[ 90%] Built target videoshaders
+[ 90%] Building CXX object build/input/touch/CMakeFiles/input_touch.dir/ITouchInputHandling.cpp.o
+[ 90%] Linking CXX static library input_touch.a
+[ 90%] Built target input_touch
+[ 90%] Building CXX object build/input/touch/generic/CMakeFiles/input_touch_generic.dir/GenericTouchActionHandler.cpp.o
+[ 90%] Building CXX object build/utils/CMakeFiles/utils.dir/XMLUtils.cpp.o
+[ 90%] Building CXX object build/cores/VideoPlayer/videorenderers/hwdec/CMakeFiles/videorenderers_hwdec.dir/DRMPRIMEEGL.cpp.o
+[ 90%] Building CXX object build/input/touch/generic/CMakeFiles/input_touch_generic.dir/GenericTouchInputHandler.cpp.o
+[ 90%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/RenderFlags.cpp.o
+[ 90%] Building CXX object build/cores/RetroPlayer/shaders/gles/CMakeFiles/rp-shaders-gles.dir/ShaderTextureGLES.cpp.o
+[ 90%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/RenderManager.cpp.o
+[ 90%] Building CXX object build/utils/CMakeFiles/utils.dir/XSLTUtils.cpp.o
+[ 90%] Building CXX object build/input/touch/generic/CMakeFiles/input_touch_generic.dir/GenericTouchPinchDetector.cpp.o
+[ 91%] Building CXX object build/input/touch/generic/CMakeFiles/input_touch_generic.dir/GenericTouchRotateDetector.cpp.o
+[ 91%] Building CXX object build/input/touch/generic/CMakeFiles/input_touch_generic.dir/GenericTouchSwipeDetector.cpp.o
+[ 91%] Building CXX object build/cores/RetroPlayer/shaders/gles/CMakeFiles/rp-shaders-gles.dir/ShaderTextureGLESRef.cpp.o
+[ 91%] Linking CXX static library videorenderers_hwdec.a
+[ 91%] Building CXX object build/cores/RetroPlayer/shaders/gles/CMakeFiles/rp-shaders-gles.dir/ShaderUtilsGLES.cpp.o
+[ 91%] Built target videorenderers_hwdec
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/EGLUtils.cpp.o
+[ 91%] Linking CXX static library input_touch_generic.a
+[ 91%] Built target input_touch_generic
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/EGLFence.cpp.o
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/GLUtils.cpp.o
+[ 91%] Linking CXX static library rp-shaders-gles.a
+[ 91%] Built target rp-shaders-gles
+[ 91%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/DebugRenderer.cpp.o
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/BufferObject.cpp.o
+[ 91%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/FrameBufferObject.cpp.o
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/BufferObjectFactory.cpp.o
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/DumbBufferObject.cpp.o
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/UDMABufferObject.cpp.o
+[ 91%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/LinuxRendererGLES.cpp.o
+[ 91%] Building CXX object build/utils/CMakeFiles/utils.dir/DMAHeapBufferObject.cpp.o
+[ 92%] Building CXX object build/cores/VideoPlayer/videorenderers/CMakeFiles/videorenderers.dir/OverlayRendererGLES.cpp.o
+[ 92%] Building CXX object build/utils/CMakeFiles/utils.dir/GBMBufferObject.cpp.o
+[ 92%] Building CXX object build/utils/CMakeFiles/utils.dir/EGLImage.cpp.o
+[ 92%] Building CXX object build/utils/CMakeFiles/utils.dir/DRMHelpers.cpp.o
+[ 92%] Building CXX object build/utils/CMakeFiles/utils.dir/DisplayInfo.cpp.o
+[ 92%] Linking CXX static library videorenderers.a
+[ 92%] Built target videorenderers
+[ 92%] Building CXX object build/platform/common/speech/CMakeFiles/platform_common_speech.dir/SpeechRecognitionStub.cpp.o
+[ 92%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/AppParamParserLinux.cpp.o
+[ 92%] Building CXX object build/platform/linux/input/CMakeFiles/input_linux.dir/LibInputHandler.cpp.o
+[ 92%] Linking CXX static library platform_common_speech.a
+[ 92%] Built target platform_common_speech
+[ 92%] Building CXX object build/platform/linux/network/CMakeFiles/platform_linux_network.dir/NetworkLinux.cpp.o
+[ 92%] Building CXX object build/platform/linux/input/CMakeFiles/input_linux.dir/LibInputKeyboard.cpp.o
+[ 92%] Linking CXX static library utils.a
+[ 92%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/CPUInfoLinux.cpp.o
+[ 92%] Built target utils
+[ 92%] Building CXX object build/platform/linux/peripherals/CMakeFiles/platform_linux_peripherals.dir/PeripheralBusUSBLibUdev.cpp.o
+[ 92%] Linking CXX static library platform_linux_network.a
+[ 92%] Built target platform_linux_network
+[ 92%] Building CXX object build/platform/linux/powermanagement/CMakeFiles/platform_linux_powermanagement.dir/CustomPowerSyscall.cpp.o
+[ 92%] Building CXX object build/platform/linux/input/CMakeFiles/input_linux.dir/LibInputPointer.cpp.o
+[ 92%] Building CXX object build/platform/linux/input/CMakeFiles/input_linux.dir/LibInputSettings.cpp.o
+[ 92%] Linking CXX static library platform_linux_peripherals.a
+[ 92%] Building CXX object build/platform/linux/input/CMakeFiles/input_linux.dir/LibInputTouch.cpp.o
+[ 92%] Building CXX object build/platform/linux/powermanagement/CMakeFiles/platform_linux_powermanagement.dir/LinuxPowerSyscall.cpp.o
+[ 92%] Built target platform_linux_peripherals
+[ 92%] Building CXX object build/platform/linux/storage/CMakeFiles/platform_linux_storage.dir/LinuxStorageProvider.cpp.o
+[ 92%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/GPUInfoLinux.cpp.o
+[ 92%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/MemUtils.cpp.o
+[ 92%] Building CXX object build/platform/linux/powermanagement/CMakeFiles/platform_linux_powermanagement.dir/ConsoleUPowerSyscall.cpp.o
+[ 92%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/OptionalsReg.cpp.o
+[ 92%] Building CXX object build/platform/linux/storage/CMakeFiles/platform_linux_storage.dir/UDisksProvider.cpp.o
+[ 92%] Building CXX object build/platform/linux/threads/CMakeFiles/platform_linux_threads.dir/ThreadImplLinux.cpp.o
+[ 92%] Building CXX object build/platform/linux/input/CMakeFiles/input_linux.dir/EvdevKeyMapping.cpp.o
+[ 93%] Building CXX object build/platform/linux/powermanagement/CMakeFiles/platform_linux_powermanagement.dir/LogindUPowerSyscall.cpp.o
+[ 93%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/PlatformLinux.cpp.o
+[ 93%] Linking CXX static library input_linux.a
+[ 93%] Built target input_linux
+[ 93%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/ConvUtils.cpp.o
+[ 93%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/CPUInfoPosix.cpp.o
+[ 93%] Linking CXX static library platform_linux_threads.a
+[ 93%] Built target platform_linux_threads
+[ 93%] Building CXX object build/platform/posix/filesystem/CMakeFiles/platform_posix_filesystem.dir/PosixDirectory.cpp.o
+[ 93%] Building CXX object build/platform/linux/powermanagement/CMakeFiles/platform_linux_powermanagement.dir/UPowerSyscall.cpp.o
+[ 93%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/Filesystem.cpp.o
+[ 93%] Building CXX object build/platform/linux/storage/CMakeFiles/platform_linux_storage.dir/UDisks2Provider.cpp.o
+[ 93%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/GPUInfoPosix.cpp.o
+In file included from /home/chris/xbmc-hcmerge/xbmc/windowing/wayland/WinSystemWaylandEGLContext.h:11,
+                 from /home/chris/xbmc-hcmerge/xbmc/windowing/wayland/WinSystemWaylandEGLContextGLES.h:11,
+                 from /home/chris/xbmc-hcmerge/xbmc/platform/linux/PlatformLinux.cpp:31:
+/home/chris/xbmc-hcmerge/xbmc/windowing/wayland/WinSystemWayland.h:94:8: warning: ‘virtual void KODI::WINDOWING::WAYLAND::CWinSystemWayland::Register(IDispResource*)’ was hidden [-Woverloaded-virtual=]
+   94 |   void Register(IDispResource* resource) override;
+      |        ^~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/windowing/wayland/WinSystemWaylandEGLContextGLES.h:26:15: note:   by ‘static void KODI::WINDOWING::WAYLAND::CWinSystemWaylandEGLContextGLES::Register()’
+   26 |   static void Register();
+      |               ^~~~~~~~
+[ 95%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/SysfsPath.cpp.o
+[ 95%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/MessagePrinter.cpp.o
+[ 95%] Linking CXX static library platform_linux_powermanagement.a
+[ 95%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/PlatformPosix.cpp.o
+[ 95%] Building CXX object build/platform/posix/filesystem/CMakeFiles/platform_posix_filesystem.dir/PosixFile.cpp.o
+[ 95%] Built target platform_linux_powermanagement
+[ 95%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/PosixMountProvider.cpp.o
+[ 95%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/TimeUtils.cpp.o
+[ 95%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/FDEventMonitor.cpp.o
+[ 95%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/DBusMessage.cpp.o
+[ 96%] Building CXX object build/platform/posix/filesystem/CMakeFiles/platform_posix_filesystem.dir/SMBDirectory.cpp.o
+[ 96%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/PosixResourceCounter.cpp.o
+[ 96%] Building CXX object build/platform/linux/CMakeFiles/linuxsupport.dir/DBusUtil.cpp.o
+[ 96%] Building CXX object build/platform/linux/storage/CMakeFiles/platform_linux_storage.dir/UDevProvider.cpp.o
+[ 96%] Building CXX object build/platform/posix/network/CMakeFiles/platform_posix_network.dir/NetworkPosix.cpp.o
+[ 96%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/XHandle.cpp.o
+[ 96%] Linking CXX static library linuxsupport.a
+[ 96%] Built target linuxsupport
+[ 96%] Building CXX object build/platform/posix/storage/discs/CMakeFiles/platform_posix_storage_discs.dir/DiscDriveHandlerPosix.cpp.o
+[ 96%] Linking CXX static library platform_posix_network.a
+[ 96%] Built target platform_posix_network
+[ 96%] Building CXX object build/platform/posix/filesystem/CMakeFiles/platform_posix_filesystem.dir/SMBFile.cpp.o
+[ 96%] Linking CXX static library platform_linux_storage.a
+[ 96%] Building CXX object build/platform/posix/filesystem/CMakeFiles/platform_posix_filesystem.dir/SMBWSDiscovery.cpp.o
+[ 96%] Built target platform_linux_storage
+[ 96%] Building CXX object build/platform/posix/CMakeFiles/platform_posix.dir/XTimeUtils.cpp.o
+[ 96%] Building CXX object build/platform/posix/filesystem/CMakeFiles/platform_posix_filesystem.dir/SMBWSDiscoveryListener.cpp.o
+[ 96%] Linking CXX static library platform_posix_storage_discs.a
+[ 96%] Built target platform_posix_storage_discs
+[ 96%] Building CXX object build/platform/posix/threads/CMakeFiles/platform_posix_threads.dir/RecursiveMutex.cpp.o
+[ 96%] Linking CXX static library platform_posix.a
+[ 96%] Built target platform_posix
+[ 96%] Building CXX object build/platform/posix/utils/CMakeFiles/platform_posix_utils.dir/Mmap.cpp.o
+[ 96%] Linking CXX static library platform_posix_threads.a
+[ 96%] Built target platform_posix_threads
+[ 96%] Building CXX object build/windowing/linux/CMakeFiles/windowing_linux.dir/OSScreenSaverFreedesktop.cpp.o
+[ 96%] Building CXX object build/platform/posix/utils/CMakeFiles/platform_posix_utils.dir/PosixInterfaceForCLog.cpp.o
+[ 96%] Building CXX object build/windowing/linux/CMakeFiles/windowing_linux.dir/WinSystemEGL.cpp.o
+[ 96%] Building CXX object build/platform/linux/network/zeroconf/CMakeFiles/platform_linux_network_zeroconf.dir/ZeroconfAvahi.cpp.o
+[ 96%] Linking CXX static library windowing_linux.a
+[ 96%] Built target windowing_linux
+[ 96%] Building CXX object build/platform/posix/utils/CMakeFiles/platform_posix_utils.dir/SharedMemory.cpp.o
+[ 96%] Building CXX object build/cdrip/CMakeFiles/cdrip.dir/CDDARipJob.cpp.o
+[ 96%] Building CXX object build/platform/linux/network/zeroconf/CMakeFiles/platform_linux_network_zeroconf.dir/ZeroconfBrowserAvahi.cpp.o
+[ 96%] Building CXX object build/cdrip/CMakeFiles/cdrip.dir/Encoder.cpp.o
+[ 96%] Linking CXX static library platform_posix_utils.a
+[ 96%] Built target platform_posix_utils
+[ 96%] Building CXX object build/network/dacp/CMakeFiles/network_dacp.dir/dacp.cpp.o
+[ 96%] Linking CXX static library network_dacp.a
+[ 96%] Built target network_dacp
+[ 96%] Building CXX object build/rendering/gles/CMakeFiles/rendering_gles.dir/RenderSystemGLES.cpp.o
+[ 96%] Building CXX object build/cdrip/CMakeFiles/cdrip.dir/EncoderAddon.cpp.o
+[ 96%] Linking CXX static library platform_posix_filesystem.a
+[ 96%] Building CXX object build/cdrip/CMakeFiles/cdrip.dir/EncoderFFmpeg.cpp.o
+[ 96%] Built target platform_posix_filesystem
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/AddonCallback.cpp.o
+[ 96%] Building CXX object build/cdrip/CMakeFiles/cdrip.dir/CDDARipper.cpp.o
+[ 96%] Linking CXX static library platform_linux_network_zeroconf.a
+[ 96%] Built target platform_linux_network_zeroconf
+[ 96%] Building CXX object build/interfaces/legacy/wsgi/CMakeFiles/legacy_interface_wsgi.dir/WsgiErrorStream.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/AddonClass.cpp.o
+[ 96%] Building CXX object build/rendering/gles/CMakeFiles/rendering_gles.dir/ScreenshotSurfaceGLES.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Addon.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/wsgi/CMakeFiles/legacy_interface_wsgi.dir/WsgiInputStream.cpp.o
+[ 96%] Building CXX object build/rendering/gles/CMakeFiles/rendering_gles.dir/GLESShader.cpp.o
+[ 96%] Building CXX object build/rendering/gles/CMakeFiles/rendering_gles.dir/GuiCompositeShaderGLES.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/wsgi/CMakeFiles/legacy_interface_wsgi.dir/WsgiResponseBody.cpp.o
+[ 96%] Linking CXX static library cdrip.a
+[ 96%] Built target cdrip
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/AddonPythonInvoker.cpp.o
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/CallbackHandler.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/wsgi/CMakeFiles/legacy_interface_wsgi.dir/WsgiResponse.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/AddonUtils.cpp.o
+[ 96%] Linking CXX static library rendering_gles.a
+[ 96%] Built target rendering_gles
+[ 96%] Generating AddonModuleXbmcwsgi.i.cpp
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/ContextItemAddonInvoker.cpp.o
+[ 96%] Generating AddonModuleXbmc.i.cpp
+[ 96%] Linking CXX static library legacy_interface_wsgi.a
+[ 96%] Built target legacy_interface_wsgi
+[ 96%] Building CXX object build/network/upnp/CMakeFiles/network_upnp.dir/UPnP.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/CallbackFunction.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/CallbackHandler.cpp.o
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/LanguageHook.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Control.cpp.o
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/PythonInvoker.cpp.o
+[ 96%] Generating AddonModuleXbmcaddon.i.cpp
+[ 96%] Building CXX object build/network/upnp/CMakeFiles/network_upnp.dir/UPnPInternal.cpp.o
+[ 96%] Building CXX object build/network/upnp/CMakeFiles/network_upnp.dir/UPnPPlayer.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Dialog.cpp.o
+[ 96%] Generating AddonModuleXbmcdrm.i.cpp
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/XBPython.cpp.o
+[ 96%] Building CXX object build/network/upnp/CMakeFiles/network_upnp.dir/UPnPRenderer.cpp.o
+[ 96%] Generating AddonModuleXbmcgui.i.cpp
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/DrmCryptoSession.cpp.o
+[ 96%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPFileHandler.cpp.o
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/swig.cpp.o
+[ 96%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPImageHandler.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/File.cpp.o
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/InfoTagGame.cpp.o
+[ 96%] Building CXX object build/interfaces/python/CMakeFiles/python_interface.dir/PyContext.cpp.o
+[ 96%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPImageTransformationHandler.cpp.o
+[ 96%] Building CXX object build/network/upnp/CMakeFiles/network_upnp.dir/UPnPServer.cpp.o
+[ 96%] Linking CXX static library python_interface.a
+[ 96%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/InfoTagMusic.cpp.o
+[ 96%] Built target python_interface
+[ 96%] Building CXX object build/network/upnp/CMakeFiles/network_upnp.dir/UPnPSettings.cpp.o
+[ 96%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPJsonRpcHandler.cpp.o
+[ 96%] Generating AddonModuleXbmcplugin.i.cpp
+[ 97%] Generating AddonModuleXbmcvfs.i.cpp
+[ 97%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPRequestHandlerUtils.cpp.o
+[ 97%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/InfoTagPicture.cpp.o
+[ 97%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPVfsHandler.cpp.o
+[ 97%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/InfoTagRadioRDS.cpp.o
+[ 97%] Building CXX object build/swig/CMakeFiles/python_binding.dir/AddonModuleXbmcaddon.i.cpp.o
+[ 97%] Linking CXX static library network_upnp.a
+[ 97%] Built target network_upnp
+[ 98%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPWebinterfaceAddonsHandler.cpp.o
+[ 98%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPWebinterfaceHandler.cpp.o
+[ 98%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/IHTTPRequestHandler.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/InfoTagVideo.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Keyboard.cpp.o
+[ 98%] Building CXX object build/network/httprequesthandler/CMakeFiles/network_httprequesthandlers.dir/HTTPPythonHandler.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/LanguageHook.cpp.o
+[ 98%] Building CXX object build/swig/CMakeFiles/python_binding.dir/AddonModuleXbmcdrm.i.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/ListItem.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/ModuleXbmc.cpp.o
+[ 98%] Linking CXX static library network_httprequesthandlers.a
+[ 98%] Built target network_httprequesthandlers
+[ 98%] Built target wrap_libdvdnav
+[ 98%] Building CXX object build/swig/CMakeFiles/python_binding.dir/AddonModuleXbmcgui.i.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/ModuleXbmcgui.cpp.o
+[ 98%] Building CXX object build/swig/CMakeFiles/python_binding.dir/AddonModuleXbmc.i.cpp.o
+[ 98%] Building CXX object build/swig/CMakeFiles/python_binding.dir/AddonModuleXbmcplugin.i.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/ModuleXbmcplugin.cpp.o
+[ 98%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/ModuleXbmcvfs.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Monitor.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Player.cpp.o
+[100%] Building CXX object build/swig/CMakeFiles/python_binding.dir/AddonModuleXbmcvfs.i.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/PlayList.cpp.o
+[100%] Building CXX object build/swig/CMakeFiles/python_binding.dir/AddonModuleXbmcwsgi.i.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Settings.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/String.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/Window.cpp.o
+[100%] Built target gen_skin_pack
+[100%] Built target kodi-libraries
+[100%] Built target generate-packaging
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/WindowDialog.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/WindowDialogMixin.cpp.o
+[100%] Building CXX object build/interfaces/legacy/CMakeFiles/legacy_interface.dir/WindowXML.cpp.o
+[100%] Linking CXX static library libpython_binding.a
+[100%] Built target python_binding
+[100%] Linking CXX static library legacy_interface.a
+[100%] Built target legacy_interface
+[100%] Linking CXX static library libkodi.a
+[100%] Built target libkodi
+[100%] Building CXX object CMakeFiles/kodi.dir/xbmc/platform/posix/main.cpp.o
+[100%] Linking CXX executable kodi.bin
+[100%] Built target kodi
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'

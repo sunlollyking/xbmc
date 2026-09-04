@@ -1,0 +1,95 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  0%] Performing build step for 'buildtexturepacker'
+[  1%] Built target build-ffmpeg
+[  1%] Built target build-crossguid
+[  1%] Built target build-JsonSchemaBuilder
+[  1%] Built target build-poppler
+[  1%] Built target build-libdvdcss
+[  1%] Built target wrapper
+[  1%] Built target compileinfo
+[  2%] Built target build-utfcpp
+[100%] Built target TexturePacker
+[  2%] Built target generate-wayland-extra-protocols
+Generating xbmc.json/addon.xml
+[  2%] Built target gen_system_addons
+[  2%] No install step for 'buildtexturepacker'
+[  2%] Built target retroplayer_messages
+[  3%] Built target sse4
+[  7%] Built target upnp
+[  7%] Completed 'buildtexturepacker'
+[  7%] Built target generate_json_header
+[  8%] Built target build-libdvdread
+[  8%] Built target build-taglib
+[  8%] Built target build-libdvdnav
+[  8%] Built target wrapper.def
+[  8%] Built target buildtexturepacker
+[  8%] Copying files into build tree
+[  8%] Built target rp-process-gbm
+[  8%] Built target network_httprequesthandlers_python
+[  8%] Built target windowing_gbm
+[ 10%] Built target processGBM
+[ 10%] Built target rp-process-wayland
+[ 10%] Built target processWayland
+[ 11%] Built target windowing_gbm_drm
+[ 12%] Built target cores
+[ 13%] Built target windowing_WAYLAND
+[ 13%] Built target dllloader
+[ 13%] Built target dllexports
+[ 15%] Built target audioengine
+[ 15%] Built target exports_utils
+[ 15%] Built target externalplayer
+[ 15%] Built target paplayer
+[ 15%] Built target playercorefactory
+[ 15%] Built target export-files
+[ 15%] Built target events
+[ 15%] Built target events_windows
+[ 16%] Built target bluray
+[ 17%] Built target musicdatabasedirectory
+[ 17%] Building CXX object build/games/CMakeFiles/games.dir/GameSettings.cpp.o
+[ 17%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o
+[ 17%] Built target gamecheevos
+[ 18%] Built target videodatabasedirectory
+[ 18%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientSubsystem.cpp.o
+[ 18%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientTranslator.cpp.o
+[ 23%] Built target filesystem
+[ 23%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscs.cpp.o
+[ 23%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscTransport.cpp.o
+[ 23%] Building CXX object build/games/CMakeFiles/games.dir/GameUtils.cpp.o
+[ 23%] Building CXX object build/games/CMakeFiles/games.dir/VideoFilters.cpp.o
+[ 23%] Linking CXX static library gamediscs.a
+[ 23%] Built target gamediscs
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientController.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1331:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
+ 1331 | void CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE kodiInstance,
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1331:6: note: no functions named ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
+In file included from /home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:9:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
+  118 | class CGameClient : public ADDON::CAddonDll,
+      |       ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1341:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_challenge_indicator*)’
+ 1341 | void CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:377:15: note: candidate is: ‘static void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_achievement_challenge*, bool)’
+  377 |   static void cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
+  118 | class CGameClient : public ADDON::CAddonDll,
+      |       ^~~~~~~~~~~
+make[2]: *** [build/games/addons/CMakeFiles/gameaddons.dir/build.make:79: build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:9333: build/games/addons/CMakeFiles/gameaddons.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientDevice.cpp.o
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientHardware.cpp.o
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientInput.cpp.o
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientJoystick.cpp.o
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientKeyboard.cpp.o
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientMouse.cpp.o
+[ 23%] Linking CXX static library games.a
+[ 23%] Built target games
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientPort.cpp.o
+[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientTopology.cpp.o
+[ 23%] Linking CXX static library gameinput.a
+[ 23%] Built target gameinput
+make: *** [Makefile:146: all] Error 2
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'

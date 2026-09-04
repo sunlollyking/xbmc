@@ -473,31 +473,6 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
       value = AchievementRuntime().GetRichPresence();
       return true;
     }
-    case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE:
-    {
-      value = ShowIndicators() ? AchievementRuntime().GetChallengeAchievementTitle() : "";
-      return true;
-    }
-    case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE:
-    {
-      value = ShowIndicators() ? AchievementRuntime().GetChallengeAchievementBadge() : "";
-      return true;
-    }
-    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE:
-    {
-      value = ShowIndicators() ? AchievementRuntime().GetTrackedAchievementTitle() : "";
-      return true;
-    }
-    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS:
-    {
-      value = ShowIndicators() ? AchievementRuntime().GetTrackedAchievementProgress() : "";
-      return true;
-    }
-    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE:
-    {
-      value = ShowIndicators() ? AchievementRuntime().GetTrackedAchievementBadge() : "";
-      return true;
-    }
     case RETROPLAYER_ACHIEVEMENTS_PROGRESS:
     {
       const CAchievementRuntime& runtime = AchievementRuntime();
@@ -516,7 +491,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     {
       // Answered empty rather than never recorded, so that turning it off while
       // an attempt is live takes the indicator off screen at once
-      if (!CServiceBroker::GetGameServices().GameSettings().GetChallengeIndicator())
+      if (!ShowIndicators())
       {
         value.clear();
         return true;
@@ -598,7 +573,8 @@ bool CGamesGUIInfo::GetInt(int& value,
     {
       // Answered here as well as on GetLabel so a progress control can be bound
       // to it directly
-      value = static_cast<int>(AchievementRuntime().GetTrackedAchievementPercent());
+      const AchievementProgressIndicator indicator = AchievementRuntime().GetProgressIndicator();
+      value = indicator.id == 0 ? 0 : static_cast<int>(indicator.measuredPercent);
       return true;
     }
     default:

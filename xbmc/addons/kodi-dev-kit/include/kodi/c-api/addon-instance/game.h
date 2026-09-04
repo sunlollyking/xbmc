@@ -1740,7 +1740,6 @@ extern "C"
      void(__cdecl*)(const void*, const char*, unsigned int),
      const void*);
     void(__cdecl* FreeString)(const AddonInstance_Game*, char*);
-    GAME_ERROR(__cdecl* RCSetEncoreModeEnabled)(const AddonInstance_Game*, bool);
 
     /*!
      * @brief Run a frame that is about to be taken back

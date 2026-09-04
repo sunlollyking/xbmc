@@ -1,0 +1,411 @@
+-- The CXX compiler identification is GNU 15.2.0
+-- The C compiler identification is GNU 15.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/cc
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Mirror download location: https://mirrors.kodi.tv
+-- Source directory: /home/chris/xbmc-hcmerge
+-- Build directory: /home/chris/xbmc-hcmerge/build
+-- Generator: Single-configuration: RelWithDebInfo (Unix Makefiles)
+-- CMake Version: 4.2.3
+-- System type: Linux
+CMake Warning at cmake/modules/buildtools/LDGOLD.cmake:10 (message):
+  GNU gold linker is not available, falling back to default system linker
+Call Stack (most recent call first):
+  cmake/scripts/linux/ArchSetup.cmake:49 (include)
+  cmake/scripts/common/ArchSetup.cmake:78 (include)
+  CMakeLists.txt:89 (include)
+
+
+-- Host architecture is little-endian
+-- Core system type: linux
+-- Platform: gbm;wayland
+-- CPU: x86_64, ARCH: x86_64-linux
+-- Cross-Compiling: FALSE
+-- Execute build artefacts on host: 
+-- Depends based build: 
+-- statx is available
+-- Checking to see if CXX compiler accepts flag -msse
+-- Checking to see if CXX compiler accepts flag -msse - yes
+-- Checking to see if CXX compiler accepts flag -msse2
+-- Checking to see if CXX compiler accepts flag -msse2 - yes
+-- Checking to see if CXX compiler accepts flag -msse3
+-- Checking to see if CXX compiler accepts flag -msse3 - yes
+-- Checking to see if CXX compiler accepts flag -mssse3
+-- Checking to see if CXX compiler accepts flag -mssse3 - yes
+-- Checking to see if CXX compiler accepts flag -msse4.1
+-- Checking to see if CXX compiler accepts flag -msse4.1 - yes
+-- Checking to see if CXX compiler accepts flag -msse4.2
+-- Checking to see if CXX compiler accepts flag -msse4.2 - yes
+-- Checking to see if CXX compiler accepts flag -mavx
+-- Checking to see if CXX compiler accepts flag -mavx - yes
+-- Checking to see if CXX compiler accepts flag -mavx2
+-- Checking to see if CXX compiler accepts flag -mavx2 - yes
+-- Found CCache: /usr/bin/ccache (found version "4.12.3")
+-- Found ClangFormat: /usr/bin/clang-format (found suitable version "21.1.8 (6ubuntu1)", minimum required is "9.0")
+-- Found FlatC Compiler: /bin/flatc (found version "23.5.26")
+-- Found JsonSchemaBuilder: /home/chris/xbmc-hcmerge/build/build/bin/JsonSchemaBuilder
+-- Building internal TexturePacker
+-- Shipping internal TexturePacker
+-- Internal TexturePacker will be executed during build
+CMake Warning at cmake/modules/FindCdio.cmake:28 (message):
+  Detected libcdio (2.2.0) and libcdio++ () version mismatch.  libcdio++ will
+  not be used.
+Call Stack (most recent call first):
+  cmake/modules/FindIso9660pp.cmake:16 (find_package)
+  cmake/scripts/common/Macros.cmake:381 (find_package)
+  cmake/scripts/common/Macros.cmake:431 (find_package_with_ver)
+  CMakeLists.txt:303 (core_optional_dep)
+
+
+-- Building poppler: (version "26.01.0")
+-- Building crossguid: (version "ca1bf4b810e2d188d04cb6286f957008ee1b7681")
+-- Building ffmpeg: (version "9.0.1")
+-- Performing Test Iconv_IS_BUILT_IN
+-- Performing Test Iconv_IS_BUILT_IN - Success
+-- Building libdvdcss: (version "1.5.0")
+-- Found Meson: /bin/meson (found version "1.10.1")
+-- Found Ninja: /bin/ninja (found version "1.13.2")
+-- Building libdvdread: (version "7.0.1")
+-- Building libdvdnav: (version "7.0.0")
+-- Found Threads: TRUE
+-- Building utfcpp: (version "4.0.6")
+-- Building taglib: (version "2.3.1")
+-- [download 0% complete]
+-- [download 1% complete]
+-- [download 2% complete]
+-- [download 3% complete]
+-- [download 4% complete]
+-- [download 5% complete]
+-- [download 6% complete]
+-- [download 7% complete]
+-- [download 8% complete]
+-- [download 9% complete]
+-- [download 10% complete]
+-- [download 11% complete]
+-- [download 12% complete]
+-- [download 13% complete]
+-- [download 14% complete]
+-- [download 15% complete]
+-- [download 16% complete]
+-- [download 17% complete]
+-- [download 18% complete]
+-- [download 19% complete]
+-- [download 20% complete]
+-- [download 21% complete]
+-- [download 22% complete]
+-- [download 23% complete]
+-- [download 24% complete]
+-- [download 25% complete]
+-- [download 26% complete]
+-- [download 27% complete]
+-- [download 28% complete]
+-- [download 29% complete]
+-- [download 30% complete]
+-- [download 31% complete]
+-- [download 32% complete]
+-- [download 33% complete]
+-- [download 34% complete]
+-- [download 35% complete]
+-- [download 36% complete]
+-- [download 37% complete]
+-- [download 38% complete]
+-- [download 39% complete]
+-- [download 40% complete]
+-- [download 41% complete]
+-- [download 42% complete]
+-- [download 43% complete]
+-- [download 44% complete]
+-- [download 45% complete]
+-- [download 46% complete]
+-- [download 47% complete]
+-- [download 48% complete]
+-- [download 49% complete]
+-- [download 50% complete]
+-- [download 51% complete]
+-- [download 52% complete]
+-- [download 53% complete]
+-- [download 54% complete]
+-- [download 55% complete]
+-- [download 56% complete]
+-- [download 57% complete]
+-- [download 58% complete]
+-- [download 59% complete]
+-- [download 60% complete]
+-- [download 61% complete]
+-- [download 62% complete]
+-- [download 63% complete]
+-- [download 64% complete]
+-- [download 65% complete]
+-- [download 66% complete]
+-- [download 67% complete]
+-- [download 68% complete]
+-- [download 69% complete]
+-- [download 70% complete]
+-- [download 71% complete]
+-- [download 72% complete]
+-- [download 73% complete]
+-- [download 74% complete]
+-- [download 75% complete]
+-- [download 76% complete]
+-- [download 77% complete]
+-- [download 78% complete]
+-- [download 79% complete]
+-- [download 80% complete]
+-- [download 81% complete]
+-- [download 82% complete]
+-- [download 83% complete]
+-- [download 84% complete]
+-- [download 85% complete]
+-- [download 86% complete]
+-- [download 87% complete]
+-- [download 88% complete]
+-- [download 89% complete]
+-- [download 90% complete]
+-- [download 91% complete]
+-- [download 92% complete]
+-- [download 93% complete]
+-- [download 94% complete]
+-- [download 95% complete]
+-- [download 96% complete]
+-- [download 97% complete]
+-- [download 98% complete]
+-- [download 99% complete]
+-- [download 100% complete]
+-- [download 0% complete]
+-- [download 1% complete]
+-- [download 2% complete]
+-- [download 3% complete]
+-- [download 4% complete]
+-- [download 5% complete]
+-- [download 6% complete]
+-- [download 7% complete]
+-- [download 8% complete]
+-- [download 9% complete]
+-- [download 10% complete]
+-- [download 11% complete]
+-- [download 12% complete]
+-- [download 13% complete]
+-- [download 14% complete]
+-- [download 15% complete]
+-- [download 16% complete]
+-- [download 17% complete]
+-- [download 18% complete]
+-- [download 19% complete]
+-- [download 20% complete]
+-- [download 21% complete]
+-- [download 22% complete]
+-- [download 23% complete]
+-- [download 24% complete]
+-- [download 25% complete]
+-- [download 26% complete]
+-- [download 27% complete]
+-- [download 28% complete]
+-- [download 29% complete]
+-- [download 30% complete]
+-- [download 31% complete]
+-- [download 32% complete]
+-- [download 33% complete]
+-- [download 34% complete]
+-- [download 35% complete]
+-- [download 36% complete]
+-- [download 37% complete]
+-- [download 38% complete]
+-- [download 39% complete]
+-- [download 40% complete]
+-- [download 41% complete]
+-- [download 42% complete]
+-- [download 43% complete]
+-- [download 44% complete]
+-- [download 45% complete]
+-- [download 46% complete]
+-- [download 47% complete]
+-- [download 48% complete]
+-- [download 49% complete]
+-- [download 50% complete]
+-- [download 51% complete]
+-- [download 52% complete]
+-- [download 53% complete]
+-- [download 54% complete]
+-- [download 55% complete]
+-- [download 56% complete]
+-- [download 57% complete]
+-- [download 58% complete]
+-- [download 59% complete]
+-- [download 60% complete]
+-- [download 61% complete]
+-- [download 62% complete]
+-- [download 63% complete]
+-- [download 64% complete]
+-- [download 65% complete]
+-- [download 66% complete]
+-- [download 67% complete]
+-- [download 68% complete]
+-- [download 69% complete]
+-- [download 70% complete]
+-- [download 71% complete]
+-- [download 72% complete]
+-- [download 73% complete]
+-- [download 74% complete]
+-- [download 75% complete]
+-- [download 76% complete]
+-- [download 77% complete]
+-- [download 78% complete]
+-- [download 79% complete]
+-- [download 80% complete]
+-- [download 81% complete]
+-- [download 82% complete]
+-- [download 83% complete]
+-- [download 84% complete]
+-- [download 85% complete]
+-- [download 86% complete]
+-- [download 87% complete]
+-- [download 88% complete]
+-- [download 89% complete]
+-- [download 90% complete]
+-- [download 91% complete]
+-- [download 92% complete]
+-- [download 93% complete]
+-- [download 94% complete]
+-- [download 95% complete]
+-- [download 96% complete]
+-- [download 97% complete]
+-- [download 98% complete]
+-- [download 99% complete]
+-- [download 100% complete]
+-- [download 1% complete]
+-- [download 2% complete]
+-- [download 3% complete]
+-- [download 5% complete]
+-- [download 6% complete]
+-- [download 8% complete]
+-- [download 10% complete]
+-- [download 11% complete]
+-- [download 12% complete]
+-- [download 13% complete]
+-- [download 15% complete]
+-- [download 17% complete]
+-- [download 18% complete]
+-- [download 19% complete]
+-- [download 20% complete]
+-- [download 21% complete]
+-- [download 22% complete]
+-- [download 23% complete]
+-- [download 24% complete]
+-- [download 25% complete]
+-- [download 26% complete]
+-- [download 27% complete]
+-- [download 28% complete]
+-- [download 29% complete]
+-- [download 30% complete]
+-- [download 31% complete]
+-- [download 33% complete]
+-- [download 36% complete]
+-- [download 37% complete]
+-- [download 38% complete]
+-- [download 40% complete]
+-- [download 41% complete]
+-- [download 42% complete]
+-- [download 43% complete]
+-- [download 44% complete]
+-- [download 46% complete]
+-- [download 49% complete]
+-- [download 50% complete]
+-- [download 51% complete]
+-- [download 52% complete]
+-- [download 54% complete]
+-- [download 57% complete]
+-- [download 59% complete]
+-- [download 60% complete]
+-- [download 61% complete]
+-- [download 63% complete]
+-- [download 65% complete]
+-- [download 66% complete]
+-- [download 67% complete]
+-- [download 69% complete]
+-- [download 74% complete]
+-- [download 75% complete]
+-- [download 77% complete]
+-- [download 79% complete]
+-- [download 80% complete]
+-- [download 84% complete]
+-- [download 85% complete]
+-- [download 86% complete]
+-- [download 87% complete]
+-- [download 88% complete]
+-- [download 89% complete]
+-- [download 90% complete]
+-- [download 91% complete]
+-- [download 92% complete]
+-- [download 94% complete]
+-- [download 98% complete]
+-- [download 99% complete]
+-- [download 100% complete]
+-- #---- CONFIGURATION ----#
+-- Platforms: gbm wayland
+-- App package: org.xbmc.kodi
+-- -- PATH config --
+-- Prefix: /usr/local
+-- Libdir: /usr/local/lib
+-- Bindir: /usr/local/bin
+-- Includedir: /usr/local/include
+-- Datarootdir: /usr/local/share
+-- Datadir: /usr/local/share
+-- Docdir: /usr/local/share/doc/kodi
+-- CCACHE enabled: Yes
+-- CLANGFORMAT enabled: Yes
+-- CLANGTIDY enabled: No
+-- CPPCHECK enabled: No
+-- INCLUDEWHATYOUUSE enabled: No
+-- ALSA enabled: Yes
+-- AVAHI enabled: Yes
+-- BLUETOOTH enabled: No
+-- BLURAY enabled: Yes
+-- CAP enabled: No
+-- CEC enabled: No
+-- DBUS enabled: Yes
+-- ISO9660PP enabled: No
+-- LCMS2 enabled: Yes
+-- LIRCCLIENT enabled: No
+-- MDNS enabled: No
+-- MICROHTTPD enabled: Yes
+-- NFS enabled: Yes
+-- PIPEWIRE enabled: No
+-- PLIST enabled: Yes
+-- POPPLER enabled: Yes
+-- PULSEAUDIO enabled: Yes
+-- PYTHON enabled: Yes
+-- SMBCLIENT enabled: Yes
+-- SNDIO enabled: No
+-- UDEV enabled: Yes
+-- UDFREAD enabled: Yes
+-- XSLT enabled: Yes
+-- VAAPI enabled: No
+-- VAAPI enabled: No
+-- MARIADBCLIENT enabled: Yes
+-- Configuring done (13.5s)
+-- Generating done (1.2s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ENABLE_INTERNAL_BOOST
+    ENABLE_INTERNAL_LIBDATACHANNEL
+    ENABLE_INTERNAL_LIBJUICE
+    ENABLE_INTERNAL_LIBSRTP
+    ENABLE_INTERNAL_LIBTORRENT
+    ENABLE_INTERNAL_LMDB
+    ENABLE_INTERNAL_PLOG
+    ENABLE_INTERNAL_TRY_SIGNAL
+    ENABLE_INTERNAL_USRSCTP
+
+
+-- Build files have been written to: /home/chris/xbmc-hcmerge/build

@@ -1,0 +1,211 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  0%] Performing build step for 'buildtexturepacker'
+[  0%] Built target build-crossguid
+[  0%] Built target build-poppler
+[  1%] Built target build-ffmpeg
+[  1%] Built target build-JsonSchemaBuilder
+[  1%] Built target build-libdvdcss
+[  1%] Built target compileinfo
+[  1%] Built target wrapper
+[  2%] Built target build-utfcpp
+[  2%] Built target generate-wayland-extra-protocols
+Generating xbmc.json/addon.xml
+[  6%] Built target upnp
+[100%] Built target TexturePacker
+[  6%] Built target gen_system_addons
+[  6%] Built target retroplayer_messages
+[  7%] Built target build-libdvdread
+[  8%] Built target sse4
+[  8%] No install step for 'buildtexturepacker'
+[  8%] Built target generate_json_header
+[  8%] Built target build-taglib
+[  8%] Completed 'buildtexturepacker'
+[  8%] Built target build-libdvdnav
+[  8%] Built target wrapper.def
+[  8%] Copying files into build tree
+[  8%] Built target rp-process-gbm
+[  8%] Built target network_httprequesthandlers_python
+[  8%] Built target buildtexturepacker
+[ 10%] Built target processGBM
+[ 10%] Built target rp-process-wayland
+[ 10%] Built target processWayland
+[ 10%] Built target windowing_gbm
+[ 11%] Built target windowing_gbm_drm
+[ 12%] Built target cores
+[ 12%] Built target dllloader
+[ 13%] Built target windowing_WAYLAND
+[ 15%] Built target audioengine
+[ 15%] Built target dllexports
+[ 15%] Built target export-files
+[ 15%] Built target exports_utils
+[ 15%] Built target externalplayer
+[ 15%] Built target paplayer
+[ 15%] Built target playercorefactory
+[ 15%] Built target events
+[ 16%] Built target bluray
+[ 16%] Built target events_windows
+[ 16%] Built target games
+[ 17%] Built target videodatabasedirectory
+[ 18%] Built target musicdatabasedirectory
+[ 18%] Built target gameaddons
+[ 18%] Built target gamecheevos
+[ 18%] Built target game_addon_streams
+[ 18%] Built target gameinput
+[ 18%] Built target gamediscs
+[ 20%] Built target games_agents_input
+[ 25%] Built target filesystem
+[ 25%] Built target games_cheats
+[ 25%] Built target games_controller
+[ 25%] Built target games_agents_windows
+[ 25%] Built target games_controller_dialogs
+[ 26%] Built target games_controller_guicontrols
+[ 26%] Built target games_controller_input
+[ 26%] Built target games_controller_listproviders
+[ 27%] Built target games_controller_types
+[ 27%] Built target games_controller_windows
+[ 28%] Built target gamedialogs
+[ 28%] Built target games_database
+[ 28%] Built target game_disc_dialog
+[ 28%] Built target games_manual
+[ 30%] Built target games_library
+[ 31%] Built target gameosddialogs
+[ 32%] Built target games_ports_input
+[ 32%] Built target games_ports_guicontrols
+[ 32%] Built target games_ports_types
+[ 32%] Built target games_ports_windows
+[ 32%] Built target gametags
+[ 32%] Built target input
+[ 32%] Built target gameswindows
+[ 32%] Built target input_actions
+[ 32%] Built target input_joystick_dialogs
+[ 32%] Built target input_joystick_mapping
+[ 32%] Built target input_joystick_generic
+[ 33%] Built target input_joystick
+[ 35%] Built target input_keyboard
+[ 35%] Built target input_keymaps_joysticks
+[ 35%] Built target input_keyboard_generic
+[ 35%] Built target input_keymaps_generic
+[ 35%] Built target input_keymaps
+[ 36%] Built target input_keymaps_keyboard
+[ 36%] Built target input_keymaps_touch
+[ 36%] Built target input_keymaps_remote
+[ 36%] Built target input_mouse
+[ 36%] Built target interfaces
+[ 36%] Built target input_mouse_generic
+[ 36%] Built target info_interface
+[ 37%] Built target generic_interface
+[ 37%] Built target media
+[ 37%] Built target interfaces_builtins
+[ 38%] Built target drm
+[ 40%] Built target jsonrpc_interface
+[ 40%] Built target music_dialogs
+[ 40%] Built target music_jobs
+[ 41%] Built target music_infoscanner
+[ 41%] Built target music
+[ 42%] Built target music_tags
+[ 42%] Built target music_windows
+[ 42%] Built target peripherals
+[ 43%] Built target network_websockets
+[ 45%] Built target network
+[ 45%] Built target peripheral_bus_virtual
+[ 45%] Built target peripherals_bus
+[ 45%] Built target peripherals_addons
+[ 46%] Built target peripherals_devices
+[ 46%] Built target peripherals_dialogs
+[ 46%] Built target peripherals_events
+[ 46%] Built target profiles_dialogs
+[ 46%] Built target profiles
+[ 46%] Built target profiles_windows
+[ 47%] Built target pvr
+[ 47%] Built target pvr_addons
+[ 47%] Built target pvr_filesystem
+[ 48%] Built target pvr_channels
+[ 50%] Built target pvr_epg
+[ 50%] Built target pvr_dialogs
+[ 50%] Built target pvr_recordings
+[ 50%] Built target pvr_guilib_guiinfo
+[ 50%] Built target pvr_providers
+[ 51%] Built target pvr_guilib
+[ 51%] Built target pvr_settings
+[ 52%] Built target pvr_timers
+[ 53%] Built target retroplayer
+[ 53%] Built target pvr_utils
+[ 53%] Built target rp_audio
+[ 53%] Built target pvr_windows
+[ 53%] Built target rp-buffers-video
+[ 53%] Built target retroplayer_guicontrols
+[ 55%] Built target rp-buffers
+[ 55%] Built target retroplayer_guiplayback
+[ 55%] Built target retroplayer_guibridge
+[ 55%] Built target retroplayer_guiwindows
+[ 55%] Built target rp-process
+[ 56%] Built target retroplayer_playback
+[ 56%] Built target rp-videorenderers
+[ 56%] Built target rp-rendering
+[ 56%] Built target retroplayer_savestates
+[ 56%] Built target rp-shaders
+[ 56%] Built target retroplayer_memory
+[ 56%] Built target retroplayer_streams
+[ 57%] Built target settings_lib
+[ 57%] Built target settings_dialogs
+[ 57%] Built target settings_windows
+[ 58%] Built target settings
+[ 58%] Built target addons_addoninfo
+[ 58%] Built target addons_binary-addons
+[ 58%] Built target addons_gui_skin
+[ 60%] Built target addons_gui
+[ 62%] Built target xbmc
+[ 63%] Built target addons
+[ 63%] Built target addons_interfaces
+[ 63%] Built target addons_settings
+[ 63%] Built target addons_interfaces_gui
+[ 65%] Built target addons_interfaces_gui_controls
+[ 65%] Built target addons_interfaces_gui_dialogs
+[ 65%] Built target commons
+[ 65%] Built target dbwrappers
+[ 65%] Built target favourites
+[ 65%] Built target application
+[ 66%] Built target dialogs
+[ 66%] Built target guilib_announcement_handlers
+[ 67%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GamesGUIInfo.cpp.o
+[ 67%] Built target imagefiles
+[ 67%] Built target guilib_listproviders
+[ 68%] Built target jobs
+[ 68%] Building CXX object build/messaging/CMakeFiles/messaging.dir/ApplicationMessenger.cpp.o
+[ 68%] Building CXX object build/pictures/CMakeFiles/pictures.dir/GUIDialogPictureInfo.cpp.o
+[ 68%] Building CXX object build/messagingHelpers/CMakeFiles/messagingHelpers.dir/DialogHelper.cpp.o
+[ 72%] Built target guilib
+[ 72%] Building CXX object build/messagingHelpers/CMakeFiles/messagingHelpers.dir/DialogOKHelper.cpp.o
+[ 72%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIControlsGUIInfo.cpp.o
+[ 72%] Linking CXX static library messagingHelpers.a
+[ 72%] Built target messagingHelpers
+[ 72%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/LibraryGUIInfo.cpp.o
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/GUIViewStatePictures.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp: In member function ‘virtual bool KODI::GUILIB::GUIINFO::CGamesGUIInfo::GetInt(int&, const CGUIListItem*, int, const KODI::GUILIB::GUIINFO::CGUIInfo&) const’:
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:576:53: error: ‘const class KODI::GAME::CAchievementRuntime’ has no member named ‘GetTrackedAchievementPercent’
+  576 |       value = static_cast<int>(AchievementRuntime().GetTrackedAchievementPercent());
+      |                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/build.make:191: build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GamesGUIInfo.cpp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[ 72%] Building CXX object build/pictures_metadata/CMakeFiles/pictures_metadata.dir/ImageMetadataParser.cpp.o
+[ 72%] Linking CXX static library messaging.a
+[ 72%] Built target messaging
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/GUIWindowPictures.cpp.o
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/GUIWindowSlideShow.cpp.o
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/Picture.cpp.o
+make[1]: *** [CMakeFiles/Makefile2:13684: build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/PictureFolderImageFileLoader.cpp.o
+[ 72%] Linking CXX static library pictures_metadata.a
+[ 72%] Built target pictures_metadata
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/PictureInfoLoader.cpp.o
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/PictureInfoTag.cpp.o
+[ 72%] Building CXX object build/pictures/CMakeFiles/pictures.dir/PictureScalingAlgorithm.cpp.o
+[ 73%] Building CXX object build/pictures/CMakeFiles/pictures.dir/PictureThumbLoader.cpp.o
+[ 73%] Building CXX object build/pictures/CMakeFiles/pictures.dir/SlideShowDelegator.cpp.o
+[ 73%] Building CXX object build/pictures/CMakeFiles/pictures.dir/SlideShowPicture.cpp.o
+[ 73%] Building CXX object build/pictures/CMakeFiles/pictures.dir/SlideShowPictureGLES.cpp.o
+[ 73%] Linking CXX static library pictures.a
+[ 73%] Built target pictures
+make: *** [Makefile:146: all] Error 2
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'

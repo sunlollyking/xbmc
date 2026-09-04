@@ -1,0 +1,598 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  1%] Built target build-ffmpeg
+[  1%] Built target build-JsonSchemaBuilder
+[  1%] Performing build step for 'buildtexturepacker'
+[  1%] Built target build-poppler
+[  1%] Built target build-crossguid
+[  1%] Built target build-libdvdcss
+[  1%] Built target compileinfo
+[  1%] Built target wrapper
+[  2%] Built target build-utfcpp
+[  2%] Built target generate-wayland-extra-protocols
+Generating xbmc.json/addon.xml
+[  2%] Built target gen_system_addons
+[100%] Built target TexturePacker
+[  3%] Built target retroplayer_messages
+[  3%] Built target sse4
+[  3%] No install step for 'buildtexturepacker'
+[  3%] Built target generate_json_header
+[  7%] Built target upnp
+[  7%] Completed 'buildtexturepacker'
+[  7%] Built target build-taglib
+[  8%] Built target build-libdvdread
+[  8%] Built target build-libdvdnav
+[  8%] Built target wrapper.def
+[  8%] Built target buildtexturepacker
+[  8%] Copying files into build tree
+[ 10%] Built target processGBM
+[ 10%] Built target rp-process-gbm
+[ 10%] Built target network_httprequesthandlers_python
+[ 10%] Built target windowing_gbm
+[ 10%] Built target rp-process-wayland
+[ 11%] Built target windowing_gbm_drm
+[ 11%] Built target processWayland
+[ 11%] Built target export-files
+[ 12%] Built target windowing_WAYLAND
+[ 13%] Built target cores
+[ 13%] Built target dllloader
+[ 15%] Built target audioengine
+[ 15%] Built target dllexports
+[ 15%] Built target paplayer
+[ 15%] Built target exports_utils
+[ 15%] Built target externalplayer
+[ 15%] Built target events_windows
+[ 15%] Built target events
+[ 15%] Built target playercorefactory
+[ 16%] Built target bluray
+[ 18%] Built target videodatabasedirectory
+[ 18%] Built target games
+[ 18%] Built target musicdatabasedirectory
+[ 23%] Built target filesystem
+[ 23%] Built target gameaddons
+[ 23%] Built target gamecheevos
+[ 25%] Built target games_agents_input
+[ 25%] Built target gamediscs
+[ 25%] Built target game_addon_streams
+[ 25%] Built target gameinput
+[ 25%] Built target games_agents_windows
+[ 25%] Built target games_cheats
+[ 25%] Built target games_controller_dialogs
+[ 25%] Built target games_controller
+[ 25%] Built target games_controller_listproviders
+[ 26%] Built target games_controller_guicontrols
+[ 27%] Built target games_controller_types
+[ 27%] Built target games_controller_input
+[ 27%] Built target games_controller_windows
+[ 27%] Built target game_disc_dialog
+[ 27%] Built target games_database
+[ 28%] Built target gamedialogs
+[ 30%] Built target games_library
+[ 30%] Built target games_ports_guicontrols
+[ 30%] Built target games_manual
+[ 31%] Built target gameosddialogs
+[ 32%] Built target games_ports_input
+[ 32%] Built target games_ports_types
+[ 32%] Built target gametags
+[ 32%] Built target games_ports_windows
+[ 32%] Built target gameswindows
+[ 32%] Built target input_actions
+[ 32%] Built target input
+[ 32%] Built target input_joystick_dialogs
+[ 32%] Built target input_joystick_generic
+[ 33%] Built target input_joystick
+[ 33%] Built target input_joystick_mapping
+[ 33%] Built target input_keyboard_generic
+[ 35%] Built target input_keyboard
+[ 35%] Built target input_keymaps
+[ 35%] Built target input_keymaps_generic
+[ 35%] Built target input_keymaps_joysticks
+[ 36%] Built target input_keymaps_keyboard
+[ 36%] Built target input_keymaps_remote
+[ 36%] Built target input_mouse
+[ 36%] Built target input_keymaps_touch
+[ 36%] Built target input_mouse_generic
+[ 36%] Built target interfaces
+[ 36%] Built target info_interface
+[ 37%] Built target generic_interface
+[ 37%] Built target interfaces_builtins
+[ 37%] Built target media
+[ 38%] Built target drm
+[ 38%] Built target music_dialogs
+[ 38%] Built target music_infoscanner
+[ 38%] Built target music_jobs
+[ 40%] Built target jsonrpc_interface
+[ 41%] Built target music
+[ 42%] Built target network_websockets
+[ 42%] Built target music_windows
+[ 42%] Built target peripherals
+[ 43%] Built target music_tags
+[ 43%] Built target peripherals_addons
+[ 43%] Built target peripherals_bus
+[ 45%] Built target network
+[ 45%] Built target peripheral_bus_virtual
+[ 46%] Built target peripherals_devices
+[ 46%] Built target peripherals_dialogs
+[ 46%] Built target peripherals_events
+[ 46%] Built target profiles
+[ 46%] Built target profiles_dialogs
+[ 46%] Built target profiles_windows
+[ 46%] Built target pvr_addons
+[ 47%] Built target pvr
+[ 48%] Built target pvr_channels
+[ 50%] Built target pvr_epg
+[ 50%] Built target pvr_filesystem
+[ 50%] Built target pvr_guilib_guiinfo
+[ 50%] Built target pvr_dialogs
+[ 50%] Built target pvr_providers
+[ 50%] Built target pvr_recordings
+[ 50%] Built target pvr_settings
+[ 51%] Built target pvr_guilib
+[ 51%] Built target pvr_utils
+[ 52%] Built target pvr_timers
+[ 52%] Built target pvr_windows
+[ 53%] Built target retroplayer
+[ 53%] Built target rp-buffers-video
+[ 53%] Built target rp_audio
+[ 53%] Built target retroplayer_guibridge
+[ 53%] Built target retroplayer_guicontrols
+[ 55%] Built target rp-buffers
+[ 55%] Built target retroplayer_guiwindows
+[ 55%] Built target retroplayer_guiplayback
+[ 55%] Building CXX object build/cores/RetroPlayer/playback/CMakeFiles/retroplayer_playback.dir/ReversiblePlayback.cpp.o
+[ 55%] Built target rp-process
+[ 55%] Built target rp-rendering
+[ 55%] Building CXX object build/cores/RetroPlayer/savestates/CMakeFiles/retroplayer_savestates.dir/SavestateDatabase.cpp.o
+[ 55%] Built target rp-videorenderers
+[ 55%] Building CXX object build/cores/RetroPlayer/shaders/CMakeFiles/rp-shaders.dir/ShaderPreset.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/savestates/CMakeFiles/retroplayer_savestates.dir/SavestateBlob.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/streams/CMakeFiles/retroplayer_streams.dir/RetroPlayerAudio.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/streams/CMakeFiles/retroplayer_streams.dir/RetroPlayerRendering.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/savestates/CMakeFiles/retroplayer_savestates.dir/SavestateFlatBuffer.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/streams/memory/CMakeFiles/retroplayer_memory.dir/BasicMemoryStream.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/streams/memory/CMakeFiles/retroplayer_memory.dir/DeltaPairMemoryStream.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/streams/CMakeFiles/retroplayer_streams.dir/RetroPlayerStreamTypes.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/streams/CMakeFiles/retroplayer_streams.dir/RetroPlayerVideo.cpp.o
+[ 55%] Linking CXX static library retroplayer_playback.a
+[ 56%] Built target retroplayer_playback
+[ 56%] Building CXX object build/cores/RetroPlayer/streams/CMakeFiles/retroplayer_streams.dir/RPStreamManager.cpp.o
+[ 56%] Linking CXX static library retroplayer_savestates.a
+[ 56%] Built target retroplayer_savestates
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/AdvancedSettings.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/streams/memory/CMakeFiles/retroplayer_memory.dir/LinearMemoryStream.cpp.o
+[ 56%] Linking CXX static library retroplayer_memory.a
+[ 56%] Built target retroplayer_memory
+[ 56%] Building CXX object build/cores/RetroPlayer/shaders/CMakeFiles/rp-shaders.dir/ShaderPresetFactory.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/DisplaySettings.cpp.o
+[ 56%] Linking CXX static library retroplayer_streams.a
+[ 56%] Built target retroplayer_streams
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/GameSettings.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/LibExportSettings.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/shaders/CMakeFiles/rp-shaders.dir/ShaderUtils.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/MediaSettings.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/MediaSourceSettings.cpp.o
+[ 56%] Linking CXX static library rp-shaders.a
+[ 56%] Built target rp-shaders
+[ 56%] Building CXX object build/settings/dialogs/CMakeFiles/settings_dialogs.dir/GUIDialogContentSettings.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/PlayerSettings.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/ServicesSettings.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingAddon.cpp.o
+[ 56%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingConditions.cpp.o
+[ 56%] Building CXX object build/settings/dialogs/CMakeFiles/settings_dialogs.dir/GUIDialogLibExportSettings.cpp.o
+[ 57%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingControl.cpp.o
+[ 57%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingCreator.cpp.o
+[ 57%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingDateTime.cpp.o
+[ 57%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingPath.cpp.o
+[ 57%] Building CXX object build/settings/CMakeFiles/settings.dir/Settings.cpp.o
+[ 57%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/ISetting.cpp.o
+[ 57%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/ISettingControl.cpp.o
+[ 57%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/Setting.cpp.o
+[ 57%] Building CXX object build/settings/dialogs/CMakeFiles/settings_dialogs.dir/GUIDialogSettingsBase.cpp.o
+[ 57%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingCategoryAccess.cpp.o
+[ 57%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingsBase.cpp.o
+[ 58%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingConditions.cpp.o
+[ 58%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingsValueFlatJsonSerializer.cpp.o
+[ 58%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingDependency.cpp.o
+[ 58%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingRequirement.cpp.o
+[ 58%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingsValueXmlSerializer.cpp.o
+[ 58%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingUtils.cpp.o
+[ 58%] Building CXX object build/settings/dialogs/CMakeFiles/settings_dialogs.dir/GUIDialogSettingsManagerBase.cpp.o
+[ 58%] Building CXX object build/settings/dialogs/CMakeFiles/settings_dialogs.dir/GUIDialogSettingsManualBase.cpp.o
+[ 58%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingSection.cpp.o
+[ 58%] Building CXX object build/settings/CMakeFiles/settings.dir/SkinSettings.cpp.o
+[ 58%] Building CXX object build/settings/CMakeFiles/settings.dir/SettingsComponent.cpp.o
+[ 58%] Building CXX object build/settings/CMakeFiles/settings.dir/SubtitlesSettings.cpp.o
+[ 58%] Building CXX object build/settings/CMakeFiles/settings.dir/DiscSettings.cpp.o
+[ 58%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingsManager.cpp.o
+[ 58%] Building CXX object build/settings/windows/CMakeFiles/settings_windows.dir/GUIControlSettings.cpp.o
+[ 58%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/AutoSwitch.cpp.o
+[ 58%] Linking CXX static library settings.a
+[ 58%] Built target settings
+[ 58%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/BackgroundInfoLoader.cpp.o
+[ 58%] Linking CXX static library settings_dialogs.a
+[ 58%] Built target settings_dialogs
+[ 58%] Building CXX object build/settings/windows/CMakeFiles/settings_windows.dir/GUIWindowSettings.cpp.o
+[ 58%] Building CXX object build/settings/windows/CMakeFiles/settings_windows.dir/GUIWindowSettingsCategory.cpp.o
+[ 58%] Building CXX object build/settings/windows/CMakeFiles/settings_windows.dir/GUIWindowSettingsScreenCalibration.cpp.o
+[ 60%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/ContextMenuItem.cpp.o
+[ 60%] Building CXX object build/addons/CMakeFiles/addons.dir/Addon.cpp.o
+[ 60%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingsMigration.cpp.o
+[ 60%] Building CXX object build/addons_addoninfo/CMakeFiles/addons_addoninfo.dir/AddonInfoBuilder.cpp.o
+[ 60%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/ContextMenuManager.cpp.o
+[ 60%] Linking CXX static library settings_windows.a
+[ 60%] Built target settings_windows
+[ 60%] Building CXX object build/addons_binary-addons/CMakeFiles/addons_binary-addons.dir/BinaryAddonManager.cpp.o
+[ 60%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingsMigrationPrimitive.cpp.o
+[ 60%] Building CXX object build/addons_binary-addons/CMakeFiles/addons_binary-addons.dir/AddonDll.cpp.o
+[ 60%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonBuilder.cpp.o
+[ 60%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingsMigrationSteps.cpp.o
+[ 60%] Building CXX object build/settings/lib/CMakeFiles/settings_lib.dir/SettingUpdate.cpp.o
+[ 60%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/ContextMenus.cpp.o
+[ 60%] Building CXX object build/addons_binary-addons/CMakeFiles/addons_binary-addons.dir/AddonInstanceHandler.cpp.o
+[ 60%] Building CXX object build/addons/CMakeFiles/addons.dir/BinaryAddonCache.cpp.o
+[ 60%] Linking CXX static library settings_lib.a
+[ 60%] Built target settings_lib
+[ 60%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/CueDocument.cpp.o
+[ 61%] Building CXX object build/addons_gui/CMakeFiles/addons_gui.dir/GUIDialogAddonInfo.cpp.o
+[ 61%] Building CXX object build/addons_addoninfo/CMakeFiles/addons_addoninfo.dir/AddonExtensions.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonDatabase.cpp.o
+[ 61%] Building CXX object build/addons_binary-addons/CMakeFiles/addons_binary-addons.dir/BinaryAddonBase.cpp.o
+[ 61%] Building CXX object build/addons_addoninfo/CMakeFiles/addons_addoninfo.dir/AddonInfo.cpp.o
+[ 61%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/DatabaseManager.cpp.o
+[ 61%] Linking CXX static library addons_binary-addons.a
+[ 61%] Built target addons_binary-addons
+[ 61%] Building CXX object build/addons_addoninfo/CMakeFiles/addons_addoninfo.dir/AddonType.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonInstaller.cpp.o
+[ 61%] Linking CXX static library addons_addoninfo.a
+[ 61%] Built target addons_addoninfo
+[ 61%] Building CXX object build/addons_gui_skin/CMakeFiles/addons_gui_skin.dir/SkinTimer.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonManager.cpp.o
+[ 61%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/DbUrl.cpp.o
+[ 61%] Building CXX object build/addons_gui/CMakeFiles/addons_gui.dir/GUIDialogAddonSettings.cpp.o
+[ 61%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/DynamicDll.cpp.o
+[ 61%] Building CXX object build/addons_gui_skin/CMakeFiles/addons_gui_skin.dir/SkinTimerManager.cpp.o
+[ 61%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/FileItem.cpp.o
+[ 61%] Linking CXX static library addons_gui_skin.a
+[ 61%] Built target addons_gui_skin
+[ 61%] Building CXX object build/addons_interfaces/CMakeFiles/addons_interfaces.dir/AddonBase.cpp.o
+[ 61%] Building CXX object build/addons_interfaces/CMakeFiles/addons_interfaces.dir/AudioEngine.cpp.o
+[ 61%] Building CXX object build/addons_gui/CMakeFiles/addons_gui.dir/GUIHelpers.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonRepos.cpp.o
+[ 61%] Building CXX object build/addons_interfaces/CMakeFiles/addons_interfaces.dir/General.cpp.o
+[ 61%] Building CXX object build/addons_gui/CMakeFiles/addons_gui.dir/GUIViewStateAddonBrowser.cpp.o
+[ 61%] Building CXX object build/addons_interfaces/CMakeFiles/addons_interfaces.dir/Filesystem.cpp.o
+[ 61%] Building CXX object build/addons_gui/CMakeFiles/addons_gui.dir/GUIWindowAddonBrowser.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonStatusHandler.cpp.o
+[ 61%] Building CXX object build/addons_interfaces/CMakeFiles/addons_interfaces.dir/Network.cpp.o
+[ 61%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/FileItemList.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonSystemSettings.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonUpdateRules.cpp.o
+[ 61%] Linking CXX static library addons_interfaces.a
+[ 61%] Built target addons_interfaces
+[ 61%] Building CXX object build/addons_interfaces_gui/CMakeFiles/addons_interfaces_gui.dir/GUITranslator.cpp.o
+[ 61%] Building CXX object build/addons_interfaces_gui/CMakeFiles/addons_interfaces_gui.dir/General.cpp.o
+[ 61%] Linking CXX static library addons_gui.a
+[ 61%] Built target addons_gui
+[ 61%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Button.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonVersion.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/AudioDecoder.cpp.o
+[ 61%] Building CXX object build/addons_interfaces_gui/CMakeFiles/addons_interfaces_gui.dir/ListItem.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/ContextMenuAddon.cpp.o
+[ 61%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Edit.cpp.o
+[ 61%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/FileItemListModification.cpp.o
+[ 61%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/GUIInfoManager.cpp.o
+[ 61%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/FadeLabel.cpp.o
+[ 61%] Building CXX object build/addons_interfaces_gui/CMakeFiles/addons_interfaces_gui.dir/Window.cpp.o
+[ 61%] Building CXX object build/addons/CMakeFiles/addons.dir/ContextMenus.cpp.o
+[ 61%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Image.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Label.cpp.o
+[ 62%] Building CXX object build/addons/CMakeFiles/addons.dir/ExtsMimeSupportList.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/ContextMenu.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Progress.cpp.o
+[ 62%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/GUILargeTextureManager.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/ExtendedProgressBar.cpp.o
+[ 62%] Linking CXX static library addons_interfaces_gui.a
+[ 62%] Built target addons_interfaces_gui
+[ 62%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/FileBrowser.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/RadioButton.cpp.o
+[ 62%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/GUIPassword.cpp.o
+[ 62%] Building CXX object build/addons/CMakeFiles/addons.dir/FontResource.cpp.o
+[ 62%] Building CXX object build/addons/CMakeFiles/addons.dir/FilesystemInstaller.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Rendering.cpp.o
+[ 62%] Building CXX object build/addons/CMakeFiles/addons.dir/GameResource.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/Keyboard.cpp.o
+[ 62%] Building CXX object build/addons/CMakeFiles/addons.dir/ImageDecoder.cpp.o
+[ 62%] Building CXX object build/addons/CMakeFiles/addons.dir/ImageResource.cpp.o
+[ 62%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/InfoScanner.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/SettingsSlider.cpp.o
+[ 62%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/LangInfo.cpp.o
+[ 62%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/MediaSource.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/Numeric.cpp.o
+[ 62%] Building CXX object build/addons/CMakeFiles/addons.dir/LanguageResource.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Slider.cpp.o
+[ 62%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/NfoFile.cpp.o
+[ 62%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/OK.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/SkinResource.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/PluginSource.cpp.o
+[ 63%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/Spin.cpp.o
+[ 63%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/Progress.cpp.o
+[ 63%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/Select.cpp.o
+[ 63%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/PasswordManager.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/Repository.cpp.o
+[ 63%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/TextViewer.cpp.o
+[ 63%] Building CXX object build/addons_interfaces_gui_controls/CMakeFiles/addons_interfaces_gui_controls.dir/TextBox.cpp.o
+[ 63%] Building CXX object build/addons_interfaces_gui_dialogs/CMakeFiles/addons_interfaces_gui_dialogs.dir/YesNo.cpp.o
+[ 63%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/PlayListPlayer.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/RepositoryUpdater.cpp.o
+[ 63%] Linking CXX static library addons_interfaces_gui_controls.a
+[ 63%] Built target addons_interfaces_gui_controls
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/Scraper.cpp.o
+[ 63%] Linking CXX static library addons_interfaces_gui_dialogs.a
+[ 63%] Built target addons_interfaces_gui_dialogs
+[ 63%] Building CXX object build/addons_settings/CMakeFiles/addons_settings.dir/AddonSettings.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/ScreenSaver.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/Service.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/ShaderPreset.cpp.o
+[ 63%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/PartyModeManager.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/Skin.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/UISoundsResource.cpp.o
+[ 63%] Building CXX object build/addons_settings/CMakeFiles/addons_settings.dir/SettingUrlEncodedString.cpp.o
+[ 63%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/SectionLoader.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/VFSEntry.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/Visualization.cpp.o
+[ 63%] Linking CXX static library addons_settings.a
+[ 63%] Built target addons_settings
+[ 63%] Building CXX object build/application/CMakeFiles/application.dir/AppEnvironment.cpp.o
+[ 63%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/SeekHandler.cpp.o
+[ 63%] Building CXX object build/addons/CMakeFiles/addons.dir/Webinterface.cpp.o
+[ 63%] Building CXX object build/application/CMakeFiles/application.dir/AppInboundProtocol.cpp.o
+[ 63%] Building CXX object build/application/CMakeFiles/application.dir/Application.cpp.o
+[ 63%] Building CXX object build/commons/CMakeFiles/commons.dir/Exception.cpp.o
+[ 63%] Linking CXX static library addons.a
+[ 63%] Built target addons
+[ 63%] Building CXX object build/dbwrappers/CMakeFiles/dbwrappers.dir/Database.cpp.o
+[ 63%] Linking CXX static library commons.a
+[ 63%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationActionListeners.cpp.o
+[ 63%] Built target commons
+[ 63%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogBoxBase.cpp.o
+[ 63%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/ServiceBroker.cpp.o
+[ 63%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationMessageHandling.cpp.o
+[ 63%] Building CXX object build/dbwrappers/CMakeFiles/dbwrappers.dir/DatabaseQuery.cpp.o
+[ 63%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogBusy.cpp.o
+[ 63%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/ServiceManager.cpp.o
+[ 63%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogBusyNoCancel.cpp.o
+[ 63%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationPlay.cpp.o
+[ 63%] Building CXX object build/dbwrappers/CMakeFiles/dbwrappers.dir/dataset.cpp.o
+[ 63%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogButtonMenu.cpp.o
+[ 63%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogCache.cpp.o
+[ 63%] Building CXX object build/favourites/CMakeFiles/favourites.dir/ContextMenus.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/SystemGlobals.cpp.o
+[ 65%] Building CXX object build/dbwrappers/CMakeFiles/dbwrappers.dir/qry_dat.cpp.o
+[ 65%] Building CXX object build/dbwrappers/CMakeFiles/dbwrappers.dir/sqlitedataset.cpp.o
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationPlayer.cpp.o
+[ 65%] Building CXX object build/favourites/CMakeFiles/favourites.dir/GUIViewStateFavourites.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogColorPicker.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/TextureCache.cpp.o
+[ 65%] Building CXX object build/favourites/CMakeFiles/favourites.dir/GUIWindowFavourites.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogContextMenu.cpp.o
+[ 65%] Building CXX object build/dbwrappers/CMakeFiles/dbwrappers.dir/mysqldataset.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/TextureCacheJob.cpp.o
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationPlayerCallback.cpp.o
+[ 65%] Building CXX object build/favourites/CMakeFiles/favourites.dir/FavouritesService.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogExtendedProgressBar.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/TextureDatabase.cpp.o
+[ 65%] Building CXX object build/favourites/CMakeFiles/favourites.dir/FavouritesURL.cpp.o
+[ 65%] Linking CXX static library dbwrappers.a
+[ 65%] Built target dbwrappers
+[ 65%] Building CXX object build/favourites/CMakeFiles/favourites.dir/FavouritesUtils.cpp.o
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationPowerHandling.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogFileBrowser.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/ThumbLoader.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/URL.cpp.o
+[ 65%] Linking CXX static library favourites.a
+[ 65%] Built target favourites
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/Util.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/XBDateTime.cpp.o
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationSettingsHandling.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogGamepad.cpp.o
+[ 65%] Building CXX object build/xbmc/CMakeFiles/xbmc.dir/Autorun.cpp.o
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationSkinHandling.cpp.o
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationStackHelper.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogKaiToast.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogKeyboardGeneric.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogKeyboardTouch.cpp.o
+[ 65%] Linking CXX static library xbmc.a
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/ApplicationVolumeHandling.cpp.o
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/AppParamParser.cpp.o
+[ 65%] Built target xbmc
+[ 65%] Building CXX object build/application/CMakeFiles/application.dir/AppParams.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogMediaFilter.cpp.o
+[ 65%] Building CXX object build/guilib/CMakeFiles/guilib.dir/DDSImage.cpp.o
+[ 65%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIInfo.cpp.o
+[ 65%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIInfoHelper.cpp.o
+[ 65%] Linking CXX static library application.a
+[ 65%] Building CXX object build/guilib_announcement_handlers/CMakeFiles/guilib_announcement_handlers.dir/GUIAnnouncementHandlerContainer.cpp.o
+[ 65%] Built target application
+[ 65%] Building CXX object build/guilib_announcement_handlers/CMakeFiles/guilib_announcement_handlers.dir/sources/GUISourcesAnnouncementHandler.cpp.o
+[ 65%] Building CXX object build/guilib/CMakeFiles/guilib.dir/DirtyRegionSolvers.cpp.o
+[ 65%] Building CXX object build/guilib_announcement_handlers/CMakeFiles/guilib_announcement_handlers.dir/player/GUIPlayerAnnouncementHandler.cpp.o
+[ 65%] Building CXX object build/guilib/CMakeFiles/guilib.dir/DirtyRegionTracker.cpp.o
+[ 65%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIInfoProviders.cpp.o
+[ 65%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIInfoLabel.cpp.o
+[ 65%] Linking CXX static library guilib_announcement_handlers.a
+[ 65%] Built target guilib_announcement_handlers
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogMediaSource.cpp.o
+[ 65%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIInfoBool.cpp.o
+[ 65%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogNumeric.cpp.o
+[ 65%] Building CXX object build/guilib/CMakeFiles/guilib.dir/FFmpegImage.cpp.o
+[ 66%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogOK.cpp.o
+[ 66%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogPlayerControls.cpp.o
+[ 66%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIInfoColor.cpp.o
+[ 66%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIAction.cpp.o
+[ 66%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogPlayerProcessInfo.cpp.o
+[ 66%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogProgress.cpp.o
+[ 66%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogSeekBar.cpp.o
+[ 66%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIAudioManager.cpp.o
+[ 66%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GUIInfoUtils.cpp.o
+[ 66%] Building CXX object build/guilib_listproviders/CMakeFiles/guilib_listproviders.dir/DirectoryProvider.cpp.o
+[ 66%] Building CXX object build/imagefiles/CMakeFiles/imagefiles.dir/ImageCacheCleaner.cpp.o
+[ 66%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogSelect.cpp.o
+[ 66%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/AddonsGUIInfo.cpp.o
+[ 66%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIBaseContainer.cpp.o
+[ 66%] Building CXX object build/imagefiles/CMakeFiles/imagefiles.dir/ImageFileURL.cpp.o
+[ 66%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogSimpleMenu.cpp.o
+[ 67%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GamesGUIInfo.cpp.o
+[ 67%] Building CXX object build/imagefiles/CMakeFiles/imagefiles.dir/SpecialImageLoaderFactory.cpp.o
+[ 67%] Linking CXX static library imagefiles.a
+[ 67%] Built target imagefiles
+[ 67%] Building CXX object build/jobs/CMakeFiles/jobs.dir/JobManager.cpp.o
+[ 67%] Building CXX object build/guilib_listproviders/CMakeFiles/guilib_listproviders.dir/IListProvider.cpp.o
+[ 67%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogSlider.cpp.o
+[ 67%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIBorderedImage.cpp.o
+[ 67%] Building CXX object build/guilib_listproviders/CMakeFiles/guilib_listproviders.dir/MultiProvider.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp: In member function ‘virtual bool KODI::GUILIB::GUIINFO::CGamesGUIInfo::GetLabel(std::string&, const CFileItem*, int, const KODI::GUILIB::GUIINFO::CGUIInfo&, std::string*) const’:
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:478:55: error: ‘const class KODI::GAME::CAchievementRuntime’ has no member named ‘GetChallengeAchievementTitle’
+  478 |       value = ShowIndicators() ? AchievementRuntime().GetChallengeAchievementTitle() : "";
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:483:55: error: ‘const class KODI::GAME::CAchievementRuntime’ has no member named ‘GetChallengeAchievementBadge’
+  483 |       value = ShowIndicators() ? AchievementRuntime().GetChallengeAchievementBadge() : "";
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:488:55: error: ‘const class KODI::GAME::CAchievementRuntime’ has no member named ‘GetTrackedAchievementTitle’; did you mean ‘GetUnlockedAchievements’?
+  488 |       value = ShowIndicators() ? AchievementRuntime().GetTrackedAchievementTitle() : "";
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                       GetUnlockedAchievements
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:493:55: error: ‘const class KODI::GAME::CAchievementRuntime’ has no member named ‘GetTrackedAchievementProgress’; did you mean ‘SetAchievementProgress’?
+  493 |       value = ShowIndicators() ? AchievementRuntime().GetTrackedAchievementProgress() : "";
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                       SetAchievementProgress
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:498:55: error: ‘const class KODI::GAME::CAchievementRuntime’ has no member named ‘GetTrackedAchievementBadge’; did you mean ‘GetUnlockedAchievements’?
+  498 |       value = ShowIndicators() ? AchievementRuntime().GetTrackedAchievementBadge() : "";
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                       GetUnlockedAchievements
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:514:5: error: duplicate case value
+  514 |     case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:476:5: note: previously used here
+  476 |     case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:515:5: error: duplicate case value
+  515 |     case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:481:5: note: previously used here
+  481 |     case RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:548:5: error: duplicate case value
+  548 |     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:486:5: note: previously used here
+  486 |     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:549:5: error: duplicate case value
+  549 |     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:496:5: note: previously used here
+  496 |     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:550:5: error: duplicate case value
+  550 |     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:491:5: note: previously used here
+  491 |     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS:
+      |     ^~~~
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp: In member function ‘virtual bool KODI::GUILIB::GUIINFO::CGamesGUIInfo::GetInt(int&, const CGUIListItem*, int, const KODI::GUILIB::GUIINFO::CGUIInfo&) const’:
+/home/chris/xbmc-hcmerge/xbmc/guilib/guiinfo/GamesGUIInfo.cpp:601:53: error: ‘const class KODI::GAME::CAchievementRuntime’ has no member named ‘GetTrackedAchievementPercent’
+  601 |       value = static_cast<int>(AchievementRuntime().GetTrackedAchievementPercent());
+      |                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/build.make:191: build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GamesGUIInfo.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:13684: build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 67%] Building CXX object build/guilib_listproviders/CMakeFiles/guilib_listproviders.dir/StaticProvider.cpp.o
+[ 68%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogSmartPlaylistEditor.cpp.o
+[ 68%] Building CXX object build/jobs/CMakeFiles/jobs.dir/JobQueue.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIButtonControl.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIColorButtonControl.cpp.o
+[ 68%] Linking CXX static library jobs.a
+[ 68%] Linking CXX static library guilib_listproviders.a
+[ 68%] Built target jobs
+[ 68%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogSmartPlaylistRule.cpp.o
+[ 68%] Built target guilib_listproviders
+[ 68%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogSubMenu.cpp.o
+[ 68%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogTextViewer.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIComponent.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIColorManager.cpp.o
+[ 68%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogVolumeBar.cpp.o
+[ 68%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogYesNo.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIControl.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIControlFactory.cpp.o
+[ 68%] Building CXX object build/dialogs/CMakeFiles/dialogs.dir/GUIDialogPlayEject.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIControlGroup.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIControlGroupList.cpp.o
+[ 68%] Linking CXX static library dialogs.a
+[ 68%] Built target dialogs
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIControlLookup.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIControlProfiler.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIDialog.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIEditControl.cpp.o
+[ 68%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIFadeLabelControl.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIFixedListContainer.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIFont.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIFontCache.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIFontManager.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIFontTTF.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIImage.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIIncludes.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIKeyboardFactory.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUILabelControl.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUILabel.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIListContainer.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIListGroup.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIListItem.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIListItemLayout.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIListLabel.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIMessage.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIMoverControl.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIMultiImage.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIPanelContainer.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIProgressControl.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIRadioButtonControl.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIRangesControl.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIRenderingControl.cpp.o
+[ 70%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIResizeControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIRSSControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIScrollBarControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUISettingsSliderControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUISliderControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUISpinControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUISpinControlEx.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIStaticItem.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUITextBox.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUITextLayout.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUITexture.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUITextureCallbackManager.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIToggleButtonControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIUtils.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIVideoControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIVisualisationControl.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIWindow.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIWindowManager.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIWrappingListContainer.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/imagefactory.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/ImageSettings.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/IWindowManagerCallback.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/SkinMapManager.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/StereoscopicsManager.cpp.o
+[ 71%] Building CXX object build/guilib/CMakeFiles/guilib.dir/TextureBundle.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/TextureBundleXBT.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/Texture.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/TextureBase.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/TextureManager.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/VisibleEffect.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/XBTF.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/XBTFReader.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/Shader.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIFontTTFGLES.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUITextureGLES.cpp.o
+[ 72%] Building CXX object build/guilib/CMakeFiles/guilib.dir/TextureGLES.cpp.o
+[ 72%] Linking CXX static library guilib.a
+[ 72%] Built target guilib
+make: *** [Makefile:146: all] Error 2
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'

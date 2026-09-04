@@ -9,7 +9,6 @@
 #include "GameClientCheevos.h"
 
 #include "ServiceBroker.h"
-#include "games/dialogs/osd/DialogGameIndicators.h"
 #include "TextureCache.h"
 #include "XBDateTime.h"
 #include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/game.h"
@@ -236,40 +235,6 @@ void CGameClientCheevos::OnGameCompleted(const std::string& title, bool hardcore
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 
-void CGameClientCheevos::OnChallengeIndicator(const game_rc_challenge_indicator* indicator)
-{
-  CAchievementRuntime& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
-
-  ChallengeIndicator attempted;
-  if (indicator != nullptr)
-  {
-    attempted.id = indicator->id;
-    attempted.title = indicator->title != nullptr ? indicator->title : "";
-    attempted.badgeUrl = indicator->badge_url != nullptr ? indicator->badge_url : "";
-  }
-
-  runtime.SetChallengeIndicator(attempted, indicator != nullptr);
-  CDialogGameIndicators::Show();
-}
-
-void CGameClientCheevos::OnProgressIndicator(const game_rc_progress_indicator* indicator)
-{
-  ProgressIndicator shown;
-  if (indicator != nullptr)
-  {
-    shown.id = indicator->id;
-    shown.title = indicator->title != nullptr ? indicator->title : "";
-    shown.badgeUrl = indicator->badge_url != nullptr ? indicator->badge_url : "";
-    shown.measuredProgress =
-        indicator->measured_progress != nullptr ? indicator->measured_progress : "";
-    shown.measuredPercent = indicator->measured_percent;
-  }
-
-  CServiceBroker::GetGameServices().AchievementRuntime().SetProgressIndicator(
-      shown, indicator != nullptr);
-  CDialogGameIndicators::Show();
-}
-
 void CGameClientCheevos::OnAchievementProgress(const game_rc_achievement_progress* progress,
                                                unsigned int count)
 {
@@ -383,13 +348,6 @@ void CGameClientCheevos::OnGameClosed()
   CServiceBroker::GetGameServices().AchievementRuntime().Clear();
 
   NotifyDialogs();
-}
-
-bool CGameClientCheevos::SendEncoreMode()
-{
-  const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
-
-  return m_gameClient.SetEncoreModeEnabled(gameSettings.GetAchievementsEncore());
 }
 
 bool CGameClientCheevos::SendCredentials()

@@ -1112,16 +1112,6 @@ public:
   virtual GAME_ERROR RCSetHardcoreEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
   //----------------------------------------------------------------------------
 
-  //============================================================================
-  /// @brief Set whether already-earned achievements can be earned again
-  ///
-  /// @param[in] enabled True to re-earn achievements already unlocked
-  ///
-  /// @return The error, or @ref GAME_ERROR_NO_ERROR on success
-  ///
-  /// @note Added in Game API 8.1.0
-  ///
-  virtual GAME_ERROR RCSetEncoreModeEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
   //----------------------------------------------------------------------------
   //============================================================================
   /// @brief Activate an achievement
@@ -1254,35 +1244,6 @@ public:
                                                     static_cast<unsigned int>(progress.size()));
   }
 
-  //============================================================================
-  /// @brief **Callback to Kodi Function**\n
-  /// Show the achievement the player is working towards, or hide it
-  ///
-  /// @param[in] indicator The achievement to show, or `nullptr` to hide it
-  ///
-  /// @remarks Only called from the add-on itself
-  ///
-  /// @note Added in Game API 8.1.0
-  ///
-  void RCOnProgressIndicator(const game_rc_progress_indicator* indicator)
-  {
-    m_instanceData->toKodi->RCOnProgressIndicator(m_instanceData->toKodi->kodiInstance, indicator);
-  }
-
-  //============================================================================
-  /// @brief **Callback to Kodi Function**\n
-  /// Show or hide the achievement the player is inside an attempt at
-  ///
-  /// @param[in] indicator The achievement being attempted, or `nullptr` to hide
-  ///
-  /// @remarks Only called from the add-on itself
-  ///
-  /// @note Added in Game API 8.1.0
-  ///
-  void RCOnChallengeIndicator(const game_rc_challenge_indicator* indicator)
-  {
-    m_instanceData->toKodi->RCOnChallengeIndicator(m_instanceData->toKodi->kodiInstance, indicator);
-  }
 
   //============================================================================
   /// @brief **Callback to Kodi Function**\n
@@ -1711,7 +1672,6 @@ private:
     instance->game->toAddon->SetRetroAchievementsCredentials =
         ADDON_SetRetroAchievementsCredentials;
     instance->game->toAddon->RCSetHardcoreEnabled = ADDON_RCSetHardcoreEnabled;
-    instance->game->toAddon->RCSetEncoreModeEnabled = ADDON_RCSetEncoreModeEnabled;
     instance->game->toAddon->ActivateAchievement = ADDON_ActivateAchievement;
     instance->game->toAddon->GetCheevoUrlId = ADDON_GetCheevoUrlId;
 
@@ -1925,13 +1885,6 @@ private:
   {
     return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
         ->DeserializeAchievements(data, size);
-  }
-
-  inline static GAME_ERROR ADDON_RCSetEncoreModeEnabled(const AddonInstance_Game* instance,
-                                                        bool enabled)
-  {
-    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)
-        ->RCSetEncoreModeEnabled(enabled);
   }
 
   // --- Cheat operations --------------------------------------------------------

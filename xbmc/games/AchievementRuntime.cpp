@@ -128,6 +128,12 @@ void CAchievementRuntime::SetChallenge(const AchievementChallenge& challenge, bo
       if (it == m_state.challenges.end())
         m_state.challenges.emplace_back(challenge);
     }
+    else if (challenge.id == 0)
+    {
+      // The runtime names no achievement with a hide, so an id of zero means
+      // every attempt has ended, as it does for the progress indicators
+      m_state.challenges.clear();
+    }
     else if (it != m_state.challenges.end())
     {
       m_state.challenges.erase(it);

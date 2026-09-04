@@ -371,8 +371,6 @@ void CReversiblePlayback::CommitSavestate(bool autosave,
 
 bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
 {
-  const size_t memorySize = m_gameClient->GetSerializeSize();
-
   // Loading a save state is always blocked in hardcore; creating one is not,
   // so that players can still keep a state for later
   if (HardcoreRestrictionsApply())
@@ -382,7 +380,7 @@ bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
     return false;
   }
 
-  const size_t memorySize = m_gameClient->SerializeSize();
+  const size_t memorySize = m_gameClient->GetSerializeSize();
 
   // Game client must support serialization
   if (memorySize == 0)
@@ -785,7 +783,7 @@ void CReversiblePlayback::UpdateMemoryStream()
   // Hardcore forbids rewind, so the buffer isn't just unused - it shouldn't be
   // allocated at all. It costs the savestate size for every frame of the
   // rewind window, which runs to gigabytes on consoles with large states.
-  if (m_gameClient->SerializeSize() > 0 && !HardcoreRestrictionsApply())
+  if (m_gameClient->GetSerializeSize() > 0 && !HardcoreRestrictionsApply())
     bRewindEnabled = gameSettings.RewindEnabled();
 
   if (bRewindEnabled)

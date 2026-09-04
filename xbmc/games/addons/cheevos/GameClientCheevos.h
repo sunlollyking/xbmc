@@ -56,12 +56,6 @@ public:
   void OnRichPresenceUpdated(const std::string& evaluation);
   void OnLoginResult(const game_rc_login_result& data);
   void OnAchievementProgress(const game_rc_achievement_progress* progress, unsigned int count);
-
-  //! \brief Show the achievement the player is working towards, or hide it when null
-  void OnProgressIndicator(const game_rc_progress_indicator* indicator);
-
-  //! \brief Show the achievement being attempted, or hide it when null
-  void OnChallengeIndicator(const game_rc_challenge_indicator* indicator);
   void OnServerError(const std::string& message, const std::string& api);
   void OnConnectionChanged(bool connected);
 
@@ -107,14 +101,6 @@ public:
    * \return True if the client accepted them
    */
   bool SendCredentials();
-
-  /*!
-   * \brief Tell the client whether to play for earned achievements again
-   *
-   * Sent on every load, because the achievement runtime is built per game and
-   * would otherwise keep whatever the last one was told.
-   */
-  bool SendEncoreMode();
 
 private:
   CGameClient& m_gameClient;

@@ -1,0 +1,114 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  0%] Performing build step for 'buildtexturepacker'
+[  1%] Built target build-ffmpeg
+[  1%] Built target build-JsonSchemaBuilder
+[  1%] Built target build-crossguid
+[  1%] Built target build-poppler
+[  1%] Built target build-libdvdcss
+[  1%] Built target wrapper
+[  2%] Built target build-utfcpp
+[  2%] Built target compileinfo
+[100%] Built target TexturePacker
+Generating xbmc.json/addon.xml
+[  2%] Built target generate-wayland-extra-protocols
+[  2%] No install step for 'buildtexturepacker'
+[  2%] Built target generate_json_header
+[  6%] Built target upnp
+[  6%] Completed 'buildtexturepacker'
+[  6%] Built target gen_system_addons
+[  6%] Built target retroplayer_messages
+[  7%] Built target build-libdvdread
+[  8%] Built target sse4
+[  8%] Built target build-taglib
+[  8%] Built target build-libdvdnav
+[  8%] Built target buildtexturepacker
+[  8%] Built target wrapper.def
+[  8%] Built target rp-process-gbm
+[  8%] Copying files into build tree
+[ 10%] Built target processGBM
+[ 10%] Built target network_httprequesthandlers_python
+[ 10%] Built target windowing_gbm
+[ 11%] Built target windowing_gbm_drm
+[ 11%] Built target processWayland
+[ 11%] Built target rp-process-wayland
+[ 12%] Built target cores
+[ 12%] Built target export-files
+[ 13%] Built target windowing_WAYLAND
+[ 13%] Built target dllloader
+[ 13%] Built target dllexports
+[ 13%] Built target exports_utils
+[ 15%] Built target audioengine
+[ 15%] Built target externalplayer
+[ 15%] Built target paplayer
+[ 15%] Built target events
+[ 15%] Built target playercorefactory
+[ 15%] Built target events_windows
+[ 16%] Built target bluray
+[ 17%] Built target videodatabasedirectory
+[ 18%] Built target musicdatabasedirectory
+[ 18%] Building CXX object build/games/CMakeFiles/games.dir/GameSettings.cpp.o
+[ 18%] Building CXX object build/games/CMakeFiles/games.dir/GameServices.cpp.o
+[ 18%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o
+[ 18%] Building CXX object build/games/addons/cheevos/CMakeFiles/gamecheevos.dir/GameClientCheevos.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/AddonsDirectory.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/games/GameSettings.cpp:56:19: error: redefinition of ‘const std::string {anonymous}::SETTING_GAMES_ACHIEVEMENTS_ENCORE’
+   56 | const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/GameSettings.cpp:53:19: note: ‘const std::string {anonymous}::SETTING_GAMES_ACHIEVEMENTS_ENCORE’ previously declared here
+   53 | const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [build/games/CMakeFiles/games.dir/build.make:135: build/games/CMakeFiles/games.dir/GameSettings.cpp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[ 20%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientInGameSaves.cpp.o
+make[1]: *** [CMakeFiles/Makefile2:9297: build/games/CMakeFiles/games.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 20%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientProperties.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp: In member function ‘bool KODI::GAME::CGameClient::Initialize()’:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:222:23: error: ‘struct AddonToKodiFuncTable_Game’ has no member named ‘RCOnProgressIndicator’
+  222 |   m_ifc.game->toKodi->RCOnProgressIndicator = cb_rc_on_progress_indicator;
+      |                       ^~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:222:47: error: ‘cb_rc_on_progress_indicator’ was not declared in this scope; did you mean ‘game_rc_progress_indicator’?
+  222 |   m_ifc.game->toKodi->RCOnProgressIndicator = cb_rc_on_progress_indicator;
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                               game_rc_progress_indicator
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp: In member function ‘bool KODI::GAME::CGameClient::OpenFile(const CFileItem&, KODI::RETRO::IStreamManager&, KODI::GAME::IGameInputCallback*)’:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:311:13: error: ‘class KODI::GAME::CGameClientCheevos’ has no member named ‘SendEncoreMode’
+  311 |   Cheevos().SendEncoreMode();
+      |             ^~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp: In member function ‘bool KODI::GAME::CGameClient::OpenStandalone(KODI::RETRO::IStreamManager&, KODI::GAME::IGameInputCallback*)’:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:367:13: error: ‘class KODI::GAME::CGameClientCheevos’ has no member named ‘SendEncoreMode’
+  367 |   Cheevos().SendEncoreMode();
+      |             ^~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp: At global scope:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1036:6: error: redefinition of ‘bool KODI::GAME::CGameClient::SetEncoreModeEnabled(bool)’
+ 1036 | bool CGameClient::SetEncoreModeEnabled(bool enabled)
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:977:6: note: ‘bool KODI::GAME::CGameClient::SetEncoreModeEnabled(bool)’ previously defined here
+  977 | bool CGameClient::SetEncoreModeEnabled(bool enabled)
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1352:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
+ 1352 | void CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE kodiInstance,
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1352:6: note: no functions named ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
+In file included from /home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:9:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
+  118 | class CGameClient : public ADDON::CAddonDll,
+      |       ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1362:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_challenge_indicator*)’
+ 1362 | void CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:377:15: note: candidate is: ‘static void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_achievement_challenge*, bool)’
+  377 |   static void cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
+  118 | class CGameClient : public ADDON::CAddonDll,
+      |       ^~~~~~~~~~~
+make[2]: *** [build/games/addons/CMakeFiles/gameaddons.dir/build.make:79: build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[ 20%] Linking CXX static library gamecheevos.a
+[ 20%] Built target gamecheevos
+[ 20%] Linking CXX static library filesystem.a
+[ 23%] Built target filesystem
+make[1]: *** [CMakeFiles/Makefile2:9333: build/games/addons/CMakeFiles/gameaddons.dir/all] Error 2
+make: *** [Makefile:146: all] Error 2
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'

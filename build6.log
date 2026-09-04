@@ -1,0 +1,744 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  0%] Built target build-JsonSchemaBuilder
+[  0%] Built target build-crossguid
+[  0%] Performing build step for 'buildtexturepacker'
+[  0%] Built target build-poppler
+[  1%] Built target build-ffmpeg
+[  1%] Built target build-libdvdcss
+[  1%] Built target wrapper
+[  2%] Built target build-utfcpp
+[  2%] Built target compileinfo
+[  2%] Built target generate-wayland-extra-protocols
+[100%] Built target TexturePacker
+[  2%] Built target gen_system_addons
+Generating xbmc.json/addon.xml
+[  2%] No install step for 'buildtexturepacker'
+[  6%] Built target upnp
+[  7%] Built target sse4
+[  7%] Built target retroplayer_messages
+[  7%] Built target generate_json_header
+[  7%] Completed 'buildtexturepacker'
+[  8%] Built target build-libdvdread
+[  8%] Built target build-taglib
+[  8%] Built target wrapper.def
+[  8%] Built target build-libdvdnav
+[  8%] Built target buildtexturepacker
+[  8%] Built target rp-process-gbm
+[  8%] Copying files into build tree
+[  8%] Built target wrap_libdvdnav
+[ 10%] Built target processGBM
+[ 10%] Built target network_httprequesthandlers_python
+[ 10%] Built target rp-process-wayland
+[ 11%] Built target windowing_gbm_drm
+[ 11%] Built target windowing_gbm
+[ 11%] Built target processWayland
+[ 12%] Built target cores
+[ 12%] Built target dllloader
+[ 12%] Built target export-files
+[ 13%] Built target audioengine
+[ 15%] Built target windowing_WAYLAND
+[ 15%] Built target dllexports
+[ 15%] Built target exports_utils
+[ 15%] Built target externalplayer
+[ 15%] Built target paplayer
+[ 15%] Built target playercorefactory
+[ 15%] Built target events_windows
+[ 15%] Built target events
+[ 16%] Built target bluray
+[ 17%] Built target musicdatabasedirectory
+[ 22%] Built target filesystem
+[ 23%] Built target videodatabasedirectory
+[ 23%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o
+[ 23%] Built target games
+[ 23%] Built target gamecheevos
+[ 23%] Built target gameinput
+[ 23%] Built target gamediscs
+[ 23%] Building CXX object build/games/addons/streams/CMakeFiles/game_addon_streams.dir/GameClientStreamAudio.cpp.o
+[ 23%] Building CXX object build/games/agents/input/CMakeFiles/games_agents_input.dir/AgentController.cpp.o
+[ 23%] Building CXX object build/games/addons/streams/CMakeFiles/game_addon_streams.dir/GameClientStreamHwFramebuffer.cpp.o
+[ 23%] Building CXX object build/games/cheats/CMakeFiles/games_cheats.dir/CheatPack.cpp.o
+[ 25%] Building CXX object build/games/agents/input/CMakeFiles/games_agents_input.dir/AgentInput.cpp.o
+[ 25%] Building CXX object build/games/addons/streams/CMakeFiles/game_addon_streams.dir/GameClientStreams.cpp.o
+[ 25%] Building CXX object build/games/addons/streams/CMakeFiles/game_addon_streams.dir/GameClientStreamSwFramebuffer.cpp.o
+[ 25%] Building CXX object build/games/cheats/CMakeFiles/games_cheats.dir/CheatRuntime.cpp.o
+[ 25%] Building CXX object build/games/addons/streams/CMakeFiles/game_addon_streams.dir/GameClientStreamVideo.cpp.o
+[ 25%] Linking CXX static library gameaddons.a
+[ 25%] Built target gameaddons
+[ 25%] Building CXX object build/games/agents/windows/CMakeFiles/games_agents_windows.dir/GUIAgentControllerList.cpp.o
+[ 25%] Building CXX object build/games/agents/windows/CMakeFiles/games_agents_windows.dir/GUIAgentWindow.cpp.o
+[ 25%] Linking CXX static library games_cheats.a
+[ 25%] Built target games_cheats
+[ 25%] Building CXX object build/games/controllers/CMakeFiles/games_controller.dir/Controller.cpp.o
+[ 25%] Linking CXX static library game_addon_streams.a
+[ 25%] Built target game_addon_streams
+[ 25%] Building CXX object build/games/agents/input/CMakeFiles/games_agents_input.dir/AgentJoystick.cpp.o
+[ 25%] Building CXX object build/games/controllers/CMakeFiles/games_controller.dir/ControllerLayout.cpp.o
+[ 25%] Building CXX object build/games/agents/input/CMakeFiles/games_agents_input.dir/AgentKeyboard.cpp.o
+[ 25%] Building CXX object build/games/agents/input/CMakeFiles/games_agents_input.dir/AgentMouse.cpp.o
+[ 25%] Building CXX object build/games/controllers/dialogs/CMakeFiles/games_controller_dialogs.dir/ControllerInstaller.cpp.o
+[ 25%] Building CXX object build/games/controllers/CMakeFiles/games_controller.dir/ControllerManager.cpp.o
+[ 25%] Linking CXX static library games_agents_windows.a
+[ 25%] Built target games_agents_windows
+[ 25%] Building CXX object build/games/controllers/CMakeFiles/games_controller.dir/ControllerTranslator.cpp.o
+[ 25%] Building CXX object build/games/controllers/CMakeFiles/games_controller.dir/DefaultController.cpp.o
+[ 25%] Building CXX object build/games/controllers/dialogs/CMakeFiles/games_controller_dialogs.dir/ControllerSelect.cpp.o
+[ 25%] Building CXX object build/games/controllers/dialogs/CMakeFiles/games_controller_dialogs.dir/GUIDialogAxisDetection.cpp.o
+[ 25%] Linking CXX static library games_agents_input.a
+[ 25%] Built target games_agents_input
+[ 25%] Building CXX object build/games/controllers/dialogs/CMakeFiles/games_controller_dialogs.dir/GUIDialogButtonCapture.cpp.o
+[ 25%] Linking CXX static library games_controller.a
+[ 25%] Building CXX object build/games/controllers/dialogs/CMakeFiles/games_controller_dialogs.dir/GUIDialogIgnoreInput.cpp.o
+[ 25%] Built target games_controller
+[ 25%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUICardinalFeatureButton.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIControllerButton.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIFeatureButton.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIFeatureControls.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIFeatureFactory.cpp.o
+[ 26%] Linking CXX static library games_controller_dialogs.a
+[ 26%] Built target games_controller_dialogs
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIFeatureTranslator.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIGameController.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIGameControllerList.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIScalarFeatureButton.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUISelectKeyButton.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIThrottleButton.cpp.o
+[ 26%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/ControllerActivity.cpp.o
+[ 26%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIWheelButton.cpp.o
+[ 26%] Building CXX object build/games/controllers/listproviders/CMakeFiles/games_controller_listproviders.dir/GUIGameControllerProvider.cpp.o
+[ 26%] Building CXX object build/games/controllers/types/CMakeFiles/games_controller_types.dir/ControllerGrid.cpp.o
+[ 27%] Building CXX object build/games/controllers/types/CMakeFiles/games_controller_types.dir/ControllerHub.cpp.o
+[ 27%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/ControllerState.cpp.o
+[ 27%] Linking CXX static library games_controller_guicontrols.a
+[ 27%] Built target games_controller_guicontrols
+[ 27%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/DefaultButtonMap.cpp.o
+[ 27%] Linking CXX static library games_controller_listproviders.a
+[ 27%] Built target games_controller_listproviders
+[ 27%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/DefaultKeyboardTranslator.cpp.o
+[ 27%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/DefaultMouseTranslator.cpp.o
+[ 27%] Building CXX object build/games/controllers/types/CMakeFiles/games_controller_types.dir/ControllerNode.cpp.o
+[ 27%] Building CXX object build/games/controllers/windows/CMakeFiles/games_controller_windows.dir/GUIConfigurationWizard.cpp.o
+[ 27%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/InputSink.cpp.o
+[ 27%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/PhysicalFeature.cpp.o
+[ 27%] Building CXX object build/games/controllers/input/CMakeFiles/games_controller_input.dir/PhysicalTopology.cpp.o
+[ 27%] Building CXX object build/games/controllers/windows/CMakeFiles/games_controller_windows.dir/GUIControllerList.cpp.o
+[ 27%] Building CXX object build/games/controllers/windows/CMakeFiles/games_controller_windows.dir/GUIControllerWindow.cpp.o
+[ 27%] Linking CXX static library games_controller_types.a
+[ 27%] Linking CXX static library games_controller_input.a
+[ 27%] Built target games_controller_types
+[ 27%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameClientTable.cpp.o
+[ 27%] Built target games_controller_input
+[ 27%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameDatabase.cpp.o
+[ 27%] Building CXX object build/games/controllers/windows/CMakeFiles/games_controller_windows.dir/GUIFeatureList.cpp.o
+[ 27%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameDatabaseArt.cpp.o
+[ 27%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameDatabaseExport.cpp.o
+[ 27%] Building CXX object build/games/dialogs/CMakeFiles/gamedialogs.dir/GUIDialogGameContentSettings.cpp.o
+[ 27%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DialogGameDiscManager.cpp.o
+[ 27%] Linking CXX static library games_controller_windows.a
+[ 27%] Built target games_controller_windows
+[ 27%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameAchievements.cpp.o
+[ 27%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameIndicators.cpp.o
+[ 27%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameDatabaseGames.cpp.o
+[ 28%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameCheats.cpp.o
+[ 28%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerActions.cpp.o
+[ 28%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameAdvancedSettings.cpp.o
+[ 30%] Building CXX object build/games/dialogs/CMakeFiles/gamedialogs.dir/GUIDialogGameInfo.cpp.o
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameLeaderboards.cpp.o
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameLeaderboardEntries.cpp.o
+[ 30%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerButtons.cpp.o
+[ 30%] Building CXX object build/games/dialogs/CMakeFiles/gamedialogs.dir/GUIDialogSelectGameClient.cpp.o
+[ 30%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerDiscList.cpp.o
+[ 30%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameDatabaseNav.cpp.o
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/LeaderboardUtils.cpp.o
+[ 30%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerGame.cpp.o
+[ 30%] Building CXX object build/games/dialogs/CMakeFiles/gamedialogs.dir/GUIDialogSelectSavestate.cpp.o
+[ 30%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerMenu.cpp.o
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameOSD.cpp.o
+[ 30%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerSortUtils.cpp.o
+[ 30%] Linking CXX static library gamedialogs.a
+[ 30%] Built target gamedialogs
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameOSDHelp.cpp.o
+[ 30%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameDbUrl.cpp.o
+[ 30%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameDatabasePaths.cpp.o
+[ 30%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameDatabasePlatforms.cpp.o
+[ 30%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameFileIdentity.cpp.o
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameSaves.cpp.o
+[ 30%] Building CXX object build/games/database/CMakeFiles/games_database.dir/GameLibraryDDL.cpp.o
+[ 30%] Building CXX object build/games/database/CMakeFiles/games_database.dir/PathDefaults.cpp.o
+[ 30%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameInfoScanner.cpp.o
+[ 30%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameLibraryQueue.cpp.o
+[ 30%] Building CXX object build/games/database/CMakeFiles/games_database.dir/VideoFilterTable.cpp.o
+[ 30%] Linking CXX static library game_disc_dialog.a
+[ 30%] Built target game_disc_dialog
+[ 30%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/ArchiveManualPages.cpp.o
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameStretchMode.cpp.o
+[ 30%] Linking CXX static library games_database.a
+[ 30%] Built target games_database
+[ 30%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameVideoFilter.cpp.o
+[ 31%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameLibraryTypes.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/GUIDialogGameManuals.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/GUIWindowGameManual.cpp.o
+[ 31%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameListXml.cpp.o
+[ 31%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameVideoRotation.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/ManualPages.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/ManualCache.cpp.o
+[ 31%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameVideoSelect.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/ManualPosition.cpp.o
+[ 31%] Building CXX object build/games/ports/guicontrols/CMakeFiles/games_ports_guicontrols.dir/GUIActivePortList.cpp.o
+[ 31%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameNameParser.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/PdfDocument.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/PdfDocumentCache.cpp.o
+[ 31%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameVolume.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/PdfImageFileLoader.cpp.o
+[ 31%] Building CXX object build/games/library/CMakeFiles/games_library.dir/GameScraper.cpp.o
+[ 31%] Building CXX object build/games/manual/CMakeFiles/games_manual.dir/PdfManualPages.cpp.o
+[ 31%] Linking CXX static library games_ports_guicontrols.a
+[ 31%] Built target games_ports_guicontrols
+[ 31%] Building CXX object build/games/ports/input/CMakeFiles/games_ports_input.dir/PhysicalPort.cpp.o
+[ 31%] Building CXX object build/games/library/CMakeFiles/games_library.dir/PlatformCatalogue.cpp.o
+[ 31%] Linking CXX static library games_manual.a
+[ 31%] Built target games_manual
+[ 31%] Building CXX object build/games/library/CMakeFiles/games_library.dir/ReleasePolicy.cpp.o
+[ 31%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogInGameSaves.cpp.o
+[ 31%] Building CXX object build/games/ports/input/CMakeFiles/games_ports_input.dir/PortInput.cpp.o
+[ 31%] Building CXX object build/games/ports/types/CMakeFiles/games_ports_types.dir/PortNode.cpp.o
+[ 31%] Building CXX object build/games/ports/windows/CMakeFiles/games_ports_windows.dir/GUIPortList.cpp.o
+[ 31%] Linking CXX static library gameosddialogs.a
+[ 31%] Built target gameosddialogs
+[ 31%] Building CXX object build/games/tags/CMakeFiles/gametags.dir/GameInfoTag.cpp.o
+[ 32%] Building CXX object build/games/ports/input/CMakeFiles/games_ports_input.dir/PortManager.cpp.o
+[ 32%] Linking CXX static library games_ports_types.a
+[ 32%] Linking CXX static library games_library.a
+[ 32%] Built target games_ports_types
+[ 32%] Building CXX object build/games/tags/CMakeFiles/gametags.dir/GameInfoTagLoader.cpp.o
+[ 32%] Built target games_library
+[ 32%] Building CXX object build/games/windows/CMakeFiles/gameswindows.dir/GUIViewStateWindowGames.cpp.o
+[ 32%] Building CXX object build/games/ports/windows/CMakeFiles/games_ports_windows.dir/GUIPortWindow.cpp.o
+[ 32%] Linking CXX static library games_ports_input.a
+[ 32%] Built target games_ports_input
+[ 32%] Building CXX object build/games/windows/CMakeFiles/gameswindows.dir/GUIWindowGames.cpp.o
+[ 32%] Building CXX object build/input/CMakeFiles/input.dir/InertialScrollingHandler.cpp.o
+[ 32%] Building CXX object build/input/CMakeFiles/input.dir/InputCodingTableBasePY.cpp.o
+[ 32%] Linking CXX static library gametags.a
+[ 32%] Built target gametags
+[ 32%] Building CXX object build/input/CMakeFiles/input.dir/InputCodingTableFactory.cpp.o
+[ 32%] Building CXX object build/input/CMakeFiles/input.dir/InputCodingTableKorean.cpp.o
+[ 32%] Building CXX object build/input/CMakeFiles/input.dir/InputManager.cpp.o
+[ 32%] Linking CXX static library games_ports_windows.a
+[ 32%] Built target games_ports_windows
+[ 32%] Building CXX object build/input/actions/CMakeFiles/input_actions.dir/Action.cpp.o
+[ 32%] Building CXX object build/input/CMakeFiles/input.dir/InputTranslator.cpp.o
+[ 32%] Building CXX object build/input/CMakeFiles/input.dir/WindowTranslator.cpp.o
+[ 32%] Building CXX object build/input/actions/CMakeFiles/input_actions.dir/ActionTranslator.cpp.o
+[ 32%] Linking CXX static library gameswindows.a
+[ 32%] Built target gameswindows
+[ 32%] Building CXX object build/input/joysticks/CMakeFiles/input_joystick.dir/DeadzoneFilter.cpp.o
+[ 32%] Building CXX object build/input/joysticks/dialogs/CMakeFiles/input_joystick_dialogs.dir/GUIDialogNewJoystick.cpp.o
+[ 32%] Linking CXX static library input_actions.a
+[ 32%] Built target input_actions
+[ 32%] Building CXX object build/input/joysticks/generic/CMakeFiles/input_joystick_generic.dir/DriverReceiving.cpp.o
+[ 32%] Building CXX object build/input/joysticks/CMakeFiles/input_joystick.dir/DriverPrimitive.cpp.o
+[ 32%] Building CXX object build/input/joysticks/generic/CMakeFiles/input_joystick_generic.dir/FeatureHandling.cpp.o
+[ 33%] Building CXX object build/input/joysticks/CMakeFiles/input_joystick.dir/JoystickEasterEgg.cpp.o
+[ 33%] Building CXX object build/input/joysticks/CMakeFiles/input_joystick.dir/JoystickMonitor.cpp.o
+[ 33%] Linking CXX static library input_joystick_dialogs.a
+[ 33%] Built target input_joystick_dialogs
+[ 33%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/AxisDetector.cpp.o
+[ 33%] Building CXX object build/input/joysticks/CMakeFiles/input_joystick.dir/JoystickTranslator.cpp.o
+[ 33%] Building CXX object build/input/joysticks/generic/CMakeFiles/input_joystick_generic.dir/InputHandling.cpp.o
+[ 33%] Linking CXX static library input.a
+[ 33%] Built target input
+[ 33%] Building CXX object build/input/joysticks/CMakeFiles/input_joystick.dir/JoystickUtils.cpp.o
+[ 33%] Building CXX object build/input/joysticks/CMakeFiles/input_joystick.dir/RumbleGenerator.cpp.o
+[ 33%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/ButtonMapping.cpp.o
+[ 33%] Building CXX object build/input/keyboard/CMakeFiles/input_keyboard.dir/Key.cpp.o
+[ 33%] Building CXX object build/input/keyboard/CMakeFiles/input_keyboard.dir/KeyboardEasterEgg.cpp.o
+[ 33%] Building CXX object build/input/keyboard/CMakeFiles/input_keyboard.dir/KeyboardLayout.cpp.o
+[ 33%] Linking CXX static library input_joystick_generic.a
+[ 33%] Built target input_joystick_generic
+[ 33%] Building CXX object build/input/keyboard/generic/CMakeFiles/input_keyboard_generic.dir/DefaultKeyboardHandling.cpp.o
+[ 35%] Building CXX object build/input/keyboard/CMakeFiles/input_keyboard.dir/KeyboardLayoutManager.cpp.o
+[ 35%] Linking CXX static library input_joystick.a
+[ 35%] Built target input_joystick
+[ 35%] Building CXX object build/input/keyboard/generic/CMakeFiles/input_keyboard_generic.dir/KeyboardInputHandling.cpp.o
+[ 35%] Building CXX object build/input/keyboard/CMakeFiles/input_keyboard.dir/KeyboardStat.cpp.o
+[ 35%] Linking CXX static library input_keyboard_generic.a
+[ 35%] Built target input_keyboard_generic
+[ 35%] Building CXX object build/input/keyboard/CMakeFiles/input_keyboard.dir/KeyboardTranslator.cpp.o
+[ 35%] Building CXX object build/input/keyboard/CMakeFiles/input_keyboard.dir/XBMC_keytable.cpp.o
+[ 35%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/ButtonDetector.cpp.o
+[ 35%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/HatDetector.cpp.o
+[ 35%] Building CXX object build/input/keymaps/CMakeFiles/input_keymaps.dir/AppTranslator.cpp.o
+[ 35%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/KeyDetector.cpp.o
+[ 35%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/MouseButtonDetector.cpp.o
+[ 35%] Building CXX object build/input/keymaps/CMakeFiles/input_keymaps.dir/ButtonStat.cpp.o
+[ 35%] Building CXX object build/input/keymaps/generic/CMakeFiles/input_keymaps_generic.dir/KeyHandler.cpp.o
+[ 35%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/PointerDetector.cpp.o
+[ 35%] Linking CXX static library input_keyboard.a
+[ 35%] Building CXX object build/input/keymaps/CMakeFiles/input_keymaps.dir/ButtonTranslator.cpp.o
+[ 35%] Built target input_keyboard
+[ 35%] Building CXX object build/input/keymaps/CMakeFiles/input_keymaps.dir/Keymap.cpp.o
+[ 35%] Building CXX object build/input/joysticks/mapping/CMakeFiles/input_joystick_mapping.dir/PrimitiveDetector.cpp.o
+[ 35%] Linking CXX static library input_keymaps_generic.a
+[ 35%] Built target input_keymaps_generic
+[ 35%] Building CXX object build/input/keymaps/joysticks/CMakeFiles/input_keymaps_joysticks.dir/GamepadTranslator.cpp.o
+[ 35%] Building CXX object build/input/keymaps/CMakeFiles/input_keymaps.dir/KeymapEnvironment.cpp.o
+[ 35%] Building CXX object build/input/keymaps/CMakeFiles/input_keymaps.dir/WindowKeymap.cpp.o
+[ 35%] Building CXX object build/input/keymaps/joysticks/CMakeFiles/input_keymaps_joysticks.dir/JoystickMapper.cpp.o
+[ 35%] Linking CXX static library input_joystick_mapping.a
+[ 35%] Built target input_joystick_mapping
+[ 35%] Building CXX object build/input/keymaps/keyboard/CMakeFiles/input_keymaps_keyboard.dir/KeyboardActionMap.cpp.o
+[ 35%] Building CXX object build/input/keymaps/keyboard/CMakeFiles/input_keymaps_keyboard.dir/KeyboardTranslator.cpp.o
+[ 35%] Building CXX object build/input/keymaps/joysticks/CMakeFiles/input_keymaps_joysticks.dir/KeymapHandler.cpp.o
+[ 35%] Linking CXX static library input_keymaps.a
+[ 35%] Built target input_keymaps
+[ 35%] Building CXX object build/input/keymaps/joysticks/CMakeFiles/input_keymaps_joysticks.dir/KeymapHandling.cpp.o
+[ 35%] Building CXX object build/input/keymaps/remote/CMakeFiles/input_keymaps_remote.dir/CustomControllerTranslator.cpp.o
+[ 35%] Building CXX object build/input/keymaps/touch/CMakeFiles/input_keymaps_touch.dir/TouchTranslator.cpp.o
+[ 35%] Building CXX object build/input/keymaps/remote/CMakeFiles/input_keymaps_remote.dir/IRTranslator.cpp.o
+[ 36%] Linking CXX static library input_keymaps_keyboard.a
+[ 36%] Built target input_keymaps_keyboard
+[ 36%] Building CXX object build/input/mouse/CMakeFiles/input_mouse.dir/MouseStat.cpp.o
+[ 36%] Linking CXX static library input_keymaps_joysticks.a
+[ 36%] Built target input_keymaps_joysticks
+[ 36%] Building CXX object build/input/mouse/generic/CMakeFiles/input_mouse_generic.dir/DefaultMouseHandling.cpp.o
+[ 36%] Building CXX object build/input/mouse/CMakeFiles/input_mouse.dir/MouseTranslator.cpp.o
+[ 36%] Building CXX object build/interfaces/CMakeFiles/interfaces.dir/AnnouncementManager.cpp.o
+[ 36%] Building CXX object build/input/mouse/generic/CMakeFiles/input_mouse_generic.dir/MouseInputHandling.cpp.o
+[ 36%] Linking CXX static library input_keymaps_touch.a
+[ 36%] Built target input_keymaps_touch
+[ 36%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/AddonBuiltins.cpp.o
+[ 36%] Linking CXX static library input_mouse_generic.a
+[ 36%] Built target input_mouse_generic
+[ 36%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/ApplicationBuiltins.cpp.o
+[ 36%] Linking CXX static library input_keymaps_remote.a
+[ 36%] Built target input_keymaps_remote
+[ 36%] Building CXX object build/interfaces/generic/CMakeFiles/generic_interface.dir/ILanguageInvoker.cpp.o
+[ 36%] Building CXX object build/interfaces/generic/CMakeFiles/generic_interface.dir/LanguageInvokerThread.cpp.o
+[ 36%] Linking CXX static library input_mouse.a
+[ 36%] Built target input_mouse
+[ 36%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/Builtins.cpp.o
+[ 36%] Building CXX object build/interfaces/generic/CMakeFiles/generic_interface.dir/RunningScriptObserver.cpp.o
+[ 36%] Linking CXX static library interfaces.a
+[ 36%] Built target interfaces
+[ 37%] Building CXX object build/interfaces/generic/CMakeFiles/generic_interface.dir/ScriptInvocationManager.cpp.o
+[ 37%] Building CXX object build/interfaces/info/CMakeFiles/info_interface.dir/InfoBool.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/CECBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/GameBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/generic/CMakeFiles/generic_interface.dir/ScriptRunner.cpp.o
+[ 37%] Building CXX object build/interfaces/info/CMakeFiles/info_interface.dir/InfoExpression.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/GUIBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/GUIControlBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/GUIContainerBuiltins.cpp.o
+[ 37%] Linking CXX static library generic_interface.a
+[ 37%] Building CXX object build/interfaces/info/CMakeFiles/info_interface.dir/SkinVariable.cpp.o
+[ 37%] Built target generic_interface
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/AddonsOperations.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/LibraryBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/OpticalBuiltins.cpp.o
+[ 37%] Linking CXX static library info_interface.a
+[ 37%] Built target info_interface
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/ApplicationOperations.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/PictureBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/PlayerBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/AudioLibrary.cpp.o
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/DatabaseOperations.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/ProfileBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/PVRBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/FavouritesOperations.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/SkinBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/SystemBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/FileItemHandler.cpp.o
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/FileOperations.cpp.o
+[ 37%] Building CXX object build/interfaces/builtins/CMakeFiles/interfaces_builtins.dir/WeatherBuiltins.cpp.o
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/GUIOperations.cpp.o
+[ 37%] Building CXX object build/media/CMakeFiles/media.dir/MediaType.cpp.o
+[ 37%] Linking CXX static library interfaces_builtins.a
+[ 37%] Built target interfaces_builtins
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/InputOperations.cpp.o
+[ 37%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/JSONRPC.cpp.o
+[ 38%] Building CXX object build/drm/CMakeFiles/drm.dir/CryptoSession.cpp.o
+[ 38%] Linking CXX static library media.a
+[ 38%] Built target media
+[ 38%] Building CXX object build/music/CMakeFiles/music.dir/Album.cpp.o
+[ 38%] Linking CXX static library drm.a
+[ 38%] Built target drm
+[ 38%] Building CXX object build/music/dialogs/CMakeFiles/music_dialogs.dir/GUIDialogInfoProviderSettings.cpp.o
+[ 38%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/JSONServiceDescription.cpp.o
+[ 38%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/JSONUtils.cpp.o
+[ 38%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/PlayerOperations.cpp.o
+[ 38%] Building CXX object build/music/dialogs/CMakeFiles/music_dialogs.dir/GUIDialogMusicInfo.cpp.o
+[ 38%] Building CXX object build/music/dialogs/CMakeFiles/music_dialogs.dir/GUIDialogMusicOSD.cpp.o
+[ 38%] Building CXX object build/music/CMakeFiles/music.dir/Artist.cpp.o
+[ 38%] Building CXX object build/music/dialogs/CMakeFiles/music_dialogs.dir/GUIDialogSongInfo.cpp.o
+[ 38%] Building CXX object build/music/dialogs/CMakeFiles/music_dialogs.dir/GUIDialogVisualisationPresetList.cpp.o
+[ 38%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/PlaylistOperations.cpp.o
+[ 38%] Building CXX object build/music/infoscanner/CMakeFiles/music_infoscanner.dir/MusicAlbumInfo.cpp.o
+[ 38%] Building CXX object build/music/infoscanner/CMakeFiles/music_infoscanner.dir/MusicArtistInfo.cpp.o
+[ 38%] Building CXX object build/music/CMakeFiles/music.dir/ContextMenus.cpp.o
+[ 38%] Linking CXX static library music_dialogs.a
+[ 38%] Built target music_dialogs
+[ 38%] Building CXX object build/music/jobs/CMakeFiles/music_jobs.dir/MusicLibraryJob.cpp.o
+[ 38%] Building CXX object build/music/CMakeFiles/music.dir/GUIViewStateMusic.cpp.o
+[ 38%] Building CXX object build/music/infoscanner/CMakeFiles/music_infoscanner.dir/MusicInfoScanner.cpp.o
+[ 38%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/ProfilesOperations.cpp.o
+[ 38%] Building CXX object build/music/infoscanner/CMakeFiles/music_infoscanner.dir/MusicInfoScraper.cpp.o
+[ 38%] Building CXX object build/music/jobs/CMakeFiles/music_jobs.dir/MusicLibraryProgressJob.cpp.o
+[ 38%] Building CXX object build/music/jobs/CMakeFiles/music_jobs.dir/MusicLibraryCleaningJob.cpp.o
+[ 38%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MatroskaTagMapping.cpp.o
+[ 38%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/PVROperations.cpp.o
+[ 38%] Building CXX object build/music/jobs/CMakeFiles/music_jobs.dir/MusicLibraryExportJob.cpp.o
+[ 38%] Building CXX object build/music/CMakeFiles/music.dir/MusicDatabase.cpp.o
+[ 38%] Building CXX object build/music/jobs/CMakeFiles/music_jobs.dir/MusicLibraryImportJob.cpp.o
+[ 38%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MatroskaTagReader.cpp.o
+[ 38%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/SettingsOperations.cpp.o
+[ 38%] Building CXX object build/music/jobs/CMakeFiles/music_jobs.dir/MusicLibraryScanningJob.cpp.o
+[ 40%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicCodecInfoFFmpeg.cpp.o
+[ 40%] Linking CXX static library music_jobs.a
+[ 40%] Built target music_jobs
+[ 40%] Building CXX object build/music/windows/CMakeFiles/music_windows.dir/GUIWindowMusicBase.cpp.o
+[ 40%] Linking CXX static library music_infoscanner.a
+[ 40%] Built target music_infoscanner
+[ 40%] Building CXX object build/network/CMakeFiles/network.dir/DNSNameCache.cpp.o
+[ 40%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicInfoTag.cpp.o
+[ 40%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/SystemOperations.cpp.o
+[ 40%] Building CXX object build/network/CMakeFiles/network.dir/EventClient.cpp.o
+[ 40%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/TextureOperations.cpp.o
+[ 40%] Building CXX object build/music/windows/CMakeFiles/music_windows.dir/GUIWindowMusicNav.cpp.o
+[ 40%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicInfoTagLoaderDatabase.cpp.o
+[ 41%] Building CXX object build/network/CMakeFiles/network.dir/EventPacket.cpp.o
+[ 41%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/GameLibrary.cpp.o
+[ 41%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicInfoTagLoaderFactory.cpp.o
+[ 41%] Building CXX object build/network/CMakeFiles/network.dir/EventServer.cpp.o
+[ 41%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicInfoTagLoaderFFmpeg.cpp.o
+[ 41%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/VideoLibrary.cpp.o
+[ 41%] Building CXX object build/music/windows/CMakeFiles/music_windows.dir/GUIWindowMusicPlaylist.cpp.o
+[ 41%] Building CXX object build/network/CMakeFiles/network.dir/GUIDialogNetworkSetup.cpp.o
+[ 41%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicInfoTagLoaderMatroska.cpp.o
+[ 41%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicInfoTagLoaderShn.cpp.o
+[ 41%] Building CXX object build/music/windows/CMakeFiles/music_windows.dir/GUIWindowMusicPlaylistEditor.cpp.o
+[ 41%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/ReplayGain.cpp.o
+[ 42%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/VideoLibrarySetSourceContent.cpp.o
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/Network.cpp.o
+[ 42%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/TagLibVFSStream.cpp.o
+[ 42%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/TagLoaderTagLib.cpp.o
+[ 42%] Building CXX object build/interfaces/json-rpc/CMakeFiles/jsonrpc_interface.dir/XBMCOperations.cpp.o
+[ 42%] Building CXX object build/music/windows/CMakeFiles/music_windows.dir/GUIWindowVisualisation.cpp.o
+[ 42%] Building CXX object build/music/CMakeFiles/music.dir/MusicDbUrl.cpp.o
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/NetworkFileItemClassify.cpp.o
+[ 42%] Linking CXX static library jsonrpc_interface.a
+[ 42%] Building CXX object build/music/CMakeFiles/music.dir/MusicEmbeddedCoverLoaderFFmpeg.cpp.o
+[ 42%] Built target jsonrpc_interface
+[ 42%] Building CXX object build/music/CMakeFiles/music.dir/MusicEmbeddedImageFileLoader.cpp.o
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/NetworkServices.cpp.o
+[ 42%] Building CXX object build/music/CMakeFiles/music.dir/MusicFileItemClassify.cpp.o
+[ 42%] Building CXX object build/music/windows/CMakeFiles/music_windows.dir/MusicFileItemListModifier.cpp.o
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/Socket.cpp.o
+[ 42%] Building CXX object build/music/tags/CMakeFiles/music_tags.dir/MusicInfoTagLoaderCDDA.cpp.o
+[ 42%] Building CXX object build/music/CMakeFiles/music.dir/MusicInfoLoader.cpp.o
+[ 42%] Linking CXX static library music_windows.a
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/TCPServer.cpp.o
+[ 42%] Built target music_windows
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/UdpClient.cpp.o
+[ 42%] Linking CXX static library music_tags.a
+[ 42%] Built target music_tags
+[ 42%] Building CXX object build/network/websocket/CMakeFiles/network_websockets.dir/WebSocket.cpp.o
+[ 42%] Building CXX object build/network/websocket/CMakeFiles/network_websockets.dir/WebSocketManager.cpp.o
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/WakeOnAccess.cpp.o
+[ 42%] Building CXX object build/network/CMakeFiles/network.dir/ZeroconfBrowser.cpp.o
+[ 42%] Building CXX object build/music/CMakeFiles/music.dir/MusicLibraryQueue.cpp.o
+[ 42%] Building CXX object build/network/websocket/CMakeFiles/network_websockets.dir/WebSocketV13.cpp.o
+[ 43%] Building CXX object build/network/websocket/CMakeFiles/network_websockets.dir/WebSocketV8.cpp.o
+[ 45%] Building CXX object build/music/CMakeFiles/music.dir/MusicThumbLoader.cpp.o
+[ 45%] Building CXX object build/music/CMakeFiles/music.dir/MusicUtils.cpp.o
+[ 45%] Linking CXX static library network_websockets.a
+[ 45%] Built target network_websockets
+[ 45%] Building CXX object build/peripherals/CMakeFiles/peripherals.dir/Peripherals.cpp.o
+[ 45%] Building CXX object build/music/CMakeFiles/music.dir/Song.cpp.o
+[ 45%] Building CXX object build/network/CMakeFiles/network.dir/Zeroconf.cpp.o
+[ 45%] Building CXX object build/network/CMakeFiles/network.dir/cddb.cpp.o
+[ 45%] Building CXX object build/network/CMakeFiles/network.dir/AirPlayServer.cpp.o
+[ 45%] Building CXX object build/peripherals/addons/CMakeFiles/peripherals_addons.dir/AddonButtonMap.cpp.o
+[ 45%] Linking CXX static library music.a
+[ 45%] Built target music
+[ 45%] Building CXX object build/peripherals/bus/CMakeFiles/peripherals_bus.dir/PeripheralBus.cpp.o
+[ 45%] Linking CXX static library peripherals.a
+[ 45%] Built target peripherals
+[ 45%] Building CXX object build/network/CMakeFiles/network.dir/WebServer.cpp.o
+[ 45%] Building CXX object build/peripherals/bus/virtual/CMakeFiles/peripheral_bus_virtual.dir/PeripheralBusAddon.cpp.o
+[ 45%] Building CXX object build/peripherals/addons/CMakeFiles/peripherals_addons.dir/AddonButtonMapping.cpp.o
+[ 45%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/Peripheral.cpp.o
+[ 45%] Linking CXX static library peripherals_bus.a
+[ 45%] Built target peripherals_bus
+[ 45%] Building CXX object build/peripherals/dialogs/CMakeFiles/peripherals_dialogs.dir/GUIDialogPeripherals.cpp.o
+[ 45%] Building CXX object build/peripherals/addons/CMakeFiles/peripherals_addons.dir/AddonInputHandling.cpp.o
+[ 45%] Building CXX object build/peripherals/dialogs/CMakeFiles/peripherals_dialogs.dir/GUIDialogPeripheralSettings.cpp.o
+[ 45%] Building CXX object build/peripherals/bus/virtual/CMakeFiles/peripheral_bus_virtual.dir/PeripheralBusApplication.cpp.o
+[ 45%] Linking CXX static library network.a
+[ 45%] Built target network
+[ 45%] Building CXX object build/peripherals/events/CMakeFiles/peripherals_events.dir/EventLockHandle.cpp.o
+[ 45%] Building CXX object build/peripherals/events/CMakeFiles/peripherals_events.dir/EventPollHandle.cpp.o
+[ 45%] Building CXX object build/peripherals/events/CMakeFiles/peripherals_events.dir/EventScanner.cpp.o
+[ 45%] Building CXX object build/peripherals/addons/CMakeFiles/peripherals_addons.dir/PeripheralAddon.cpp.o
+[ 45%] Linking CXX static library peripherals_events.a
+[ 45%] Linking CXX static library peripheral_bus_virtual.a
+[ 45%] Built target peripherals_events
+[ 45%] Building CXX object build/profiles/CMakeFiles/profiles.dir/Profile.cpp.o
+[ 45%] Built target peripheral_bus_virtual
+[ 45%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralBluetooth.cpp.o
+[ 45%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralDisk.cpp.o
+[ 45%] Linking CXX static library peripherals_dialogs.a
+[ 45%] Built target peripherals_dialogs
+[ 45%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralHID.cpp.o
+[ 45%] Building CXX object build/profiles/CMakeFiles/profiles.dir/ProfileManager.cpp.o
+[ 46%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralImon.cpp.o
+[ 46%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralJoystick.cpp.o
+[ 46%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralKeyboard.cpp.o
+[ 46%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralMouse.cpp.o
+[ 46%] Building CXX object build/peripherals/addons/CMakeFiles/peripherals_addons.dir/PeripheralAddonTranslator.cpp.o
+[ 46%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralNIC.cpp.o
+[ 46%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralNyxboard.cpp.o
+[ 46%] Linking CXX static library profiles.a
+[ 46%] Linking CXX static library peripherals_addons.a
+[ 46%] Building CXX object build/peripherals/devices/CMakeFiles/peripherals_devices.dir/PeripheralTuner.cpp.o
+[ 46%] Built target profiles
+[ 46%] Building CXX object build/profiles/dialogs/CMakeFiles/profiles_dialogs.dir/GUIDialogLockSettings.cpp.o
+[ 46%] Built target peripherals_addons
+[ 46%] Building CXX object build/profiles/windows/CMakeFiles/profiles_windows.dir/GUIWindowSettingsProfile.cpp.o
+[ 46%] Building CXX object build/profiles/dialogs/CMakeFiles/profiles_dialogs.dir/GUIDialogProfileSettings.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRCachedImage.cpp.o
+[ 46%] Linking CXX static library peripherals_devices.a
+[ 46%] Built target peripherals_devices
+[ 46%] Building CXX object build/pvr/addons/CMakeFiles/pvr_addons.dir/PVRClient.cpp.o
+[ 46%] Linking CXX static library profiles_windows.a
+[ 46%] Built target profiles_windows
+[ 46%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannel.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRCachedImages.cpp.o
+[ 46%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroup.cpp.o
+[ 46%] Linking CXX static library profiles_dialogs.a
+[ 46%] Built target profiles_dialogs
+[ 46%] Building CXX object build/pvr/addons/CMakeFiles/pvr_addons.dir/PVRClientCapabilities.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRChannelGroupImageFileLoader.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRChannelNumberInputHandler.cpp.o
+[ 46%] Building CXX object build/pvr/addons/CMakeFiles/pvr_addons.dir/PVRClientMenuHooks.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRComponentRegistration.cpp.o
+[ 46%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupAllChannels.cpp.o
+[ 46%] Building CXX object build/pvr/addons/CMakeFiles/pvr_addons.dir/PVRClientUID.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRContextMenus.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRDatabase.cpp.o
+[ 46%] Building CXX object build/pvr/addons/CMakeFiles/pvr_addons.dir/PVRClients.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVREdl.cpp.o
+[ 46%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupFactory.cpp.o
+[ 46%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVREventLogJob.cpp.o
+[ 46%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupAllChannelsSingleClient.cpp.o
+[ 47%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRItem.cpp.o
+[ 47%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRManager.cpp.o
+[ 47%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRPlaybackState.cpp.o
+[ 47%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupFromClient.cpp.o
+[ 47%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupMember.cpp.o
+[ 47%] Linking CXX static library pvr_addons.a
+[ 47%] Built target pvr_addons
+[ 47%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRChannelManager.cpp.o
+[ 47%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupMergedByName.cpp.o
+[ 47%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupSettings.cpp.o
+[ 47%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRStreamProperties.cpp.o
+[ 47%] Building CXX object build/pvr/CMakeFiles/pvr.dir/PVRThumbLoader.cpp.o
+[ 47%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroups.cpp.o
+[ 47%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelGroupsContainer.cpp.o
+[ 47%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelNumber.cpp.o
+[ 48%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRRadioRDSInfoTag.cpp.o
+[ 48%] Linking CXX static library pvr.a
+[ 48%] Built target pvr
+[ 48%] Building CXX object build/pvr/channels/CMakeFiles/pvr_channels.dir/PVRChannelsPath.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRChannelsOSD.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRGroupManager.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRGuideInfo.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRChannelGuide.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRGuideControls.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRGuideSearch.cpp.o
+[ 48%] Linking CXX static library pvr_channels.a
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRRadioRDSInfo.cpp.o
+[ 48%] Built target pvr_channels
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRRecordingInfo.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRRecordingSettings.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRTimerSettings.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRClientPriorities.cpp.o
+[ 48%] Building CXX object build/pvr/dialogs/CMakeFiles/pvr_dialogs.dir/GUIDialogPVRItemsViewBase.cpp.o
+[ 48%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgContainer.cpp.o
+[ 48%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/Epg.cpp.o
+[ 48%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgDatabase.cpp.o
+[ 48%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgGuidePath.cpp.o
+[ 48%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgInfoTag.cpp.o
+[ 48%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgSearch.cpp.o
+[ 48%] Linking CXX static library pvr_dialogs.a
+[ 48%] Built target pvr_dialogs
+[ 48%] Building CXX object build/pvr/filesystem/CMakeFiles/pvr_filesystem.dir/PVRGUIDirectory.cpp.o
+[ 48%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgSearchFilter.cpp.o
+[ 50%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgSearchPath.cpp.o
+[ 50%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgChannelData.cpp.o
+[ 50%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgTagsCache.cpp.o
+[ 50%] Building CXX object build/pvr/epg/CMakeFiles/pvr_epg.dir/EpgTagsContainer.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/GUIEPGGridContainer.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/GUIEPGGridContainerModel.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/guiinfo/CMakeFiles/pvr_guilib_guiinfo.dir/PVRGUIInfo.cpp.o
+[ 50%] Linking CXX static library pvr_epg.a
+[ 50%] Linking CXX static library pvr_filesystem.a
+[ 50%] Built target pvr_filesystem
+[ 50%] Built target pvr_epg
+[ 50%] Building CXX object build/pvr/providers/CMakeFiles/pvr_providers.dir/PVRProvider.cpp.o
+[ 50%] Building CXX object build/pvr/recordings/CMakeFiles/pvr_recordings.dir/PVRRecording.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRFileItemListModifier.cpp.o
+[ 50%] Building CXX object build/pvr/providers/CMakeFiles/pvr_providers.dir/PVRProviders.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionListener.cpp.o
+[ 50%] Building CXX object build/pvr/providers/CMakeFiles/pvr_providers.dir/PVRProvidersPath.cpp.o
+[ 50%] Building CXX object build/pvr/recordings/CMakeFiles/pvr_recordings.dir/PVRRecordings.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsChannels.cpp.o
+[ 50%] Linking CXX static library pvr_providers.a
+[ 50%] Built target pvr_providers
+[ 50%] Building CXX object build/pvr/guilib/guiinfo/CMakeFiles/pvr_guilib_guiinfo.dir/PVRGUITimerInfo.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/guiinfo/CMakeFiles/pvr_guilib_guiinfo.dir/PVRGUITimesInfo.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsClients.cpp.o
+[ 50%] Building CXX object build/pvr/recordings/CMakeFiles/pvr_recordings.dir/PVRRecordingsPath.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsDatabase.cpp.o
+[ 50%] Linking CXX static library pvr_guilib_guiinfo.a
+[ 50%] Built target pvr_guilib_guiinfo
+[ 50%] Building CXX object build/pvr/settings/CMakeFiles/pvr_settings.dir/PVRCustomTimerSettings.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsEPG.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsUtils.cpp.o
+[ 50%] Linking CXX static library pvr_recordings.a
+[ 50%] Built target pvr_recordings
+[ 50%] Building CXX object build/pvr/timers/CMakeFiles/pvr_timers.dir/PVRTimerInfoTag.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsParentalControl.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsPlayback.cpp.o
+[ 50%] Building CXX object build/pvr/settings/CMakeFiles/pvr_settings.dir/PVRIntSettingDefinition.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsPowerManagement.cpp.o
+[ 50%] Building CXX object build/pvr/settings/CMakeFiles/pvr_settings.dir/PVRIntSettingValues.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsRecordings.cpp.o
+[ 50%] Building CXX object build/pvr/settings/CMakeFiles/pvr_settings.dir/PVRSettings.cpp.o
+[ 50%] Building CXX object build/pvr/timers/CMakeFiles/pvr_timers.dir/PVRTimerRuleMatcher.cpp.o
+[ 50%] Building CXX object build/pvr/utils/CMakeFiles/pvr_utils.dir/PVRPathUtils.cpp.o
+[ 50%] Building CXX object build/pvr/utils/CMakeFiles/pvr_utils.dir/PVRStreamUtils.cpp.o
+[ 50%] Building CXX object build/pvr/timers/CMakeFiles/pvr_timers.dir/PVRTimers.cpp.o
+[ 50%] Building CXX object build/pvr/settings/CMakeFiles/pvr_settings.dir/PVRStringSettingDefinition.cpp.o
+[ 50%] Building CXX object build/pvr/settings/CMakeFiles/pvr_settings.dir/PVRStringSettingValues.cpp.o
+[ 50%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIActionsTimers.cpp.o
+[ 50%] Building CXX object build/pvr/settings/CMakeFiles/pvr_settings.dir/PVRTimerSettingDefinition.cpp.o
+[ 50%] Linking CXX static library pvr_utils.a
+[ 50%] Built target pvr_utils
+[ 50%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIViewStatePVR.cpp.o
+[ 50%] Building CXX object build/cores/RetroPlayer/CMakeFiles/retroplayer.dir/RetroPlayer.cpp.o
+[ 50%] Linking CXX static library pvr_settings.a
+[ 50%] Built target pvr_settings
+[ 50%] Building CXX object build/cores/RetroPlayer/audio/CMakeFiles/rp_audio.dir/AudioTranslator.cpp.o
+[ 50%] Linking CXX static library rp_audio.a
+[ 50%] Built target rp_audio
+[ 51%] Building CXX object build/pvr/timers/CMakeFiles/pvr_timers.dir/PVRTimersPath.cpp.o
+[ 51%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRBase.cpp.o
+[ 51%] Building CXX object build/pvr/timers/CMakeFiles/pvr_timers.dir/PVRTimerType.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/BaseRenderBuffer.cpp.o
+[ 51%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIChannelIconUpdater.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/BaseRenderBufferPool.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/CMakeFiles/retroplayer.dir/RetroPlayerAutoSave.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferManager.cpp.o
+[ 51%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRChannels.cpp.o
+[ 51%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIChannelNavigator.cpp.o
+[ 51%] Linking CXX static library pvr_timers.a
+[ 51%] Built target pvr_timers
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/video/CMakeFiles/rp-buffers-video.dir/RenderBufferGuiTexture.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferOpenGLES.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/CMakeFiles/retroplayer.dir/RetroPlayerInput.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/video/CMakeFiles/rp-buffers-video.dir/RenderBufferSysMem.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferPoolOpenGLES.cpp.o
+[ 51%] Linking CXX static library rp-buffers-video.a
+[ 51%] Built target rp-buffers-video
+[ 51%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIGameMessenger.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferDMA.cpp.o
+[ 51%] Building CXX object build/pvr/guilib/CMakeFiles/pvr_guilib.dir/PVRGUIProgressHandler.cpp.o
+[ 51%] Building CXX object build/cores/RetroPlayer/CMakeFiles/retroplayer.dir/RetroPlayerUtils.cpp.o
+[ 51%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRGuide.cpp.o
+[ 52%] Linking CXX static library retroplayer.a
+[ 52%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIGameRenderManager.cpp.o
+[ 52%] Built target retroplayer
+[ 52%] Building CXX object build/cores/RetroPlayer/guicontrols/CMakeFiles/retroplayer_guicontrols.dir/GUIGameControl.cpp.o
+[ 52%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIGameSettings.cpp.o
+[ 52%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferPoolDMA.cpp.o
+[ 53%] Linking CXX static library pvr_guilib.a
+[ 53%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferDMAOpenGLES.cpp.o
+[ 53%] Built target pvr_guilib
+[ 53%] Building CXX object build/cores/RetroPlayer/guiplayback/CMakeFiles/retroplayer_guiplayback.dir/GUIPlaybackControl.cpp.o
+[ 53%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIGameSettingsHandle.cpp.o
+[ 53%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIGameVideoHandle.cpp.o
+[ 53%] Linking CXX static library retroplayer_guiplayback.a
+[ 53%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIRenderHandle.cpp.o
+[ 53%] Built target retroplayer_guiplayback
+[ 53%] Building CXX object build/cores/RetroPlayer/guiwindows/CMakeFiles/retroplayer_guiwindows.dir/GameWindowFullScreen.cpp.o
+[ 53%] Building CXX object build/cores/RetroPlayer/guicontrols/CMakeFiles/retroplayer_guicontrols.dir/GUIRenderSettings.cpp.o
+[ 53%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIRenderTarget.cpp.o
+[ 53%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferPoolDMAOpenGLES.cpp.o
+[ 53%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRProviders.cpp.o
+[ 53%] Linking CXX static library retroplayer_guicontrols.a
+[ 53%] Built target retroplayer_guicontrols
+[ 53%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferFBO.cpp.o
+[ 53%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRRecordings.cpp.o
+[ 53%] Building CXX object build/cores/RetroPlayer/guibridge/CMakeFiles/retroplayer_guibridge.dir/GUIRenderTargetFactory.cpp.o
+[ 53%] Linking CXX static library retroplayer_guibridge.a
+[ 53%] Built target retroplayer_guibridge
+[ 53%] Building CXX object build/cores/RetroPlayer/guiwindows/CMakeFiles/retroplayer_guiwindows.dir/GameWindowFullScreenText.cpp.o
+[ 53%] Building CXX object build/cores/RetroPlayer/buffers/CMakeFiles/rp-buffers.dir/RenderBufferPoolFBO.cpp.o
+[ 53%] Linking CXX static library retroplayer_guiwindows.a
+[ 53%] Built target retroplayer_guiwindows
+[ 53%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRSearch.cpp.o
+[ 53%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRTimers.cpp.o
+[ 53%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRTimersBase.cpp.o
+[ 53%] Building CXX object build/pvr/windows/CMakeFiles/pvr_windows.dir/GUIWindowPVRTimerRules.cpp.o
+[ 55%] Building CXX object build/cores/RetroPlayer/playback/CMakeFiles/retroplayer_playback.dir/GameLoop.cpp.o
+[ 56%] Linking CXX static library rp-buffers.a
+[ 56%] Built target rp-buffers
+[ 56%] Building CXX object build/cores/RetroPlayer/playback/CMakeFiles/retroplayer_playback.dir/ReversiblePlayback.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/process/CMakeFiles/rp-process.dir/RPProcessInfo.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/process/CMakeFiles/rp-process.dir/egl/RPProcessInfoEGL.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/CMakeFiles/rp-rendering.dir/RenderContext.cpp.o
+[ 56%] Linking CXX static library pvr_windows.a
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/VideoRenderers/CMakeFiles/rp-videorenderers.dir/RPBaseRenderer.cpp.o
+[ 56%] Built target pvr_windows
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/VideoRenderers/CMakeFiles/rp-videorenderers.dir/RPRendererGuiTexture.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp: In member function ‘virtual bool KODI::RETRO::CReversiblePlayback::LoadSavestate(const std::string&)’:
+/home/chris/xbmc-hcmerge/xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp:385:16: error: redeclaration of ‘const size_t memorySize’
+  385 |   const size_t memorySize = m_gameClient->SerializeSize();
+      |                ^~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp:374:16: note: ‘const size_t memorySize’ previously declared here
+  374 |   const size_t memorySize = m_gameClient->GetSerializeSize();
+      |                ^~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp:385:43: error: ‘class KODI::GAME::CGameClient’ has no member named ‘SerializeSize’; did you mean ‘size_t KODI::GAME::CGameClient::m_serializeSize’? (not accessible from this context)
+  385 |   const size_t memorySize = m_gameClient->SerializeSize();
+      |                                           ^~~~~~~~~~~~~
+In file included from /home/chris/xbmc-hcmerge/xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp:28:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:459:18: note: declared private here
+  459 |   mutable size_t m_serializeSize = 0;
+      |                  ^~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp: In member function ‘void KODI::RETRO::CReversiblePlayback::UpdateMemoryStream()’:
+/home/chris/xbmc-hcmerge/xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp:788:21: error: ‘class KODI::GAME::CGameClient’ has no member named ‘SerializeSize’; did you mean ‘size_t KODI::GAME::CGameClient::m_serializeSize’? (not accessible from this context)
+  788 |   if (m_gameClient->SerializeSize() > 0 && !HardcoreRestrictionsApply())
+      |                     ^~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:459:18: note: declared private here
+  459 |   mutable size_t m_serializeSize = 0;
+      |                  ^~~~~~~~~~~~~~~
+make[2]: *** [build/cores/RetroPlayer/playback/CMakeFiles/retroplayer_playback.dir/build.make:93: build/cores/RetroPlayer/playback/CMakeFiles/retroplayer_playback.dir/ReversiblePlayback.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:12639: build/cores/RetroPlayer/playback/CMakeFiles/retroplayer_playback.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/VideoRenderers/CMakeFiles/rp-videorenderers.dir/RPRendererOpenGLES.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/VideoRenderers/CMakeFiles/rp-videorenderers.dir/RPRendererDMAUtils.cpp.o
+[ 56%] Linking CXX static library rp-process.a
+[ 56%] Built target rp-process
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/VideoRenderers/CMakeFiles/rp-videorenderers.dir/RPRendererDMAOpenGLES.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/VideoRenderers/CMakeFiles/rp-videorenderers.dir/RPRendererFBO.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/CMakeFiles/rp-rendering.dir/RenderSettings.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/CMakeFiles/rp-rendering.dir/RenderTranslator.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/CMakeFiles/rp-rendering.dir/RenderUtils.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/CMakeFiles/rp-rendering.dir/RenderVideoSettings.cpp.o
+[ 56%] Building CXX object build/cores/RetroPlayer/rendering/CMakeFiles/rp-rendering.dir/RPRenderManager.cpp.o
+[ 56%] Linking CXX static library rp-videorenderers.a
+[ 56%] Built target rp-videorenderers
+[ 56%] Linking CXX static library rp-rendering.a
+[ 56%] Built target rp-rendering
+make: *** [Makefile:146: all] Error 2
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'

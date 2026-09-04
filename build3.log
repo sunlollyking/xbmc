@@ -1,0 +1,228 @@
+make: Entering directory '/home/chris/xbmc-hcmerge/build'
+[  1%] Built target build-ffmpeg
+[  1%] Built target build-crossguid
+[  1%] Built target build-JsonSchemaBuilder
+[  1%] Built target build-poppler
+[  1%] Performing build step for 'buildtexturepacker'
+[  1%] Built target build-libdvdcss
+[  1%] Built target wrapper
+[  2%] Built target build-utfcpp
+[  2%] Built target compileinfo
+[  2%] Built target generate-wayland-extra-protocols
+Generating xbmc.json/addon.xml
+[  2%] Built target retroplayer_messages
+[100%] Built target TexturePacker
+[  2%] Built target gen_system_addons
+[  6%] Built target upnp
+[  6%] No install step for 'buildtexturepacker'
+[  6%] Built target generate_json_header
+[  7%] Built target sse4
+[  8%] Built target build-libdvdread
+[  8%] Completed 'buildtexturepacker'
+[  8%] Built target build-taglib
+[  8%] Built target wrapper.def
+[  8%] Built target build-libdvdnav
+[  8%] Built target buildtexturepacker
+[  8%] Built target rp-process-gbm
+[  8%] Copying files into build tree
+[  8%] Built target wrap_libdvdnav
+[  8%] Built target network_httprequesthandlers_python
+[ 10%] Built target processGBM
+[ 10%] Built target windowing_gbm
+[ 10%] Built target rp-process-wayland
+[ 11%] Built target windowing_gbm_drm
+[ 11%] Built target processWayland
+[ 11%] Built target export-files
+[ 12%] Built target cores
+[ 13%] Built target windowing_WAYLAND
+[ 13%] Built target dllloader
+[ 15%] Built target audioengine
+[ 15%] Built target dllexports
+[ 15%] Built target exports_utils
+[ 15%] Built target externalplayer
+[ 15%] Built target paplayer
+[ 15%] Built target playercorefactory
+[ 15%] Built target events_windows
+[ 15%] Built target events
+[ 16%] Built target bluray
+[ 17%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/AddonsDirectory.cpp.o
+[ 17%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o
+[ 17%] Building CXX object build/games/CMakeFiles/games.dir/AchievementRuntime.cpp.o
+[ 18%] Built target musicdatabasedirectory
+[ 20%] Built target videodatabasedirectory
+[ 20%] Building CXX object build/games/addons/cheevos/CMakeFiles/gamecheevos.dir/GameClientCheevos.cpp.o
+[ 20%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscM3U.cpp.o
+[ 20%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscPlaylist.cpp.o
+In file included from /home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.cpp:9:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.h:61:34: error: ‘game_rc_progress_indicator’ does not name a type; did you mean ‘game_rc_achievement_progress_indicator’?
+   61 |   void OnProgressIndicator(const game_rc_progress_indicator* indicator);
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                  game_rc_achievement_progress_indicator
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.h:64:35: error: ‘game_rc_challenge_indicator’ does not name a type
+   64 |   void OnChallengeIndicator(const game_rc_challenge_indicator* indicator);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.cpp:19:
+/home/chris/xbmc-hcmerge/xbmc/games/GameSettings.h:101:8: error: ‘bool KODI::GAME::CGameSettings::GetAchievementsEncore() const’ cannot be overloaded with ‘bool KODI::GAME::CGameSettings::GetAchievementsEncore() const’
+  101 |   bool GetAchievementsEncore() const;
+      |        ^~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/GameSettings.h:85:8: note: previous declaration ‘bool KODI::GAME::CGameSettings::GetAchievementsEncore() const’
+   85 |   bool GetAchievementsEncore() const;
+      |        ^~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.cpp:239:6: error: no declaration matches ‘void KODI::GAME::CGameClientCheevos::OnChallengeIndicator(const game_rc_challenge_indicator*)’
+  239 | void CGameClientCheevos::OnChallengeIndicator(const game_rc_challenge_indicator* indicator)
+      |      ^~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.h:68:8: note: candidates are: ‘void KODI::GAME::CGameClientCheevos::OnChallengeIndicator(const game_rc_achievement_challenge&, bool)’
+   68 |   void OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show);
+      |        ^~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.h:64:8: note:                 ‘void KODI::GAME::CGameClientCheevos::OnChallengeIndicator(const int*)’
+   64 |   void OnChallengeIndicator(const game_rc_challenge_indicator* indicator);
+      |        ^~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.h:37:7: note: ‘class KODI::GAME::CGameClientCheevos’ defined here
+   37 | class CGameClientCheevos : public Observer
+      |       ^~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.cpp:255:6: error: no declaration matches ‘void KODI::GAME::CGameClientCheevos::OnProgressIndicator(const game_rc_progress_indicator*)’
+  255 | void CGameClientCheevos::OnProgressIndicator(const game_rc_progress_indicator* indicator)
+      |      ^~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.h:61:8: note: candidate is: ‘void KODI::GAME::CGameClientCheevos::OnProgressIndicator(const int*)’
+   61 |   void OnProgressIndicator(const game_rc_progress_indicator* indicator);
+      |        ^~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/cheevos/GameClientCheevos.h:37:7: note: ‘class KODI::GAME::CGameClientCheevos’ defined here
+   37 | class CGameClientCheevos : public Observer
+      |       ^~~~~~~~~~~~~~~~~~
+make[2]: *** [build/games/addons/cheevos/CMakeFiles/gamecheevos.dir/build.make:79: build/games/addons/cheevos/CMakeFiles/gamecheevos.dir/GameClientCheevos.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:9369: build/games/addons/cheevos/CMakeFiles/gamecheevos.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/CurlFile.cpp.o
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp: In member function ‘bool KODI::GAME::CGameClient::Initialize()’:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:222:23: error: ‘struct AddonToKodiFuncTable_Game’ has no member named ‘RCOnProgressIndicator’
+  222 |   m_ifc.game->toKodi->RCOnProgressIndicator = cb_rc_on_progress_indicator;
+      |                       ^~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:222:47: error: ‘cb_rc_on_progress_indicator’ was not declared in this scope; did you mean ‘game_rc_progress_indicator’?
+  222 |   m_ifc.game->toKodi->RCOnProgressIndicator = cb_rc_on_progress_indicator;
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                               game_rc_progress_indicator
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp: At global scope:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1036:6: error: redefinition of ‘bool KODI::GAME::CGameClient::SetEncoreModeEnabled(bool)’
+ 1036 | bool CGameClient::SetEncoreModeEnabled(bool enabled)
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:977:6: note: ‘bool KODI::GAME::CGameClient::SetEncoreModeEnabled(bool)’ previously defined here
+  977 | bool CGameClient::SetEncoreModeEnabled(bool enabled)
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1352:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
+ 1352 | void CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE kodiInstance,
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1352:6: note: no functions named ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
+In file included from /home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:9:
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
+  118 | class CGameClient : public ADDON::CAddonDll,
+      |       ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1362:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_challenge_indicator*)’
+ 1362 | void CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+      |      ^~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:377:15: note: candidate is: ‘static void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_achievement_challenge*, bool)’
+  377 |   static void cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
+  118 | class CGameClient : public ADDON::CAddonDll,
+      |       ^~~~~~~~~~~
+make[2]: *** [build/games/addons/CMakeFiles/gameaddons.dir/build.make:79: build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:9333: build/games/addons/CMakeFiles/gameaddons.dir/all] Error 2
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DAVCommon.cpp.o
+[ 20%] Building CXX object build/games/CMakeFiles/games.dir/GameThumbLoader.cpp.o
+[ 20%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscModel.cpp.o
+[ 20%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscMergeUtils.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DAVDirectory.cpp.o
+[ 20%] Building CXX object build/games/CMakeFiles/games.dir/GameManual.cpp.o
+[ 20%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscs.cpp.o
+[ 20%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscTransport.cpp.o
+[ 20%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscXML.cpp.o
+[ 20%] Building CXX object build/games/CMakeFiles/games.dir/GameServices.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DAVFile.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DirectoryCache.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/Directory.cpp.o
+In file included from /home/chris/xbmc-hcmerge/xbmc/games/GameServices.cpp:16:
+/home/chris/xbmc-hcmerge/xbmc/games/GameSettings.h:101:8: error: ‘bool KODI::GAME::CGameSettings::GetAchievementsEncore() const’ cannot be overloaded with ‘bool KODI::GAME::CGameSettings::GetAchievementsEncore() const’
+  101 |   bool GetAchievementsEncore() const;
+      |        ^~~~~~~~~~~~~~~~~~~~~
+/home/chris/xbmc-hcmerge/xbmc/games/GameSettings.h:85:8: note: previous declaration ‘bool KODI::GAME::CGameSettings::GetAchievementsEncore() const’
+   85 |   bool GetAchievementsEncore() const;
+      |        ^~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [build/games/CMakeFiles/games.dir/build.make:121: build/games/CMakeFiles/games.dir/GameServices.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:9297: build/games/CMakeFiles/games.dir/all] Error 2
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DirectoryFactory.cpp.o
+[ 20%] Linking CXX static library gamediscs.a
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DirectoryHistory.cpp.o
+[ 20%] Built target gamediscs
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DllLibCurl.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DiscDirectoryHelper.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/EpisodesDirectory.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/EventsDirectory.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/FavouritesDirectory.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/FFmpegVfsContext.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/FileCache.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/File.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/FileDirectoryFactory.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/FileFactory.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/FTPDirectory.cpp.o
+[ 20%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/FTPParse.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/HTTPDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/IDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/IFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ImageFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/GameDatabaseDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/LibraryDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/MultiPathDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/MultiPathFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/MusicDatabaseDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/MusicDatabaseFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/MusicFileDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/MusicSearchDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/OverrideDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/OverrideFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/PipeFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/PipesManager.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/PlaylistDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/PlaylistFileDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/PluginDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/PluginFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/PVRDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ResourceDirectory.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ResourceFile.cpp.o
+[ 21%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/RSSDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ShoutcastFile.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/SmartPlaylistDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/SourcesDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/SpecialProtocol.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/SpecialProtocolDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/SpecialProtocolFile.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/StackDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/VideoDatabaseDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/VideoDatabaseFile.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/VirtualDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/XbtDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/XbtFile.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/XbtManager.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ZeroconfDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ZipDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ZipFile.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/ZipManager.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/UDFBlockInput.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/UDFContext.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/UDFDirectory.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/UDFFile.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/BlurayCallback.cpp.o
+[ 22%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/BlurayDiscCache.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/BlurayDirectory.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/BlurayFile.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/CDDADirectory.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/CDDAFile.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/DVDDirectory.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/NFSDirectory.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/NFSFile.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/NptXbmcFile.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/UPnPDirectory.cpp.o
+[ 23%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/UPnPFile.cpp.o
+[ 23%] Linking CXX static library filesystem.a
+[ 23%] Built target filesystem
+make: *** [Makefile:146: all] Error 2
+make: Leaving directory '/home/chris/xbmc-hcmerge/build'
