@@ -20346,7 +20346,13 @@ msgctxt "#35594"
 msgid "A collection often holds translations, prototypes, demos and BIOS images beside the games. With this on they are left out of the library; the files stay where they are."
 msgstr ""
 
-#empty strings from id 35595 to 35999
+#. Help text of the Games category in the media settings
+#: system/settings/settings.xml
+msgctxt "#35595"
+msgid "This category contains the settings for how the game library is filled and what it shows."
+msgstr ""
+
+#empty strings from id 35596 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

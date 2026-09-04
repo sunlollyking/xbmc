@@ -13,6 +13,9 @@
 #include "games/GameUtils.h"
 #include "guilib/WindowIDs.h"
 #include "playlists/PlayListFileItemClassify.h"
+#include "ServiceBroker.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "settings/MediaSourceSettings.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -28,9 +31,17 @@ using namespace GAME;
 CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   : CGUIViewState(items)
 {
+  // "The Legend of Zelda" sorts under L where a person asked for that, as it
+  // does everywhere else in Kodi
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const SortAttribute byTitle =
+      settings && settings->GetBool(CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING)
+          ? SortAttributeIgnoreArticle
+          : SortAttributeNone;
+
   if (items.IsVirtualDirectoryRoot())
   {
-    AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS());
+    AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS(), byTitle);
     AddSortMethod(SortBy::DRIVE_TYPE, 564, LABEL_MASKS());
     SetSortMethod(SortBy::LABEL);
     SetSortOrder(SortOrder::ASCENDING);
@@ -42,7 +53,7 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   {
     if (items.GetContent() == "games" || items.GetContent() == "releases")
     {
-      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Title, Year
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y"), byTitle); // Title, Year
       AddSortMethod(SortBy::YEAR, 562, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
       AddSortMethod(SortBy::RATING, 563, LABEL_MASKS("%T", "%R", "%T", "%R"));
       AddSortMethod(SortBy::USER_RATING, 38018, LABEL_MASKS("%T", "%r", "%T", "%r"));
@@ -54,7 +65,7 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     }
     else
     {
-      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%L", "%V", "%L", "%V")); // Label, count
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%L", "%V", "%L", "%V"), byTitle); // Label, count
       SetSortMethod(SortBy::LABEL);
     }
     SetSortOrder(SortOrder::ASCENDING);
@@ -69,8 +80,8 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   }
   else
   {
-    AddSortMethod(SortBy::FILE, 561,
-                  LABEL_MASKS("%F", "%I", "%L", "")); // Filename, Size | Label, empty
+    AddSortMethod(SortBy::FILE, 561, LABEL_MASKS("%F", "%I", "%L", ""),
+                  byTitle); // Filename, Size | Label, empty
     AddSortMethod(SortBy::SIZE, 553,
                   LABEL_MASKS("%L", "%I", "%L", "%I")); // Filename, Size | Label, Size
 
