@@ -20352,7 +20352,47 @@ msgctxt "#35595"
 msgid "This category contains the settings for how the game library is filled and what it shows."
 msgstr ""
 
-#empty strings from id 35596 to 35999
+#. What a game is, where it is not a game as it was sold
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35596"
+msgid "Demo"
+msgstr ""
+
+#. What a game is, where it is not a game as it was sold
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35597"
+msgid "BIOS"
+msgstr ""
+
+#. What a game is, where it is not a game as it was sold
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35598"
+msgid "Application"
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35599"
+msgid "Co-op"
+msgstr ""
+
+#empty string with id 35600
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35601"
+msgid "Languages"
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35602"
+msgid "Revision"
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35603"
+msgid "Serial"
+msgstr ""
+
+#empty strings from id 35604 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

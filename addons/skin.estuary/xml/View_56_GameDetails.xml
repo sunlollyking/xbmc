@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<!--
+		The layout every emulator front end settles on: the titles down one side,
+		and on the other the game's own logo, a picture of it running, and what is
+		known about it. Estuary's panels and type, EmulationStation's shape.
+	-->
+	<include name="View_56_GameDetails">
+		<control type="group">
+			<include>OpenClose_Left</include>
+			<visible>Control.IsVisible(56)</visible>
+			<include>Visible_Left</include>
+			<include content="ListContainer">
+				<param name="left" value="-5" />
+				<param name="right" value="1195" />
+				<param name="list_id" value="56" />
+				<param name="viewtype_label" value="$LOCALIZE[31620]" />
+			</include>
+		</control>
+		<control type="group">
+			<depth>DepthContentPanel</depth>
+			<include>OpenClose_Right</include>
+			<visible>Control.IsVisible(56)</visible>
+			<include>Visible_Right</include>
+			<control type="group">
+				<right>-20</right>
+				<width>1235</width>
+				<include content="ContentPanel">
+					<param name="width" value="1235" />
+					<param name="left" value="0" />
+					<param name="top" value="-20" />
+					<param name="flipx" value="true" />
+				</include>
+
+				<!-- The game's own backdrop behind the panel, kept faint -->
+				<control type="image">
+					<left>20</left>
+					<right>30</right>
+					<top>0</top>
+					<bottom>60</bottom>
+					<aspectratio align="center" aligny="center">scale</aspectratio>
+					<fadetime>400</fadetime>
+					<colordiffuse>22FFFFFF</colordiffuse>
+					<texture background="true">$VAR[GameBackdropVar]</texture>
+				</control>
+
+				<!-- The case first, front then back, the way it is turned over in
+				     the hand, and then the game itself running. The covers lead: they
+				     are what a shelf is browsed by -->
+				<control type="group">
+					<visible>!String.IsEmpty(ListItem.Art(boxback))</visible>
+					<control type="image">
+						<left>40</left>
+						<top>50</top>
+						<width>390</width>
+						<height>470</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>300</fadetime>
+						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+					</control>
+					<control type="image">
+						<left>445</left>
+						<top>50</top>
+						<width>390</width>
+						<height>470</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>300</fadetime>
+						<texture background="true">$INFO[ListItem.Art(boxback)]</texture>
+					</control>
+					<control type="image">
+						<left>850</left>
+						<top>50</top>
+						<width>340</width>
+						<height>470</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>300</fadetime>
+						<texture background="true">$VAR[GameScreenshotVar]</texture>
+					</control>
+				</control>
+
+				<!-- With no back cover scraped, the front takes the space, and the
+				     cartridge or the disc sits at its corner as a film shows the
+				     disc at the corner of its poster -->
+				<control type="group">
+					<visible>String.IsEmpty(ListItem.Art(boxback))</visible>
+					<control type="image">
+						<left>40</left>
+						<top>50</top>
+						<width>430</width>
+						<height>470</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>300</fadetime>
+						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+					</control>
+					<control type="image">
+						<left>320</left>
+						<top>360</top>
+						<width>180</width>
+						<height>180</height>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<fadetime>300</fadetime>
+						<texture background="true">$VAR[GameMediaVar]</texture>
+						<visible>!String.IsEmpty($VAR[GameMediaVar])</visible>
+					</control>
+					<control type="image">
+						<left>520</left>
+						<top>50</top>
+						<width>670</width>
+						<height>470</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>300</fadetime>
+						<texture background="true">$VAR[GameScreenshotVar]</texture>
+					</control>
+				</control>
+
+				<!-- The name, or the logo where a game has one, with the smaller
+				     pictures following it on the same line -->
+				<control type="grouplist">
+					<left>40</left>
+					<top>540</top>
+					<width>1150</width>
+					<height>90</height>
+					<itemgap>20</itemgap>
+					<orientation>horizontal</orientation>
+					<align>left</align>
+					<control type="image">
+						<width>420</width>
+						<height>90</height>
+						<aspectratio align="left" aligny="center">keep</aspectratio>
+						<fadetime>300</fadetime>
+						<texture background="true">$INFO[ListItem.Art(clearlogo)]</texture>
+						<visible>!String.IsEmpty(ListItem.Art(clearlogo))</visible>
+					</control>
+					<control type="label">
+						<width max="700">auto</width>
+						<height>90</height>
+						<aligny>center</aligny>
+						<font>font37</font>
+						<label>$INFO[ListItem.Title]</label>
+						<visible>String.IsEmpty(ListItem.Art(clearlogo))</visible>
+					</control>
+					<include content="GameArtCorner">
+						<param name="art" value="titlescreen" />
+						<param name="w" value="100" />
+						<param name="h" value="90" />
+					</include>
+					<include content="GameArtCorner">
+						<param name="art" value="cartridge" />
+						<param name="w" value="100" />
+						<param name="h" value="90" />
+					</include>
+					<include content="GameArtCorner">
+						<param name="art" value="disc" />
+						<param name="w" value="100" />
+						<param name="h" value="90" />
+					</include>
+					<include content="GameArtCorner">
+						<param name="art" value="screenshot1" />
+						<param name="w" value="100" />
+						<param name="h" value="90" />
+					</include>
+					<include content="GameArtCorner">
+						<param name="art" value="fanart" />
+						<param name="w" value="100" />
+						<param name="h" value="90" />
+					</include>
+				</control>
+
+				<include content="GameFactsPanel">
+					<param name="left" value="40" />
+					<param name="top" value="640" />
+					<param name="facts_top" value="700" />
+					<param name="width" value="1150" />
+				</include>
+
+				<control type="textbox">
+					<left>40</left>
+					<width>1150</width>
+					<top>900</top>
+					<bottom>50</bottom>
+					<font>font13</font>
+					<label>$INFO[ListItem.Plot]</label>
+					<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
+				</control>
+
+				<control type="scrollbar" id="56600">
+					<left>20</left>
+					<top>list_top_offset</top>
+					<width>12</width>
+					<bottom>list_bottom_offset</bottom>
+					<onleft>56</onleft>
+					<onright>56</onright>
+					<orientation>vertical</orientation>
+					<animation effect="zoom" end="50,100" time="300" tween="sine" center="20,0" easing="inout" condition="!Control.HasFocus(56600)">conditional</animation>
+				</control>
+			</control>
+		</control>
+	</include>
+</includes>

@@ -178,6 +178,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case LISTITEM_SET:
     case LISTITEM_TAG:
     case LISTITEM_TRAILER:
+    case LISTITEM_PREMIERED:
     case LISTITEM_PLATFORM:
     case LISTITEM_DEVELOPER:
     case LISTITEM_PUBLISHER:
@@ -206,6 +207,23 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
         case LISTITEM_GENRE:
           value = StringUtils::Join(tag->GetGenres(), ", ");
           return !value.empty();
+        case LISTITEM_PREMIERED:
+        {
+          // The day it was sold where the library knows it, the year otherwise
+          CDateTime date;
+          date.SetFromDBDate(tag->GetReleaseDate());
+          if (date.IsValid())
+          {
+            value = date.GetAsLocalizedDate();
+            return true;
+          }
+          if (tag->GetYear() > 0)
+          {
+            value = std::to_string(tag->GetYear());
+            return true;
+          }
+          break;
+        }
         case LISTITEM_YEAR:
           if (tag->GetYear() > 0)
           {

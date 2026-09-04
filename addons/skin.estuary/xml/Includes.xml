@@ -22,6 +22,9 @@
 	<include file="View_500_Wall.xml" />
 	<include file="View_501_Banner.xml" />
 	<include file="View_502_FanArt.xml" />
+	<include file="View_56_GameDetails.xml" />
+	<include file="View_57_GameShelf.xml" />
+	<include file="View_58_GameScreens.xml" />
 	<include file="View_504_MediaList.xml" />
 	<include file="Variables.xml" />
 	<include condition="Integer.IsLessOrEqual(System.ScreenHeight,720)" file="Constants_720.xml" />

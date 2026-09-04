@@ -180,6 +180,9 @@ public:
    * a key. The key is stored beside the title and never shown.
    */
   static std::string TitleKey(std::string_view title);
+
+  //! \brief The string id naming a category, for a listing to show
+  static int CategoryLabel(GameCategory category);
 };
 
 /*!

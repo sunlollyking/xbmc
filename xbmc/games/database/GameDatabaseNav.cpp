@@ -16,6 +16,8 @@
 #include "games/library/GameDbUrl.h"
 #include "games/tags/GameInfoTag.h"
 #include "playlists/SmartPlayList.h"
+#include "resources/LocalizeStrings.h"
+#include "resources/ResourcesComponent.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/DatabaseUtils.h"
@@ -299,6 +301,42 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
         item->SetFolder(true);
       }
       item->SetProperty("gameid", game.GetDatabaseId());
+
+      // Everything else the library holds about this game, so a skin can put
+      // it on screen without asking the database again
+      if (game.GetCategory() != GameCategory::RETAIL)
+        item->SetProperty("gamecategory",
+                          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
+                              CGameLibraryTypes::CategoryLabel(game.GetCategory())));
+
+      const std::string languages = record->at(GAMEDB_RELEASE_LANGUAGES).get_asString();
+      if (!languages.empty())
+        item->SetProperty("languages", StringUtils::ToUpper(languages));
+
+      const std::string revision = record->at(GAMEDB_RELEASE_REVISION).get_asString();
+      if (!revision.empty())
+        item->SetProperty("revision", revision);
+
+      const std::string serial = record->at(GAMEDB_RELEASE_SERIAL).get_asString();
+      if (!serial.empty())
+        item->SetProperty("serial", serial);
+
+      if (game.IsCoop())
+        item->SetProperty("coop", CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
+                                      35599)); // "Co-op"
+
+      const std::string matched(CGameLibraryTypes::ToString(game.GetMatchMethod()));
+      if (!matched.empty())
+        item->SetProperty("matchedby", matched);
+
+      if (!game.GetManual().empty())
+        item->SetProperty("hasmanual", true);
+      if (game.IsFavourite())
+        item->SetProperty("favourite", true);
+      if (game.IsCompleted())
+        item->SetProperty("completed", true);
+      if (game.GetAchievementsEarned() > 0)
+        item->SetProperty("achievementsearned", game.GetAchievementsEarned());
       item->SetLabelPreformatted(true);
 
       items.Add(item);

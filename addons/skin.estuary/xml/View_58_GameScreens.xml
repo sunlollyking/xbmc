@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<!--
+		A wall of covers, falling back to the game itself running for the
+		machines whose boxes were never photographed, with what is known about
+		the one in hand along the bottom.
+	-->
+	<include name="View_58_GameScreens">
+		<control type="group">
+			<visible>Control.IsVisible(58)</visible>
+			<control type="panel" id="58">
+				<left>50</left>
+				<right>50</right>
+				<top>list_top_offset</top>
+				<bottom>180</bottom>
+				<onleft>9000</onleft>
+				<onright>58600</onright>
+				<onup>58</onup>
+				<ondown>58</ondown>
+				<scrolltime tween="cubic" easing="out">400</scrolltime>
+				<pagecontrol>58600</pagecontrol>
+				<preloaditems>2</preloaditems>
+				<viewtype label="$LOCALIZE[31622]">wrap</viewtype>
+				<itemlayout width="240" height="380">
+					<control type="image">
+						<left>10</left>
+						<top>10</top>
+						<width>220</width>
+						<height>300</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>200</fadetime>
+						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameWallVar]</texture>
+					</control>
+					<control type="label">
+						<left>10</left>
+						<top>316</top>
+						<width>220</width>
+						<height>50</height>
+						<align>center</align>
+						<font>font12</font>
+						<textcolor>grey</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="240" height="380">
+					<control type="group">
+						<depth>DepthContentPopout</depth>
+						<animation type="Focus">
+							<effect type="zoom" start="100" end="110" time="200" tween="sine" easing="inout" center="auto" />
+						</animation>
+						<animation type="Unfocus">
+							<effect type="zoom" start="110" end="100" time="200" tween="sine" easing="inout" center="auto" />
+						</animation>
+						<control type="image">
+							<left>10</left>
+							<top>10</top>
+							<width>220</width>
+							<height>300</height>
+							<aspectratio align="center" aligny="bottom">keep</aspectratio>
+							<fadetime>200</fadetime>
+							<bordertexture border="5" infill="false" colordiffuse="button_focus">colors/white.png</bordertexture>
+							<bordersize>5</bordersize>
+							<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameWallVar]</texture>
+						</control>
+						<control type="label">
+							<left>10</left>
+							<top>316</top>
+							<width>220</width>
+							<height>50</height>
+							<align>center</align>
+							<font>font12</font>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<!-- What is known about the game in hand, along the bottom -->
+			<control type="group">
+				<left>50</left>
+				<bottom>60</bottom>
+				<height>140</height>
+				<visible>!String.IsEmpty(ListItem.Title)</visible>
+				<control type="label">
+					<width>1400</width>
+					<height>50</height>
+					<font>font30</font>
+					<label>$INFO[ListItem.Title]</label>
+				</control>
+				<control type="label">
+					<top>52</top>
+					<width>1400</width>
+					<height>36</height>
+					<font>font12</font>
+					<textcolor>grey</textcolor>
+					<label>$VAR[GameFactsLineVar]</label>
+				</control>
+				<control type="label">
+					<top>90</top>
+					<width>1400</width>
+					<height>36</height>
+					<font>font12</font>
+					<textcolor>grey</textcolor>
+					<label>$INFO[ListItem.Developer,$LOCALIZE[35521]: ,]$INFO[ListItem.Region,  ·  $LOCALIZE[35524]: ,]$INFO[ListItem.Property(serial),  ·  $LOCALIZE[35603]: ,]$INFO[ListItem.GameClient,  ·  $LOCALIZE[35510]: ,]</label>
+				</control>
+				<control type="image">
+					<right>60</right>
+					<top>0</top>
+					<width>230</width>
+					<height>130</height>
+					<aspectratio align="right" aligny="center">keep</aspectratio>
+					<fadetime>200</fadetime>
+					<texture background="true">$VAR[GameScreenshotVar]</texture>
+				</control>
+			</control>
+
+			<control type="scrollbar" id="58600">
+				<right>20</right>
+				<top>list_top_offset</top>
+				<width>12</width>
+				<bottom>180</bottom>
+				<onleft>58</onleft>
+				<onright>58</onright>
+				<orientation>vertical</orientation>
+				<animation effect="zoom" end="50,100" time="300" tween="sine" center="20,0" easing="inout" condition="!Control.HasFocus(58600)">conditional</animation>
+			</control>
+		</control>
+	</include>
+</includes>

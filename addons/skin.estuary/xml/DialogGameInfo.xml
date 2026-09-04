@@ -38,6 +38,32 @@
 					<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
 					<bordersize>20</bordersize>
 					<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+					<visible>String.IsEmpty(ListItem.Art(boxback))</visible>
+				</control>
+				<!-- Both faces of the case, where the back was scraped -->
+				<control type="group">
+					<depth>DepthContentPopout</depth>
+					<visible>!String.IsEmpty(ListItem.Art(boxback))</visible>
+					<control type="image">
+						<left>4</left>
+						<top>4</top>
+						<width>526</width>
+						<height>390</height>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+						<bordersize>20</bordersize>
+						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+					</control>
+					<control type="image">
+						<left>4</left>
+						<top>415</top>
+						<width>526</width>
+						<height>390</height>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+						<bordersize>20</bordersize>
+						<texture background="true">$INFO[ListItem.Art(boxback)]</texture>
+					</control>
 				</control>
 			</control>
 			<control type="group">

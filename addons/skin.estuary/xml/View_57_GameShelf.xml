@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<!--
+		Batocera's shelf: the boxes run along the bottom, and the game in hand
+		fills the screen behind them with its own backdrop, logo and description.
+	-->
+	<include name="View_57_GameShelf">
+		<control type="group">
+			<visible>Control.IsVisible(57)</visible>
+			<control type="image">
+				<left>0</left>
+				<right>0</right>
+				<top>0</top>
+				<bottom>0</bottom>
+				<aspectratio align="center" aligny="center">scale</aspectratio>
+				<fadetime>400</fadetime>
+				<texture background="true">$VAR[GameBackdropVar]</texture>
+			</control>
+			<control type="image">
+				<left>0</left>
+				<right>0</right>
+				<top>0</top>
+				<bottom>0</bottom>
+				<texture>colors/black.png</texture>
+				<colordiffuse>A0FFFFFF</colordiffuse>
+			</control>
+
+			<control type="group">
+				<left>80</left>
+				<top>120</top>
+				<control type="image">
+					<width>620</width>
+					<height>150</height>
+					<aspectratio align="left" aligny="center">keep</aspectratio>
+					<fadetime>300</fadetime>
+					<texture background="true">$INFO[ListItem.Art(clearlogo)]</texture>
+					<visible>!String.IsEmpty(ListItem.Art(clearlogo))</visible>
+				</control>
+				<control type="label">
+					<width>1100</width>
+					<height>150</height>
+					<aligny>center</aligny>
+					<font>font45_title</font>
+					<label>$INFO[ListItem.Title]</label>
+					<shadowcolor>text_shadow</shadowcolor>
+					<visible>String.IsEmpty(ListItem.Art(clearlogo))</visible>
+				</control>
+				<control type="label">
+					<top>160</top>
+					<width>1100</width>
+					<height>36</height>
+					<font>font13</font>
+					<textcolor>grey</textcolor>
+					<label>$VAR[GameFactsLineVar]</label>
+					<shadowcolor>text_shadow</shadowcolor>
+				</control>
+			</control>
+
+			<include content="GameFactsPanel">
+				<param name="left" value="80" />
+				<param name="top" value="330" />
+				<param name="facts_top" value="392" />
+				<param name="width" value="1240" />
+			</include>
+
+			<control type="image">
+				<right>90</right>
+				<top>150</top>
+				<width>460</width>
+				<height>270</height>
+				<aspectratio align="right" aligny="top">keep</aspectratio>
+				<fadetime>300</fadetime>
+				<texture background="true">$VAR[GameScreenshotVar]</texture>
+			</control>
+			<control type="textbox">
+				<right>90</right>
+				<top>440</top>
+				<width>460</width>
+				<height>180</height>
+				<font>font12</font>
+				<label>$INFO[ListItem.Plot]</label>
+				<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
+			</control>
+
+			<control type="fixedlist" id="57">
+				<left>60</left>
+				<right>60</right>
+				<top>640</top>
+				<height>380</height>
+				<orientation>horizontal</orientation>
+				<movement>3</movement>
+				<focusposition>2</focusposition>
+				<scrolltime tween="cubic" easing="out">400</scrolltime>
+				<onleft>57</onleft>
+				<onright>57</onright>
+				<onup>9000</onup>
+				<ondown>57</ondown>
+				<viewtype label="$LOCALIZE[31621]">wrap</viewtype>
+				<itemlayout width="240" height="380">
+					<control type="image">
+						<left>10</left>
+						<top>10</top>
+						<width>220</width>
+						<height>290</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>200</fadetime>
+						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+					</control>
+					<control type="label">
+						<left>10</left>
+						<top>306</top>
+						<width>220</width>
+						<height>60</height>
+						<align>center</align>
+						<font>font12</font>
+						<textcolor>grey</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="240" height="380">
+					<control type="image">
+						<left>10</left>
+						<top>10</top>
+						<width>220</width>
+						<height>290</height>
+						<aspectratio align="center" aligny="bottom">keep</aspectratio>
+						<fadetime>200</fadetime>
+						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+						<animation effect="zoom" end="112" center="120,300" time="200" tween="sine" condition="Control.HasFocus(57)">Conditional</animation>
+					</control>
+					<control type="label">
+						<left>10</left>
+						<top>316</top>
+						<width>220</width>
+						<height>60</height>
+						<align>center</align>
+						<font>font12</font>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</focusedlayout>
+			</control>
+		</control>
+	</include>
+</includes>

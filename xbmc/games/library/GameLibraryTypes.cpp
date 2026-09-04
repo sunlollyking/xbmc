@@ -183,6 +183,26 @@ MatchMethod CGameLibraryTypes::MatchMethodFromString(std::string_view method)
   return FromWord(matchMethods, method);
 }
 
+int CGameLibraryTypes::CategoryLabel(GameCategory category)
+{
+  switch (category)
+  {
+    case GameCategory::HACK:
+      return 35536; // "Hacks"
+    case GameCategory::HOMEBREW:
+      return 35537; // "Homebrew"
+    case GameCategory::DEMO:
+      return 35596; // "Demo"
+    case GameCategory::BIOS:
+      return 35597; // "BIOS"
+    case GameCategory::APPLICATION:
+      return 35598; // "Application"
+    case GameCategory::RETAIL:
+      break;
+  }
+  return 0;
+}
+
 std::string CGameLibraryTypes::TitleKey(std::string_view title)
 {
   std::string lower = StringUtils::ToLower(std::string(title));
