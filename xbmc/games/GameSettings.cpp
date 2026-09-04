@@ -226,10 +226,16 @@ std::string CGameSettings::LoginToRA(const std::string& username,
 
   CLog::Log(LOGDEBUG, "CGameSettings::LoginToRA -- logging in as '{}'", username);
 
+  // The server answers a wrong user or password with 401 and a JSON body
+  // saying so. CCurlFile fails on any 4xx by default and throws the body away,
+  // which turned every mistyped password into "failed to contact server"
+  CURL url{LOGIN_TO_RETRO_ACHIEVEMENTS_URL};
+  url.SetProtocolOption("failonerror", "false");
+
   XFILE::CCurlFile request;
   request.SetRequestHeader("User-Agent", CSysInfo::GetUserAgent());
   std::string strResponse;
-  if (request.Post(LOGIN_TO_RETRO_ACHIEVEMENTS_URL, postData, strResponse))
+  if (request.Post(url.Get(), postData, strResponse))
   {
     CVariant data(CVariant::VariantTypeObject);
     if (CJSONVariantParser::Parse(strResponse, data))
