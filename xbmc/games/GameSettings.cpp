@@ -88,6 +88,7 @@ CGameSettings::CGameSettings()
        SETTING_GAMES_RUNAHEADFRAMES, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
        SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
+       SETTING_GAMES_ACHIEVEMENTS_HARDCORE, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
        SETTING_GAMES_CLEAR_MANUAL_CACHE});
 
   // A person should say who they are once. The scrapers keep fields of their
@@ -233,7 +234,8 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
       settingId == SETTING_GAMES_ENABLERUNAHEAD || settingId == SETTING_GAMES_RUNAHEADFRAMES ||
-      settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE)
+      settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
+      settingId == SETTING_GAMES_ACHIEVEMENTS_ENCORE)
   {
     // Hardcore belongs here as much as the rewind settings do: turning it on
     // has to drop the rewind buffer, or the frames already in it stay
