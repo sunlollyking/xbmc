@@ -183,6 +183,12 @@ public:
 
   //! \brief The string id naming a category, for a listing to show
   static int CategoryLabel(GameCategory category);
+
+  /*!
+   * \brief The string a machine's kind and its medium go by on screen
+   */
+  static int PlatformTypeLabel(PlatformType type);
+  static int MediaFormatLabel(MediaFormat format);
 };
 
 /*!

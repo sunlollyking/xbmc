@@ -9,6 +9,7 @@
 		<control type="group">
 			<visible>Control.IsVisible(58)</visible>
 			<control type="panel" id="58">
+				<visible>Container.Content(games) | Container.Content(releases)</visible>
 				<left>50</left>
 				<right>50</right>
 				<top>list_top_offset</top>

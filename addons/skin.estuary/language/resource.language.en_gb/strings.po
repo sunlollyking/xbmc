@@ -1015,8 +1015,13 @@ msgctxt "#31621"
 msgid "Shelf"
 msgstr ""
 
-#. Name of the view showing games running rather than their boxes
+#. Name of the view showing a wall of covers
 msgctxt "#31622"
-msgid "Screens"
+msgid "Covers"
+msgstr ""
+
+#. Name of the view showing the machines rather than their games
+msgctxt "#31623"
+msgid "Machines"
 msgstr ""
 

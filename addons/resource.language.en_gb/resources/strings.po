@@ -20432,6 +20432,91 @@ msgctxt "#35611"
 msgid "Icon"
 msgstr ""
 
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35612"
+msgid "Console"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35613"
+msgid "Handheld"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35614"
+msgid "Computer"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35615"
+msgid "Arcade"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35616"
+msgid "Pinball"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35617"
+msgid "Virtual machine"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35618"
+msgid "Tape"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35619"
+msgid "Floppy disk"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35620"
+msgid "Card"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35621"
+msgid "Download"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35622"
+msgid "Machine"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35623"
+msgid "Medium"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35624"
+msgid "In production"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35625"
+msgid "File types"
+msgstr ""
+
+#: addons/skin.estuary/xml/View_59_GameMachines.xml
+msgctxt "#35626"
+msgid "Controller"
+msgstr ""
+
+#: addons/skin.estuary/xml/View_59_GameMachines.xml
+msgctxt "#35627"
+msgid "Illustration"
+msgstr ""
+
+#: addons/skin.estuary/xml/View_59_GameMachines.xml
+msgctxt "#35628"
+msgid "Photograph"
+msgstr ""
+
 #empty strings from id 35604 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp

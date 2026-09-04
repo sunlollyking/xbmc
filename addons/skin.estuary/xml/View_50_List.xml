@@ -120,6 +120,7 @@
 	<include name="ListContainer">
 		<param name="left">0</param>
 		<param name="right">0</param>
+		<param name="visible" default="Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(games) | Container.Content(platforms) | Container.Content(releases) | Window.IsActive(videoplaylist) | Window.IsActive(musicplaylist) | $EXP[videoasset_true]" />
 		<definition>
 			<control type="fixedlist" id="$PARAM[list_id]">
 				<left>$PARAM[left]</left>
@@ -136,7 +137,7 @@
 				<onup>$PARAM[list_id]</onup>
 				<ondown>$PARAM[list_id]</ondown>
 				<viewtype label="$PARAM[viewtype_label]">list</viewtype>
-				<visible>Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(games) | Container.Content(platforms) | Container.Content(releases) | Window.IsActive(videoplaylist) | Window.IsActive(musicplaylist) | $EXP[videoasset_true]</visible>
+				<visible>$PARAM[visible]</visible>
 				<focusedlayout height="list_item_height">
 					<control type="image">
 						<left>0</left>

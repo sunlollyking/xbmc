@@ -9,17 +9,28 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "GameDatabase.h"
+#include "ServiceBroker.h"
 
-#include "games/tags/GameInfoTag.h"
 #include "XBDateTime.h"
 #include "dbwrappers/dataset.h"
 #include "games/library/GameDbUrl.h"
+#include "games/tags/GameInfoTag.h"
+#include "resources/LocalizeStrings.h"
+#include "resources/ResourcesComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
 using namespace KODI;
 using namespace GAME;
+
+namespace
+{
+std::string Localize(int id)
+{
+  return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(id);
+}
+} // namespace
 
 int CGameDatabase::AddPlatform(const PlatformInfo& platform)
 {
@@ -237,6 +248,26 @@ bool CGameDatabase::GetPlatformsNav(const std::string& baseDir,
     item->SetProperty("gamecount", platform.gameCount);
     item->SetProperty("released", platform.released);
     item->SetProperty("platformtype", std::string(CGameLibraryTypes::ToString(platform.type)));
+    if (platform.discontinued > 0)
+      item->SetProperty("discontinued", platform.discontinued);
+    if (platform.released > 0)
+    {
+      std::string years = std::to_string(platform.released);
+      if (platform.discontinued > 0)
+        years += " - " + std::to_string(platform.discontinued);
+      item->SetProperty("years", years);
+    }
+    if (!platform.family.empty())
+      item->SetProperty("family", platform.family);
+    if (!platform.extensions.empty())
+      item->SetProperty("extensions", StringUtils::Join(platform.extensions, ", "));
+
+    // The kind of machine and what it read, in words rather than slugs
+    if (const int label = CGameLibraryTypes::PlatformTypeLabel(platform.type); label > 0)
+      item->SetProperty("machine", Localize(label));
+    if (const int label = CGameLibraryTypes::MediaFormatLabel(platform.media); label > 0)
+      item->SetProperty("medium", Localize(label));
+
     if (!platform.overview.empty())
       item->GetGameInfoTag()->SetOverview(platform.overview);
     item->SetLabel2(std::to_string(platform.gameCount));

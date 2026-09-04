@@ -183,6 +183,52 @@ MatchMethod CGameLibraryTypes::MatchMethodFromString(std::string_view method)
   return FromWord(matchMethods, method);
 }
 
+int CGameLibraryTypes::PlatformTypeLabel(PlatformType type)
+{
+  switch (type)
+  {
+    case PlatformType::CONSOLE:
+      return 35612; // "Console"
+    case PlatformType::HANDHELD:
+      return 35613; // "Handheld"
+    case PlatformType::COMPUTER:
+      return 35614; // "Computer"
+    case PlatformType::ARCADE:
+      return 35615; // "Arcade"
+    case PlatformType::PINBALL:
+      return 35616; // "Pinball"
+    case PlatformType::VIRTUAL:
+      return 35617; // "Virtual machine"
+    case PlatformType::UNKNOWN:
+    case PlatformType::OTHER:
+      break;
+  }
+  return 0;
+}
+
+int CGameLibraryTypes::MediaFormatLabel(MediaFormat format)
+{
+  switch (format)
+  {
+    case MediaFormat::CARTRIDGE:
+      return 35578; // "Cartridge"
+    case MediaFormat::DISC:
+      return 35579; // "Disc"
+    case MediaFormat::TAPE:
+      return 35618; // "Tape"
+    case MediaFormat::DISK:
+      return 35619; // "Floppy disk"
+    case MediaFormat::CARD:
+      return 35620; // "Card"
+    case MediaFormat::DOWNLOAD:
+      return 35621; // "Download"
+    case MediaFormat::UNKNOWN:
+    case MediaFormat::OTHER:
+      break;
+  }
+  return 0;
+}
+
 int CGameLibraryTypes::CategoryLabel(GameCategory category)
 {
   switch (category)

@@ -341,6 +341,21 @@
 	<variable name="GameFactsLineVar">
 		<value>$INFO[ListItem.Platform]$INFO[ListItem.Year,  ·  ,]$INFO[ListItem.Genre,  ·  ,]$INFO[ListItem.Publisher,  ·  ,]$INFO[ListItem.Players,  ·  $LOCALIZE[35525]: ,]$INFO[ListItem.AchievementsTotal,  ·  , $LOCALIZE[35588]]</value>
 	</variable>
+	<variable name="MachineLogoVar">
+		<value condition="!String.IsEmpty(ListItem.Art(clearlogo))">$INFO[ListItem.Art(clearlogo)]</value>
+		<value>$INFO[ListItem.Art(logo)]</value>
+	</variable>
+	<variable name="MachinePhotoVar">
+		<value condition="!String.IsEmpty(ListItem.Art(photo))">$INFO[ListItem.Art(photo)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(illustration))">$INFO[ListItem.Art(illustration)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(controller))">$INFO[ListItem.Art(controller)]</value>
+		<value>$INFO[ListItem.Art(fanart)]</value>
+	</variable>
+	<variable name="MachineBackdropVar">
+		<value condition="!String.IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(illustration))">$INFO[ListItem.Art(illustration)]</value>
+		<value>$INFO[ListItem.Art(photo)]</value>
+	</variable>
 	<variable name="GameWallVar">
 		<value condition="!String.IsEmpty(ListItem.Art(boxfront))">$INFO[ListItem.Art(boxfront)]</value>
 		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>

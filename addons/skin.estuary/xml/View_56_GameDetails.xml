@@ -15,6 +15,7 @@
 				<param name="right" value="1195" />
 				<param name="list_id" value="56" />
 				<param name="viewtype_label" value="$LOCALIZE[31620]" />
+				<param name="visible" value="Container.Content(games) | Container.Content(releases)" />
 			</include>
 		</control>
 		<control type="group">
@@ -100,7 +101,7 @@
 						<aspectratio align="center" aligny="center">keep</aspectratio>
 						<fadetime>300</fadetime>
 						<texture background="true">$VAR[GameMediaVar]</texture>
-						<visible>!String.IsEmpty($VAR[GameMediaVar])</visible>
+						<visible>!String.IsEmpty(ListItem.Art(cartridge)) | !String.IsEmpty(ListItem.Art(disc)) | !String.IsEmpty(ListItem.Art(wheel))</visible>
 					</control>
 					<control type="image">
 						<left>520</left>

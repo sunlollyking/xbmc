@@ -695,8 +695,36 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
 
   for (const auto& [type, pieces] : art)
   {
-    if (!pieces.empty() && !pieces.front().url.empty())
-      m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type, pieces.front().url);
+    if (pieces.empty() || pieces.front().url.empty())
+      continue;
+    m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type, pieces.front().url);
+
+    int extra = 0;
+    for (const GameScrapeArt& piece : pieces)
+    {
+      if (piece.url == pieces.front().url || piece.url.empty())
+        continue;
+      if (++extra > MAX_EXTRA_ART)
+        break;
+      m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type + std::to_string(extra),
+                               piece.url);
+    }
+  }
+
+  // A skin that knows nothing of games still asks a folder for its thumb, so
+  // the machine's best picture answers to that name as well
+  if (!art.contains("thumb"))
+  {
+    for (const char* type : {"clearlogo", "logo", "photo", "illustration", "fanart"})
+    {
+      const auto found = art.find(type);
+      if (found != art.end() && !found->second.empty() && !found->second.front().url.empty())
+      {
+        m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, "thumb",
+                                 found->second.front().url);
+        break;
+      }
+    }
   }
 
   CLog::Log(LOGINFO, "GAME: Described {} with {} picture(s)", platform.name, art.size());

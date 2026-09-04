@@ -83,6 +83,7 @@
 			</control>
 
 			<control type="fixedlist" id="57">
+				<visible>Container.Content(games) | Container.Content(releases)</visible>
 				<left>60</left>
 				<right>60</right>
 				<top>640</top>
