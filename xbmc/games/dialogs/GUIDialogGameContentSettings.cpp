@@ -22,8 +22,6 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
-#include "resources/LocalizeStrings.h"
-#include "resources/ResourcesComponent.h"
 #include "settings/lib/Setting.h"
 #include "settings/windows/GUIControlSettings.h"
 #include "utils/StringUtils.h"
@@ -46,11 +44,6 @@ constexpr const char* SETTING_NO_UPDATE = "gamecontent.noupdate";
 constexpr const char* SETTING_EXCLUDE = "gamecontent.exclude";
 constexpr const char* SETTING_GAME_CLIENT = "gamecontent.gameclient";
 constexpr const char* SETTING_VIDEO_FILTER = "gamecontent.videofilter";
-
-std::string Localize(int id)
-{
-  return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(id);
-}
 
 std::vector<std::string> FolderExtensions(const std::string& folder)
 {
