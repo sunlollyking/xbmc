@@ -125,6 +125,12 @@ private:
                                                     std::vector<struct GameScrapeCandidate>& candidates);
   CGameScraper* ScraperFor(const GamePathContent& content);
 
+  //! \brief Whether the library may ask the internet, or reads what is on this disk
+  static bool DownloadsAllowed();
+
+  //! \brief A game as it was sold, rather than a hack, a prototype or a BIOS
+  static bool IsRetail(const ParsedGameName& parsed);
+
   /*!
    * \brief Ask the scraper about a folder's next hundred games at once
    *
@@ -151,6 +157,7 @@ private:
   int m_currentItem{0};
   int m_itemCount{0};
   bool m_interactive{false};
+  bool m_retailOnly{false};
   int m_added{0};
   int m_identified{0};
 };

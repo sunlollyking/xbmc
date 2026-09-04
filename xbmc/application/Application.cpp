@@ -96,6 +96,7 @@
 #include "messaging/ThreadMessage.h"
 #include "messaging/helpers/DialogHelper.h"
 #include "messaging/helpers/DialogOKHelper.h"
+#include "games/library/GameLibraryQueue.h"
 #include "music/MusicLibraryQueue.h"
 #include "music/MusicThumbLoader.h"
 #include "music/MusicUtils.h"
@@ -2779,6 +2780,13 @@ void CApplication::UpdateLibraries()
     CLog::LogF(LOGINFO, "Starting video library startup scan");
     CVideoLibraryQueue::GetInstance().ScanLibrary(
         "", false, !settings->GetBool(CSettings::SETTING_VIDEOLIBRARY_BACKGROUNDUPDATE));
+  }
+
+  if (settings->GetBool(CSettings::SETTING_GAMELIBRARY_UPDATEONSTARTUP))
+  {
+    CLog::LogF(LOGINFO, "Starting game library startup scan");
+    KODI::GAME::CGameLibraryQueue::GetInstance().ScanLibrary(
+        "", !settings->GetBool(CSettings::SETTING_GAMELIBRARY_BACKGROUNDUPDATE));
   }
 
   if (settings->GetBool(CSettings::SETTING_MUSICLIBRARY_UPDATEONSTARTUP))

@@ -1013,6 +1013,10 @@
           <level>1</level>
           <control type="button" format="action" />
         </setting>
+        <setting id="source.games" type="action" label="35589" help="39007">
+          <level>1</level>
+          <control type="button" format="action" />
+        </setting>
       </group>
       <group id="2" label="14236">
         <setting id="videolibrary.updateonstartup" type="boolean" label="14245" help="36146">
@@ -1119,7 +1123,63 @@
           <control type="button" format="action" />
         </setting>
       </group>
-      <group id="4" label="14280">
+      <group id="4" label="35590">
+        <setting id="gamelibrary.updateonstartup" type="boolean" label="14245" help="36146">
+          <level>1</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.backgroundupdate" type="boolean" label="14246" help="36147">
+          <level>1</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.downloadinfo" type="boolean" label="35591" help="35592">
+          <level>1</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.ignorenonretail" type="boolean" label="35593" help="35594">
+          <level>1</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.showderivedgames" type="boolean" label="35541" help="35542">
+          <level>1</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.regionpriority" type="string" label="35552" help="35553">
+          <level>0</level>
+          <default>Europe,World,USA,Japan</default>
+          <control type="edit" format="string" />
+        </setting>
+        <setting id="gamelibrary.ageratingboards" type="string" label="35586" help="35587">
+          <level>1</level>
+          <default>PEGI,BBFC,ESRB,USK,CERO,ACB,GRAC</default>
+          <control type="edit" format="string" />
+        </setting>
+        <setting id="gamelibrary.preferretail" type="boolean" label="35554" help="35557">
+          <level>1</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.prefernewestrevision" type="boolean" label="35555" help="35557">
+          <level>1</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.preferverified" type="boolean" label="35556" help="35557">
+          <level>1</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamelibrary.cleanup" type="action" label="14247" help="36148">
+          <level>2</level>
+          <control type="button" format="action" />
+        </setting>
+      </group>
+      <group id="5" label="14280">
         <setting id="maintenance.cleanimagecache" type="action" label="14281" help="14282">
           <level>3</level>
           <control type="button" format="action" />
@@ -2906,40 +2966,7 @@
       </group>
     </category>
     <category id="gamelibrary" label="35538" help="35538">
-      <group id="1" label="14022">
-        <setting id="gamelibrary.showderivedgames" type="boolean" label="35541" help="35542">
-          <level>1</level>
-          <default>false</default>
-          <control type="toggle" />
-        </setting>
-      </group>
-      <group id="2" label="35543">
-        <setting id="gamelibrary.regionpriority" type="string" label="35552" help="35553">
-          <level>0</level>
-          <default>Europe,World,USA,Japan</default>
-          <control type="edit" format="string" />
-        </setting>
-        <setting id="gamelibrary.ageratingboards" type="string" label="35586" help="35587">
-          <level>1</level>
-          <default>PEGI,BBFC,ESRB,USK,CERO,ACB,GRAC</default>
-          <control type="edit" format="string" />
-        </setting>
-        <setting id="gamelibrary.preferretail" type="boolean" label="35554" help="35557">
-          <level>1</level>
-          <default>true</default>
-          <control type="toggle" />
-        </setting>
-        <setting id="gamelibrary.prefernewestrevision" type="boolean" label="35555" help="35557">
-          <level>1</level>
-          <default>true</default>
-          <control type="toggle" />
-        </setting>
-        <setting id="gamelibrary.preferverified" type="boolean" label="35556" help="35557">
-          <level>1</level>
-          <default>true</default>
-          <control type="toggle" />
-        </setting>
-      </group>
+      
     </category>
   </section>
   <section id="system" label="13000" help="36349">

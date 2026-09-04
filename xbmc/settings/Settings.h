@@ -83,6 +83,11 @@ public:
   static constexpr auto SETTING_VIDEOLIBRARY_UPDATEONSTARTUP = "videolibrary.updateonstartup";
   static constexpr auto SETTING_VIDEOLIBRARY_BACKGROUNDUPDATE = "videolibrary.backgroundupdate";
   static constexpr auto SETTING_VIDEOLIBRARY_CLEANUP = "videolibrary.cleanup";
+  static constexpr auto SETTING_GAMELIBRARY_UPDATEONSTARTUP = "gamelibrary.updateonstartup";
+  static constexpr auto SETTING_GAMELIBRARY_BACKGROUNDUPDATE = "gamelibrary.backgroundupdate";
+  static constexpr auto SETTING_GAMELIBRARY_CLEANUP = "gamelibrary.cleanup";
+  static constexpr auto SETTING_GAMELIBRARY_DOWNLOADINFO = "gamelibrary.downloadinfo";
+  static constexpr auto SETTING_GAMELIBRARY_IGNORENONRETAIL = "gamelibrary.ignorenonretail";
   static constexpr auto SETTING_VIDEOLIBRARY_EXPORT = "videolibrary.export";
   static constexpr auto SETTING_VIDEOLIBRARY_IMPORT = "videolibrary.import";
   static constexpr auto SETTING_VIDEOLIBRARY_SHOWEMPTYTVSHOWS = "videolibrary.showemptytvshows";
@@ -484,6 +489,7 @@ public:
   static constexpr auto SETTING_GENERAL_ADDONFOREIGNFILTER = "general.addonforeignfilter";
   static constexpr auto SETTING_GENERAL_ADDONBROKENFILTER = "general.addonbrokenfilter";
   static constexpr auto SETTING_SOURCE_VIDEOS = "source.videos";
+  static constexpr auto SETTING_SOURCE_GAMES = "source.games";
   static constexpr auto SETTING_SOURCE_MUSIC = "source.music";
   static constexpr auto SETTING_SOURCE_PICTURES = "source.pictures";
   static constexpr auto SETTING_FILECACHE_BUFFERMODE = "filecache.buffermode";

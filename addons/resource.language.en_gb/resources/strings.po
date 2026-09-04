@@ -20314,7 +20314,39 @@ msgctxt "#35588"
 msgid "Achievements"
 msgstr ""
 
-#empty strings from id 35589 to 35999
+#. Games entry in the Manage sources list
+#: system/settings/settings.xml
+msgctxt "#35589"
+msgid "Games..."
+msgstr ""
+
+#. Heading of the game library settings
+#: system/settings/settings.xml
+msgctxt "#35590"
+msgid "Game library"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35591"
+msgid "Download information from the internet"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35592"
+msgid "Scans read the offline catalogue whatever this says. With this on they also ask the providers your scraper is set up for, which is where descriptions, artwork and achievement counts come from."
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35593"
+msgid "Leave out hacks, prototypes and BIOS files"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35594"
+msgid "A collection often holds translations, prototypes, demos and BIOS images beside the games. With this on they are left out of the library; the files stay where they are."
+msgstr ""
+
+#empty strings from id 35595 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

@@ -37,6 +37,8 @@
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
 #include "utils/Digest.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -493,6 +495,9 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   m_gameList.clear();
   CGameListXml::Load(folder, m_gameList);
 
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  m_retailOnly = settings && settings->GetBool(CSettings::SETTING_GAMELIBRARY_IGNORENONRETAIL);
+
   const std::string hash = FolderHash(items);
   std::string storedHash;
   m_database.GetPathHash(folder, storedHash);
@@ -504,12 +509,15 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
     m_itemCount = static_cast<int>(entries.size());
     m_currentItem = 0;
 
-    // Asked about a chunk at a time, so a full set is a few hundred calls
-    // rather than tens of thousands
-    constexpr size_t chunkSize = 100;
+    // Asked about a chunk at a time, so a full set is hundreds of calls rather
+    // than tens of thousands. The chunk is small enough that the progress bar
+    // keeps moving: nothing is written until the batch it belongs to is done.
+    constexpr size_t chunkSize = 25;
     for (size_t start = 0; start < entries.size() && m_bRunning; start += chunkSize)
     {
       const size_t end = std::min(start + chunkSize, entries.size());
+      if (m_handle != nullptr)
+        m_handle->SetText(platform.name);
       Prefetch(&entries[start], end - start, content, platform);
 
       for (size_t i = start; i < end; ++i)
@@ -652,6 +660,19 @@ bool CGameInfoScanner::RefreshGame(int idGame)
   return ok;
 }
 
+bool CGameInfoScanner::DownloadsAllowed()
+{
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  return settings == nullptr || settings->GetBool(CSettings::SETTING_GAMELIBRARY_DOWNLOADINFO);
+}
+
+bool CGameInfoScanner::IsRetail(const ParsedGameName& parsed)
+{
+  if (parsed.hack || parsed.licence == Licence::HOMEBREW || parsed.licence == Licence::AFTERMARKET)
+    return false;
+  return parsed.status == ReleaseStatus::RETAIL;
+}
+
 CGameScraper* CGameInfoScanner::ScraperFor(const GamePathContent& content)
 {
   const std::string scraperId = content.scraper;
@@ -764,6 +785,9 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   if (parsed.displayTitle.empty())
     return false;
 
+  if (m_retailOnly && !IsRetail(parsed))
+    return false;
+
   if (m_handle != nullptr)
     m_handle->SetText(platform.name + " - " + parsed.displayTitle);
 
@@ -839,8 +863,9 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     }
   }
 
-  // Ask the scraper set for this folder, or the default one
-  CGameScraper* scraper = ScraperFor(content);
+  // Ask the scraper set for this folder, or the default one. With the library
+  // set to stay offline, nothing is asked and the file names carry the library.
+  CGameScraper* scraper = DownloadsAllowed() ? ScraperFor(content) : nullptr;
 
   KODI::ART::Artwork art;
   MatchMethod matchedBy = sidecar ? MatchMethod::SIDECAR : MatchMethod::NONE;
