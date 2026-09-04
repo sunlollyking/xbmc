@@ -20517,6 +20517,17 @@ msgctxt "#35628"
 msgid "Photograph"
 msgstr ""
 
+#: system/settings/settings.xml
+msgctxt "#35629"
+msgid "Refresh achievement progress"
+msgstr ""
+
+#. Description of setting with label #35629 "Refresh achievement progress"
+#: system/settings/settings.xml
+msgctxt "#35630"
+msgid "Ask the achievement service how far you have got with each game, and record it beside them. This also happens whenever the library is updated."
+msgstr ""
+
 #empty strings from id 35604 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp

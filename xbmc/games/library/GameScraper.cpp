@@ -35,6 +35,7 @@ constexpr int PROTOCOL_VERSION = 1;
 constexpr const char* PROPERTY_CANDIDATE = "gamelibrary.candidate";
 constexpr const char* PROPERTY_DETAILS = "gamelibrary.details";
 constexpr const char* PROPERTY_PLATFORM = "gamelibrary.platform";
+constexpr const char* PROPERTY_PROGRESS = "gamelibrary.progress";
 constexpr const char* PROPERTY_BATCH = "gamelibrary.batch";
 
 std::vector<std::string> Strings(const CVariant& value)
@@ -563,5 +564,31 @@ bool CGameScraper::GetPlatform(const GameScrapeRequest& request,
     platform.overview = payload["overview"].asString();
 
   ReadArt(payload["art"], art);
+  return true;
+}
+
+bool CGameScraper::GetProgress(std::map<std::string, GameProgress>& progress)
+{
+  GameScrapeRequest request;
+  CFileItem result;
+  if (!XFILE::CPluginDirectory::GetPluginResult(BuildUrl("getprogress", request), result, false))
+    return false;
+
+  CVariant payload;
+  if (!ParsePayload(result, PROPERTY_PROGRESS, payload))
+    return false;
+  if (!payload.isObject())
+    return false;
+
+  for (auto it = payload.begin_map(); it != payload.end_map(); ++it)
+  {
+    const CVariant& counts = it->second;
+    GameProgress one;
+    one.total = static_cast<int>(counts["total"].asInteger());
+    one.earned = static_cast<int>(counts["earned"].asInteger());
+    one.hardcore = static_cast<int>(counts["hardcore"].asInteger());
+    if (one.total > 0)
+      progress[it->first] = one;
+  }
   return true;
 }

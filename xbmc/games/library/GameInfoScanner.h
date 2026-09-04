@@ -125,6 +125,9 @@ private:
                                                     std::vector<struct GameScrapeCandidate>& candidates);
   CGameScraper* ScraperFor(const GamePathContent& content);
 
+  //! \brief Ask the scraper how far the signed-in person has got, and record it
+  void RefreshProgress();
+
   //! \brief Describe the machine itself, once, with its own pictures
   void ScrapePlatform(const GamePathContent& content, const PlatformInfo& platform);
 

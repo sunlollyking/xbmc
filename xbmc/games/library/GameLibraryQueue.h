@@ -72,6 +72,14 @@ public:
    */
   bool CleanLibrary(const std::set<int>& paths = {}, bool modal = false);
 
+  /*!
+   * \brief Ask the scraper how far the signed-in person has got, and record it
+   *
+   * Runs at the end of a library update as well; this is for asking again
+   * after an evening's play without waiting for the next scan.
+   */
+  void RefreshAchievementProgress();
+
   bool IsRunning() const;
 
 protected:

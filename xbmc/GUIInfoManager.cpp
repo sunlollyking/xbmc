@@ -7911,7 +7911,7 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///
 /// -----------------------------------------------------------------------------
 // clang-format off
-constexpr std::array<InfoMap, 242> listitem_labels = {{
+constexpr std::array<InfoMap, 244> listitem_labels = {{
     {"thumb",                         LISTITEM_THUMB},
     {"icon",                          LISTITEM_ICON},
     {"actualicon",                    LISTITEM_ACTUAL_ICON},
@@ -8030,6 +8030,8 @@ constexpr std::array<InfoMap, 242> listitem_labels = {{
     {"releasecount",                  LISTITEM_RELEASE_COUNT},
     {"achievementstotal",             LISTITEM_ACHIEVEMENTS_TOTAL},
     {"achievementsearned",            LISTITEM_ACHIEVEMENTS_EARNED},
+    {"achievementspercent",           LISTITEM_ACHIEVEMENTS_PERCENT},
+    {"achievementsprogress",          LISTITEM_ACHIEVEMENTS_PROGRESS},
     {"gamecategory",                  LISTITEM_GAME_CATEGORY},
     {"gameclient",                    LISTITEM_GAME_CLIENT},
     {"set",                           LISTITEM_SET},

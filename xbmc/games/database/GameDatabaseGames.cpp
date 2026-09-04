@@ -636,6 +636,54 @@ bool CGameDatabase::SetPlayCount(int idGame, int count)
                                  count, idGame));
 }
 
+int CGameDatabase::SetAchievementProgress(const std::string& source,
+                                          const std::map<std::string, GameProgress>& progress)
+{
+  if (source.empty() || m_pDB == nullptr)
+    return 0;
+
+  int matched = 0;
+  try
+  {
+    BeginTransaction();
+
+    // What is not in the answer has not been earned, so yesterday's count
+    // does not survive a reset on the service
+    ExecuteQuery("UPDATE game SET achievementsEarned = 0, achievementsHardcore = 0 "
+                 "WHERE achievementsEarned > 0 OR achievementsHardcore > 0");
+
+    for (const auto& [id, counts] : progress)
+    {
+      if (id.empty() || counts.total <= 0)
+        continue;
+
+      const int idGame = GetSingleValueInt(
+          PrepareSQL("SELECT media_id FROM uniqueid WHERE media_type = '%s' AND type = '%s' AND "
+                     "value = '%s'",
+                     MediaTypeGame, source.c_str(), id.c_str()));
+      if (idGame <= 0)
+        continue;
+
+      // The set can grow after a game was scraped, and the person's own
+      // total is the newer word on how big it is
+      ExecuteQuery(PrepareSQL("UPDATE game SET achievementsEarned = %i, achievementsHardcore = %i, "
+                              "achievementsTotal = MAX(achievementsTotal, %i) WHERE idGame = %i",
+                              counts.earned, counts.hardcore, counts.total, idGame));
+      ++matched;
+    }
+
+    CommitTransaction();
+  }
+  catch (...)
+  {
+    RollbackTransaction();
+    CLog::Log(LOGERROR, "GAME: Failed to record achievement progress");
+    return 0;
+  }
+
+  return matched;
+}
+
 bool CGameDatabase::SetCompleted(int idGame, bool completed)
 {
   return ExecuteQuery(PrepareSQL("UPDATE game SET completed = %i WHERE idGame = %i",

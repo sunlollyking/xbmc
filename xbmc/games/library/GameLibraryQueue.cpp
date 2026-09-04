@@ -137,6 +137,40 @@ private:
   std::vector<int> m_games;
 };
 
+class CGameAchievementProgressJob : public CJob
+{
+public:
+  const char* GetType() const override { return "GameAchievementProgressJob"; }
+
+  bool DoWork() override
+  {
+    std::unique_ptr<CGameScraper> scraper = CGameScraper::CreateDefault();
+    if (!scraper)
+      return false;
+
+    std::map<std::string, GameProgress> progress;
+    if (!scraper->GetProgress(progress) || progress.empty())
+      return false;
+
+    CGameDatabase db;
+    if (!db.Open())
+      return false;
+
+    const int matched = db.SetAchievementProgress("retroachievements", progress);
+    CLog::Log(LOGINFO, "GAME: {} of {} games with achievement progress are in the library", matched,
+              progress.size());
+
+    CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE);
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+    return true;
+  }
+
+  bool Equals(const CJob* job) const override
+  {
+    return dynamic_cast<const CGameAchievementProgressJob*>(job) != nullptr;
+  }
+};
+
 class CGameLibraryCleaningJob : public CJob
 {
 public:
@@ -215,6 +249,11 @@ void CGameLibraryQueue::StopLibraryScanning()
   std::unique_lock lock(m_critical);
   if (m_scanner != nullptr)
     m_scanner->Stop();
+}
+
+void CGameLibraryQueue::RefreshAchievementProgress()
+{
+  AddJob(new CGameAchievementProgressJob());
 }
 
 bool CGameLibraryQueue::CleanLibrary(const std::set<int>& paths, bool modal)

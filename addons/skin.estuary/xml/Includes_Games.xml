@@ -1166,33 +1166,28 @@
 		one hides itself when the library has nothing to put in it.
 	-->
 	<include name="GamePill">
+		<param name="postfix" default="" />
+		<param name="visible" default="true" />
 		<definition>
-			<control type="group">
+			<!-- A button rather than a group: only a control that draws its own
+			     label can size itself to it inside a grouplist -->
+			<control type="button">
 				<width>auto</width>
 				<height>44</height>
-				<visible>!String.IsEmpty($PARAM[info])</visible>
-				<control type="image">
-					<width>auto</width>
-					<height>44</height>
-					<texture border="8">buttons/button-nofo.png</texture>
-				</control>
-				<control type="label">
-					<left>14</left>
-					<right>14</right>
-					<height>44</height>
-					<aligny>center</aligny>
-					<font>font12</font>
-					<textcolor>$PARAM[colour]</textcolor>
-					<label>$PARAM[label]$INFO[$PARAM[info]]</label>
-				</control>
+				<font>font12</font>
+				<textoffsetx>14</textoffsetx>
+				<textoffsety>0</textoffsety>
+				<aligny>center</aligny>
+				<enable>false</enable>
+				<disabledcolor>$PARAM[colour]</disabledcolor>
+				<texturenofocus border="8">buttons/button-nofo.png</texturenofocus>
+				<texturefocus border="8">buttons/button-nofo.png</texturefocus>
+				<label>$PARAM[label]$INFO[$PARAM[info]]$PARAM[postfix]</label>
+				<visible>!String.IsEmpty($PARAM[info]) + [$PARAM[visible]]</visible>
 			</control>
 		</definition>
 	</include>
 
-	<!--
-		Everything the library holds about a game, in two columns, each line
-		gone when there is nothing to say.
-	-->
 	<include name="GameFactCompact">
 		<param name="lw" default="168" />
 		<param name="vw" default="200" />
@@ -1233,9 +1228,16 @@
 					<param name="colour" value="white" />
 				</include>
 				<include content="GamePill">
+					<param name="info" value="ListItem.AchievementsPercent" />
+					<param name="label" value="$LOCALIZE[35588]: " />
+					<param name="postfix" value="%" />
+					<param name="colour" value="FF66BB6A" />
+				</include>
+				<include content="GamePill">
 					<param name="info" value="ListItem.AchievementsTotal" />
 					<param name="label" value="$LOCALIZE[35588]: " />
 					<param name="colour" value="FF66BB6A" />
+					<param name="visible" value="String.IsEmpty(ListItem.AchievementsPercent)" />
 				</include>
 				<include content="GamePill">
 					<param name="info" value="ListItem.Players" />
@@ -1371,45 +1373,39 @@
 					<orientation>vertical</orientation>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35588]" />
-						<param name="info" value="ListItem.AchievementsTotal" />
-						<param name="lw" value="150" />
-						<param name="vw" value="150" />
+						<param name="info" value="ListItem.AchievementsProgress" />
+						<param name="lw" value="175" />
+						<param name="vw" value="145" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[567]" />
 						<param name="info" value="ListItem.PlayCount" />
-						<param name="lw" value="150" />
-						<param name="vw" value="150" />
+						<param name="lw" value="175" />
+						<param name="vw" value="145" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[568]" />
 						<param name="info" value="ListItem.LastPlayed" />
-						<param name="lw" value="150" />
-						<param name="vw" value="150" />
+						<param name="lw" value="175" />
+						<param name="vw" value="145" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[570]" />
 						<param name="info" value="ListItem.DateAdded" />
-						<param name="lw" value="150" />
-						<param name="vw" value="150" />
-					</include>
-					<include content="GameFactCompact">
-						<param name="label" value="$LOCALIZE[563]" />
-						<param name="info" value="ListItem.Rating" />
-						<param name="lw" value="150" />
-						<param name="vw" value="150" />
+						<param name="lw" value="175" />
+						<param name="vw" value="145" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[20074]" />
 						<param name="info" value="ListItem.Mpaa" />
-						<param name="lw" value="150" />
-						<param name="vw" value="150" />
+						<param name="lw" value="175" />
+						<param name="vw" value="145" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35585]" />
 						<param name="info" value="ListItem.Property(hasmanual)" />
-						<param name="lw" value="150" />
-						<param name="vw" value="150" />
+						<param name="lw" value="175" />
+						<param name="vw" value="145" />
 					</include>
 				</control>
 			</control>

@@ -12,6 +12,7 @@
 #include "VideoFilterTable.h"
 #include "dbwrappers/Database.h"
 #include "games/library/GameLibraryTypes.h"
+#include "games/library/GameScraper.h"
 #include "media/MediaType.h"
 #include "utils/Artwork.h"
 
@@ -252,6 +253,18 @@ public:
 
   //! \brief How often a game was played, over every file it has
   bool SetPlayCount(int idGame, int count);
+
+  /*!
+   * \brief Record how far the signed-in person has got with each game
+   *
+   * Keyed by the id the source keeps the count under. A game not named in
+   * the answer has not been played, so its count is cleared rather than left
+   * to go stale.
+   *
+   * \return How many games the answer matched
+   */
+  int SetAchievementProgress(const std::string& source,
+                             const std::map<std::string, GameProgress>& progress);
 
   //! \brief The classification boards a person wants to see, in their order
   static std::vector<std::string> PreferredAgeRatingBoards();

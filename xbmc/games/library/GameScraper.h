@@ -98,6 +98,17 @@ struct GameScrapeArt
  * scraper that answers with nothing, or with something unreadable, is a
  * scraper that found nothing: no result is ever invented on its behalf.
  */
+/*!
+ * \ingroup games
+ * \brief What one person has earned of one game's achievements
+ */
+struct GameProgress
+{
+  int total{0};
+  int earned{0};
+  int hardcore{0};
+};
+
 class CGameScraper
 {
 public:
@@ -173,6 +184,15 @@ public:
   bool GetPlatform(const GameScrapeRequest& request,
                    PlatformInfo& platform,
                    std::map<std::string, std::vector<GameScrapeArt>>& art);
+
+  /*!
+   * \brief How far the signed-in person has got with the games they have played
+   *
+   * Keyed by the scraper's own game id for whichever source keeps the count,
+   * which today is RetroAchievements. About the person rather than about a
+   * game, so it is asked for once and answers for the whole library.
+   */
+  bool GetProgress(std::map<std::string, GameProgress>& progress);
 
 private:
   bool m_answersBatches{true};

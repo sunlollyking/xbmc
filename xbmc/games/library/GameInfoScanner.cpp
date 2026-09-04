@@ -62,6 +62,9 @@ constexpr std::array<const char*, 1> playlistExtensions{".m3u"};
 
 //! How many further pictures of one kind a game keeps, beyond the first
 constexpr int MAX_EXTRA_ART = 9;
+
+//! Whose count of earned achievements the library keeps
+constexpr const char* PROGRESS_SOURCE = "retroachievements";
 constexpr std::array<const char*, 4> trackExtensions{".bin", ".img", ".raw", ".wav"};
 
 std::string Localize(int id)
@@ -259,6 +262,9 @@ void CGameInfoScanner::Process()
       break;
     DoScan(root);
   }
+
+  if (m_bRunning)
+    RefreshProgress();
 
   announcer.Announce(ANNOUNCEMENT::GameLibrary, "OnScanFinished");
   CLog::Log(LOGINFO, "GAME: Scan finished: {} games added, {} identified", m_added, m_identified);
@@ -728,6 +734,24 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
   }
 
   CLog::Log(LOGINFO, "GAME: Described {} with {} picture(s)", platform.name, art.size());
+}
+
+void CGameInfoScanner::RefreshProgress()
+{
+  if (!DownloadsAllowed())
+    return;
+
+  CGameScraper* scraper = ScraperFor(GamePathContent{});
+  if (scraper == nullptr)
+    return;
+
+  std::map<std::string, GameProgress> progress;
+  if (!scraper->GetProgress(progress) || progress.empty())
+    return;
+
+  const int matched = m_database.SetAchievementProgress(PROGRESS_SOURCE, progress);
+  CLog::Log(LOGINFO, "GAME: {} of {} games with achievement progress are in the library", matched,
+            progress.size());
 }
 
 bool CGameInfoScanner::DownloadsAllowed()

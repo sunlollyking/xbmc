@@ -187,6 +187,8 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case LISTITEM_RELEASE_COUNT:
     case LISTITEM_ACHIEVEMENTS_TOTAL:
     case LISTITEM_ACHIEVEMENTS_EARNED:
+    case LISTITEM_ACHIEVEMENTS_PERCENT:
+    case LISTITEM_ACHIEVEMENTS_PROGRESS:
     case LISTITEM_GAME_CATEGORY:
     case LISTITEM_GAME_CLIENT:
     {
@@ -330,6 +332,25 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           if (tag->HasAchievements())
           {
             value = std::to_string(tag->GetAchievementsEarned());
+            return true;
+          }
+          break;
+        case LISTITEM_ACHIEVEMENTS_PROGRESS:
+          // How much of the set is earned, or how big it is where none is
+          if (tag->HasAchievements())
+          {
+            value = tag->GetAchievementsEarned() > 0
+                        ? StringUtils::Format("{} / {}", tag->GetAchievementsEarned(),
+                                              tag->GetAchievementsTotal())
+                        : std::to_string(tag->GetAchievementsTotal());
+            return true;
+          }
+          break;
+        case LISTITEM_ACHIEVEMENTS_PERCENT:
+          // What a profile on the service shows: how much of the set is earned
+          if (tag->GetAchievementsTotal() > 0 && tag->GetAchievementsEarned() > 0)
+          {
+            value = std::to_string(100 * tag->GetAchievementsEarned() / tag->GetAchievementsTotal());
             return true;
           }
           break;
