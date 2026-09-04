@@ -13,7 +13,6 @@
 #include "URL.h"
 #include "utils/ArtUtils.h"
 #include "utils/FileUtils.h"
-#include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML2.h"
 #include "utils/log.h"
@@ -42,17 +41,6 @@ std::string GetNFOPath(const CFileItem& item)
   return URIUtils::ReplaceExtension(item.GetPath(), NFO_EXTENSION);
 }
 
-//! \brief The text of a child element, or an empty string
-std::string GetText(const tinyxml2::XMLElement* parent, const char* name)
-{
-  const tinyxml2::XMLElement* element = parent->FirstChildElement(name);
-  if (element == nullptr || element->GetText() == nullptr)
-    return "";
-
-  std::string text = element->GetText();
-  StringUtils::Trim(text);
-  return text;
-}
 } // namespace
 
 bool CGameInfoTagLoader::HasNFO(const CFileItem& item)
@@ -85,50 +73,25 @@ bool CGameInfoTagLoader::Load(const CFileItem& item, CGameInfoTag& tag)
 
   CLog::Log(LOGDEBUG, "Loading game NFO {}", CURL::GetRedacted(nfoPath));
 
-  if (const std::string title = GetText(rootElement, "title"); !title.empty())
-    tag.SetTitle(title);
+  return tag.Load(rootElement);
+}
 
-  // "plot" is accepted alongside "overview" because that is what every other
-  // NFO in Kodi calls it, and a collection is likely to have been written for
-  // those first
-  std::string overview = GetText(rootElement, "overview");
-  if (overview.empty())
-    overview = GetText(rootElement, "plot");
-  if (!overview.empty())
-    tag.SetOverview(overview);
+bool CGameInfoTagLoader::Save(const CFileItem& item, const CGameInfoTag& tag)
+{
+  const std::string nfoPath = GetNFOPath(item);
+  if (nfoPath.empty())
+    return false;
 
-  if (const std::string platform = GetText(rootElement, "platform"); !platform.empty())
-    tag.SetPlatform(platform);
+  CXBMCTinyXML2 xmlDoc;
+  xmlDoc.InsertEndChild(xmlDoc.NewDeclaration());
+  tag.Save(&xmlDoc, XML_ROOT);
 
-  if (const std::string developer = GetText(rootElement, "developer"); !developer.empty())
-    tag.SetDeveloper(developer);
-
-  if (const std::string publisher = GetText(rootElement, "publisher"); !publisher.empty())
-    tag.SetPublisher(publisher);
-
-  if (const std::string region = GetText(rootElement, "region"); !region.empty())
-    tag.SetRegion(region);
-
-  if (const std::string year = GetText(rootElement, "year"); !year.empty())
+  if (!xmlDoc.SaveFile(nfoPath))
   {
-    if (StringUtils::IsNaturalNumber(year))
-      tag.SetYear(static_cast<unsigned int>(std::stoul(year)));
+    CLog::Log(LOGERROR, "Failed to write game NFO {}: {}", CURL::GetRedacted(nfoPath),
+              xmlDoc.ErrorStr());
+    return false;
   }
-
-  std::vector<std::string> genres;
-  for (const tinyxml2::XMLElement* genre = rootElement->FirstChildElement("genre"); genre != nullptr;
-       genre = genre->NextSiblingElement("genre"))
-  {
-    if (genre->GetText() == nullptr)
-      continue;
-
-    std::string text = genre->GetText();
-    StringUtils::Trim(text);
-    if (!text.empty())
-      genres.emplace_back(std::move(text));
-  }
-  if (!genres.empty())
-    tag.SetGenres(genres);
-
+  return true;
   return true;
 }

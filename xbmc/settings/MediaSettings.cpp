@@ -20,6 +20,7 @@
 #include "music/MusicLibraryQueue.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "games/database/GameDatabase.h"
 #include "games/library/GameLibraryQueue.h"
 #include "settings/Settings.h"
 #include "settings/dialogs/GUIDialogLibExportSettings.h"
@@ -347,6 +348,25 @@ void CMediaSettings::OnSettingAction(const std::shared_ptr<const CSetting>& sett
   }
   else if (settingId == CSettings::SETTING_GAMELIBRARY_REFRESHPROGRESS)
     KODI::GAME::CGameLibraryQueue::GetInstance().RefreshAchievementProgress();
+  else if (settingId == CSettings::SETTING_GAMELIBRARY_EXPORT)
+    CBuiltins::GetInstance().Execute("exportlibrary(games)");
+  else if (settingId == CSettings::SETTING_GAMELIBRARY_IMPORT)
+  {
+    std::string path;
+    std::vector<CMediaSource> shares;
+    CServiceBroker::GetMediaManager().GetLocalDrives(shares);
+    CServiceBroker::GetMediaManager().GetNetworkLocations(shares);
+    CServiceBroker::GetMediaManager().GetRemovableDrives(shares);
+
+    if (CGUIDialogFileBrowser::ShowAndGetDirectory(
+            shares, CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(651), path))
+    {
+      KODI::GAME::CGameDatabase gamedatabase;
+      gamedatabase.Open();
+      gamedatabase.ImportFromXML(path);
+      gamedatabase.Close();
+    }
+  }
   else if (settingId == CSettings::SETTING_VIDEOLIBRARY_EXPORT)
     CBuiltins::GetInstance().Execute("exportlibrary(video)");
   else if (settingId == CSettings::SETTING_VIDEOLIBRARY_IMPORT)

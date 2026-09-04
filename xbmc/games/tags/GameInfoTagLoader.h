@@ -40,6 +40,13 @@ public:
   static bool Load(const CFileItem& item, CGameInfoTag& tag);
 
   /*!
+   * \brief Write a game's NFO beside the file it describes
+   *
+   * \return True if the file was written
+   */
+  static bool Save(const CFileItem& item, const CGameInfoTag& tag);
+
+  /*!
    * \brief Whether an item has an NFO to read
    *
    * Asked before loading, because reading the tag creates one on the item and

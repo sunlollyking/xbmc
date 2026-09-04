@@ -214,3 +214,97 @@ TEST(TestGameInfoTagLoader, AYearThatIsNotANumberIsLeftAlone)
   EXPECT_EQ(tag.GetTitle(), "Kept");
   EXPECT_EQ(tag.GetYear(), 0u);
 }
+
+TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
+{
+  //
+  // Spec: an exported game survives the trip through XML
+  //
+
+  CGameInfoTag written;
+  written.SetTitle("Super Test Bros.");
+  written.SetOriginalTitle("スーパーテストブラザーズ");
+  written.SetSortTitle("Super Test Bros");
+  written.SetPlatform("Nintendo 64");
+  written.SetOverview("A game that exists to be written.");
+  written.SetYear(1996);
+  written.SetReleaseDate("1996-06-23");
+  written.SetRegion("PAL");
+  written.SetGenres({"Platformer", "Test"});
+  written.SetDevelopers({"Team Kodi", "Someone Else"});
+  written.SetPublishers({"Nobody"});
+  written.SetCollections({"Test Bros."});
+  written.SetTags({"verified"});
+  written.SetPlayers(1, 4);
+  written.SetCoop(true);
+  written.SetUniqueID("igdb", "1234", true);
+  written.SetUniqueID("thegamesdb", "99");
+  written.SetPlayCount(7);
+  written.SetLastPlayed("2026-09-04 12:00:00");
+  written.SetUserRating(9);
+  written.SetFavourite(true);
+  written.SetCompleted(true);
+  written.SetAchievements(25, 3, 1);
+
+  CNFOFixture fixture;
+  const std::string game = fixture.Path("roundtrip.n64");
+  CFileItem item(game, false);
+  ASSERT_TRUE(CGameInfoTagLoader::Save(item, written));
+
+  CGameInfoTag read;
+  ASSERT_TRUE(CGameInfoTagLoader::Load(item, read));
+
+  EXPECT_EQ(read.GetTitle(), written.GetTitle());
+  EXPECT_EQ(read.GetOriginalTitle(), written.GetOriginalTitle());
+  EXPECT_EQ(read.GetSortTitle(), written.GetSortTitle());
+  EXPECT_EQ(read.GetPlatform(), written.GetPlatform());
+  EXPECT_EQ(read.GetOverview(), written.GetOverview());
+  EXPECT_EQ(read.GetYear(), written.GetYear());
+  EXPECT_EQ(read.GetReleaseDate(), written.GetReleaseDate());
+  EXPECT_EQ(read.GetRegion(), written.GetRegion());
+  EXPECT_EQ(read.GetGenres(), written.GetGenres());
+  EXPECT_EQ(read.GetDevelopers(), written.GetDevelopers());
+  EXPECT_EQ(read.GetPublishers(), written.GetPublishers());
+  EXPECT_EQ(read.GetCollections(), written.GetCollections());
+  EXPECT_EQ(read.GetTags(), written.GetTags());
+  EXPECT_EQ(read.GetPlayersMin(), 1);
+  EXPECT_EQ(read.GetPlayersMax(), 4);
+  EXPECT_TRUE(read.IsCoop());
+  EXPECT_EQ(read.GetUniqueID("igdb"), "1234");
+  EXPECT_EQ(read.GetUniqueID("thegamesdb"), "99");
+  EXPECT_EQ(read.GetPlayCount(), 7);
+  EXPECT_EQ(read.GetLastPlayed(), written.GetLastPlayed());
+  EXPECT_EQ(read.GetUserRating(), 9);
+  EXPECT_TRUE(read.IsFavourite());
+  EXPECT_TRUE(read.IsCompleted());
+  EXPECT_EQ(read.GetAchievementsTotal(), 25);
+  EXPECT_EQ(read.GetAchievementsEarned(), 3);
+  EXPECT_EQ(read.GetAchievementsHardcore(), 1);
+}
+
+TEST(TestGameInfoTagLoader, WritingLeavesOutWhatTheGameDoesNotHave)
+{
+  //
+  // Spec: an empty field is absent rather than written empty, so an NFO says
+  // only what is known
+  //
+
+  CGameInfoTag tag;
+  tag.SetTitle("Bare");
+
+  CNFOFixture fixture;
+  const std::string game = fixture.Path("bare.n64");
+  ASSERT_TRUE(CGameInfoTagLoader::Save(CFileItem(game, false), tag));
+
+  XFILE::CFile file;
+  ASSERT_TRUE(file.Open(URIUtils::ReplaceExtension(game, ".nfo")));
+  std::vector<uint8_t> buffer(static_cast<size_t>(file.GetLength()));
+  file.Read(buffer.data(), buffer.size());
+  const std::string contents(buffer.begin(), buffer.end());
+
+  EXPECT_NE(contents.find("<title>Bare</title>"), std::string::npos);
+  EXPECT_EQ(contents.find("<overview>"), std::string::npos);
+  EXPECT_EQ(contents.find("<year>"), std::string::npos);
+  EXPECT_EQ(contents.find("<favourite>"), std::string::npos);
+  EXPECT_EQ(contents.find("<achievements"), std::string::npos);
+}

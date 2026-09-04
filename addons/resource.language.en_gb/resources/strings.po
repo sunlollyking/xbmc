@@ -20528,6 +20528,28 @@ msgctxt "#35630"
 msgid "Ask the achievement service how far you have got with each game, and record it beside them. This also happens whenever the library is updated."
 msgstr ""
 
+#: xbmc/interfaces/builtins/LibraryBuiltins.cpp
+msgctxt "#35631"
+msgid "Export game library"
+msgstr ""
+
+#. Description of setting with label #14248 "Export library"
+#: system/settings/settings.xml
+msgctxt "#35632"
+msgid "Write the game library out as XML, either as one file for the whole library or as an NFO beside each game. What you did with a game -- how often you played it, whether it is a favourite, your own rating -- travels with it."
+msgstr ""
+
+#. Description of setting with label #14249 "Import library"
+#: system/settings/settings.xml
+msgctxt "#35633"
+msgid "Read back a game library that was exported as a single file. A game is matched by the file it came from, then by whichever catalogue named it; only what a rescan cannot recover is restored."
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseExport.cpp
+msgctxt "#35634"
+msgid "Import game library"
+msgstr ""
+
 #empty strings from id 35604 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp

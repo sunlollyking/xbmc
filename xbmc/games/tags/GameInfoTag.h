@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include <tinyxml2.h>
+
 namespace KODI
 {
 namespace GAME
@@ -271,6 +273,24 @@ public:
   const std::string& GetLastUnlock() const { return m_strLastUnlock; }
   void SetLastUnlock(const std::string& date) { m_strLastUnlock = date; }
   ///@}
+
+  /*!
+   * \brief Write this game to an XML element, and read one back
+   *
+   * The shape a game NFO takes, and what a library export is made of. Only
+   * what a person or another library could act on is written: the database
+   * ids a game holds are meaningless anywhere but the library that issued
+   * them, while the unique ids from the catalogues travel.
+   */
+  void Save(tinyxml2::XMLNode* node, const char* tag) const;
+
+  /*!
+   * \brief Read a game from an XML element
+   *
+   * A field absent from the element leaves what the tag already holds, so a
+   * hand-written NFO can say one thing and leave the rest to the scraper.
+   */
+  bool Load(const tinyxml2::XMLElement* element);
 
   void Archive(CArchive& ar) override;
   void Serialize(CVariant& value) const override;

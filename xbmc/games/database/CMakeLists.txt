@@ -1,6 +1,7 @@
 set(SOURCES GameClientTable.cpp
             GameDatabase.cpp
             GameDatabaseArt.cpp
+            GameDatabaseExport.cpp
             GameDatabaseGames.cpp
             GameDatabaseNav.cpp
             GameDatabasePaths.cpp

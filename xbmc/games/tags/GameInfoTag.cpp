@@ -11,6 +11,7 @@
 #include "utils/Archive.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
+#include "utils/XMLUtils.h"
 
 #include <algorithm>
 #include <string>
@@ -614,4 +615,292 @@ void CGameInfoTag::ToSortable(SortItem& sortable, Field field) const
     default:
       break;
   }
+}
+
+namespace
+{
+//! \brief The text of a child element, or an empty string
+std::string ChildText(const tinyxml2::XMLElement* parent, const char* name)
+{
+  const tinyxml2::XMLElement* element = parent->FirstChildElement(name);
+  if (element == nullptr || element->GetText() == nullptr)
+    return "";
+
+  std::string text = element->GetText();
+  StringUtils::Trim(text);
+  return text;
+}
+
+//! \brief Every occurrence of a repeated child element
+std::vector<std::string> ChildTexts(const tinyxml2::XMLElement* parent, const char* name)
+{
+  std::vector<std::string> out;
+  for (const tinyxml2::XMLElement* child = parent->FirstChildElement(name); child != nullptr;
+       child = child->NextSiblingElement(name))
+  {
+    if (child->GetText() == nullptr)
+      continue;
+    std::string text = child->GetText();
+    StringUtils::Trim(text);
+    if (!text.empty())
+      out.emplace_back(std::move(text));
+  }
+  return out;
+}
+
+//! \brief An element carrying text, appended to the node
+tinyxml2::XMLElement* AddChild(tinyxml2::XMLNode* node, const char* name, const std::string& text)
+{
+  tinyxml2::XMLDocument* doc = node->GetDocument();
+  tinyxml2::XMLElement* element = doc->NewElement(name);
+  if (!text.empty())
+    element->SetText(text.c_str());
+  node->InsertEndChild(element);
+  return element;
+}
+} // namespace
+
+void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
+{
+  if (node == nullptr)
+    return;
+
+  tinyxml2::XMLDocument* doc = node->GetDocument();
+  tinyxml2::XMLElement* game = doc->NewElement(tag);
+  node->InsertEndChild(game);
+
+  XMLUtils::SetString(game, "title", m_strTitle);
+  if (!m_strOriginalTitle.empty())
+    XMLUtils::SetString(game, "originaltitle", m_strOriginalTitle);
+  if (!m_strSortTitle.empty())
+    XMLUtils::SetString(game, "sorttitle", m_strSortTitle);
+  if (!m_strPlatform.empty())
+    XMLUtils::SetString(game, "platform", m_strPlatform);
+  if (!m_strOverview.empty())
+    XMLUtils::SetString(game, "overview", m_strOverview);
+  if (m_year > 0)
+    XMLUtils::SetInt(game, "year", static_cast<int>(m_year));
+  if (!m_strReleaseDate.empty())
+    XMLUtils::SetString(game, "releasedate", m_strReleaseDate);
+  if (!m_strRegion.empty())
+    XMLUtils::SetString(game, "region", m_strRegion);
+
+  XMLUtils::SetStringArray(game, "genre", m_genres);
+  XMLUtils::SetStringArray(game, "developer",
+                           m_developers.empty() && !m_strDeveloper.empty()
+                               ? std::vector<std::string>{m_strDeveloper}
+                               : m_developers);
+  XMLUtils::SetStringArray(game, "publisher",
+                           m_publishers.empty() && !m_strPublisher.empty()
+                               ? std::vector<std::string>{m_strPublisher}
+                               : m_publishers);
+  XMLUtils::SetStringArray(game, "collection", m_collections);
+  XMLUtils::SetStringArray(game, "tag", m_tags);
+
+  if (m_playersMin > 0 || m_playersMax > 0 || m_coop)
+  {
+    tinyxml2::XMLElement* players = AddChild(game, "players", "");
+    if (m_playersMin > 0)
+      players->SetAttribute("min", m_playersMin);
+    if (m_playersMax > 0)
+      players->SetAttribute("max", m_playersMax);
+    if (m_coop)
+      players->SetAttribute("coop", true);
+  }
+
+  if (m_category != GameCategory::RETAIL)
+    XMLUtils::SetString(game, "category", std::string(CGameLibraryTypes::ToString(m_category)));
+
+  for (const auto& [name, rating] : m_ratings)
+  {
+    tinyxml2::XMLElement* element = AddChild(game, "rating", StringUtils::Format("{:.1f}", rating.rating));
+    element->SetAttribute("name", name.c_str());
+    element->SetAttribute("max", rating.max);
+    if (rating.votes > 0)
+      element->SetAttribute("votes", rating.votes);
+    if (name == m_strDefaultRating)
+      element->SetAttribute("default", true);
+  }
+
+  for (const GameAgeRating& age : m_ageRatings)
+  {
+    tinyxml2::XMLElement* element = AddChild(game, "agerating", age.value);
+    element->SetAttribute("board", age.board.c_str());
+    if (!age.descriptors.empty())
+      element->SetAttribute("descriptors", age.descriptors.c_str());
+  }
+
+  for (const auto& [type, value] : m_uniqueIds)
+  {
+    tinyxml2::XMLElement* element = AddChild(game, "uniqueid", value);
+    element->SetAttribute("type", type.c_str());
+    if (type == m_strDefaultUniqueId)
+      element->SetAttribute("default", true);
+  }
+
+  if (!m_strTrailer.empty())
+    XMLUtils::SetString(game, "trailer", m_strTrailer);
+  if (!m_strManual.empty())
+    XMLUtils::SetString(game, "manual", m_strManual);
+
+  // What the person did with the game, which is the part worth carrying to
+  // another box and the part a rescan cannot recover
+  if (m_playCount > 0)
+    XMLUtils::SetInt(game, "playcount", m_playCount);
+  if (!m_strLastPlayed.empty())
+    XMLUtils::SetString(game, "lastplayed", m_strLastPlayed);
+  if (!m_strDateAdded.empty())
+    XMLUtils::SetString(game, "dateadded", m_strDateAdded);
+  if (m_userRating > 0)
+    XMLUtils::SetInt(game, "userrating", m_userRating);
+  if (m_favourite)
+    XMLUtils::SetBoolean(game, "favourite", true);
+  if (m_completed)
+    XMLUtils::SetBoolean(game, "completed", true);
+  if (m_achievementsTotal > 0)
+  {
+    tinyxml2::XMLElement* element = AddChild(game, "achievements", "");
+    element->SetAttribute("total", m_achievementsTotal);
+    element->SetAttribute("earned", m_achievementsEarned);
+    element->SetAttribute("hardcore", m_achievementsHardcore);
+  }
+  if (!m_strLastUnlock.empty())
+    XMLUtils::SetString(game, "lastunlock", m_strLastUnlock);
+  if (!m_strLastScraped.empty())
+    XMLUtils::SetString(game, "lastscraped", m_strLastScraped);
+}
+
+bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
+{
+  if (element == nullptr)
+    return false;
+
+  if (const std::string title = ChildText(element, "title"); !title.empty())
+    m_strTitle = title;
+  if (const std::string value = ChildText(element, "originaltitle"); !value.empty())
+    m_strOriginalTitle = value;
+  if (const std::string value = ChildText(element, "sorttitle"); !value.empty())
+    m_strSortTitle = value;
+  if (const std::string value = ChildText(element, "platform"); !value.empty())
+    m_strPlatform = value;
+
+  // "plot" is accepted alongside "overview" because that is what every other
+  // NFO in Kodi calls it, and a collection is likely to have been written for
+  // those first
+  std::string overview = ChildText(element, "overview");
+  if (overview.empty())
+    overview = ChildText(element, "plot");
+  if (!overview.empty())
+    m_strOverview = overview;
+
+  if (const std::string year = ChildText(element, "year");
+      StringUtils::IsNaturalNumber(year) && !year.empty())
+    m_year = static_cast<unsigned int>(std::stoul(year));
+  if (const std::string value = ChildText(element, "releasedate"); !value.empty())
+    m_strReleaseDate = value;
+  if (const std::string value = ChildText(element, "region"); !value.empty())
+    m_strRegion = value;
+
+  if (std::vector<std::string> values = ChildTexts(element, "genre"); !values.empty())
+    m_genres = std::move(values);
+  if (std::vector<std::string> values = ChildTexts(element, "developer"); !values.empty())
+  {
+    m_strDeveloper = values.front();
+    m_developers = std::move(values);
+  }
+  if (std::vector<std::string> values = ChildTexts(element, "publisher"); !values.empty())
+  {
+    m_strPublisher = values.front();
+    m_publishers = std::move(values);
+  }
+  if (std::vector<std::string> values = ChildTexts(element, "collection"); !values.empty())
+    m_collections = std::move(values);
+  if (std::vector<std::string> values = ChildTexts(element, "tag"); !values.empty())
+    m_tags = std::move(values);
+
+  if (const tinyxml2::XMLElement* players = element->FirstChildElement("players");
+      players != nullptr)
+  {
+    players->QueryIntAttribute("min", &m_playersMin);
+    players->QueryIntAttribute("max", &m_playersMax);
+    players->QueryBoolAttribute("coop", &m_coop);
+  }
+
+  if (const std::string value = ChildText(element, "category"); !value.empty())
+    m_category = CGameLibraryTypes::GameCategoryFromString(value);
+
+  for (const tinyxml2::XMLElement* child = element->FirstChildElement("rating"); child != nullptr;
+       child = child->NextSiblingElement("rating"))
+  {
+    const char* name = child->Attribute("name");
+    if (name == nullptr || child->GetText() == nullptr)
+      continue;
+    GameRating rating;
+    rating.rating = static_cast<float>(std::atof(child->GetText()));
+    child->QueryFloatAttribute("max", &rating.max);
+    child->QueryIntAttribute("votes", &rating.votes);
+    m_ratings[name] = rating;
+    if (child->BoolAttribute("default") || m_strDefaultRating.empty())
+      m_strDefaultRating = name;
+  }
+
+  for (const tinyxml2::XMLElement* child = element->FirstChildElement("agerating"); child != nullptr;
+       child = child->NextSiblingElement("agerating"))
+  {
+    const char* board = child->Attribute("board");
+    if (board == nullptr || child->GetText() == nullptr)
+      continue;
+    GameAgeRating age;
+    age.board = board;
+    age.value = child->GetText();
+    if (const char* descriptors = child->Attribute("descriptors"); descriptors != nullptr)
+      age.descriptors = descriptors;
+    m_ageRatings.emplace_back(std::move(age));
+  }
+
+  for (const tinyxml2::XMLElement* child = element->FirstChildElement("uniqueid"); child != nullptr;
+       child = child->NextSiblingElement("uniqueid"))
+  {
+    const char* type = child->Attribute("type");
+    if (type == nullptr || child->GetText() == nullptr)
+      continue;
+    m_uniqueIds[type] = child->GetText();
+    if (child->BoolAttribute("default") || m_strDefaultUniqueId.empty())
+      m_strDefaultUniqueId = type;
+  }
+
+  if (const std::string value = ChildText(element, "trailer"); !value.empty())
+    m_strTrailer = value;
+  if (const std::string value = ChildText(element, "manual"); !value.empty())
+    m_strManual = value;
+
+  if (const std::string value = ChildText(element, "playcount");
+      StringUtils::IsNaturalNumber(value) && !value.empty())
+    m_playCount = std::stoi(value);
+  if (const std::string value = ChildText(element, "lastplayed"); !value.empty())
+    m_strLastPlayed = value;
+  if (const std::string value = ChildText(element, "dateadded"); !value.empty())
+    m_strDateAdded = value;
+  if (const std::string value = ChildText(element, "userrating");
+      StringUtils::IsNaturalNumber(value) && !value.empty())
+    m_userRating = std::stoi(value);
+  if (const std::string value = ChildText(element, "favourite"); !value.empty())
+    m_favourite = StringUtils::EqualsNoCase(value, "true");
+  if (const std::string value = ChildText(element, "completed"); !value.empty())
+    m_completed = StringUtils::EqualsNoCase(value, "true");
+
+  if (const tinyxml2::XMLElement* child = element->FirstChildElement("achievements");
+      child != nullptr)
+  {
+    child->QueryIntAttribute("total", &m_achievementsTotal);
+    child->QueryIntAttribute("earned", &m_achievementsEarned);
+    child->QueryIntAttribute("hardcore", &m_achievementsHardcore);
+  }
+  if (const std::string value = ChildText(element, "lastunlock"); !value.empty())
+    m_strLastUnlock = value;
+  if (const std::string value = ChildText(element, "lastscraped"); !value.empty())
+    m_strLastScraped = value;
+
+  m_bLoaded = true;
+  return true;
 }

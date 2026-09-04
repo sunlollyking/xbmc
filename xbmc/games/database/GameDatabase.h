@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include <tinyxml2.h>
+
 class CFileItem;
 class CFileItemList;
 class CDbUrl;
@@ -266,6 +268,30 @@ public:
   int SetAchievementProgress(const std::string& source,
                              const std::map<std::string, GameProgress>& progress);
 
+  /*!
+   * \brief Write the library out as XML
+   *
+   * \param path Where to write it
+   * \param singleFile One gamedb.xml for the whole library, rather than an
+   *                   NFO beside each game
+   * \param images Copy the artwork alongside
+   * \param overwrite Replace files that are already there
+   */
+  void ExportToXML(const std::string& path,
+                   bool singleFile = true,
+                   bool images = false,
+                   bool overwrite = false);
+
+  /*!
+   * \brief Read back what a person did with their games
+   *
+   * Matches an exported game to one in the library by the file it came from,
+   * then by whichever catalogue named it. Only play count, favourite,
+   * completed and the person's own rating are restored: everything a scraper
+   * knows, a rescan fetches again and more recently.
+   */
+  void ImportFromXML(const std::string& path);
+
   //! \brief The classification boards a person wants to see, in their order
   static std::vector<std::string> PreferredAgeRatingBoards();
   bool SetUserRating(int idGame, int rating);
@@ -322,6 +348,13 @@ protected:
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:
+  std::string GetPlayPathForGame(int idGame);
+  void ExportArt(int idGame,
+                 const std::string& playPath,
+                 const std::string& artDir,
+                 bool overwrite);
+  int FindGameForImport(const tinyxml2::XMLElement* element, const CGameInfoTag& tag);
+
   int RunQuery(const std::string& sql);
 
   // Lookup tables (genre, tag, company, collection, region)
