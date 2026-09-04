@@ -141,18 +141,18 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
   }
 
   const std::string& list = url.GetList();
+  // These nodes are the newest few whatever they are then sorted by, so the
+  // limit belongs in the query and the sort is applied to what comes back
   if (list == "recentlyadded")
   {
     filter.AppendOrder("game_view.dateAdded DESC");
-    if (sorting.sortBy == SortBy::NONE && sorting.limitEnd == 0)
-      filter.limit = PrepareSQL("%i", RECENT_LIMIT);
+    filter.limit = PrepareSQL("%i", RECENT_LIMIT);
   }
   else if (list == "recentlyplayed")
   {
     filter.AppendWhere("game_view.lastPlayed IS NOT NULL AND game_view.lastPlayed <> ''");
     filter.AppendOrder("game_view.lastPlayed DESC");
-    if (sorting.sortBy == SortBy::NONE && sorting.limitEnd == 0)
-      filter.limit = PrepareSQL("%i", RECENT_LIMIT);
+    filter.limit = PrepareSQL("%i", RECENT_LIMIT);
   }
   else if (list == "neverplayed")
     filter.AppendWhere("game_view.playCount = 0");
