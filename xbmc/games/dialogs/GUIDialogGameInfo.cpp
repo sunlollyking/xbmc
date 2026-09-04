@@ -55,10 +55,12 @@ constexpr int CONTROL_BTN_ARTWORK = 16;
  * on screen. Anything the library holds that is not listed here is shown
  * after these, under the name the scraper gave it.
  */
-constexpr std::array<std::pair<const char*, int>, 10> ART_TYPES = {{
+constexpr std::array<std::pair<const char*, int>, 18> ART_TYPES = {{
     {"boxfront", 35576},
     {"boxback", 35577},
-    {"spine", 35584},
+    {"boxspine", 35584},
+    {"box3d", 35605},
+    {"boxfull", 35606},
     {"cartridge", 35578},
     {"disc", 35579},
     {"titlescreen", 35580},
@@ -66,6 +68,12 @@ constexpr std::array<std::pair<const char*, int>, 10> ART_TYPES = {{
     {"snap", 35581},
     {"clearlogo", 35582},
     {"banner", 35583},
+    {"marquee", 35604},
+    {"flyer", 35607},
+    {"map", 35608},
+    {"bezel", 35609},
+    {"mix", 35610},
+    {"fanart", 20445},
 }};
 
 std::string Localize(int id)

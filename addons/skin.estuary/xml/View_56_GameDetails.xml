@@ -53,7 +53,7 @@
 						<left>40</left>
 						<top>50</top>
 						<width>390</width>
-						<height>470</height>
+						<height>440</height>
 						<aspectratio align="center" aligny="bottom">keep</aspectratio>
 						<fadetime>300</fadetime>
 						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
@@ -62,7 +62,7 @@
 						<left>445</left>
 						<top>50</top>
 						<width>390</width>
-						<height>470</height>
+						<height>440</height>
 						<aspectratio align="center" aligny="bottom">keep</aspectratio>
 						<fadetime>300</fadetime>
 						<texture background="true">$INFO[ListItem.Art(boxback)]</texture>
@@ -71,7 +71,7 @@
 						<left>850</left>
 						<top>50</top>
 						<width>340</width>
-						<height>470</height>
+						<height>440</height>
 						<aspectratio align="center" aligny="bottom">keep</aspectratio>
 						<fadetime>300</fadetime>
 						<texture background="true">$VAR[GameScreenshotVar]</texture>
@@ -87,7 +87,7 @@
 						<left>40</left>
 						<top>50</top>
 						<width>430</width>
-						<height>470</height>
+						<height>440</height>
 						<aspectratio align="center" aligny="bottom">keep</aspectratio>
 						<fadetime>300</fadetime>
 						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
@@ -106,7 +106,7 @@
 						<left>520</left>
 						<top>50</top>
 						<width>670</width>
-						<height>470</height>
+						<height>440</height>
 						<aspectratio align="center" aligny="bottom">keep</aspectratio>
 						<fadetime>300</fadetime>
 						<texture background="true">$VAR[GameScreenshotVar]</texture>
@@ -117,7 +117,7 @@
 				     pictures following it on the same line -->
 				<control type="grouplist">
 					<left>40</left>
-					<top>540</top>
+					<top>505</top>
 					<width>1150</width>
 					<height>90</height>
 					<itemgap>20</itemgap>
@@ -144,43 +144,50 @@
 						<param name="w" value="100" />
 						<param name="h" value="90" />
 					</include>
-					<include content="GameArtCorner">
-						<param name="art" value="cartridge" />
-						<param name="w" value="100" />
-						<param name="h" value="90" />
-					</include>
-					<include content="GameArtCorner">
-						<param name="art" value="disc" />
-						<param name="w" value="100" />
-						<param name="h" value="90" />
-					</include>
-					<include content="GameArtCorner">
-						<param name="art" value="screenshot1" />
-						<param name="w" value="100" />
-						<param name="h" value="90" />
-					</include>
-					<include content="GameArtCorner">
-						<param name="art" value="fanart" />
-						<param name="w" value="100" />
-						<param name="h" value="90" />
-					</include>
 				</control>
 
 				<include content="GameFactsPanel">
 					<param name="left" value="40" />
-					<param name="top" value="640" />
-					<param name="facts_top" value="700" />
+					<param name="top" value="600" />
+					<param name="facts_top" value="660" />
 					<param name="width" value="1150" />
 				</include>
 
 				<control type="textbox">
 					<left>40</left>
-					<width>1150</width>
+					<width>620</width>
 					<top>900</top>
-					<bottom>50</bottom>
+					<bottom>40</bottom>
 					<font>font13</font>
 					<label>$INFO[ListItem.Plot]</label>
 					<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
+				</control>
+
+				<!-- The other pictures, whichever of them a game has -->
+				<control type="grouplist">
+					<left>700</left>
+					<top>900</top>
+					<width>490</width>
+					<height>128</height>
+					<itemgap>10</itemgap>
+					<orientation>horizontal</orientation>
+					<align>right</align>
+					<include content="GameArtTile">
+						<param name="art" value="cartridge" />
+						<param name="label" value="$LOCALIZE[35578]" />
+					</include>
+					<include content="GameArtTile">
+						<param name="art" value="disc" />
+						<param name="label" value="$LOCALIZE[35579]" />
+					</include>
+					<include content="GameArtTile">
+						<param name="art" value="marquee" />
+						<param name="label" value="$LOCALIZE[35604]" />
+					</include>
+					<include content="GameArtTile">
+						<param name="art" value="flyer" />
+						<param name="label" value="$LOCALIZE[35607]" />
+					</include>
 				</control>
 
 				<control type="scrollbar" id="56600">

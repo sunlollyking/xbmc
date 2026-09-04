@@ -190,7 +190,7 @@
 					<top>468</top>
 					<control type="button" id="138">
 						<width>1244</width>
-						<height>380</height>
+						<height>236</height>
 						<textoffsetx>40</textoffsetx>
 						<textoffsety>20</textoffsety>
 						<aligny>bottom</aligny>
@@ -205,68 +205,125 @@
 					</control>
 					<control type="textbox">
 						<left>40</left>
-						<top>30</top>
+						<top>26</top>
 						<width>1164</width>
-						<height>300</height>
+						<height>190</height>
 						<font>font13</font>
 						<label>$INFO[ListItem.Plot]</label>
 						<autoscroll delay="8000" time="3000" repeat="10000">Control.HasFocus(138)</autoscroll>
 					</control>
 					<control type="group">
-						<description>The rest of the pictures, where a description would be</description>
-						<visible>String.IsEmpty(ListItem.Plot)</visible>
+						<description>Every other picture the library holds; the Artwork button opens them whole</description>
+						<top>218</top>
+						<control type="label">
+							<left>40</left>
+							<top>0</top>
+							<width>1164</width>
+							<height>36</height>
+							<font>font12</font>
+							<textcolor>grey</textcolor>
+							<label>$LOCALIZE[35575]</label>
+							<visible>!(String.IsEmpty(ListItem.Art(boxback)) + String.IsEmpty(ListItem.Art(cartridge)) + String.IsEmpty(ListItem.Art(disc)) + String.IsEmpty(ListItem.Art(clearlogo)) + String.IsEmpty(ListItem.Art(titlescreen)) + String.IsEmpty(ListItem.Art(screenshot)) + String.IsEmpty(ListItem.Art(marquee)) + String.IsEmpty(ListItem.Art(box3d)) + String.IsEmpty(ListItem.Art(boxspine)) + String.IsEmpty(ListItem.Art(boxfull)) + String.IsEmpty(ListItem.Art(banner)) + String.IsEmpty(ListItem.Art(flyer)) + String.IsEmpty(ListItem.Art(map)) + String.IsEmpty(ListItem.Art(bezel)) + String.IsEmpty(ListItem.Art(mix)) + String.IsEmpty(ListItem.Art(fanart)))</visible>
+						</control>
+						<control type="grouplist">
+							<left>40</left>
+							<top>42</top>
+							<width>1164</width>
+							<height>128</height>
+							<itemgap>10</itemgap>
+							<orientation>horizontal</orientation>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="boxback" />
+								<param name="label" value="$LOCALIZE[35577]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="cartridge" />
+								<param name="label" value="$LOCALIZE[35578]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="disc" />
+								<param name="label" value="$LOCALIZE[35579]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="clearlogo" />
+								<param name="label" value="$LOCALIZE[35582]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="titlescreen" />
+								<param name="label" value="$LOCALIZE[35580]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="screenshot" />
+								<param name="label" value="$LOCALIZE[35581]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="marquee" />
+								<param name="label" value="$LOCALIZE[35604]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="box3d" />
+								<param name="label" value="$LOCALIZE[35605]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="boxspine" />
+								<param name="label" value="$LOCALIZE[35584]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="boxfull" />
+								<param name="label" value="$LOCALIZE[35606]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="banner" />
+								<param name="label" value="$LOCALIZE[35583]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="flyer" />
+								<param name="label" value="$LOCALIZE[35607]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="map" />
+								<param name="label" value="$LOCALIZE[35608]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="bezel" />
+								<param name="label" value="$LOCALIZE[35609]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="mix" />
+								<param name="label" value="$LOCALIZE[35610]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="fanart" />
+								<param name="label" value="$LOCALIZE[20445]" />
+							</include>
+						</control>
 						<control type="label">
 							<left>40</left>
 							<top>20</top>
 							<width>1164</width>
-							<height>40</height>
-							<font>font12</font>
-							<textcolor>grey</textcolor>
-							<label>$LOCALIZE[35575]</label>
-						</control>
-						<control type="grouplist">
-							<left>40</left>
-							<top>66</top>
-							<width>1164</width>
-							<height>250</height>
-							<itemgap>20</itemgap>
-							<orientation>horizontal</orientation>
-							<include content="GameArtThumb">
-								<param name="art" value="boxback" />
-							</include>
-							<include content="GameArtThumb">
-								<param name="art" value="cartridge" />
-							</include>
-							<include content="GameArtThumb">
-								<param name="art" value="disc" />
-							</include>
-							<include content="GameArtThumb">
-								<param name="art" value="titlescreen" />
-							</include>
-							<include content="GameArtThumb">
-								<param name="art" value="screenshot" />
-							</include>
-							<include content="GameArtThumb">
-								<param name="art" value="snap" />
-							</include>
-							<include content="GameArtThumb">
-								<param name="art" value="clearlogo" />
-							</include>
-							<include content="GameArtThumb">
-								<param name="art" value="fanart" />
-							</include>
-						</control>
-						<control type="label">
-							<left>40</left>
-							<top>30</top>
-							<width>1164</width>
-							<height>300</height>
+							<height>120</height>
 							<font>font13</font>
 							<textcolor>grey</textcolor>
 							<align>center</align>
 							<aligny>center</aligny>
 							<label>$LOCALIZE[19055]</label>
-							<visible>String.IsEmpty(ListItem.Art(boxback)) + String.IsEmpty(ListItem.Art(cartridge)) + String.IsEmpty(ListItem.Art(disc)) + String.IsEmpty(ListItem.Art(titlescreen)) + String.IsEmpty(ListItem.Art(screenshot)) + String.IsEmpty(ListItem.Art(snap)) + String.IsEmpty(ListItem.Art(clearlogo)) + String.IsEmpty(ListItem.Art(fanart))</visible>
+							<visible>String.IsEmpty(ListItem.Plot) + String.IsEmpty(ListItem.Art(boxback)) + String.IsEmpty(ListItem.Art(cartridge)) + String.IsEmpty(ListItem.Art(disc)) + String.IsEmpty(ListItem.Art(clearlogo)) + String.IsEmpty(ListItem.Art(titlescreen)) + String.IsEmpty(ListItem.Art(screenshot)) + String.IsEmpty(ListItem.Art(marquee)) + String.IsEmpty(ListItem.Art(box3d)) + String.IsEmpty(ListItem.Art(boxspine)) + String.IsEmpty(ListItem.Art(boxfull)) + String.IsEmpty(ListItem.Art(banner)) + String.IsEmpty(ListItem.Art(flyer)) + String.IsEmpty(ListItem.Art(map)) + String.IsEmpty(ListItem.Art(bezel)) + String.IsEmpty(ListItem.Art(mix)) + String.IsEmpty(ListItem.Art(fanart))</visible>
 						</control>
 					</control>
 				</control>

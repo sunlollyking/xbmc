@@ -1431,6 +1431,33 @@
 		</definition>
 	</include>
 
+	<include name="GameArtTile">
+		<param name="w" default="112" />
+		<definition>
+			<control type="group">
+				<width>$PARAM[w]</width>
+				<height>124</height>
+				<visible>!String.IsEmpty(ListItem.Art($PARAM[art]))</visible>
+				<control type="image">
+					<width>$PARAM[w]</width>
+					<height>96</height>
+					<aspectratio align="center" aligny="center">keep</aspectratio>
+					<fadetime>200</fadetime>
+					<texture background="true">$INFO[ListItem.Art($PARAM[art])]</texture>
+				</control>
+				<control type="label">
+					<top>98</top>
+					<width>$PARAM[w]</width>
+					<height>24</height>
+					<align>center</align>
+					<font>font10</font>
+					<textcolor>grey</textcolor>
+					<label>$PARAM[label]</label>
+				</control>
+			</control>
+		</definition>
+	</include>
+
 	<include name="GameArtThumb">
 		<definition>
 			<control type="group">

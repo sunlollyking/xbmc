@@ -20392,6 +20392,46 @@ msgctxt "#35603"
 msgid "Serial"
 msgstr ""
 
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35604"
+msgid "Marquee"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35605"
+msgid "3D box"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35606"
+msgid "Box texture"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35607"
+msgid "Flyer"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35608"
+msgid "Map"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35609"
+msgid "Bezel"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35610"
+msgid "Composed picture"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35611"
+msgid "Icon"
+msgstr ""
+
 #empty strings from id 35604 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp

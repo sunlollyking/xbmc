@@ -61,7 +61,7 @@ constexpr std::array<const char*, 3> sheetExtensions{".cue", ".gdi", ".m3u"};
 constexpr std::array<const char*, 1> playlistExtensions{".m3u"};
 
 //! How many further pictures of one kind a game keeps, beyond the first
-constexpr int MAX_EXTRA_ART = 3;
+constexpr int MAX_EXTRA_ART = 9;
 constexpr std::array<const char*, 4> trackExtensions{".bin", ".img", ".raw", ".wav"};
 
 std::string Localize(int id)
