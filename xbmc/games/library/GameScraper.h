@@ -120,7 +120,6 @@ public:
   /*!
    * \brief Give the scraper the per-path settings it was set up with
    */
-  void SetPathSettings(const std::string& settingsXml);
 
   /*!
    * \brief Ask what a file might be

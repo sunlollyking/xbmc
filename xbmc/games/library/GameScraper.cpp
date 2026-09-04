@@ -143,11 +143,6 @@ std::string CGameScraper::Name() const
   return m_addon->Name();
 }
 
-void CGameScraper::SetPathSettings(const std::string& settingsXml)
-{
-  m_addon->SetPathSettings(ADDON::ContentType::GAMES, settingsXml);
-}
-
 std::string CGameScraper::BuildUrl(const std::string& action, const GameScrapeRequest& request) const
 {
   CURL url("plugin://" + m_addon->ID() + "/");
@@ -191,9 +186,9 @@ std::string CGameScraper::BuildUrl(const std::string& action, const GameScrapeRe
   if (request.bulk)
     url.SetOption("bulk", "1");
 
-  const std::string settings = m_addon->GetPathSettingsAsJSON();
-  url.SetOption("pathSettings", settings.empty() ? "{}" : settings);
-
+  // The add-on reads its own settings. They are not sent here: Kodi writes
+  // the whole URL to the debug log, and these settings hold the keys and
+  // passwords a person gave their scraper.
   return url.Get();
 }
 

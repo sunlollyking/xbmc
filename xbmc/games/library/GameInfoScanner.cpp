@@ -665,8 +665,6 @@ CGameScraper* CGameInfoScanner::ScraperFor(const GamePathContent& content)
       CLog::Log(LOGWARNING, "GAME: Scraper {} is not available; using the default", scraperId);
       created = CGameScraper::CreateDefault();
     }
-    if (created && !content.settings.empty())
-      created->SetPathSettings(content.settings);
     it = m_scrapers.emplace(scraperId, std::move(created)).first;
   }
   return it->second.get();
