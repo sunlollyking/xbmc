@@ -226,6 +226,8 @@ private:
         return "albums"sv;
       case ARTISTS:
         return "artists"sv;
+      case GAMES:
+        return "games"sv;
       case NONE:
         return "none"sv;
     }
