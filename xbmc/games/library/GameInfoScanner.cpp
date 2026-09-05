@@ -672,6 +672,40 @@ bool CGameInfoScanner::RefreshGame(int idGame)
   return ok;
 }
 
+PlatformInfo CGameInfoScanner::MergeScrapedPlatform(const PlatformInfo& curated,
+                                                    const PlatformInfo& scraped)
+{
+  PlatformInfo merged = scraped;
+
+  // Identity is the catalogue's to state. Providers answer with a marketing name,
+  // or with the name of a different machine in the same family: the id shared by
+  // the PC-8001 and the PC-8801 turns one into the other.
+  merged.id = curated.id;
+  merged.slug = curated.slug;
+  merged.name = curated.name;
+  merged.sortName = curated.sortName;
+  merged.extensions = curated.extensions;
+  merged.aliases = curated.aliases;
+  merged.providerIds = curated.providerIds;
+
+  if (!curated.manufacturer.empty())
+    merged.manufacturer = curated.manufacturer;
+  if (!curated.family.empty())
+    merged.family = curated.family;
+  if (curated.type != PlatformType::UNKNOWN)
+    merged.type = curated.type;
+  if (curated.media != MediaFormat::UNKNOWN)
+    merged.media = curated.media;
+  if (curated.released != 0)
+    merged.released = curated.released;
+  if (curated.discontinued != 0)
+    merged.discontinued = curated.discontinued;
+  if (!curated.overview.empty())
+    merged.overview = curated.overview;
+
+  return merged;
+}
+
 void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const PlatformInfo& platform)
 {
   if (platform.id <= 0 || !DownloadsAllowed())
@@ -696,8 +730,7 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
   if (!scraper->GetPlatform(request, scraped, art))
     return;
 
-  scraped.id = platform.id;
-  m_database.SetPlatformDetails(scraped);
+  m_database.SetPlatformDetails(MergeScrapedPlatform(platform, scraped));
 
   for (const auto& [type, pieces] : art)
   {

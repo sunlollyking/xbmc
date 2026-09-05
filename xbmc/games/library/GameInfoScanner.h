@@ -109,6 +109,16 @@ public:
                           const PlatformInfo& platform,
                           struct GameScrapeRequest& request);
 
+  /*!
+   * \brief Take from a scraped platform only what the catalogue does not already say
+   *
+   * The catalogue is curated; a provider answers with whatever it happens to call
+   * the machine. Identity is the catalogue's to state, description and dates are
+   * worth having when it stays silent.
+   */
+  static PlatformInfo MergeScrapedPlatform(const PlatformInfo& curated,
+                                           const PlatformInfo& scraped);
+
 protected:
   // Implementation of CInfoScanner
   std::pair<ScanComplete, ContentFound> DoScan(const std::string& strDirectory) override;
