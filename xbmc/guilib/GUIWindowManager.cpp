@@ -372,7 +372,6 @@ void CGUIWindowManager::CreateWindows()
   Add(new GAME::CGUIDialogGameManuals);
   Add(new GAME::CDialogGameLeaderboards);
   Add(new GAME::CDialogGameLeaderboardEntries);
-  Add(new GAME::CDialogGameIndicators);
   Add(new RETRO::CGameWindowFullScreen);
 }
 
@@ -504,7 +503,6 @@ bool CGUIWindowManager::DestroyWindows()
     DestroyWindow(WINDOW_DIALOG_GAME_LEADERBOARD_ENTRIES);
     DestroyWindow(WINDOW_DIALOG_GAME_INDICATORS);
     DestroyWindow(WINDOW_DIALOG_GAME_ACHIEVEMENTS);
-    DestroyWindow(WINDOW_DIALOG_GAME_INDICATORS);
     DestroyWindow(WINDOW_FULLSCREEN_GAME);
 
     Remove(WINDOW_SETTINGS_SERVICE);
