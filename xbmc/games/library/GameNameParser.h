@@ -65,6 +65,18 @@ public:
   static ParsedGameName Parse(std::string_view fileName);
 
   /*!
+   * \brief Turn a WHDLoad install name into something a catalogue can match
+   *
+   * Amiga collections are named for the WHDLoad slave rather than the game:
+   * "SecretOfMonkeyIsland_v3.4_1625". The version, the hardware flags and the
+   * slave number say nothing about which game it is, and the words are run
+   * together, so nothing matches by name until they are separated.
+   *
+   * \return The spaced title, or an empty string if this is not such a name
+   */
+  static std::string ParseWhdLoadName(std::string_view fileName);
+
+  /*!
    * \brief "Legend of Zelda, The" -> "The Legend of Zelda"
    */
   static std::string DisplayTitle(std::string_view title);

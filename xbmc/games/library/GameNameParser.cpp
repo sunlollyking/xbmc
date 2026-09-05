@@ -208,10 +208,71 @@ std::string CGameNameParser::DisplayTitle(std::string_view title)
   return text;
 }
 
+std::string CGameNameParser::ParseWhdLoadName(std::string_view fileName)
+{
+  std::string name(fileName);
+
+  // Only WHDLoad names look like this. A catalogue name always has spaces in it,
+  // so requiring their absence keeps every other convention out of here.
+  if (name.find(' ') != std::string::npos)
+    return "";
+
+  const size_t dot = name.rfind('.');
+  if (dot != std::string::npos && name.size() - dot <= 5)
+    name.erase(dot);
+
+  // The title is whatever precedes the version, which every slave carries
+  static const std::string version = "_v";
+  const size_t at = name.find(version);
+  if (at == std::string::npos || at == 0 ||
+      at + version.size() >= name.size() ||
+      !std::isdigit(static_cast<unsigned char>(name[at + version.size()])))
+    return "";
+  name.erase(at);
+
+  std::string title;
+  for (size_t i = 0; i < name.size(); ++i)
+  {
+    const unsigned char c = static_cast<unsigned char>(name[i]);
+    if (c == '_' || c == '-')
+    {
+      title += ' ';
+      continue;
+    }
+    if (i > 0 && !title.empty() && title.back() != ' ')
+    {
+      const unsigned char prev = static_cast<unsigned char>(name[i - 1]);
+      const bool startsWord = std::isupper(c) && (std::islower(prev) || std::isdigit(prev));
+      // "UFOEnemy" splits before the last capital of a run, not inside it
+      const bool endsAcronym = std::isupper(c) && std::isupper(prev) &&
+                               i + 1 < name.size() &&
+                               std::islower(static_cast<unsigned char>(name[i + 1]));
+      // "Turrican3" is two words, "A10" is one: a lone letter before the digits
+      // belongs to them
+      const size_t wordStart = title.rfind(' ');
+      const size_t wordLength = title.size() - (wordStart == std::string::npos ? 0 : wordStart + 1);
+      const bool startsNumber = std::isdigit(c) && std::isalpha(prev) && wordLength > 1;
+      if (startsWord || endsAcronym || startsNumber)
+        title += ' ';
+    }
+    title += static_cast<char>(c);
+  }
+
+  StringUtils::Trim(title);
+  return title;
+}
+
 ParsedGameName CGameNameParser::Parse(std::string_view fileName)
 {
   Patterns& re = GetPatterns();
   ParsedGameName out;
+
+  if (const std::string whdload = ParseWhdLoadName(fileName); !whdload.empty())
+  {
+    out.title = whdload;
+    out.displayTitle = DisplayTitle(whdload);
+    return out;
+  }
 
   std::string name(fileName);
   if (Matches(re.extension, Lower(name)))
