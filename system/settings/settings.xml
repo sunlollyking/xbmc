@@ -1124,6 +1124,18 @@
         </setting>
       </group>
       <group id="4" label="35590">
+        <setting id="gamelibrary.selectaction" type="integer" label="22079" help="35638">
+          <level>0</level>
+          <default>8</default> <!-- ACTION_PLAY -->
+          <constraints>
+            <options>
+              <option label="22080">0</option> <!-- ACTION_CHOOSE -->
+              <option label="208">8</option> <!-- ACTION_PLAY -->
+              <option label="22081">3</option> <!-- ACTION_INFO -->
+            </options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
         <setting id="gamelibrary.updateonstartup" type="boolean" label="14245" help="36146">
           <level>1</level>
           <default>false</default>

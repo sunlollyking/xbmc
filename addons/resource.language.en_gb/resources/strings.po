@@ -20672,6 +20672,11 @@ msgctxt "#35637"
 msgid "The key the scraper reads your achievements with, from the \"Keys\" section of your control panel on the RetroAchievements website. It is not the password above: that signs you in to play, while this reads the catalogue. Keep it as private as a password."
 msgstr ""
 
+#: system/settings/settings.xml
+msgctxt "#35638"
+msgid "Toggle between [Choose], [Play] (default) and [Show information].[CR][Choose] will ask which of them you want.[CR][Play] will start the game.[CR][Show information] will open the game's information dialog."
+msgstr ""
+
 #empty strings from id 35604 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp

@@ -84,6 +84,7 @@ public:
   static constexpr auto SETTING_VIDEOLIBRARY_BACKGROUNDUPDATE = "videolibrary.backgroundupdate";
   static constexpr auto SETTING_VIDEOLIBRARY_CLEANUP = "videolibrary.cleanup";
   static constexpr auto SETTING_GAMELIBRARY_UPDATEONSTARTUP = "gamelibrary.updateonstartup";
+  static constexpr auto SETTING_GAMELIBRARY_SELECTACTION = "gamelibrary.selectaction";
   static constexpr auto SETTING_GAMELIBRARY_BACKGROUNDUPDATE = "gamelibrary.backgroundupdate";
   static constexpr auto SETTING_GAMELIBRARY_CLEANUP = "gamelibrary.cleanup";
   static constexpr auto SETTING_GAMELIBRARY_EXPORT = "gamelibrary.export";

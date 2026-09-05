@@ -42,6 +42,16 @@ protected:
 
   bool OnClickMsg(int controlId, int actionId);
   void OnItemInfo(int itemNumber);
+  //! \brief What a click on a game should do, from the games library settings
+  static int SelectAction();
+
+  /*!
+   * \brief Ask which of them the person wants
+   *
+   * \return True when the choice has been carried out, false to play the game
+   */
+  static bool ChooseAction(const std::shared_ptr<CFileItem>& item);
+
   bool PlayGame(const CFileItem& item);
   bool CanPlay(const CFileItem& item) const;
 
