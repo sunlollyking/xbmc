@@ -258,8 +258,15 @@ bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
       StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip" ? "zip" : "archive", CURL(path),
       "").Get();
 
+  // The members are wanted as files. Letting Kodi convert them to directories
+  // offers each one to every VFS add-on in turn to ask whether it is itself an
+  // archive, so one bad add-on takes the whole scan down with it: vfs.rar
+  // segfaults on some names, and a library scan is thousands of chances to hit
+  // one. Nothing here needs a nested archive opened, only the member list.
   CFileItemList members;
-  if (!XFILE::CDirectory::GetDirectory(archiveUrl, members, "", XFILE::DIR_FLAG_DEFAULTS))
+  if (!XFILE::CDirectory::GetDirectory(archiveUrl, members, "",
+                                       XFILE::DIR_FLAG_NO_FILE_DIRS |
+                                           XFILE::DIR_FLAG_NO_FILE_INFO))
     return false;
 
   std::shared_ptr<CFileItem> best;
