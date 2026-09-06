@@ -1208,6 +1208,10 @@
 					<height>32</height>
 					<font>font12</font>
 					<label>$INFO[$PARAM[info]]</label>
+					<!-- The column cannot widen without running into the next
+					     one, and a long genre or publisher is otherwise cut off
+					     with no way to read the rest -->
+					<scroll>true</scroll>
 				</control>
 			</control>
 		</definition>
@@ -1277,43 +1281,43 @@
 						<param name="label" value="$LOCALIZE[35549]" />
 						<param name="info" value="ListItem.Platform" />
 						<param name="lw" value="170" />
-						<param name="vw" value="310" />
+						<param name="vw" value="290" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[172]" />
 						<param name="info" value="ListItem.Premiered" />
 						<param name="lw" value="170" />
-						<param name="vw" value="310" />
+						<param name="vw" value="290" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[135]" />
 						<param name="info" value="ListItem.Genre" />
 						<param name="lw" value="170" />
-						<param name="vw" value="310" />
+						<param name="vw" value="290" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35521]" />
 						<param name="info" value="ListItem.Developer" />
 						<param name="lw" value="170" />
-						<param name="vw" value="310" />
+						<param name="vw" value="290" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35522]" />
 						<param name="info" value="ListItem.Publisher" />
 						<param name="lw" value="170" />
-						<param name="vw" value="310" />
+						<param name="vw" value="290" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[20434]" />
 						<param name="info" value="ListItem.Set" />
 						<param name="lw" value="170" />
-						<param name="vw" value="310" />
+						<param name="vw" value="290" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[20459]" />
 						<param name="info" value="ListItem.Tag" />
 						<param name="lw" value="170" />
-						<param name="vw" value="310" />
+						<param name="vw" value="290" />
 					</include>
 				</control>
 				<control type="grouplist">
