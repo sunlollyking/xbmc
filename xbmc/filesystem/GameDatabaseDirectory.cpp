@@ -126,7 +126,10 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         playlists->SetFolder(true);
         items.Add(playlists);
       }
-      items.SetContent("");
+      // These are ways into the library, not things in it. Naming the content
+      // lets a skin lay them out as navigation; left blank, the window fills it
+      // in as "games" and they are drawn as though each folder were a game.
+      items.SetContent("overview");
       return true;
     }
     case GameDbNode::PLATFORMS:
