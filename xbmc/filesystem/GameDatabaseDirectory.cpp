@@ -15,6 +15,7 @@
 #include "games/library/GameDbUrl.h"
 #include "games/tags/GameInfoTag.h"
 #include "media/MediaType.h"
+#include "utils/SortUtils.h"
 #include "ServiceBroker.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
@@ -123,6 +124,11 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
             "special://xbmc/media/gamelibrary/" + std::string(segment) + ".png";
         item->SetArt("icon", glyph);
         item->SetArt("thumb", glyph);
+        // The rest of these are filters and read well in alphabetical order.
+        // This one is not a filter, it is the way to the games themselves, and
+        // sorting it under A leaves it second behind age ratings.
+        if (segment == "titles")
+          item->SetSpecialSort(SortSpecial::TOP);
         items.Add(item);
       }
 
