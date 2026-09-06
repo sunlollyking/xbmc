@@ -14,6 +14,7 @@
 #include "games/database/GameDatabase.h"
 #include "games/library/GameDbUrl.h"
 #include "games/tags/GameInfoTag.h"
+#include "media/MediaType.h"
 #include "ServiceBroker.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
@@ -126,6 +127,21 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         playlists->SetFolder(true);
         items.Add(playlists);
       }
+      // Inside a platform these all belong to that machine, and none of them
+      // has art of its own. Lend them the machine's, so a skin's art panel
+      // shows what is being browsed rather than a folder with no picture.
+      if (dbUrl.HasPlatform())
+      {
+        CVariant platformId;
+        KODI::ART::Artwork art;
+        if (dbUrl.GetOption("platformid", platformId) &&
+            db.GetArtForItem(static_cast<int>(platformId.asInteger()), MediaTypeGamePlatform, art))
+        {
+          for (const auto& item : items)
+            item->SetArt(art);
+        }
+      }
+
       // These are ways into the library, not things in it. Naming the content
       // lets a skin lay them out as navigation; left blank, the window fills it
       // in as "games" and they are drawn as though each folder were a game.
