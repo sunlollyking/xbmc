@@ -29,6 +29,7 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
+#include "media/MediaType.h"
 #include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -191,6 +192,8 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case LISTITEM_ACHIEVEMENTS_PROGRESS:
     case LISTITEM_GAME_CATEGORY:
     case LISTITEM_GAME_CLIENT:
+    case LISTITEM_DBID:
+    case LISTITEM_DBTYPE:
     {
       // A node in the library -- all games, hacks, needs attention -- is not a
       // game and has no tag, but it can still say what is down there. A folder
@@ -370,6 +373,16 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
         case LISTITEM_GAME_CLIENT:
           value = tag->GetGameClient();
           return !value.empty();
+        case LISTITEM_DBID:
+          if (tag->HasDatabaseId())
+          {
+            value = std::to_string(tag->GetDatabaseId());
+            return true;
+          }
+          break;
+        case LISTITEM_DBTYPE:
+          value = MediaTypeGame;
+          return true;
         default:
           break;
       }
