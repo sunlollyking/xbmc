@@ -32,30 +32,37 @@ using namespace XFILE;
 namespace
 {
 // Each entry an overview node lists, and the string it is labelled with
-constexpr std::array<std::pair<std::string_view, int>, 23> overviewChildren{{
-    {"titles", 35544},
-    {"genres", 135},
-    {"years", 652},
-    {"developers", 35521},
-    {"publishers", 35522},
-    {"collections", 35523},
-    {"tags", 20459},
-    {"regions", 35524},
-    {"players", 35525},
-    {"ageratings", 35526},
-    {"categories", 35527},
-    {"recentlyadded", 35528},
-    {"recentlyplayed", 35529},
-    {"neverplayed", 35530},
-    {"favourites", 1036},
-    {"completed", 35531},
-    {"multiplayer", 35532},
-    {"coop", 35533},
-    {"achievements", 35534},
-    {"inprogress", 35535},
-    {"hacks", 35536},
-    {"homebrew", 35537},
-    {"needsattention", 35562},
+struct OverviewChild
+{
+  std::string_view segment;
+  int label;
+  int description;
+};
+
+constexpr std::array<OverviewChild, 23> overviewChildren{{
+    {"titles", 35544, 35640},
+    {"genres", 135, 35641},
+    {"years", 652, 35642},
+    {"developers", 35521, 35643},
+    {"publishers", 35522, 35644},
+    {"collections", 35523, 35645},
+    {"tags", 20459, 35646},
+    {"regions", 35524, 35647},
+    {"players", 35525, 35648},
+    {"ageratings", 35526, 35649},
+    {"categories", 35527, 35650},
+    {"recentlyadded", 35528, 35651},
+    {"recentlyplayed", 35529, 35652},
+    {"neverplayed", 35530, 35653},
+    {"favourites", 1036, 35654},
+    {"completed", 35531, 35655},
+    {"multiplayer", 35532, 35656},
+    {"coop", 35533, 35657},
+    {"achievements", 35534, 35658},
+    {"inprogress", 35535, 35659},
+    {"hacks", 35536, 35660},
+    {"homebrew", 35537, 35661},
+    {"needsattention", 35562, 35662},
 }};
 
 std::string Localize(int id)
@@ -67,7 +74,7 @@ int LabelForSegment(std::string_view segment)
 {
   if (segment == "platforms")
     return 35520;
-  for (const auto& [name, label] : overviewChildren)
+  for (const auto& [name, label, description] : overviewChildren)
   {
     if (name == segment)
       return label;
@@ -112,11 +119,14 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         items.Add(item);
       }
 
-      for (const auto& [segment, label] : overviewChildren)
+      for (const auto& [segment, label, description] : overviewChildren)
       {
         const auto item = std::make_shared<CFileItem>(Localize(label));
         item->SetPath(base + std::string(segment) + "/");
         item->SetFolder(true);
+        // A line on what is down there. Several of these are not obvious from
+        // the name alone -- what counts as a hack, or as needing attention.
+        item->SetProperty("description", Localize(description));
         // A glyph for the node, named after it. These ship with Kodi rather
         // than with a skin, so every skin draws the same thing here instead of
         // falling back to a folder that says nothing about where it leads.

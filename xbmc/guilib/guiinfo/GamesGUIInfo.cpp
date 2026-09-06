@@ -192,6 +192,16 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case LISTITEM_GAME_CATEGORY:
     case LISTITEM_GAME_CLIENT:
     {
+      // A node in the library -- all games, hacks, needs attention -- is not a
+      // game and has no tag, but it can still say what is down there. A folder
+      // has nowhere else to carry that.
+      if (info.GetInfo() == LISTITEM_PLOT && item != nullptr && !item->HasGameInfoTag())
+      {
+        value = item->GetProperty("description").asString();
+        if (!value.empty())
+          return true;
+      }
+
       // Const access, so asking does not create a tag on an item that has none
       if (item == nullptr || !item->HasGameInfoTag())
         break;

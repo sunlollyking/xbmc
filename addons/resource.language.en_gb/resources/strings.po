@@ -20677,7 +20677,122 @@ msgctxt "#35638"
 msgid "Toggle between [Choose], [Play] (default) and [Show information].[CR][Choose] will ask which of them you want.[CR][Play] will start the game.[CR][Show information] will open the game's information dialog."
 msgstr ""
 
-#empty strings from id 35604 to 35999
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35640"
+msgid "Every game for this machine."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35641"
+msgid "Games grouped by the kind of game they are."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35642"
+msgid "Games grouped by the year they came out."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35643"
+msgid "Games grouped by who made them."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35644"
+msgid "Games grouped by who published them."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35645"
+msgid "Games that belong to a series."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35646"
+msgid "Games grouped by the tags you have given them."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35647"
+msgid "Games grouped by the region they were sold in."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35648"
+msgid "Games grouped by how many people can play at once."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35649"
+msgid "Games grouped by the age they were rated for."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35650"
+msgid "Games grouped by how they were released, such as sold, given away or never finished."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35651"
+msgid "The games added to the library most recently."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35652"
+msgid "The games you played most recently."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35653"
+msgid "Games you have never started."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35654"
+msgid "The games you have marked as favourites."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35655"
+msgid "Games you have marked as finished."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35656"
+msgid "Games more than one person can play."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35657"
+msgid "Games two or more people can play together, rather than against each other."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35658"
+msgid "Games that have a set of achievements to earn."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35659"
+msgid "Games you have started but not finished."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35660"
+msgid "Fan-made alterations of other games."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35661"
+msgid "Games written by enthusiasts rather than released commercially."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35662"
+msgid "Games the library could not identify, or that are missing something needed to play."
+msgstr ""
+
+#empty strings from id 35663 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
