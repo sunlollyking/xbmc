@@ -26,6 +26,8 @@
 #include "utils/Variant.h"
 #include "utils/log.h"
 
+#include <algorithm>
+
 using namespace KODI;
 using namespace GAME;
 
@@ -37,6 +39,37 @@ constexpr const char* PROPERTY_DETAILS = "gamelibrary.details";
 constexpr const char* PROPERTY_PLATFORM = "gamelibrary.platform";
 constexpr const char* PROPERTY_PROGRESS = "gamelibrary.progress";
 constexpr const char* PROPERTY_BATCH = "gamelibrary.batch";
+
+/*!
+ * \brief Whether an overview says nothing the title has not already said
+ *
+ * Arcade and some cartridge sets carry a catalogue whose description field
+ * holds the game's own name -- MAME's does by definition. Stored, that reads
+ * as a described game and no later scan offers it to a provider that has real
+ * prose, so it is refused here instead.
+ */
+bool IsJustTheTitle(const std::string& overview, const std::string& title)
+{
+  if (overview.empty() || title.empty())
+    return false;
+
+  // Drop the bracketed region, revision and set markers a filename carries
+  std::string bare;
+  bare.reserve(overview.size());
+  int depth = 0;
+  for (const char c : overview)
+  {
+    if (c == '(' || c == '[')
+      ++depth;
+    else if (c == ')' || c == ']')
+      depth = std::max(depth - 1, 0);
+    else if (depth == 0)
+      bare += c;
+  }
+  StringUtils::Trim(bare);
+
+  return StringUtils::EqualsNoCase(bare, title);
+}
 
 std::vector<std::string> Strings(const CVariant& value)
 {
@@ -422,7 +455,11 @@ bool CGameScraper::ReadDetails(const std::string& id,
   if (payload.isMember("originaltitle"))
     details.SetOriginalTitle(payload["originaltitle"].asString());
   if (payload.isMember("overview"))
-    details.SetOverview(payload["overview"].asString());
+  {
+    const std::string overview = payload["overview"].asString();
+    if (!IsJustTheTitle(overview, title))
+      details.SetOverview(overview);
+  }
   if (payload.isMember("releasedate"))
     details.SetReleaseDate(payload["releasedate"].asString());
   if (payload.isMember("year"))
