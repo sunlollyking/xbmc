@@ -1234,12 +1234,6 @@
 					<param name="colour" value="FF66BB6A" />
 				</include>
 				<include content="GamePill">
-					<param name="info" value="ListItem.AchievementsTotal" />
-					<param name="label" value="$LOCALIZE[35588]: " />
-					<param name="colour" value="FF66BB6A" />
-					<param name="visible" value="String.IsEmpty(ListItem.AchievementsPercent)" />
-				</include>
-				<include content="GamePill">
 					<param name="info" value="ListItem.Players" />
 					<param name="label" value="$LOCALIZE[35525]: " />
 					<param name="colour" value="white" />
