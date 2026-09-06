@@ -550,6 +550,9 @@
 		<value condition="!String.IsEmpty(Skin.String(HomeFanart.path))">$INFO[Skin.String(HomeFanart.path)]weather$INFO[Skin.String(HomeFanart.ext)]</value>
 	</variable>
 	<variable name="ListWatchedIconVar">
+		<!-- The ways into a platform each carry their own glyph; a folder
+		     overlay would say the same thing about all twenty-three -->
+		<value condition="Container.Content(overview) + !ListItem.IsParentFolder + !String.IsEmpty(ListItem.Art(icon))">$INFO[ListItem.Art(icon)]</value>
 		<value condition="ListItem.IsRecording">windows/pvr/record.png</value>
 		<value condition="ListItem.IsCollection">overlays/set.png</value>
 		<value condition="ListItem.HasVideoVersions + !$EXP[videoasset_true]">overlays/versions.png</value>

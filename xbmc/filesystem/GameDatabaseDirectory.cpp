@@ -116,6 +116,13 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         const auto item = std::make_shared<CFileItem>(Localize(label));
         item->SetPath(base + std::string(segment) + "/");
         item->SetFolder(true);
+        // A glyph for the node, named after it. These ship with Kodi rather
+        // than with a skin, so every skin draws the same thing here instead of
+        // falling back to a folder that says nothing about where it leads.
+        const std::string glyph =
+            "special://xbmc/media/gamelibrary/" + std::string(segment) + ".png";
+        item->SetArt("icon", glyph);
+        item->SetArt("thumb", glyph);
         items.Add(item);
       }
 
@@ -138,7 +145,17 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
             db.GetArtForItem(static_cast<int>(platformId.asInteger()), MediaTypeGamePlatform, art))
         {
           for (const auto& item : items)
-            item->SetArt(art);
+          {
+            // Merged rather than assigned, and not over what the node draws
+            // itself with. The machine's art is the backdrop here; the glyph
+            // says where the row leads, and a skin reading ListItem.Icon
+            // resolves that through the thumb.
+            for (const auto& [type, url] : art)
+            {
+              if (type != "icon" && type != "thumb" && type != "poster")
+                item->SetArt(type, url);
+            }
+          }
         }
       }
 
