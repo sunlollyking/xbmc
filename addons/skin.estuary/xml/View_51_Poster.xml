@@ -100,7 +100,7 @@
 					<control type="textbox">
 						<left>645</left>
 						<top>480</top>
-						<height>250</height>
+						<height>262</height>
 						<right>115</right>
 						<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
 						<label>$VAR[PlotTextBoxVar]</label>
@@ -135,6 +135,19 @@
 				<fadetime>200</fadetime>
 				<aspectratio>scale</aspectratio>
 				<texture fallback="DefaultMovies.png" background="true">$VAR[PosterThumbVar]</texture>
+				<visible>!Container.Content(platforms)</visible>
+			</control>
+			<control type="image">
+				<left>4</left>
+				<top>4</top>
+				<width>476</width>
+				<height>716</height>
+				<fadetime>200</fadetime>
+				<!-- A machine's logo is wide; filling a poster frame with it
+				     leaves one letter on screen -->
+				<aspectratio align="center" aligny="center">keep</aspectratio>
+				<texture fallback="DefaultMovies.png" background="true">$VAR[PosterThumbVar]</texture>
+				<visible>Container.Content(platforms)</visible>
 			</control>
 			<control type="group">
 				<visible>String.IsEqual(ListItem.DBtype,tvshow) | String.IsEqual(ListItem.DBType,season) | ListItem.IsRecording | ListItem.HasReminder | ListItem.HasTimer | ListItem.IsCollection | ListItem.HasVideoVersions | ListItem.IsPlaying | ListItem.IsResumable | ListItem.HasVideoExtras | ListItem.HasArchive | Integer.IsGreater(ListItem.Playcount,0)</visible>

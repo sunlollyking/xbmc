@@ -274,6 +274,19 @@
 					<texture fallback="DefaultMovies.png" background="true">$INFO[ListItem.Icon]</texture>
 					<aspectratio>scale</aspectratio>
 					<bordersize>20</bordersize>
+					<visible>!Container.Content(platforms)</visible>
+				</control>
+				<control type="image">
+					<left>24</left>
+					<top>-1</top>
+					<width>272</width>
+					<height>270</height>
+					<texture fallback="DefaultMovies.png" background="true">$INFO[ListItem.Icon]</texture>
+					<!-- A machine's logo is wide. Filling a frame this close to
+					     square crops it to a couple of letters, so fit it in -->
+					<aspectratio align="center" aligny="center">keep</aspectratio>
+					<bordersize>20</bordersize>
+					<visible>Container.Content(platforms)</visible>
 				</control>
 			</control>
 			<control type="group">
