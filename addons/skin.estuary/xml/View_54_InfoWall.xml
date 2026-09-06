@@ -153,6 +153,19 @@
 				<texture fallback="$PARAM[fallback_image]" background="true">$VAR[InfoWallThumbVar]</texture>
 				<aspectratio>scale</aspectratio>
 				<bordersize>20</bordersize>
+				<visible>!Container.Content(platforms)</visible>
+			</control>
+			<control type="image">
+				<left>0</left>
+				<top>10</top>
+				<width>316</width>
+				<height>218</height>
+				<texture fallback="$PARAM[fallback_image]" background="true">$VAR[InfoWallThumbVar]</texture>
+				<!-- A machine's logo is wider than this tile; fill it and the
+				     name is cropped away -->
+				<aspectratio align="center" aligny="center">keep</aspectratio>
+				<bordersize>20</bordersize>
+				<visible>Container.Content(platforms)</visible>
 			</control>
 			<control type="image">
 				<left>20</left>
