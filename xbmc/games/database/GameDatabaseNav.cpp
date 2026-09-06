@@ -357,8 +357,27 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       for (const auto& item : items)
       {
         const auto found = art.find(static_cast<int>(item->GetProperty("gameid").asInteger()));
-        if (found != art.end())
-          item->SetArt(found->second);
+        if (found == art.end())
+          continue;
+
+        item->SetArt(found->second);
+
+        // Skins draw their backdrop from fanart, and games almost never have
+        // any: of this library's 30,000, a couple of hundred do. Nearly all of
+        // them have a picture of themselves running, though, which is the same
+        // thing for this purpose. Declared as a fallback rather than written
+        // in, so nothing here claims to be fanart that isn't.
+        if (found->second.find("fanart") == found->second.end())
+        {
+          for (const char* type : {"screenshot", "titlescreen"})
+          {
+            if (found->second.find(type) != found->second.end())
+            {
+              item->SetArtFallback("fanart", type);
+              break;
+            }
+          }
+        }
       }
     }
 
