@@ -1783,6 +1783,9 @@
         <setting id="gamelibrary.showderivedgames" type="boolean" label="35541" help="35542">
           <level>1</level>
           <default>false</default>
+          <dependencies>
+            <dependency type="enable" setting="gamelibrary.ignorenonretail" operator="is">false</dependency>
+          </dependencies>
           <control type="toggle" />
         </setting>
       </group>
