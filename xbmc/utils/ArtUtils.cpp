@@ -124,6 +124,10 @@ void FillInDefaultIcon(CFileItem& item)
       {
         item.SetArt("icon", "DefaultFavourites.png");
       }
+      else if (item.IsGame())
+      {
+        item.SetArt("icon", "DefaultAddonGame.png");
+      }
       else
       {
         // default icon for unknown file type
