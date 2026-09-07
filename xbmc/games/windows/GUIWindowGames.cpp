@@ -24,6 +24,7 @@
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/GameDatabaseDirectory.h"
 #include "games/GameUtils.h"
+#include "games/tags/GameInfoTag.h"
 #include "games/database/GameDatabase.h"
 #include "games/dialogs/GUIDialogGameContentSettings.h"
 #include "games/dialogs/GUIDialogGameInfo.h"
@@ -441,6 +442,11 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
   for (int i = 0; i < items.Size(); ++i)
   {
     CFileItemPtr item = items[i];
+    // A game the library knows is one game, whatever it is packed in. Neo Geo
+    // and the arcade sets are zips, and turning those into folders means
+    // choosing a game lists the ROMs inside it rather than opening the game.
+    if (item->HasGameInfoTag() && item->GetGameInfoTag()->GetDatabaseId() > 0)
+      continue;
     if (item->IsFolder() || !item->IsFileFolder(FileFolderType::ALWAYS))
       continue;
 
