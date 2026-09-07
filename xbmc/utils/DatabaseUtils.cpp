@@ -283,6 +283,8 @@ std::string DatabaseUtils::GetField(Field field, const MediaType &mediaType, Dat
       return "game_view.strPath";
     else if (field == Field::PLATFORM)
       return "game_view.platformName";
+    else if (field == Field::GENRE)
+      return "game_view.genres";
     else if (field == Field::DEVELOPER)
       return "game_view.developers";
     else if (field == Field::PLAYERS)
@@ -970,6 +972,8 @@ int DatabaseUtils::GetField(Field field, const MediaType &mediaType, bool asInde
       return KODI::GAME::GAMEDB_PATH;
     else if (field == Field::PLATFORM)
       return KODI::GAME::GAMEDB_PLATFORM_NAME;
+    else if (field == Field::GENRE)
+      return KODI::GAME::GAMEDB_GENRES;
     else if (field == Field::DEVELOPER)
       return KODI::GAME::GAMEDB_DEVELOPERS;
     else if (field == Field::PLAYERS)
