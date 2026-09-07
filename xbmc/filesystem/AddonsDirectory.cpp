@@ -59,8 +59,8 @@ const auto CATEGORY_GAME_RESOURCES = "category.gameresources";
 const auto CATEGORY_GAME_SUPPORT_ADDONS = "category.gamesupport";
 
 const std::set<AddonType> infoProviderTypes = {
-    AddonType::SCRAPER_ALBUMS,      AddonType::SCRAPER_ARTISTS, AddonType::SCRAPER_MOVIES,
-    AddonType::SCRAPER_MUSICVIDEOS, AddonType::SCRAPER_TVSHOWS,
+    AddonType::SCRAPER_ALBUMS,      AddonType::SCRAPER_ARTISTS, AddonType::SCRAPER_GAMES,
+    AddonType::SCRAPER_MOVIES,      AddonType::SCRAPER_MUSICVIDEOS, AddonType::SCRAPER_TVSHOWS,
 };
 
 // clang-format off
