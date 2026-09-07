@@ -200,9 +200,13 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
       // has nowhere else to carry that.
       if (info.GetInfo() == LISTITEM_PLOT && item != nullptr && !item->HasGameInfoTag())
       {
-        value = item->GetProperty("description").asString();
-        if (!value.empty())
+        // Refusing has to leave value as it was, so write it only on success
+        const std::string description = item->GetProperty("description").asString();
+        if (!description.empty())
+        {
+          value = description;
           return true;
+        }
       }
 
       // Const access, so asking does not create a tag on an item that has none
