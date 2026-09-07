@@ -168,7 +168,13 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
             // resolves that through the thumb.
             for (const auto& [type, url] : art)
             {
-              if (type != "icon" && type != "thumb" && type != "poster")
+              // Only the backdrop, and only that. Lending every type hands a
+              // skin the machine's photo or its controller to draw as the row's
+              // own picture, and then every way into the platform looks the
+              // same as every other. Types arrive numbered too -- fanart1,
+              // fanart2 -- so the digits come off before the comparison.
+              const std::string kind = type.substr(0, type.find_last_not_of("0123456789") + 1);
+              if (kind == "fanart")
                 item->SetArt(type, url);
             }
           }
