@@ -124,8 +124,12 @@ void FillInDefaultIcon(CFileItem& item)
       {
         item.SetArt("icon", "DefaultFavourites.png");
       }
-      else if (item.IsGame())
+      else if (item.HasGameInfoTag())
       {
+        // Deliberately not CFileItem::IsGame(), which asks the binary add-on
+        // cache and can reach for the repository list -- far too much to do
+        // for every item of every listing, and it needs a service broker this
+        // is called without.
         item.SetArt("icon", "DefaultAddonGame.png");
       }
       else
