@@ -51,6 +51,7 @@ void CGameInfoTag::Reset()
   m_strOriginalTitle.clear();
   m_strReleaseDate.clear();
   m_strTrailer.clear();
+  m_strEdition.clear();
   m_strManual.clear();
 
   m_developers.clear();
@@ -114,6 +115,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_strOriginalTitle = tag.m_strOriginalTitle;
     m_strReleaseDate = tag.m_strReleaseDate;
     m_strTrailer = tag.m_strTrailer;
+    m_strEdition = tag.m_strEdition;
     m_strManual = tag.m_strManual;
 
     m_developers = tag.m_developers;
@@ -324,6 +326,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_strOriginalTitle;
     ar << m_strReleaseDate;
     ar << m_strTrailer;
+    ar << m_strEdition;
     ar << m_strManual;
     ar << m_developers;
     ar << m_publishers;
@@ -401,6 +404,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_strOriginalTitle;
     ar >> m_strReleaseDate;
     ar >> m_strTrailer;
+    ar >> m_strEdition;
     ar >> m_strManual;
     ar >> m_developers;
     ar >> m_publishers;
@@ -487,6 +491,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["originaltitle"] = m_strOriginalTitle;
   value["releasedate"] = m_strReleaseDate;
   value["trailer"] = m_strTrailer;
+  value["edition"] = m_strEdition;
   value["manual"] = m_strManual;
   value["developers"] = m_developers;
   value["publishers"] = m_publishers;
@@ -740,6 +745,8 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
 
   if (!m_strTrailer.empty())
     XMLUtils::SetString(game, "trailer", m_strTrailer);
+  if (!m_strEdition.empty())
+    XMLUtils::SetString(game, "edition", m_strEdition);
   if (!m_strManual.empty())
     XMLUtils::SetString(game, "manual", m_strManual);
 
@@ -871,6 +878,8 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
 
   if (const std::string value = ChildText(element, "trailer"); !value.empty())
     m_strTrailer = value;
+  if (const std::string value = ChildText(element, "edition"); !value.empty())
+    m_strEdition = value;
   if (const std::string value = ChildText(element, "manual"); !value.empty())
     m_strManual = value;
 

@@ -20792,7 +20792,12 @@ msgctxt "#35662"
 msgid "Games the library could not identify, or that are missing something needed to play."
 msgstr ""
 
-#empty strings from id 35663 to 35999
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35663"
+msgid "Edition"
+msgstr ""
+
+#empty strings from id 35664 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

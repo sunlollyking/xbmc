@@ -483,6 +483,8 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetCoop(payload["coop"].asBoolean());
   if (payload.isMember("category"))
     details.SetCategory(CGameLibraryTypes::GameCategoryFromString(payload["category"].asString()));
+  if (payload.isMember("edition"))
+    details.SetEdition(payload["edition"].asString());
   if (payload.isMember("trailer"))
     details.SetTrailer(payload["trailer"].asString());
   if (payload.isMember("manual"))

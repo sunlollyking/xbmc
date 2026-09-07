@@ -309,6 +309,9 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
                           CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
                               CGameLibraryTypes::CategoryLabel(game.GetCategory())));
 
+      if (!game.GetEdition().empty())
+        item->SetProperty("edition", game.GetEdition());
+
       const std::string languages = record->at(GAMEDB_RELEASE_LANGUAGES).get_asString();
       if (!languages.empty())
         item->SetProperty("languages", StringUtils::ToUpper(languages));

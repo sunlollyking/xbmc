@@ -344,7 +344,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 4; }
+  int GetSchemaVersion() const override { return 5; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

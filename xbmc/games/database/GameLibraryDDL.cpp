@@ -107,7 +107,8 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "genres text, "
                   "developers text, "
                   "publishers text, "
-                  "collections text)");
+                  "collections text, "
+                  "edition text)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -368,4 +369,9 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   // remembered the emulator
   if (version < 4)
     db.ExecuteQuery("ALTER TABLE platform ADD COLUMN defaultVideoFilter text");
+
+  // 5: what a dump is when it is not simply the game -- a port, a remake, a
+  // mod -- which is worth saying on the game itself
+  if (version < 5)
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN edition text");
 }

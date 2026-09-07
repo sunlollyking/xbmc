@@ -144,6 +144,12 @@ public:
 
   const std::string& GetManual() const { return m_strManual; }
   void SetManual(const std::string& url) { m_strManual = url; }
+
+  /*! \brief What this dump is, when it is not simply the game: a port, a
+   *         remake, a mod. Empty for the game itself.
+   */
+  const std::string& GetEdition() const { return m_strEdition; }
+  void SetEdition(const std::string& edition) { m_strEdition = edition; }
   ///@}
 
   /*!
@@ -325,6 +331,7 @@ private:
   std::string m_strReleaseDate;
   std::string m_strTrailer;
   std::string m_strManual;
+  std::string m_strEdition;
 
   // People and groupings
   std::vector<std::string> m_developers;

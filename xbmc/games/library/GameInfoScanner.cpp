@@ -957,6 +957,14 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   else if (parsed.status == ReleaseStatus::PROGRAM)
     tag.SetCategory(GameCategory::BIOS);
 
+  // The file name knows what this dump is better than a catalogue does, which
+  // describes the game rather than the copy in hand. A scraper may still name
+  // an edition later where the name said nothing.
+  if (!parsed.translation.empty())
+    tag.SetEdition("Fan Translation");
+  else if (parsed.hack)
+    tag.SetEdition("Mod");
+
   GameRelease release;
   release.title = parsed.title;
   release.regions = parsed.regions;
@@ -1077,6 +1085,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
           scraped.SetPublishers(tag.GetPublishers());
         if (scraped.GetCategory() == GameCategory::RETAIL && tag.GetCategory() != GameCategory::RETAIL)
           scraped.SetCategory(tag.GetCategory());
+        if (!tag.GetEdition().empty())
+          scraped.SetEdition(tag.GetEdition());
         tag = scraped;
 
         for (const GameRelease& known : catalogueReleases)

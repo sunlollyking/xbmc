@@ -88,7 +88,7 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           "achievementsEarned = %i, "
           "achievementsHardcore = %i, lastUnlock = '%s', matchedBy = '%s', trailer = '%s', "
           "manual = '%s', lastScraped = '%s', genres = '%s', developers = '%s', publishers = "
-          "'%s', collections = '%s' WHERE idGame = %i",
+          "'%s', collections = '%s', edition = '%s' WHERE idGame = %i",
           idPlatform, details.GetTitle().c_str(), sortTitle.c_str(), titleKey.c_str(),
           details.GetOriginalTitle().c_str(), details.GetOverview().c_str(),
           details.GetReleaseDate().c_str(), static_cast<int>(details.GetYear()),
@@ -99,7 +99,7 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           details.GetAchievementsHardcore(), details.GetLastUnlock().c_str(), matchedBy.c_str(),
           details.GetTrailer().c_str(), details.GetManual().c_str(),
           details.GetLastScraped().c_str(), genres.c_str(), developers.c_str(), publishers.c_str(),
-          collections.c_str(), idGame));
+          collections.c_str(), details.GetEdition().c_str(), idGame));
     }
     else
     {
@@ -110,9 +110,9 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           "idDefaultRelease, idDefaultRating, idDefaultUniqueId, userRating, favourite, "
           "completed, hidden, achievementsTotal, achievementsEarned, achievementsHardcore, "
           "lastUnlock, matchedBy, trailer, manual, lastScraped, dateAdded, genres, developers, "
-          "publishers, collections) VALUES (%i, '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i, "
-          "%i, '%s', %i, -1, -1, -1, %i, %i, %i, %i, %i, %i, %i, '%s', '%s', '%s', '%s', '%s', "
-          "'%s', '%s', '%s', '%s', '%s')",
+          "publishers, collections, edition) VALUES (%i, '%s', '%s', '%s', '%s', '%s', '%s', %i, "
+          "%i, %i, %i, '%s', %i, -1, -1, -1, %i, %i, %i, %i, %i, %i, %i, '%s', '%s', '%s', '%s', "
+          "'%s', '%s', '%s', '%s', '%s', '%s', '%s')",
           idPlatform, details.GetTitle().c_str(), sortTitle.c_str(), titleKey.c_str(),
           details.GetOriginalTitle().c_str(), details.GetOverview().c_str(),
           details.GetReleaseDate().c_str(), static_cast<int>(details.GetYear()),
@@ -124,7 +124,7 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           details.GetLastUnlock().c_str(), matchedBy.c_str(),
           details.GetTrailer().c_str(), details.GetManual().c_str(),
           details.GetLastScraped().c_str(), dateAdded.c_str(), genres.c_str(), developers.c_str(),
-          publishers.c_str(), collections.c_str()));
+          publishers.c_str(), collections.c_str(), details.GetEdition().c_str()));
       idGame = static_cast<int>(m_pDS->lastinsertid());
     }
 
@@ -496,6 +496,7 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
       CGameLibraryTypes::MatchMethodFromString(record->at(GAMEDB_MATCHED_BY).get_asString()));
   details.SetTrailer(record->at(GAMEDB_TRAILER).get_asString());
   details.SetManual(record->at(GAMEDB_MANUAL).get_asString());
+  details.SetEdition(record->at(GAMEDB_EDITION).get_asString());
   details.SetDateAdded(record->at(GAMEDB_DATE_ADDED).get_asString());
   details.SetGenres(SplitList(record->at(GAMEDB_GENRES).get_asString()));
   details.SetDevelopers(SplitList(record->at(GAMEDB_DEVELOPERS).get_asString()));
