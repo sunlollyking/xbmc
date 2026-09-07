@@ -968,6 +968,9 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   // rather than only the file that was launched. A track belonging to a sheet
   // is part of a disc, not a disc of its own, and a game with one file has no
   // disc number at all.
+  // The name usually says which disc a file is -- "(Disc 2)", "(Disk 3 of 4)",
+  // "(Side B)" -- and that is worth more than the order a directory happens to
+  // enumerate in. Counting is the fallback for a set that does not say.
   int disc = 0;
   const bool manyDiscs = std::ranges::count_if(files, [](const std::string& file)
                                                { return !HasExtension(file, trackExtensions); }) > 1;
@@ -977,7 +980,20 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     f.path = file;
     if (manyDiscs && !HasExtension(file, trackExtensions) &&
         !HasExtension(file, playlistExtensions))
-      f.disc = ++disc;
+    {
+      const int named = CGameNameParser::Parse(URIUtils::GetFileName(file)).disc;
+      if (named > 0)
+      {
+        f.disc = named;
+        // keep the counter past it, so an unnamed file later in the set does
+        // not land on a number already taken
+        disc = std::max(disc, named);
+      }
+      else
+      {
+        f.disc = ++disc;
+      }
+    }
     release.files.emplace_back(std::move(f));
   }
 
