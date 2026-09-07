@@ -839,8 +839,14 @@ void CGameInfoScanner::Prefetch(const Entry* entries,
   {
     const Entry& entry = entries[i];
     // A folder-per-game entry has to be opened to know what plays, and a game
-    // already in the library is not asked about again
-    if (entry.isFolder || entry.path.empty() || m_database.GetGameIdByFile(entry.path) > 0)
+    // that has already been described is not asked about again. One the
+    // scanner added but never described still belongs in the batch, so a
+    // resumed scan is as quick as the first one rather than falling back to a
+    // request or two per game.
+    if (entry.isFolder || entry.path.empty())
+      continue;
+    const int known = m_database.GetGameIdByFile(entry.path);
+    if (known > 0 && !m_database.GetLastScraped(known).empty())
       continue;
 
     const ParsedGameName parsed = CGameNameParser::Parse(URIUtils::GetFileName(entry.path));
