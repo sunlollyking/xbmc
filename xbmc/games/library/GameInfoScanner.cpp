@@ -1215,7 +1215,16 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     tag.SetAchievements(existing.GetAchievementsTotal(), existing.GetAchievementsEarned(),
                         existing.GetAchievementsHardcore());
     tag.SetLastUnlock(existing.GetLastUnlock());
-    tag.SetTags(existing.GetTags());
+    // Tags can be put on a game by hand, so a refresh keeps those -- but it
+    // must not throw away the ones the scrape just found, which is what
+    // replacing them outright did: the library held none at all.
+    std::vector<std::string> tags = existing.GetTags();
+    for (const std::string& name : tag.GetTags())
+    {
+      if (std::ranges::find(tags, name) == tags.end())
+        tags.emplace_back(name);
+    }
+    tag.SetTags(tags);
     KODI::ART::Artwork existingArt;
     m_database.GetArtForItem(refreshGameId, MediaTypeGame, existingArt);
     for (const auto& [type, url] : art)
