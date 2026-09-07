@@ -565,6 +565,59 @@ bool CGameDatabase::GetGameInfo(int idGame, CGameInfoTag& details)
   return false;
 }
 
+bool CGameDatabase::MergeGameInto(int idFrom, int idInto)
+{
+  if (idFrom <= 0 || idInto <= 0 || idFrom == idInto)
+    return false;
+
+  try
+  {
+    BeginTransaction();
+
+    // The releases carry the files, so they move first: deleting the row while
+    // they still point at it would take the dumps with them
+    m_pDS->exec(
+        PrepareSQL("UPDATE gamerelease SET idGame = %i WHERE idGame = %i", idInto, idFrom));
+
+    static constexpr std::array<std::pair<const char*, const char*>, 5> links{
+        {{"genre_link", "idGenre"},
+         {"tag_link", "idTag"},
+         {"developer_link", "idCompany"},
+         {"publisher_link", "idCompany"},
+         {"collection_link", "idCollection"}}};
+    for (const auto& [table, column] : links)
+    {
+      m_pDS->exec(PrepareSQL("INSERT OR IGNORE INTO %s (%s, idGame) SELECT %s, %i FROM %s WHERE "
+                             "idGame = %i",
+                             table, column, column, idInto, table, idFrom));
+    }
+
+    // Only what the survivor has no answer for; what it already knows wins
+    m_pDS->exec(PrepareSQL(
+        "INSERT INTO art (media_id, media_type, type, url) SELECT %i, '%s', type, url FROM art "
+        "WHERE media_id = %i AND media_type = '%s' AND type NOT IN (SELECT type FROM art WHERE "
+        "media_id = %i AND media_type = '%s')",
+        idInto, MediaTypeGame, idFrom, MediaTypeGame, idInto, MediaTypeGame));
+    m_pDS->exec(PrepareSQL(
+        "INSERT INTO uniqueid (media_id, media_type, type, value) SELECT %i, '%s', type, value "
+        "FROM uniqueid WHERE media_id = %i AND media_type = '%s' AND type NOT IN (SELECT type "
+        "FROM uniqueid WHERE media_id = %i AND media_type = '%s')",
+        idInto, MediaTypeGame, idFrom, MediaTypeGame, idInto, MediaTypeGame));
+
+    // Whatever is left belongs to the emptied row and goes with it
+    m_pDS->exec(PrepareSQL("DELETE FROM game WHERE idGame = %i", idFrom));
+
+    CommitTransaction();
+    return true;
+  }
+  catch (...)
+  {
+    RollbackTransaction();
+    CLog::Log(LOGERROR, "GAME: Failed to merge game {} into {}", idFrom, idInto);
+  }
+  return false;
+}
+
 bool CGameDatabase::DeleteGame(int idGame)
 {
   if (idGame <= 0)
@@ -574,7 +627,8 @@ bool CGameDatabase::DeleteGame(int idGame)
 
 int CGameDatabase::FindGameByUniqueId(int idPlatform,
                                       const std::string& type,
-                                      const std::string& value)
+                                      const std::string& value,
+                                      int exceptGame)
 {
   if (type.empty() || value.empty())
     return -1;
@@ -584,8 +638,8 @@ int CGameDatabase::FindGameByUniqueId(int idPlatform,
     return GetSingleValueInt(PrepareSQL(
         "SELECT game.idGame FROM uniqueid JOIN game ON game.idGame = uniqueid.media_id WHERE "
         "uniqueid.media_type = '%s' AND uniqueid.type = '%s' AND uniqueid.value = '%s' AND "
-        "game.idPlatform = %i",
-        MediaTypeGame, type.c_str(), value.c_str(), idPlatform));
+        "game.idPlatform = %i AND game.idGame <> %i",
+        MediaTypeGame, type.c_str(), value.c_str(), idPlatform, exceptGame));
   }
   catch (...)
   {
@@ -594,7 +648,7 @@ int CGameDatabase::FindGameByUniqueId(int idPlatform,
   return -1;
 }
 
-int CGameDatabase::FindGameByTitleKey(int idPlatform, const std::string& titleKey)
+int CGameDatabase::FindGameByTitleKey(int idPlatform, const std::string& titleKey, int exceptGame)
 {
   if (titleKey.empty())
     return -1;
@@ -602,8 +656,9 @@ int CGameDatabase::FindGameByTitleKey(int idPlatform, const std::string& titleKe
   try
   {
     return GetSingleValueInt(
-        PrepareSQL("SELECT idGame FROM game WHERE idPlatform = %i AND titleKey = '%s'", idPlatform,
-                   titleKey.c_str()));
+        PrepareSQL("SELECT idGame FROM game WHERE idPlatform = %i AND titleKey = '%s' AND "
+                   "idGame <> %i",
+                   idPlatform, titleKey.c_str(), exceptGame));
   }
   catch (...)
   {

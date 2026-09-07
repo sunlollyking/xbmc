@@ -247,8 +247,19 @@ public:
   bool GetReleasesNav(const std::string& baseDir, CFileItemList& items);
 
   bool DeleteGame(int idGame);
-  int FindGameByUniqueId(int idPlatform, const std::string& type, const std::string& value);
-  int FindGameByTitleKey(int idPlatform, const std::string& titleKey);
+
+  /*!
+   * \brief Fold one game into another, keeping its releases
+   *
+   * A game the file name named one thing and the catalogue later named another
+   * can end up being the game a second row already is. The releases move
+   * across, anything the survivor lacks is copied over, and the emptied row
+   * goes.
+   */
+  bool MergeGameInto(int idFrom, int idInto);
+  int FindGameByUniqueId(int idPlatform, const std::string& type, const std::string& value,
+                         int exceptGame = -1);
+  int FindGameByTitleKey(int idPlatform, const std::string& titleKey, int exceptGame = -1);
   bool SetDefaultRelease(int idGame, int idRelease);
   bool SetFavourite(int idGame, bool favourite);
   bool SetCompleted(int idGame, bool completed);

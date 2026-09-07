@@ -1229,7 +1229,31 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     m_database.GetArtForItem(refreshGameId, MediaTypeGame, existingArt);
     for (const auto& [type, url] : art)
       existingArt[type] = url;
-    return m_database.SetDetailsForGame(tag, existingArt) > 0;
+    if (m_database.SetDetailsForGame(tag, existingArt) <= 0)
+      return false;
+
+    // A refresh can settle on an identity some other row already has: the file
+    // name named this one thing when it was added and the catalogue names it
+    // another now. Two dumps of one game were then two games. Fold them
+    // together, keeping whichever row knows more.
+    int other = -1;
+    if (scraper != nullptr && !candidateId.empty())
+      other = m_database.FindGameByUniqueId(platform.id, scraper->ID(), candidateId, refreshGameId);
+    if (other <= 0)
+      other = m_database.FindGameByTitleKey(platform.id,
+                                            CGameLibraryTypes::TitleKey(tag.GetTitle()),
+                                            refreshGameId);
+    if (other > 0)
+    {
+      int keep = other;
+      int drop = refreshGameId;
+      CGameInfoTag survivor;
+      if (m_database.GetGameInfo(other, survivor) && survivor.GetOverview().empty() &&
+          !tag.GetOverview().empty())
+        std::swap(keep, drop);
+      m_database.MergeGameInto(drop, keep);
+    }
+    return true;
   }
 
   // Another dump of a game already in the library becomes one of its releases
