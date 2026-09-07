@@ -1227,8 +1227,24 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     tag.SetTags(tags);
     KODI::ART::Artwork existingArt;
     m_database.GetArtForItem(refreshGameId, MediaTypeGame, existingArt);
+    const auto wasFront = existingArt.find("boxfront");
+    const std::string oldFront = wasFront != existingArt.end() ? wasFront->second : "";
     for (const auto& [type, url] : art)
       existingArt[type] = url;
+    // A thumb and a poster are the box front under another name. They are
+    // stored rather than derived, and are only filled in when missing, so a
+    // front that changes leaves them pointing at the old picture -- which is
+    // how a game ends up with a cover in its info panel and none in the list.
+    if (const auto front = existingArt.find("boxfront");
+        front != existingArt.end() && front->second != oldFront && !oldFront.empty())
+    {
+      for (const char* alias : {"thumb", "poster"})
+      {
+        if (const auto it = existingArt.find(alias);
+            it != existingArt.end() && it->second == oldFront)
+          it->second = front->second;
+      }
+    }
     if (m_database.SetDetailsForGame(tag, existingArt) <= 0)
       return false;
 
