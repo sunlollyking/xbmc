@@ -36,6 +36,19 @@ TEST(TestGameNameParser, SeparatesADigitFromTheWordBeforeIt)
   EXPECT_EQ(CGameNameParser::ParseWhdLoadName("A10TankKiller_v2.0_3Disk"), "A10 Tank Killer");
 }
 
+TEST(TestGameNameParser, DropsATagThatNeverCloses)
+{
+  // Extracted sets routinely hit a 64 character filename limit, which cuts a
+  // name mid-tag. What follows the stray bracket is half an attribute, not part
+  // of the title, and keeping it stopped the whole set from matching.
+  EXPECT_EQ(CGameNameParser::Parse("Bulldog (1988)(Ariolasoft UK LTD)(Tape 2.tap").title, "Bulldog");
+  EXPECT_EQ(CGameNameParser::Parse("Samurai Trilogy (1988)(Ariolasoft UK LT2.tap").title,
+            "Samurai Trilogy");
+  EXPECT_EQ(CGameNameParser::Parse("Auf Wiedersehen Monty (1988)(Ariolasoft .tap").title,
+            "Auf Wiedersehen Monty");
+  EXPECT_EQ(CGameNameParser::Parse("Elite [cr TWD.d64").title, "Elite");
+}
+
 TEST(TestGameNameParser, LeavesEveryOtherConventionAlone)
 {
   // A catalogue name has spaces, so it must never be taken for a WHDLoad slave

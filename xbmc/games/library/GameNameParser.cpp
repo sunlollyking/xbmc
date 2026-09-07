@@ -294,7 +294,11 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName)
     const size_t close = name.find(']', open);
     if (close == std::string::npos)
     {
-      rest += name.substr(pos);
+      // A tag that never closes means the name was cut short -- extracted sets
+      // routinely hit a 64 character filename limit -- so what follows is half
+      // a tag, not part of the title. "Bulldog (1988)(Ariolasoft UK LTD)(Tape 2"
+      // is Bulldog.
+      rest += name.substr(pos, open - pos);
       break;
     }
     rest += name.substr(pos, open - pos);
@@ -339,7 +343,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName)
     const size_t close = name.find(')', open);
     if (close == std::string::npos)
     {
-      rest += name.substr(pos);
+      rest += name.substr(pos, open - pos);
       break;
     }
     rest += name.substr(pos, open - pos);
