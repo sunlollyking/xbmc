@@ -20797,7 +20797,32 @@ msgctxt "#35663"
 msgid "Edition"
 msgstr ""
 
-#empty strings from id 35664 to 35999
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35664"
+msgid "Preferred title"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35665"
+msgid "Which name to show for a game. The catalogue title is the name it is best known by, the original title is the name it was sold under in its own language, and as named on disk is what the file is called."
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35666"
+msgid "Catalogue title"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35667"
+msgid "Original title"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35668"
+msgid "As named on disk"
+msgstr ""
+
+#empty strings from id 35669 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

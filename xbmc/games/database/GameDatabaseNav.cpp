@@ -42,6 +42,37 @@ bool ShowDerivedGames()
   return settings && settings->GetBool(SETTING_GAMELIBRARY_SHOWDERIVEDGAMES);
 }
 
+/*!
+ * \brief The name to show for a game, as the person asked to see it
+ *
+ * All three names are already on the row, so changing the setting shows a
+ * different one at once rather than rebuilding the library. Sorting is left on
+ * the catalogue title, which is what sortTitle was built from: an A-Z ordered
+ * by a name nobody can see is confusing, but rewriting 30,000 sort titles
+ * whenever this changes is worse.
+ */
+std::string DisplayTitle(const CGameInfoTag& game, const dbiplus::sql_record* record)
+{
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const auto style = static_cast<TitleStyle>(
+      settings ? settings->GetInt(SETTING_GAMELIBRARY_TITLESTYLE) : 0);
+  switch (style)
+  {
+    case TitleStyle::ORIGINAL:
+      if (!game.GetOriginalTitle().empty())
+        return game.GetOriginalTitle();
+      break;
+    case TitleStyle::ON_DISK:
+      if (const std::string onDisk = record->at(GAMEDB_RELEASE_TITLE).get_asString();
+          !onDisk.empty())
+        return onDisk;
+      break;
+    case TitleStyle::CATALOGUE:
+      break;
+  }
+  return game.GetTitle();
+}
+
 std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& release)
 {
   std::vector<std::string> parts;
@@ -284,7 +315,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       CGameInfoTag game;
       GetDetailsForGame(record, game);
 
-      const auto item = std::make_shared<CFileItem>(game.GetTitle());
+      const auto item = std::make_shared<CFileItem>(DisplayTitle(game, record));
       *item->GetGameInfoTag() = game;
 
       // A game plays its default release; with no file it can only be browsed

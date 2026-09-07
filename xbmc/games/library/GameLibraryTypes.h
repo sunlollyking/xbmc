@@ -22,6 +22,15 @@ namespace GAME
  * \brief Settings the library reads
  */
 constexpr const char* SETTING_GAMELIBRARY_SHOWDERIVEDGAMES = "gamelibrary.showderivedgames";
+constexpr const char* SETTING_GAMELIBRARY_TITLESTYLE = "gamelibrary.titlestyle";
+
+//! \brief Which of a game's names to show; the order matches settings.xml
+enum class TitleStyle
+{
+  CATALOGUE = 0,
+  ORIGINAL = 1,
+  ON_DISK = 2,
+};
 constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY = "gamelibrary.regionpriority";
 constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY_DEFAULT = "Europe,World,USA,Japan";
 constexpr const char* SETTING_GAMELIBRARY_AGERATINGBOARDS = "gamelibrary.ageratingboards";

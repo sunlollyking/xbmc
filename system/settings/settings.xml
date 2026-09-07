@@ -1775,6 +1775,18 @@
           <default>true</default>
           <control type="toggle" />
         </setting>
+        <setting id="gamelibrary.titlestyle" type="integer" label="35664" help="35665">
+          <level>1</level>
+          <default>0</default> <!-- the catalogue title -->
+          <constraints>
+            <options>
+              <option label="35666">0</option> <!-- catalogue title -->
+              <option label="35667">1</option> <!-- original title -->
+              <option label="35668">2</option> <!-- as named on disk -->
+            </options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
         <setting id="gamelibrary.ignorenonretail" type="boolean" label="35593" help="35594">
           <level>1</level>
           <default>false</default>
