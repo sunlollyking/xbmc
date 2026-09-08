@@ -11,6 +11,14 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "ServiceBroker.h"
+#include "URL.h"
+#include "filesystem/CurlFile.h"
+#include "games/tags/GameInfoTag.h"
+#include "guilib/GUIComponent.h"
+#include "guilib/GUIWindowManager.h"
+#include "guilib/guiinfo/GUIInfoLabels.h"
+#include "utils/JSONVariantParser.h"
+#include "utils/log.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
@@ -34,6 +42,101 @@ using namespace GAME;
 
 namespace
 {
+//! The set and the player's standing in it, in one answer
+constexpr const char* GAME_PROGRESS_URL =
+    "https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?g={}&u={}&y={}";
+
+//! Where RetroAchievements serves achievement badges from
+constexpr const char* BADGE_URL = "https://media.retroachievements.org/Badge/{}.png";
+constexpr const char* LOCKED_BADGE_URL = "https://media.retroachievements.org/Badge/{}_lock.png";
+
+constexpr unsigned int REQUEST_TIMEOUT_SECS = 10;
+
+/*!
+ * \brief Fetches one game's achievements and the player's progress, off the GUI thread
+ */
+class CLibraryAchievementsJob : public CJob
+{
+public:
+  CLibraryAchievementsJob(std::string gameId, std::string username, std::string apiKey)
+    : m_gameId(std::move(gameId)), m_username(std::move(username)), m_apiKey(std::move(apiKey))
+  {
+  }
+
+  const char* GetType() const override { return "library-achievements"; }
+
+  bool DoWork() override
+  {
+    const std::string url = StringUtils::Format(GAME_PROGRESS_URL, CURL::Encode(m_gameId),
+                                                CURL::Encode(m_username), CURL::Encode(m_apiKey));
+
+    XFILE::CCurlFile curl;
+    curl.SetTimeout(REQUEST_TIMEOUT_SECS);
+
+    std::string response;
+    if (!curl.Get(url, response))
+      return false;
+
+    CVariant data;
+    if (!CJSONVariantParser::Parse(response, data) || !data.isObject())
+      return false;
+
+    m_state.gameTitle = data["Title"].asString();
+    m_state.gameId = static_cast<unsigned int>(data["ID"].asUnsignedInteger());
+
+    const CVariant& achievements = data["Achievements"];
+    for (auto it = achievements.begin_map(); it != achievements.end_map(); ++it)
+    {
+      const CVariant& row = it->second;
+
+      AchievementInfo info;
+      info.id = static_cast<unsigned int>(row["ID"].asUnsignedInteger());
+      info.title = row["Title"].asString();
+      info.description = row["Description"].asString();
+      info.points = static_cast<unsigned int>(row["Points"].asUnsignedInteger());
+
+      const std::string badge = row["BadgeName"].asString();
+      if (!badge.empty())
+      {
+        info.badgeUrl = StringUtils::Format(BADGE_URL, badge);
+        info.lockedBadgeUrl = StringUtils::Format(LOCKED_BADGE_URL, badge);
+      }
+
+      // Earned at all, in either mode; the date is the softcore one where both
+      // exist, which is when the achievement was first met.
+      const std::string earnedDate = row["DateEarned"].asString();
+      const std::string hardcoreDate = row["DateEarnedHardcore"].asString();
+      info.earned = !earnedDate.empty() || !hardcoreDate.empty();
+      if (info.earned)
+        info.unlockedDate.SetFromDBDateTime(earnedDate.empty() ? hardcoreDate : earnedDate);
+
+      // Rarity is published as the count of players who have it against the
+      // count who have played the game at all.
+      const auto awarded = static_cast<double>(row["NumAwarded"].asUnsignedInteger());
+      const auto players = static_cast<double>(data["NumDistinctPlayers"].asUnsignedInteger());
+      if (awarded > 0.0 && players > 0.0)
+        info.rarity = static_cast<float>(100.0 * awarded / players);
+
+      if (info.earned)
+        ++m_state.unlockedAchievements;
+      ++m_state.totalAchievements;
+
+      m_state.achievements.push_back(std::move(info));
+    }
+
+    m_state.loaded = true;
+    return true;
+  }
+
+  const AchievementState& GetState() const { return m_state; }
+
+private:
+  const std::string m_gameId;
+  const std::string m_username;
+  const std::string m_apiKey;
+  AchievementState m_state;
+};
+
 constexpr unsigned int TOAST_DISPLAY_TIME_MS = 6000;
 constexpr unsigned int TOAST_MESSAGE_TIME_MS = 500;
 
@@ -93,6 +196,7 @@ std::string RarityStars(float rarity)
 
 CDialogGameAchievements::CDialogGameAchievements()
   : CGUIDialog(WINDOW_DIALOG_GAME_ACHIEVEMENTS, "DialogGameControllers.xml"),
+    CJobQueue(false, 1),
     m_items(std::make_unique<CFileItemList>()),
     m_viewControl(std::make_unique<CGUIViewControl>())
 {
@@ -129,7 +233,18 @@ void CDialogGameAchievements::OnInitWindow()
     return;
   }
 
-  const AchievementState state = CServiceBroker::GetGameServices().AchievementRuntime().GetState();
+  m_fetched.reset();
+
+  AchievementState state = CServiceBroker::GetGameServices().AchievementRuntime().GetState();
+
+  // Nothing is playing, so the list is being opened from the library. Ask the
+  // service about the game on screen; the answer arrives in OnJobComplete.
+  if (!state.loaded && FetchForLibraryGame())
+  {
+    m_viewControl->SetCurrentView(DEFAULT_VIEW_LIST);
+    CGUIDialog::OnInitWindow();
+    return;
+  }
 
   // Identification is a network round trip, so a game opened moments ago has
   // not been answered for yet. Saying it has no achievements would be a guess,
@@ -203,7 +318,7 @@ bool CDialogGameAchievements::OnMessage(CGUIMessage& message)
 
 void CDialogGameAchievements::RefreshList()
 {
-  const AchievementState state = CServiceBroker::GetGameServices().AchievementRuntime().GetState();
+  const AchievementState state = CurrentState();
 
   // Remembered by achievement rather than by row: an unlock moves its
   // achievement from the locked group into the earned one, so the row that
@@ -331,4 +446,56 @@ void CDialogGameAchievements::RefreshList()
     header += " (" + progress + ")";
 
   SetProperty("Header", header);
+}
+
+AchievementState CDialogGameAchievements::CurrentState() const
+{
+  if (m_fetched)
+    return *m_fetched;
+
+  return CServiceBroker::GetGameServices().AchievementRuntime().GetState();
+}
+
+bool CDialogGameAchievements::FetchForLibraryGame()
+{
+  // The game whose panel the list was opened over
+  CGUIWindow* const parent = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
+      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog());
+  const CFileItemPtr item = parent != nullptr ? parent->GetCurrentListItem() : CFileItemPtr();
+  if (!item || !item->HasGameInfoTag())
+    return false;
+
+  // Every game the catalogues recognised carries the service's own id for it,
+  // which is what the set is filed under.
+  const std::string gameId = item->GetGameInfoTag()->GetUniqueID("retroachievements");
+  if (gameId.empty())
+    return false;
+
+  const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+  const std::string username = gameSettings.GetRAUsername();
+  const std::string apiKey = gameSettings.GetRAApiKey();
+  if (username.empty() || apiKey.empty())
+    return false;
+
+  AddJob(new CLibraryAchievementsJob(gameId, username, apiKey));
+  return true;
+}
+
+void CDialogGameAchievements::OnJobComplete(unsigned int jobID, bool success, CJob* job)
+{
+  if (StringUtils::EqualsNoCase(job->GetType(), "library-achievements"))
+  {
+    const auto* fetchJob = static_cast<CLibraryAchievementsJob*>(job);
+
+    if (success && !fetchJob->GetState().achievements.empty())
+      m_fetched = fetchJob->GetState();
+    else if (!success)
+      CLog::Log(LOGERROR, "CDialogGameAchievements: could not fetch achievements from the service");
+
+    // Rebuilding a list control is only safe on the GUI thread
+    CGUIMessage refresh(GUI_MSG_NOTIFY_ALL, GetID(), 0, GUI_MSG_REFRESH_LIST);
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(refresh, GetID());
+  }
+
+  CJobQueue::OnJobComplete(jobID, success, job);
 }

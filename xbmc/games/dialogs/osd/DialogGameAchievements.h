@@ -8,9 +8,12 @@
 
 #pragma once
 
+#include "games/AchievementRuntime.h"
 #include "guilib/GUIDialog.h"
+#include "jobs/JobQueue.h"
 
 #include <memory>
+#include <optional>
 
 class CFileItemList;
 class CGUIMessage;
@@ -23,13 +26,20 @@ namespace GAME
 /*!
  * \ingroup games
  *
- * \brief Lists the achievements of the currently-playing game
+ * \brief Lists a game's achievements, earned ones first
  *
- * The list is built from the achievement runtime, which is populated by the
- * game add-on. The dialog performs no RetroAchievements network I/O; badge
- * images are remote URLs resolved by Kodi's texture cache.
+ * While a game is playing the list comes from the achievement runtime, which
+ * the game add-on keeps up to date as achievements unlock.
+ *
+ * Opened from the library with nothing playing there is no runtime to ask, so
+ * the set is fetched from RetroAchievements for the game the list is showing,
+ * which is identified by its ``retroachievements`` unique id. That answer is
+ * the player's own progress at the moment of asking rather than a stored copy
+ * that would drift as they play.
+ *
+ * Badge images are remote URLs resolved by Kodi's texture cache.
  */
-class CDialogGameAchievements : public CGUIDialog
+class CDialogGameAchievements : public CGUIDialog, protected CJobQueue
 {
 public:
   CDialogGameAchievements();
@@ -45,6 +55,9 @@ protected:
   void OnInitWindow() override;
   void OnDeinitWindow(int nextWindowID) override;
 
+  // Implementation of IJobCallback via CJobQueue
+  void OnJobComplete(unsigned int jobID, bool success, CJob* job) override;
+
 private:
   /*!
    * \brief Close the dialog without it ever being drawn
@@ -54,13 +67,29 @@ private:
   void Abort();
 
   /*!
-   * \brief Rebuild the list from the achievement runtime
+   * \brief Rebuild the list from whichever source is describing this game
    */
   void RefreshList();
+
+  /*!
+   * \brief The achievements to show: the fetched set if there is one, else the
+   *        playing game's
+   */
+  AchievementState CurrentState() const;
+
+  /*!
+   * \brief Ask RetroAchievements about the game the list is showing
+   *
+   * \return True if a request was sent and its answer is worth waiting for
+   */
+  bool FetchForLibraryGame();
 
   // Dialog parameters
   std::unique_ptr<CFileItemList> m_items;
   std::unique_ptr<CGUIViewControl> m_viewControl;
+
+  //! Set only when the dialog was opened away from a playing game
+  std::optional<AchievementState> m_fetched;
 };
 } // namespace GAME
 } // namespace KODI

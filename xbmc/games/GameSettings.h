@@ -62,6 +62,14 @@ public:
   std::string GetRAToken() const;
 
   /*!
+   * \brief The key that identifies the player to the web API
+   *
+   * The token above signs requests an emulator makes while playing; this
+   * one is for asking the service about a game nobody is playing.
+   */
+  std::string GetRAApiKey() const;
+
+  /*!
    * \brief Whether achievements are earned in hardcore mode
    *
    * Hardcore doubles the points awarded, and requires the player to go without
