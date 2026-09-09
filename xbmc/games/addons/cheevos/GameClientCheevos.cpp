@@ -368,6 +368,7 @@ void CGameClientCheevos::OnLoginResult(const game_rc_login_result& data)
 void CGameClientCheevos::OnGameClosed()
 {
   m_encoreModeEnabled = false;
+  m_loggedTrackerId = 0;
 
   CServiceBroker::GetGameServices().AchievementRuntime().Clear();
 
@@ -475,8 +476,15 @@ void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
 
 void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show)
 {
-  CLog::Log(LOGDEBUG, "CGameClientCheevos: leaderboard tracker {} = \"{}\"",
-            show ? "shown" : "hidden", SafeString(data.display));
+  // Only when it appears or goes, never on the value. An attempt in progress
+  // updates its tracker every frame, and logging each one buried a three
+  // minute session under eight thousand lines.
+  const unsigned int loggedId = show ? data.id : 0;
+  if (m_loggedTrackerId.exchange(loggedId) != loggedId)
+  {
+    CLog::Log(LOGDEBUG, "CGameClientCheevos: leaderboard tracker {} = \"{}\"",
+              show ? "shown" : "hidden", SafeString(data.display));
+  }
 
   LeaderboardTracker tracker;
   tracker.id = data.id;
@@ -490,13 +498,18 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
   const std::string submitted = SafeString(data.submitted_score);
   const std::string best = SafeString(data.best_score);
 
+  // The server can answer with a count taken before it filed the entry, which
+  // reads as "484 of 483". Whatever it meant, a total below the rank is not a
+  // total, and the player is at worst last.
+  const unsigned int totalEntries = std::max(data.num_entries, data.new_rank);
+
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} placed {} of {} with {}", data.id,
-            data.new_rank, data.num_entries, submitted);
+            data.new_rank, totalEntries, submitted);
 
   // The leaderboards list would otherwise show where the player stood before
   // this attempt until the game is reloaded
   CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardStanding(
-      data.id, data.new_rank, best.empty() ? submitted : best, data.num_entries);
+      data.id, data.new_rank, best.empty() ? submitted : best, totalEntries);
 
   // Dropping the fetched page is not enough on its own: the kept copy in
   // userdata was fetched before this submission, so it would be loaded straight
