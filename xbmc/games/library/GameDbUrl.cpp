@@ -178,6 +178,14 @@ bool CGameDbUrl::parse()
       m_node = GameDbNode::RELEASES;
       m_itemType = "releases";
       ++i;
+      // A game's pictures, so that a skin can hand them to the picture
+      // window and get its browser, its slideshow and its zoom for nothing
+      if (i < segments.size() && segments[i] == "art")
+      {
+        m_node = GameDbNode::ART;
+        m_itemType = "art";
+        ++i;
+      }
     }
   }
   else if (IsList(segment))

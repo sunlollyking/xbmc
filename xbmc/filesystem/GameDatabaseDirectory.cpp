@@ -23,6 +23,8 @@
 #include "utils/Variant.h"
 #include "utils/log.h"
 
+#include <cctype>
+
 #include <array>
 #include <utility>
 
@@ -64,6 +66,26 @@ constexpr std::array<OverviewChild, 23> overviewChildren{{
     {"homebrew", 35537, 35661},
     {"needsattention", 35562, 35662},
 }};
+
+/*!
+ * \brief A picture's kind, written for a person
+ *
+ * Types arrive as the library stores them -- "boxfront", "screenshot3" -- and
+ * a browser that lists those reads like a database dump.
+ */
+std::string ArtLabel(const std::string& type)
+{
+  const size_t digits = type.find_last_not_of("0123456789") + 1;
+  std::string label = type.substr(0, digits);
+  const std::string number = type.substr(digits);
+
+  if (!label.empty())
+    label[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(label[0])));
+  if (!number.empty())
+    label += " " + number;
+
+  return label;
+}
 
 std::string Localize(int id)
 {
@@ -193,6 +215,37 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
       return db.GetGamesNav(path, items, SortDescription());
     case GameDbNode::RELEASES:
       return db.GetReleasesNav(path, items);
+    case GameDbNode::ART:
+    {
+      CVariant gameId;
+      if (!dbUrl.GetOption("gameid", gameId))
+        return false;
+
+      KODI::ART::Artwork art;
+      if (!db.GetArtForItem(static_cast<int>(gameId.asInteger()), MediaTypeGame, art))
+        return true; // a game with no pictures is empty, not broken
+
+      for (const auto& [type, url] : art)
+      {
+        // These are aliases a skin draws with, the same pictures under another
+        // name, and listing them shows each one twice
+        if (type == "thumb" || type == "poster" || type == "icon")
+          continue;
+
+        auto item = std::make_shared<CFileItem>(ArtLabel(type));
+        item->SetPath(url);
+        item->SetArt("thumb", url);
+        // Catalogues serve pictures from endpoints that carry no file
+        // extension, and the picture window decides what a file is by its
+        // name unless it is told the type outright.
+        item->SetMimeType("image/jpeg");
+        item->SetFolder(false);
+        items.Add(item);
+      }
+
+      items.SetContent("images");
+      return true;
+    }
     case GameDbNode::GENRES:
     case GameDbNode::YEARS:
     case GameDbNode::DEVELOPERS:

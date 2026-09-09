@@ -20822,7 +20822,12 @@ msgctxt "#35668"
 msgid "As named on disk"
 msgstr ""
 
-#empty strings from id 35669 to 35999
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35669"
+msgid "Artwork"
+msgstr ""
+
+#empty strings from id 35670 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

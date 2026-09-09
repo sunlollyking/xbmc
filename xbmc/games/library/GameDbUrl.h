@@ -31,6 +31,7 @@ enum class GameDbNode
   PLATFORMS,
   GAMES,
   RELEASES,
+  ART, // one game's pictures, browsable as pictures
   GENRES,
   YEARS,
   DEVELOPERS,
