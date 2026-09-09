@@ -413,6 +413,15 @@ bool CGameSettings::IsAccountVerified(const std::string& username, const std::st
   return false;
 }
 
+std::string CGameSettings::GetRAUserPicUrl() const
+{
+  const std::string username = GetRAUsername();
+  if (username.empty() || !GetAchievementsLoggedIn())
+    return {};
+
+  return StringUtils::Format(RA_USER_PIC_URL_TEMPLATE, CURL::Encode(username));
+}
+
 bool CGameSettings::GetAchievementsHardcore() const
 {
   return CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
@@ -421,15 +430,7 @@ bool CGameSettings::GetAchievementsHardcore() const
 
 void CGameSettings::SetAchievementsHardcore(bool hardcore)
 {
-  const auto settingsComponent = CServiceBroker::GetSettingsComponent();
-  if (!settingsComponent)
-    return;
-
-  const auto settings = settingsComponent->GetSettings();
-  if (!settings)
-    return;
-
-  settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE, hardcore);
+  m_settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE, hardcore);
 }
 
 bool CGameSettings::GetAchievementsEncore() const

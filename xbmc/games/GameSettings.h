@@ -70,12 +70,21 @@ public:
   std::string GetRAApiKey() const;
 
   /*!
+   * \brief The player's RetroAchievements avatar, or empty if not signed in
+   *
+   * The icon for notifications that speak for RetroAchievements, as the
+   * sign-in notification already does. Empty leaves the notification with
+   * Kodi's own icon, which is what a signed-out player should see.
+   */
+  std::string GetRAUserPicUrl() const;
+
+  /*!
    * \brief Whether achievements are earned in hardcore mode
    *
-   * Hardcore doubles the points awarded, and requires the player to go without
+   * Hardcore awards double points, and in exchange the player goes without
    * rewind, save state loading, cheats and slow motion. RetroAchievements does
-   * not allow a session started in casual mode to continue into hardcore, so
-   * turning this on mid-game resets it.
+   * not allow a session begun in casual mode to carry on into hardcore, so
+   * turning this on part-way through restarts the game.
    */
   bool GetAchievementsHardcore() const;
 

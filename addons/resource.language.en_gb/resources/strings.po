@@ -20890,7 +20890,15 @@ msgctxt "#35669"
 msgid "Artwork"
 msgstr ""
 
-#empty strings from id 35670 to 35999
+#empty strings from id 35670 to 35701
+
+#. Confirmation shown before turning hardcore mode on during a game
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35702"
+msgid "Starting a hardcore session restarts the game. Any unsaved progress will be lost.[CR][CR]Continue?"
+msgstr ""
+
+#empty strings from id 35703 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

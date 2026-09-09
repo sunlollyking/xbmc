@@ -26,11 +26,15 @@
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "resources/LocalizeStrings.h"
+#include "resources/ResourcesComponent.h"
 #include "utils/MathUtils.h"
+#include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <mutex>
@@ -69,7 +73,7 @@ bool HardcoreRestrictionsApply()
 }
 
 /*!
- * \brief Tell the player why something they asked for didn't happen
+ * \brief Tell the player why what they asked for didn't happen
  *
  * Silently ignoring the request would read as a broken control.
  */
@@ -77,10 +81,10 @@ void NotifyBlockedByHardcore(uint32_t featureStringId)
 {
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
 
-  // "Hardcore mode", "{0:s} is not available" - the mode heads the toast so the
-  // longest feature name still fits the notification's fixed width
+  // "Hardcore mode", "{0:s} is not available". The mode heads the toast so the
+  // longest feature name still fits the notification's fixed width.
   CGUIDialogKaiToast::QueueNotification(
-      CGUIDialogKaiToast::Info, strings.Get(35700),
+      CServiceBroker::GetGameServices().GameSettings().GetRAUserPicUrl(), strings.Get(35700),
       StringUtils::Format(strings.Get(35305), strings.Get(featureStringId)), TOAST_DISPLAY_TIME_MS);
 }
 } // namespace
@@ -184,7 +188,7 @@ void CReversiblePlayback::SetSpeed(double speedFactor)
       return;
     }
 
-    // Slow motion is blocked, fast forward is not. Pausing (0.0) is fine.
+    // Slow motion is withheld, fast forward is not. Pausing is fine.
     if (speedFactor > 0.0 && speedFactor < 1.0)
     {
       CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Refusing to slow down in hardcore mode");
@@ -371,8 +375,9 @@ void CReversiblePlayback::CommitSavestate(bool autosave,
 
 bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
 {
-  // Loading a save state is always blocked in hardcore; creating one is not,
-  // so that players can still keep a state for later
+  // Every route that loads a state comes through here - the in-game dialog,
+  // JSON-RPC, the Python player API - so hardcore is answered once, rather
+  // than at each caller. Creating a state is still allowed.
   if (HardcoreRestrictionsApply())
   {
     CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Refusing to load a savestate in hardcore mode");
@@ -770,11 +775,10 @@ void CReversiblePlayback::UpdateMemoryStream()
 
   GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
-  if (m_gameClient->GetSerializeSize() > 0)
-
-  // Hardcore forbids rewind, so the buffer isn't just unused - it shouldn't be
-  // allocated at all. It costs the savestate size for every frame of the
-  // rewind window, which runs to gigabytes on consoles with large states.
+  // Hardcore forbids rewind, so the buffer isn't merely unused - it shouldn't
+  // be allocated at all. It costs a fraction of the savestate size for every
+  // frame of the rewind window, which is not free on consoles with large
+  // states.
   if (m_gameClient->GetSerializeSize() > 0 && !HardcoreRestrictionsApply())
     bRewindEnabled = gameSettings.RewindEnabled();
 

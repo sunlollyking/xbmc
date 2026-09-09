@@ -78,6 +78,8 @@ TEST_F(TestGamesGUIInfo, TranslatesRetroPlayerLabels)
             RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsProgress"),
             RETROPLAYER_ACHIEVEMENTS_PROGRESS);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsHardcore"),
+            RETROPLAYER_ACHIEVEMENTS_HARDCORE);
 }
 
 namespace

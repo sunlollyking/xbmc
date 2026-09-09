@@ -4511,6 +4511,13 @@ constexpr std::array<InfoMap, 88> videoplayer = {{
 ///     **False** otherwise.
 ///     <p><hr>
 ///     @skinning_v22 **[New Boolean Condition]** \link RetroPlayer_HasCheats `RetroPlayer.HasCheats`\endlink
+///   \table_row3{   <b>`RetroPlayer.AchievementsHardcore`</b>,
+///                  \anchor RetroPlayer_AchievementsHardcore
+///                  _boolean_,
+///     @return **True** if achievements are being earned in hardcore mode\,
+///     **False** otherwise.
+///     <p><hr>
+///     @skinning_v22 **[New Boolean Condition]** \link RetroPlayer_AchievementsHardcore `RetroPlayer.AchievementsHardcore`\endlink
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`RetroPlayer.AchievementsProgress`</b>,
