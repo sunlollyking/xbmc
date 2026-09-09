@@ -1215,6 +1215,22 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     tag.SetAchievements(existing.GetAchievementsTotal(), existing.GetAchievementsEarned(),
                         existing.GetAchievementsHardcore());
     tag.SetLastUnlock(existing.GetLastUnlock());
+    // A catalogue that answered nothing about a game has not learned that the
+    // game has no description; it has only failed to find one. Writing that
+    // silence over what is already known loses it, and a refresh over a
+    // thousand games loses it a thousand times. So a field the scrape left
+    // empty keeps what it had, and only an answer replaces an answer.
+    if (tag.GetOverview().empty())
+      tag.SetOverview(existing.GetOverview());
+    if (tag.GetYear() == 0)
+      tag.SetYear(existing.GetYear());
+    if (tag.GetDevelopers().empty())
+      tag.SetDevelopers(existing.GetDevelopers());
+    if (tag.GetPublishers().empty())
+      tag.SetPublishers(existing.GetPublishers());
+    if (tag.GetGenres().empty())
+      tag.SetGenres(existing.GetGenres());
+
     // Tags can be put on a game by hand, so a refresh keeps those -- but it
     // must not throw away the ones the scrape just found, which is what
     // replacing them outright did: the library held none at all.
