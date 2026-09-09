@@ -13,7 +13,10 @@
 #include "ServiceBroker.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
+#include "cores/RetroPlayer/guibridge/GUIGameRenderManager.h"
+#include "cores/RetroPlayer/guibridge/GUIGameSettingsHandle.h"
 #include "dialogs/GUIDialogKaiToast.h"
+#include "dialogs/GUIDialogYesNo.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
@@ -138,9 +141,9 @@ void CDialogGameAchievements::OnInitWindow()
   if (!state.loaded)
   {
     // "RetroAchievements", "Still looking this game up on RetroAchievements..."
-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35264),
-                                          Localize(35299), TOAST_DISPLAY_TIME_MS, false,
-                                          TOAST_MESSAGE_TIME_MS);
+    CGUIDialogKaiToast::QueueNotification(
+        CServiceBroker::GetGameServices().GameSettings().GetRAUserPicUrl(), Localize(35264),
+        Localize(35299), TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
     Abort();
     return;
   }
@@ -148,9 +151,9 @@ void CDialogGameAchievements::OnInitWindow()
   if (state.achievements.empty())
   {
     // "RetroAchievements", "This game doesn't support RetroAchievements"
-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35264),
-                                          Localize(35286), TOAST_DISPLAY_TIME_MS, false,
-                                          TOAST_MESSAGE_TIME_MS);
+    CGUIDialogKaiToast::QueueNotification(
+        CServiceBroker::GetGameServices().GameSettings().GetRAUserPicUrl(), Localize(35264),
+        Localize(35286), TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
     Abort();
     return;
   }
@@ -184,6 +187,11 @@ bool CDialogGameAchievements::OnMessage(CGUIMessage& message)
     case GUI_MSG_CLICKED:
     {
       const int control = message.GetSenderId();
+      if (control == CONTROL_CHEEVOS_HARDCORE)
+      {
+        OnHardcoreToggled();
+        return true;
+      }
       if (control == CONTROL_CHEEVOS_ENCORE || control == CONTROL_CHEEVOS_CHALLENGE_INDICATOR)
       {
         const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
@@ -350,4 +358,31 @@ void CDialogGameAchievements::RefreshList()
   SetProperty("Header", header);
   SetProperty("Achievements.GameTitle", state.gameTitle);
   SetProperty("Achievements.Progress", progress);
+}
+
+void CDialogGameAchievements::OnHardcoreToggled()
+{
+  CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+
+  const bool enabling = !gameSettings.GetAchievementsHardcore();
+
+  // Only turning it on is asked about, and only while a game is up: that is
+  // the case that costs the player the session they are in. The radio button
+  // takes its state from the setting, so a refusal here corrects it.
+  //
+  // "Hardcore mode", "Starting a hardcore session restarts the game..."
+  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
+  if (enabling && appPlayer->IsPlayingGame() &&
+      !CGUIDialogYesNo::ShowAndGetInput(CVariant{35700}, CVariant{35702}))
+  {
+    return;
+  }
+
+  gameSettings.SetAchievementsHardcore(enabling);
+  CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
+
+  // The whole OSD goes, not just this dialog: the player asked for the game to
+  // restart, and leaving them on the menu they opened hides it
+  if (enabling)
+    CServiceBroker::GetGameRenderManager().RegisterGameSettingsDialog()->CloseOSD();
 }

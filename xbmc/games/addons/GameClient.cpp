@@ -210,6 +210,7 @@ bool CGameClient::Initialize(void)
   if (CreateInstance(&m_ifc) == ADDON_STATUS_OK)
   {
     Input().Initialize();
+    Cheevos().ObserveSettings();
     LogAddonProperties();
     return true;
   }
@@ -221,6 +222,7 @@ bool CGameClient::Initialize(void)
 
 void CGameClient::Unload()
 {
+  Cheevos().StopObservingSettings();
   Input().Deinitialize();
 
   DestroyInstance(&m_ifc);

@@ -362,6 +362,11 @@ bool CGamesGUIInfo::GetBool(bool& value,
       value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsLoggedIn();
       return true;
     }
+    case RETROPLAYER_ACHIEVEMENTS_HARDCORE:
+    {
+      value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+      return true;
+    }
     default:
       break;
   }

@@ -47,6 +47,7 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT = "gamesachievements
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
+const std::string SETTING_GAMES_ACHIEVEMENTS_HARDCORE = "gamesachievements.hardcore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_INDICATOR = "gamesachievements.challengeindicator";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
@@ -71,10 +72,11 @@ CGameSettings::CGameSettings()
   m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
 
   m_settings->RegisterCallback(
-      this, {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME,
-             SETTING_GAMES_ACHIEVEMENTS_USERNAME, SETTING_GAMES_ACHIEVEMENTS_PASSWORD,
-             SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
-             SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT});
+      this,
+      {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
+       SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
+       SETTING_GAMES_ACHIEVEMENTS_HARDCORE, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
+       SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT});
 
   // On startup reset logged-in flag if token is missing
   const std::string token = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
@@ -167,8 +169,12 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
   }
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
+      settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_ENCORE)
   {
+    // Hardcore belongs with the rewind settings: turning it on has to drop the
+    // rewind buffer, or the frames already in it stay rewindable for the rest
+    // of the session
     SetChanged();
     NotifyObservers(ObservableMessageSettingsChanged);
   }
@@ -318,6 +324,26 @@ bool CGameSettings::IsAccountVerified(const std::string& username, const std::st
 
   CLog::Log(LOGERROR, "CGameSettings::IsAccountVerified -- verification request failed");
   return false;
+}
+
+std::string CGameSettings::GetRAUserPicUrl() const
+{
+  const std::string username = GetRAUsername();
+  if (username.empty() || !GetAchievementsLoggedIn())
+    return {};
+
+  return StringUtils::Format(RA_USER_PIC_URL_TEMPLATE, CURL::Encode(username));
+}
+
+bool CGameSettings::GetAchievementsHardcore() const
+{
+  return CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+      SETTING_GAMES_ACHIEVEMENTS_HARDCORE);
+}
+
+void CGameSettings::SetAchievementsHardcore(bool hardcore)
+{
+  m_settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE, hardcore);
 }
 
 bool CGameSettings::GetAchievementsEncore() const
