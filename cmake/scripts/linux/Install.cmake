@@ -184,9 +184,14 @@ endforeach()
 if(TARGET ${APP_NAME_LC}::MicroHttpd)
   list(APPEND python_stubs ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/swig/xbmcwsgi.pyi)
 endif()
+# A packager that only wants the add-on headers configures the tree and
+# installs without building it, so the stubs SWIG would have written are not
+# there. They describe the Python API for an editor rather than being part of
+# it, so their absence is not a reason to fail the install.
 install(FILES ${python_stubs}
         DESTINATION ${datarootdir}/${APP_NAME_LC}/python-stubs
-        COMPONENT kodi-addon-dev)
+        COMPONENT kodi-addon-dev
+        OPTIONAL)
 
 # Install kodi-addon-dev add-on bindings
 install(FILES ${CMAKE_SOURCE_DIR}/cmake/scripts/common/AddonHelpers.cmake
