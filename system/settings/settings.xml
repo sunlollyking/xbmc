@@ -2902,6 +2902,9 @@
         <setting id="gamesgeneral.enablerewind" type="boolean" label="35203" help="35204">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable" setting="gamesachievements.hardcore">false</dependency>
+          </dependencies>
           <control type="toggle" />
         </setting>
         <setting id="gamesgeneral.rewindtime" type="integer" label="35205" help="35206">
@@ -2914,6 +2917,7 @@
           </constraints>
           <dependencies>
             <dependency type="enable" setting="gamesgeneral.enablerewind">true</dependency>
+            <dependency type="enable" setting="gamesachievements.hardcore">false</dependency>
           </dependencies>
           <control type="slider" format="integer">
             <popup>true</popup>
