@@ -164,6 +164,11 @@ private:
   //! Whether this instance is registered with the game settings. Only touched
   //! on Kodi's thread, either side of a game.
   bool m_observingSettings{false};
+
+  //! The leaderboard whose tracker was last logged, or 0 for none. Atomic
+  //! because the tracker arrives on the add-on's thread and a game closing
+  //! clears it on Kodi's.
+  std::atomic<unsigned int> m_loggedTrackerId{0};
 };
 } // namespace GAME
 } // namespace KODI
