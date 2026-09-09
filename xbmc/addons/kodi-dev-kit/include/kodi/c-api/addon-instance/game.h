@@ -1472,56 +1472,6 @@ extern "C"
   } ATTR_PACKED game_rc_achievement_progress_indicator;
   //----------------------------------------------------------------------------
 
-  //============================================================================
-  /// @ingroup cpp_kodi_addon_game_Defs_RetroAchievementsTypes
-  /// @brief **The achievement to put on screen**
-  ///
-  /// The achievement runtime picks one measured achievement as the one the
-  /// player is working towards, and says when to show it and when to stop.
-  /// Distinct from @ref game_rc_achievement_progress, which carries every
-  /// measured achievement so their progress can be listed.
-  ///
-  typedef struct game_rc_progress_indicator
-  {
-    /// @brief Unique RetroAchievements ID of the achievement
-    unsigned int id;
-
-    /// @brief Title of the achievement
-    const char* title;
-
-    /// @brief URL of the achievement's badge, or `NULL`
-    const char* badge_url;
-
-    /// @brief Human-readable progress such as "45/100", or `NULL`
-    const char* measured_progress;
-
-    /// @brief Progress towards the achievement, from 0.0 to 100.0
-    float measured_percent;
-  } ATTR_PACKED game_rc_progress_indicator;
-  //----------------------------------------------------------------------------
-
-  //============================================================================
-  /// @ingroup cpp_kodi_addon_game_Defs_RetroAchievementsTypes
-  /// @brief **The achievement currently being attempted**
-  ///
-  /// Raised when the player enters the conditions an achievement is watching
-  /// for, and again when they leave them. Distinct from
-  /// @ref game_rc_progress_indicator, which counts towards a target rather than
-  /// reporting an attempt in progress.
-  ///
-  typedef struct game_rc_challenge_indicator
-  {
-    /// @brief Unique RetroAchievements ID of the achievement
-    unsigned int id;
-
-    /// @brief Title of the achievement
-    const char* title;
-
-    /// @brief URL of the achievement's badge, or `NULL`
-    const char* badge_url;
-  } ATTR_PACKED game_rc_challenge_indicator;
-  //----------------------------------------------------------------------------
-
   ///@}
 
   //--==----==----==----==----==----==----==----==----==----==----==----==----==--
@@ -1634,14 +1584,13 @@ extern "C"
                                    bool show);
     void (*RCOnAchievementProgressShow)(KODI_HANDLE kodiInstance,
                                         const struct game_rc_achievement_progress_indicator* data);
-    void (*RCOnAchievementProgressUpdate)(KODI_HANDLE kodiInstance,
-                                          const struct game_rc_achievement_progress_indicator* data);
+    void (*RCOnAchievementProgressUpdate)(
+        KODI_HANDLE kodiInstance, const struct game_rc_achievement_progress_indicator* data);
     void (*RCOnAchievementProgressHide)(KODI_HANDLE kodiInstance,
                                         const struct game_rc_achievement_progress_indicator* data);
     void (*RCOnLeaderboardStarted)(KODI_HANDLE kodiInstance,
                                    const struct game_rc_leaderboard* data);
-    void (*RCOnLeaderboardFailed)(KODI_HANDLE kodiInstance,
-                                  const struct game_rc_leaderboard* data);
+    void (*RCOnLeaderboardFailed)(KODI_HANDLE kodiInstance, const struct game_rc_leaderboard* data);
     void (*RCOnLeaderboardSubmitted)(KODI_HANDLE kodiInstance,
                                      const struct game_rc_leaderboard* data);
     void (*RCOnLeaderboardTrackerShow)(KODI_HANDLE kodiInstance,

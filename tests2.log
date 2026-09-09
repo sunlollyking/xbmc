@@ -1,6 +1,19 @@
-[==========] Running 4137 tests from 320 test suites.
+[==========] Running 4222 tests from 333 test suites.
 [----------] Global test environment set-up.
-[----------] 7 tests from TestUPnPInternal
+[----------] 5 tests from TestUPnPPlaybackState
+[ RUN      ] TestUPnPPlaybackState.NothingIsWatchedBeforeAFileStarts
+[       OK ] TestUPnPPlaybackState.NothingIsWatchedBeforeAFileStarts (0 ms)
+[ RUN      ] TestUPnPPlaybackState.AStoppedRendererEndsTheFileItWasPlaying
+[       OK ] TestUPnPPlaybackState.AStoppedRendererEndsTheFileItWasPlaying (0 ms)
+[ RUN      ] TestUPnPPlaybackState.PlaybackEndsOnlyOnce
+[       OK ] TestUPnPPlaybackState.PlaybackEndsOnlyOnce (0 ms)
+[ RUN      ] TestUPnPPlaybackState.TheStopThatStartsTheNextFileDoesNotEndPlayback
+[       OK ] TestUPnPPlaybackState.TheStopThatStartsTheNextFileDoesNotEndPlayback (0 ms)
+[ RUN      ] TestUPnPPlaybackState.AnOpenThatFailsLeavesNothingWatched
+[       OK ] TestUPnPPlaybackState.AnOpenThatFailsLeavesNothingWatched (0 ms)
+[----------] 5 tests from TestUPnPPlaybackState (0 ms total)
+
+[----------] 16 tests from TestUPnPInternal
 [ RUN      ] TestUPnPInternal.BuildObjectSetsDateFromDateOnlyValue
 [       OK ] TestUPnPInternal.BuildObjectSetsDateFromDateOnlyValue (0 ms)
 [ RUN      ] TestUPnPInternal.BuildObjectSetsDateFromDateTimeValue
@@ -15,7 +28,25 @@
 [       OK ] TestUPnPInternal.BuildObjectSetsDateForDidlSourcedItem (0 ms)
 [ RUN      ] TestUPnPInternal.BuildObjectDatesFromDidlAreOrdered
 [       OK ] TestUPnPInternal.BuildObjectDatesFromDidlAreOrdered (0 ms)
-[----------] 7 tests from TestUPnPInternal (0 ms total)
+[ RUN      ] TestUPnPInternal.AddAlternateMimeResourcesOffersRegisteredFlacSpelling
+[       OK ] TestUPnPInternal.AddAlternateMimeResourcesOffersRegisteredFlacSpelling (0 ms)
+[ RUN      ] TestUPnPInternal.AddAlternateMimeResourcesOffersLegacyFlacSpelling
+[       OK ] TestUPnPInternal.AddAlternateMimeResourcesOffersLegacyFlacSpelling (0 ms)
+[ RUN      ] TestUPnPInternal.AddAlternateMimeResourcesKeepsUriAndProtocol
+[       OK ] TestUPnPInternal.AddAlternateMimeResourcesKeepsUriAndProtocol (0 ms)
+[ RUN      ] TestUPnPInternal.AddAlternateMimeResourcesDoesNotDuplicate
+[       OK ] TestUPnPInternal.AddAlternateMimeResourcesDoesNotDuplicate (0 ms)
+[ RUN      ] TestUPnPInternal.AddAlternateMimeResourcesLeavesUnrelatedTypes
+[       OK ] TestUPnPInternal.AddAlternateMimeResourcesLeavesUnrelatedTypes (0 ms)
+[ RUN      ] TestUPnPInternal.PreferResourceAddressesPutsAReachableAddressFirst
+[       OK ] TestUPnPInternal.PreferResourceAddressesPutsAReachableAddressFirst (0 ms)
+[ RUN      ] TestUPnPInternal.PreferResourceAddressesKeepsTheRestInOrder
+[       OK ] TestUPnPInternal.PreferResourceAddressesKeepsTheRestInOrder (0 ms)
+[ RUN      ] TestUPnPInternal.PreferResourceAddressesLeavesTheOrderAloneWhenNoneMatch
+[       OK ] TestUPnPInternal.PreferResourceAddressesLeavesTheOrderAloneWhenNoneMatch (0 ms)
+[ RUN      ] TestUPnPInternal.AddAlternateMimeResourcesOffersEveryAddress
+[       OK ] TestUPnPInternal.AddAlternateMimeResourcesOffersEveryAddress (0 ms)
+[----------] 16 tests from TestUPnPInternal (0 ms total)
 
 [----------] 4 tests from TestSysfsPath
 [ RUN      ] TestSysfsPath.SysfsPathTestInt
@@ -76,9 +107,16 @@
 [       OK ] TestVideoDbUrl.AssetTypes (0 ms)
 [----------] 2 tests from TestVideoDbUrl (0 ms total)
 
+[----------] 2 tests from TestVideoDatabase
+[ RUN      ] TestVideoDatabase.InsertStoresOrientationAndCenterMixLevel
+[       OK ] TestVideoDatabase.InsertStoresOrientationAndCenterMixLevel (3 ms)
+[ RUN      ] TestVideoDatabase.UpdateStoresOrientationAndCenterMixLevel
+[       OK ] TestVideoDatabase.UpdateStoresOrientationAndCenterMixLevel (3 ms)
+[----------] 2 tests from TestVideoDatabase (6 ms total)
+
 [----------] 17 tests from TestStacks
 [ RUN      ] TestStacks.TestMovieFilesStackFilesAB
-[       OK ] TestStacks.TestMovieFilesStackFilesAB (1 ms)
+[       OK ] TestStacks.TestMovieFilesStackFilesAB (0 ms)
 [ RUN      ] TestStacks.TestMovieFilesStackFilesPart
 [       OK ] TestStacks.TestMovieFilesStackFilesPart (0 ms)
 [ RUN      ] TestStacks.TestMovieFilesStackDvdIso
@@ -111,7 +149,7 @@
 [       OK ] TestStacks.TestConstructStackPath (0 ms)
 [ RUN      ] TestStacks.TestGetParentPath
 [       OK ] TestStacks.TestGetParentPath (0 ms)
-[----------] 17 tests from TestStacks (2 ms total)
+[----------] 17 tests from TestStacks (1 ms total)
 
 [----------] 2 tests from TestFilenameAttributes
 [ RUN      ] TestFilenameAttributes.GetEdition
@@ -452,21 +490,21 @@
 [ RUN      ] TestSystemInfo.Print_System_Info
 'GetKernelName(false)': "Linux"
 'GetKernelVersion()': "7.0.0"
-'GetKernelVersionFull()': "7.0.0-30-generic"
+'GetKernelVersionFull()': "7.0.0-31-generic"
 'GetOsPrettyNameWithVersion()': "Ubuntu 26.04.1 LTS"
 'GetOsName(false)': "Ubuntu"
 'GetOsVersion()': "26.04"
 'GetKernelCpuFamily()': "x86"
 'GetKernelBitness()': "64"
 'GetBuildTargetPlatformName()': "Linux"
-'GetBuildTargetPlatformVersionDecoded()': "version 7.0.12"
-'GetBuildTargetPlatformVersion()': "458764"
+'GetBuildTargetPlatformVersionDecoded()': "version 7.0.14"
+'GetBuildTargetPlatformVersion()': "458766"
 'GetBuildTargetCpuFamily()': "x86"
 'GetXbmcBitness()': "64"
 'GetUsedCompilerNameAndVer()': "GCC 15.2.0"
 'GetManufacturerName()': ""
 'GetModelName()': ""
-'GetUserAgent()': "Kodi/22.0-BETA1 (X11; Linux x86_64) Ubuntu/26.04 App_Bitness/64 Version/22.0-BETA1-(21.90.801)-Git:20260904-efaee53cd2"
+'GetUserAgent()': "Kodi/22.0-BETA2 (X11; Linux x86_64) Ubuntu/26.04 App_Bitness/64 Version/22.0-BETA2-(21.90.802)-Git:20260909-6c5ab2b911-dirty"
 [       OK ] TestSystemInfo.Print_System_Info (0 ms)
 [ RUN      ] TestSystemInfo.GetKernelName
 [       OK ] TestSystemInfo.GetKernelName (0 ms)
@@ -593,7 +631,7 @@
 [ RUN      ] TestStringUtils.WordToDigits
 [       OK ] TestStringUtils.WordToDigits (0 ms)
 [ RUN      ] TestStringUtils.CreateUUID
-CreateUUID(): ca5cb170-abd7-45f1-86b9-ac4539719198
+CreateUUID(): 19770380-8cd4-44f7-8c46-a96fd5ab87e5
 [       OK ] TestStringUtils.CreateUUID (0 ms)
 [ RUN      ] TestStringUtils.ValidateUUID
 [       OK ] TestStringUtils.ValidateUUID (0 ms)
@@ -1054,7 +1092,7 @@ CreateUUID(): ca5cb170-abd7-45f1-86b9-ac4539719198
 [       OK ] TestJobManager.PauseLowPriorityJob (0 ms)
 [ RUN      ] TestJobManager.IsProcessing
 [       OK ] TestJobManager.IsProcessing (0 ms)
-[----------] 4 tests from TestJobManager (152 ms total)
+[----------] 4 tests from TestJobManager (151 ms total)
 
 [----------] 1 test from TestHttpResponse
 [ RUN      ] TestHttpResponse.General
@@ -1163,8 +1201,8 @@ CreateUUID(): ca5cb170-abd7-45f1-86b9-ac4539719198
 
 [----------] 1 test from TestGPUInfo
 [ RUN      ] TestGPUInfo.GetTemperatureFromCmd
-[       OK ] TestGPUInfo.GetTemperatureFromCmd (2 ms)
-[----------] 1 test from TestGPUInfo (2 ms total)
+[       OK ] TestGPUInfo.GetTemperatureFromCmd (1 ms)
+[----------] 1 test from TestGPUInfo (1 ms total)
 
 [----------] 1 test from TestGlobal
 [ RUN      ] TestGlobal.Pattern1
@@ -1194,9 +1232,14 @@ CreateUUID(): ca5cb170-abd7-45f1-86b9-ac4539719198
 [ RUN      ] TestFileOperationJob.GetFunctions
 GetAverageSpeed(): 
 GetCurrentOperation(): 
-GetCurrentFile(): xbmctempfileoD6dxu
+GetCurrentFile(): xbmctempfiler9nvJg
 [       OK ] TestFileOperationJob.GetFunctions (0 ms)
-[----------] 7 tests from TestFileOperationJob (1 ms total)
+[----------] 7 tests from TestFileOperationJob (0 ms total)
+
+[----------] 1 test from TestFileExtensionProvider
+[ RUN      ] TestFileExtensionProvider.GettersAnswerEmptyAfterDeinitializationRatherThanFaulting
+[       OK ] TestFileExtensionProvider.GettersAnswerEmptyAfterDeinitializationRatherThanFaulting (0 ms)
+[----------] 1 test from TestFileExtensionProvider (0 ms total)
 
 [----------] 3 tests from TestExecString
 [ RUN      ] TestExecString.ctor_1
@@ -1332,7 +1375,7 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [       OK ] TestCPUInfo.GetCoresUsageString (0 ms)
 [ RUN      ] TestCPUInfo.GetCPUFeatures
 [       OK ] TestCPUInfo.GetCPUFeatures (0 ms)
-[----------] 7 tests from TestCPUInfo (3 ms total)
+[----------] 7 tests from TestCPUInfo (2 ms total)
 
 [----------] 20 tests from TestCharsetConverter
 [ RUN      ] TestCharsetConverter.utf8ToW
@@ -1379,8 +1422,8 @@ GetCurrentFile(): xbmctempfileoD6dxu
 
 [----------] 1 test from TestBitstreamStats
 [ RUN      ] TestBitstreamStats.General
-[       OK ] TestBitstreamStats.General (2720 ms)
-[----------] 1 test from TestBitstreamStats (2720 ms total)
+[       OK ] TestBitstreamStats.General (2696 ms)
+[----------] 1 test from TestBitstreamStats (2696 ms total)
 
 [----------] 8 tests from TestBase64
 [ RUN      ] TestBase64.Encode_1
@@ -1656,8 +1699,8 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [ RUN      ] TestI18nRegistryManager.DuplicateSubTag
 [       OK ] TestI18nRegistryManager.DuplicateSubTag (0 ms)
 [ RUN      ] TestI18nRegistryManager.LoadFile
-[       OK ] TestI18nRegistryManager.LoadFile (2 ms)
-[----------] 11 tests from TestI18nRegistryManager (2 ms total)
+[       OK ] TestI18nRegistryManager.LoadFile (0 ms)
+[----------] 11 tests from TestI18nRegistryManager (0 ms total)
 
 [----------] 13 tests from TestI18nRegistryFile
 [ RUN      ] TestI18nRegistryFile.Read
@@ -1686,7 +1729,7 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [       OK ] TestI18nRegistryFile.LineEndingsLf (0 ms)
 [ RUN      ] TestI18nRegistryFile.CasePreservation
 [       OK ] TestI18nRegistryFile.CasePreservation (0 ms)
-[----------] 13 tests from TestI18nRegistryFile (1 ms total)
+[----------] 13 tests from TestI18nRegistryFile (0 ms total)
 
 [----------] 5 tests from TestI18nSubTagLoader
 [ RUN      ] TestI18nSubTagLoader.BaseSubTag
@@ -1721,15 +1764,15 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [ RUN      ] TestSharedSection.General
 [       OK ] TestSharedSection.General (0 ms)
 [ RUN      ] TestSharedSection.GetSharedLockWhileTryingExclusiveLock
-[       OK ] TestSharedSection.GetSharedLockWhileTryingExclusiveLock (21 ms)
+[       OK ] TestSharedSection.GetSharedLockWhileTryingExclusiveLock (20 ms)
 [ RUN      ] TestSharedSection.TwoCase
 [       OK ] TestSharedSection.TwoCase (21 ms)
-[----------] 3 tests from TestSharedSection (43 ms total)
+[----------] 3 tests from TestSharedSection (42 ms total)
 
 [----------] 1 test from TestMultipleSharedSection
 [ RUN      ] TestMultipleSharedSection.General
-[       OK ] TestMultipleSharedSection.General (22 ms)
-[----------] 1 test from TestMultipleSharedSection (22 ms total)
+[       OK ] TestMultipleSharedSection.General (21 ms)
+[----------] 1 test from TestMultipleSharedSection (21 ms total)
 
 [----------] 14 tests from TestEvent
 [ RUN      ] TestEvent.General
@@ -1741,7 +1784,7 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [ RUN      ] TestEvent.TimedWaitsTimeout
 [       OK ] TestEvent.TimedWaitsTimeout (50 ms)
 [ RUN      ] TestEvent.Group
-[       OK ] TestEvent.Group (11 ms)
+[       OK ] TestEvent.Group (10 ms)
 [ RUN      ] TestEvent.TwoGroups
 [       OK ] TestEvent.TwoGroups (10 ms)
 [ RUN      ] TestEvent.AutoResetBehavior
@@ -1753,21 +1796,21 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [ RUN      ] TestEvent.SimpleTimeout
 [       OK ] TestEvent.SimpleTimeout (50 ms)
 [ RUN      ] TestEvent.GroupChildSet
-[       OK ] TestEvent.GroupChildSet (11 ms)
+[       OK ] TestEvent.GroupChildSet (10 ms)
 [ RUN      ] TestEvent.GroupChildSet2
-[       OK ] TestEvent.GroupChildSet2 (11 ms)
+[       OK ] TestEvent.GroupChildSet2 (10 ms)
 [ RUN      ] TestEvent.GroupWaitResetsChild
 [       OK ] TestEvent.GroupWaitResetsChild (1 ms)
 [ RUN      ] TestEvent.GroupTimedWait
-[       OK ] TestEvent.GroupTimedWait (81 ms)
-[----------] 14 tests from TestEvent (230 ms total)
+[       OK ] TestEvent.GroupTimedWait (80 ms)
+[----------] 14 tests from TestEvent (227 ms total)
 
 [----------] 2 tests from TestMassEvent
 [ RUN      ] TestMassEvent.General
-[       OK ] TestMassEvent.General (110 ms)
+[       OK ] TestMassEvent.General (108 ms)
 [ RUN      ] TestMassEvent.Polling
-[       OK ] TestMassEvent.Polling (106 ms)
-[----------] 2 tests from TestMassEvent (216 ms total)
+[       OK ] TestMassEvent.Polling (107 ms)
+[----------] 2 tests from TestMassEvent (215 ms total)
 
 [----------] 4 tests from TestUtil
 [ RUN      ] TestUtil.GetQualifiedFilename
@@ -1819,6 +1862,17 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [       OK ] TestURL.TestWithoutFilenameEncodingDecoding (0 ms)
 [----------] 1 test from TestURL (0 ms total)
 
+[----------] 4 tests from TestPlayListPlayer
+[ RUN      ] TestPlayListPlayer.GetNextItemIdxFromNoCurrentItemGivesTheFirstItem
+[       OK ] TestPlayListPlayer.GetNextItemIdxFromNoCurrentItemGivesTheFirstItem (0 ms)
+[ RUN      ] TestPlayListPlayer.GetNextItemIdxFromNoCurrentItemGivesTheFirstItemWithRepeatOne
+[       OK ] TestPlayListPlayer.GetNextItemIdxFromNoCurrentItemGivesTheFirstItemWithRepeatOne (0 ms)
+[ RUN      ] TestPlayListPlayer.GetNextItemIdxWithRepeatOneRepeatsTheCurrentItem
+[       OK ] TestPlayListPlayer.GetNextItemIdxWithRepeatOneRepeatsTheCurrentItem (0 ms)
+[ RUN      ] TestPlayListPlayer.ClearingTheCurrentPlaylistKeepsThePlaybackStartedState
+[       OK ] TestPlayListPlayer.ClearingTheCurrentPlaylistKeepsThePlaybackStartedState (0 ms)
+[----------] 4 tests from TestPlayListPlayer (0 ms total)
+
 [----------] 9 tests from TestPasswordManager
 [ RUN      ] TestPasswordManager.AuthenticatesPathBelowTheRememberedShare
 [       OK ] TestPasswordManager.AuthenticatesPathBelowTheRememberedShare (0 ms)
@@ -1842,10 +1896,10 @@ GetCurrentFile(): xbmctempfileoD6dxu
 
 [----------] 2 tests from TestLangInfo
 [ RUN      ] TestLangInfo.Load
-[       OK ] TestLangInfo.Load (2 ms)
+[       OK ] TestLangInfo.Load (0 ms)
 [ RUN      ] TestLangInfo.FallsBackWhenTheLanguageSettingNamesNoLanguage
 [       OK ] TestLangInfo.FallsBackWhenTheLanguageSettingNamesNoLanguage (0 ms)
-[----------] 2 tests from TestLangInfo (2 ms total)
+[----------] 2 tests from TestLangInfo (0 ms total)
 
 [----------] 8 tests from TestFileItem
 [ RUN      ] TestFileItem.TestSimplePathSet
@@ -1863,8 +1917,8 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [ RUN      ] TestFileItem.TestAssignment
 [       OK ] TestFileItem.TestAssignment (0 ms)
 [ RUN      ] TestFileItem.MimeType
-[       OK ] TestFileItem.MimeType (201 ms)
-[----------] 8 tests from TestFileItem (201 ms total)
+[       OK ] TestFileItem.MimeType (323 ms)
+[----------] 8 tests from TestFileItem (324 ms total)
 
 [----------] 2 tests from TestFileItemList
 [ RUN      ] TestFileItemList.StackRecordsWhatItsPartsAre
@@ -1901,10 +1955,10 @@ GetCurrentFile(): xbmctempfileoD6dxu
 [ RUN      ] TestDateTime.TmOperators
 [       OK ] TestDateTime.TmOperators (0 ms)
 [ RUN      ] TestDateTime.GetCurrentDateTime
-Current Date: 2026-09-04 16:54:12
+Current Date: 2026-09-09 16:16:31
 [       OK ] TestDateTime.GetCurrentDateTime (0 ms)
 [ RUN      ] TestDateTime.GetUTCDateTime
-Current Date UTC: 2026-09-04 15:54:12
+Current Date UTC: 2026-09-09 15:16:31
 [       OK ] TestDateTime.GetUTCDateTime (0 ms)
 [ RUN      ] TestDateTime.MonthStringToMonthNum
 [       OK ] TestDateTime.MonthStringToMonthNum (0 ms)
@@ -1956,15 +2010,14 @@ Current Date UTC: 2026-09-04 15:54:12
 
 [----------] 4 tests from TestMediaSourceSettings
 [ RUN      ] TestMediaSourceSettings.LoadString
-[       OK ] TestMediaSourceSettings.LoadString (2 ms)
+[       OK ] TestMediaSourceSettings.LoadString (0 ms)
 [ RUN      ] TestMediaSourceSettings.SaveString
-Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestMediaSourceSettings.SaveString (0 ms)
 [ RUN      ] TestMediaSourceSettings.GetSource
 [       OK ] TestMediaSourceSettings.GetSource (0 ms)
 [ RUN      ] TestMediaSourceSettings.SetSources
 [       OK ] TestMediaSourceSettings.SetSources (0 ms)
-[----------] 4 tests from TestMediaSourceSettings (2 ms total)
+[----------] 4 tests from TestMediaSourceSettings (0 ms total)
 
 [----------] 1 test from TestSettingsMigrationHelper
 [ RUN      ] TestSettingsMigrationHelper.ConvertSingleSettingConverterInput
@@ -2034,7 +2087,7 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestCaptureService.UnservedContinuousFailsAtFrameEnd (0 ms)
 [ RUN      ] TestCaptureService.ServedContinuousSurvivesFrameEnd
 [       OK ] TestCaptureService.ServedContinuousSurvivesFrameEnd (0 ms)
-[----------] 25 tests from TestCaptureService (238 ms total)
+[----------] 25 tests from TestCaptureService (239 ms total)
 
 [----------] 1 test from TestCaptureReadback
 [ RUN      ] TestCaptureReadback.PackedX2BGR10ChannelOrder
@@ -2049,8 +2102,8 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [ RUN      ] TestCaptureConvert.CopyBGRA8IgnoresHDRTagsNoTonemap
 [       OK ] TestCaptureConvert.CopyBGRA8IgnoresHDRTagsNoTonemap (0 ms)
 [ RUN      ] TestCaptureConvert.PQRampHonorsMasteringPeak
-[       OK ] TestCaptureConvert.PQRampHonorsMasteringPeak (969 ms)
-[----------] 4 tests from TestCaptureConvert (969 ms total)
+[       OK ] TestCaptureConvert.PQRampHonorsMasteringPeak (975 ms)
+[----------] 4 tests from TestCaptureConvert (975 ms total)
 
 [----------] 33 tests from TestPVRChannelsPath
 [ RUN      ] TestPVRChannelsPath.Parse_Protocol
@@ -2123,8 +2176,8 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 
 [----------] 1 test from TestPlayListXSPF
 [ RUN      ] TestPlayListXSPF.Load
-[       OK ] TestPlayListXSPF.Load (0 ms)
-[----------] 1 test from TestPlayListXSPF (0 ms total)
+[       OK ] TestPlayListXSPF.Load (2 ms)
+[----------] 1 test from TestPlayListXSPF (2 ms total)
 
 [----------] 1 test from TestPlayListXML
 [ RUN      ] TestPlayListXML.LoadData
@@ -2158,10 +2211,10 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 
 [----------] 2 tests from TestMetadataExtraction
 [ RUN      ] TestMetadataExtraction.TestGPSImage
-[       OK ] TestMetadataExtraction.TestGPSImage (1 ms)
+[       OK ] TestMetadataExtraction.TestGPSImage (2 ms)
 [ RUN      ] TestMetadataExtraction.TestIPTC
 [       OK ] TestMetadataExtraction.TestIPTC (0 ms)
-[----------] 2 tests from TestMetadataExtraction (1 ms total)
+[----------] 2 tests from TestMetadataExtraction (2 ms total)
 
 [----------] 31 tests from TestWebServer
 [ RUN      ] TestWebServer.IsStarted
@@ -2173,15 +2226,15 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [ RUN      ] TestWebServer.CanGetJsonRpcApiDescriptionWithHttpGet
 [       OK ] TestWebServer.CanGetJsonRpcApiDescriptionWithHttpGet (0 ms)
 [ RUN      ] TestWebServer.CanReadDataOverJsonRpcWithHttpGet
-[       OK ] TestWebServer.CanReadDataOverJsonRpcWithHttpGet (8 ms)
+[       OK ] TestWebServer.CanReadDataOverJsonRpcWithHttpGet (10 ms)
 [ RUN      ] TestWebServer.CannotModifyOverJsonRpcWithHttpGet
-[       OK ] TestWebServer.CannotModifyOverJsonRpcWithHttpGet (9 ms)
+[       OK ] TestWebServer.CannotModifyOverJsonRpcWithHttpGet (8 ms)
 [ RUN      ] TestWebServer.CanReadDataOverJsonRpcWithHttpPost
-[       OK ] TestWebServer.CanReadDataOverJsonRpcWithHttpPost (8 ms)
+[       OK ] TestWebServer.CanReadDataOverJsonRpcWithHttpPost (10 ms)
 [ RUN      ] TestWebServer.CanModifyOverJsonRpcWithHttpPost
-[       OK ] TestWebServer.CanModifyOverJsonRpcWithHttpPost (10 ms)
+[       OK ] TestWebServer.CanModifyOverJsonRpcWithHttpPost (8 ms)
 [ RUN      ] TestWebServer.CanNotHeadNonExistingFile
-[       OK ] TestWebServer.CanNotHeadNonExistingFile (2 ms)
+[       OK ] TestWebServer.CanNotHeadNonExistingFile (0 ms)
 [ RUN      ] TestWebServer.CanHeadFile
 [       OK ] TestWebServer.CanHeadFile (0 ms)
 [ RUN      ] TestWebServer.CanNotGetNonExistingFile
@@ -2226,7 +2279,7 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestWebServer.CanGetCachedRangedFileWithExactIfRange (0 ms)
 [ RUN      ] TestWebServer.CanGetCachedRangedFileWithNewerIfRange
 [       OK ] TestWebServer.CanGetCachedRangedFileWithNewerIfRange (0 ms)
-[----------] 31 tests from TestWebServer (54 ms total)
+[----------] 31 tests from TestWebServer (51 ms total)
 
 [----------] 3 tests from TestWebServerAuth
 [ RUN      ] TestWebServerAuth.GetMimeTypeReturnsTheCorrectType
@@ -2340,16 +2393,21 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestTagLoaderTagLib.SplitMBID (0 ms)
 [----------] 2 tests from TestTagLoaderTagLib (0 ms total)
 
+[----------] 1 test from TestTagLoaderTagLibMp2
+[ RUN      ] TestTagLoaderTagLibMp2.ReadsID3v2FromALayerIIFile
+[       OK ] TestTagLoaderTagLibMp2.ReadsID3v2FromALayerIIFile (0 ms)
+[----------] 1 test from TestTagLoaderTagLibMp2 (0 ms total)
+
 [----------] 4 tests from TestMusicInfoTagLoaderMatroska
 [ RUN      ] TestMusicInfoTagLoaderMatroska.ReadsAFileWithNoChapters
 [       OK ] TestMusicInfoTagLoaderMatroska.ReadsAFileWithNoChapters (0 ms)
 [ RUN      ] TestMusicInfoTagLoaderMatroska.TitlesASongAfterItsAlbumWhenTheFileNamesNoSong
-[       OK ] TestMusicInfoTagLoaderMatroska.TitlesASongAfterItsAlbumWhenTheFileNamesNoSong (2 ms)
+[       OK ] TestMusicInfoTagLoaderMatroska.TitlesASongAfterItsAlbumWhenTheFileNamesNoSong (0 ms)
 [ RUN      ] TestMusicInfoTagLoaderMatroska.SkipsAChapterTooShortToBeTheSong
 [       OK ] TestMusicInfoTagLoaderMatroska.SkipsAChapterTooShortToBeTheSong (0 ms)
 [ RUN      ] TestMusicInfoTagLoaderMatroska.DoesNotGiveTheOnlyChapterATagNamingAnotherOne
 [       OK ] TestMusicInfoTagLoaderMatroska.DoesNotGiveTheOnlyChapterATagNamingAnotherOne (0 ms)
-[----------] 4 tests from TestMusicInfoTagLoaderMatroska (4 ms total)
+[----------] 4 tests from TestMusicInfoTagLoaderMatroska (1 ms total)
 
 [----------] 11 tests from TestMatroskaTagReaderFFmpeg
 [ RUN      ] TestMatroskaTagReaderFFmpeg.SortsAlbumLevelTagsFromTheFilesOwn
@@ -2361,28 +2419,28 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [ RUN      ] TestMatroskaTagReaderFFmpeg.PrefersAChapterTitleTagToItsDisplayName
 [       OK ] TestMatroskaTagReaderFFmpeg.PrefersAChapterTitleTagToItsDisplayName (0 ms)
 [ RUN      ] TestMatroskaTagReaderFFmpeg.SwallowsAnEditionThatRerunsTheTimeline
-[matroska,webm @ 0x56211ca6ff80] The tags at index 4 refer to a non-existent chapter 2001.
+[matroska,webm @ 0x5a69f4439100] The tags at index 4 refer to a non-existent chapter 2001.
 [       OK ] TestMatroskaTagReaderFFmpeg.SwallowsAnEditionThatRerunsTheTimeline (0 ms)
 [ RUN      ] TestMatroskaTagReaderFFmpeg.ReportsNoChapterWhereTheFileGaveThemNoUid
-[matroska,webm @ 0x56211ca6ff80] The tags at index 1 refer to a non-existent chapter 1001.
-[matroska,webm @ 0x56211ca6ff80] The tags at index 2 refer to a non-existent chapter 1002.
-[matroska,webm @ 0x56211ca6ff80] The tags at index 3 refer to a non-existent chapter 1003.
+[matroska,webm @ 0x5a69f4439100] The tags at index 1 refer to a non-existent chapter 1001.
+[matroska,webm @ 0x5a69f4439100] The tags at index 2 refer to a non-existent chapter 1002.
+[matroska,webm @ 0x5a69f4439100] The tags at index 3 refer to a non-existent chapter 1003.
 [       OK ] TestMatroskaTagReaderFFmpeg.ReportsNoChapterWhereTheFileGaveThemNoUid (0 ms)
 [ RUN      ] TestMatroskaTagReaderFFmpeg.KeepsAnEditionThatStartsLater
 [       OK ] TestMatroskaTagReaderFFmpeg.KeepsAnEditionThatStartsLater (0 ms)
 [ RUN      ] TestMatroskaTagReaderFFmpeg.KeepsOnlyTheLastOfARepeatedTag
 [       OK ] TestMatroskaTagReaderFFmpeg.KeepsOnlyTheLastOfARepeatedTag (0 ms)
 [ RUN      ] TestMatroskaTagReaderFFmpeg.ClampsEveryEndOfAFileThatDeclaresNoLength
-[matroska,webm @ 0x56211ca6ff80] Estimating duration from bitrate, this may be inaccurate
+[matroska,webm @ 0x5a69f4439100] Estimating duration from bitrate, this may be inaccurate
 [       OK ] TestMatroskaTagReaderFFmpeg.ClampsEveryEndOfAFileThatDeclaresNoLength (0 ms)
 [ RUN      ] TestMatroskaTagReaderFFmpeg.ReportsEveryChapterIncludingTheTiniest
 [       OK ] TestMatroskaTagReaderFFmpeg.ReportsEveryChapterIncludingTheTiniest (0 ms)
 [ RUN      ] TestMatroskaTagReaderFFmpeg.AgreesWithTagLibOnTheChapterList
-[matroska,webm @ 0x56211ca6ff80] The tags at index 4 refer to a non-existent chapter 2001.
+[matroska,webm @ 0x5a69f4439100] The tags at index 4 refer to a non-existent chapter 2001.
 [       OK ] TestMatroskaTagReaderFFmpeg.AgreesWithTagLibOnTheChapterList (1 ms)
 [----------] 11 tests from TestMatroskaTagReaderFFmpeg (2 ms total)
 
-[----------] 18 tests from TestMatroskaTagMapping
+[----------] 22 tests from TestMatroskaTagMapping
 [ RUN      ] TestMatroskaTagMapping.MapsFileLevelTagsToTheirFields
 [       OK ] TestMatroskaTagMapping.MapsFileLevelTagsToTheirFields (0 ms)
 [ RUN      ] TestMatroskaTagMapping.MapsDatesToReleaseAndOriginal
@@ -2419,7 +2477,15 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestMatroskaTagMapping.LeavesTheTagUntouchedForUnknownKeys (0 ms)
 [ RUN      ] TestMatroskaTagMapping.SurvivesNonNumericTrackAndDiscNumbers
 [       OK ] TestMatroskaTagMapping.SurvivesNonNumericTrackAndDiscNumbers (0 ms)
-[----------] 18 tests from TestMatroskaTagMapping (0 ms total)
+[ RUN      ] TestMatroskaTagMapping.MapsReplayGainAgainstItsLevel
+[       OK ] TestMatroskaTagMapping.MapsReplayGainAgainstItsLevel (0 ms)
+[ RUN      ] TestMatroskaTagMapping.TakesTrackAndAlbumReplayGainFromTheSameFile
+[       OK ] TestMatroskaTagMapping.TakesTrackAndAlbumReplayGainFromTheSameFile (0 ms)
+[ RUN      ] TestMatroskaTagMapping.ReadsUntargetedReplayGainAsTheTracks
+[       OK ] TestMatroskaTagMapping.ReadsUntargetedReplayGainAsTheTracks (0 ms)
+[ RUN      ] TestMatroskaTagMapping.GainWithNoPeakIsNotYetValid
+[       OK ] TestMatroskaTagMapping.GainWithNoPeakIsNotYetValid (0 ms)
+[----------] 22 tests from TestMatroskaTagMapping (0 ms total)
 
 [----------] 4 tests from TestMatroskaTagChapterRanges
 [ RUN      ] TestMatroskaTagChapterRanges.ClosesAnOpenChapterWithTheMeasuredLength
@@ -2432,10 +2498,22 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestMatroskaTagChapterRanges.KeepsAChapterOfExactlyOneSecond (0 ms)
 [----------] 4 tests from TestMatroskaTagChapterRanges (0 ms total)
 
-[----------] 1 test from TestSwig
-[ RUN      ] TestSwig.TypeConversion
-[       OK ] TestSwig.TypeConversion (0 ms)
-[----------] 1 test from TestSwig (0 ms total)
+[----------] 7 tests from TestPythonBindings
+[ RUN      ] TestPythonBindings.ImportModules
+[       OK ] TestPythonBindings.ImportModules (0 ms)
+[ RUN      ] TestPythonBindings.DirectConstructWithKwargs
+[       OK ] TestPythonBindings.DirectConstructWithKwargs (0 ms)
+[ RUN      ] TestPythonBindings.SubclassExtraKwargs
+[       OK ] TestPythonBindings.SubclassExtraKwargs (0 ms)
+[ RUN      ] TestPythonBindings.SubclassNeverCallsSuper
+[       OK ] TestPythonBindings.SubclassNeverCallsSuper (0 ms)
+[ RUN      ] TestPythonBindings.CrossModule
+[       OK ] TestPythonBindings.CrossModule (0 ms)
+[ RUN      ] TestPythonBindings.NoInitInjection
+[       OK ] TestPythonBindings.NoInitInjection (0 ms)
+[ RUN      ] TestPythonBindings.TwoSubInterpreters
+[       OK ] TestPythonBindings.TwoSubInterpreters (36 ms)
+[----------] 7 tests from TestPythonBindings (37 ms total)
 
 [----------] 23 tests from TestSetSourceContentParams
 [ RUN      ] TestSetSourceContentParams.RejectsMissingPath
@@ -2514,6 +2592,34 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestJSONRPCPermission.NotificationPermissionIsAllButReadData (0 ms)
 [----------] 6 tests from TestJSONRPCPermission (0 ms total)
 
+[----------] 3 tests from TestFileOperations
+[ RUN      ] TestFileOperations.MissingPropertiesDoesNotNeedLibraryLookup
+[       OK ] TestFileOperations.MissingPropertiesDoesNotNeedLibraryLookup (0 ms)
+[ RUN      ] TestFileOperations.BasicFilePropertiesDoNotNeedLibraryLookup
+[       OK ] TestFileOperations.BasicFilePropertiesDoNotNeedLibraryLookup (0 ms)
+[ RUN      ] TestFileOperations.VideoPropertiesNeedLibraryLookup
+[       OK ] TestFileOperations.VideoPropertiesNeedLibraryLookup (0 ms)
+[----------] 3 tests from TestFileOperations (0 ms total)
+
+[----------] 8 tests from TestExecuteAddonParams
+[ RUN      ] TestExecuteAddonParams.NoParamsGivesTheBareBuiltin
+[       OK ] TestExecuteAddonParams.NoParamsGivesTheBareBuiltin (0 ms)
+[ RUN      ] TestExecuteAddonParams.ObjectParamsBecomeKeyValueArguments
+[       OK ] TestExecuteAddonParams.ObjectParamsBecomeKeyValueArguments (0 ms)
+[ RUN      ] TestExecuteAddonParams.ACommaInAnObjectValueStaysInOneArgument
+[       OK ] TestExecuteAddonParams.ACommaInAnObjectValueStaysInOneArgument (0 ms)
+[ RUN      ] TestExecuteAddonParams.AQuoteInAnObjectValueStaysInOneArgument
+[       OK ] TestExecuteAddonParams.AQuoteInAnObjectValueStaysInOneArgument (0 ms)
+[ RUN      ] TestExecuteAddonParams.ACommaInAnArrayValueStaysInOneArgument
+[       OK ] TestExecuteAddonParams.ACommaInAnArrayValueStaysInOneArgument (0 ms)
+[ RUN      ] TestExecuteAddonParams.WaitIsReadFromTheDeclaredTopLevelParameter
+[       OK ] TestExecuteAddonParams.WaitIsReadFromTheDeclaredTopLevelParameter (0 ms)
+[ RUN      ] TestExecuteAddonParams.WaitDefaultsToNotWaiting
+[       OK ] TestExecuteAddonParams.WaitDefaultsToNotWaiting (0 ms)
+[ RUN      ] TestExecuteAddonParams.AWaitKeyInsideParamsIsJustAnAddonArgument
+[       OK ] TestExecuteAddonParams.AWaitKeyInsideParamsIsJustAnAddonArgument (0 ms)
+[----------] 8 tests from TestExecuteAddonParams (0 ms total)
+
 [----------] 1 test from TestKeyboardTranslator
 [ RUN      ] TestKeyboardTranslator.TranslateKeys
 [       OK ] TestKeyboardTranslator.TranslateKeys (0 ms)
@@ -2562,12 +2668,16 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestSkinMapManager.EstuaryDefaultHdrMap (0 ms)
 [----------] 20 tests from TestSkinMapManager (0 ms total)
 
-[----------] 2 tests from TestGUIWindowOnAction
+[----------] 4 tests from TestGUIWindowOnAction
 [ RUN      ] TestGUIWindowOnAction.PropagatesToTheParentWhenTheControlsSurvive
 [       OK ] TestGUIWindowOnAction.PropagatesToTheParentWhenTheControlsSurvive (0 ms)
 [ RUN      ] TestGUIWindowOnAction.StopsPropagatingWhenTheControlsAreDestroyed
 [       OK ] TestGUIWindowOnAction.StopsPropagatingWhenTheControlsAreDestroyed (0 ms)
-[----------] 2 tests from TestGUIWindowOnAction (0 ms total)
+[ RUN      ] TestGUIWindowOnAction.DoesNotRecoverFocusBeforeInitialization
+[       OK ] TestGUIWindowOnAction.DoesNotRecoverFocusBeforeInitialization (0 ms)
+[ RUN      ] TestGUIWindowOnAction.RecoversFocusAfterInitialization
+[       OK ] TestGUIWindowOnAction.RecoversFocusAfterInitialization (0 ms)
+[----------] 4 tests from TestGUIWindowOnAction (0 ms total)
 
 [----------] 4 tests from TestGUITextLayoutFilter
 [ RUN      ] TestGUITextLayoutFilter.VeryLongPlainText
@@ -2627,6 +2737,30 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestGamesGUIInfo.AnEmptyFieldIsPassedOn (0 ms)
 [----------] 16 tests from TestGamesGUIInfo (0 ms total)
 
+[----------] 7 tests from TestGameNameParser
+[ RUN      ] TestGameNameParser.SeparatesTheWordsOfAWhdLoadName
+[       OK ] TestGameNameParser.SeparatesTheWordsOfAWhdLoadName (0 ms)
+[ RUN      ] TestGameNameParser.KeepsAnAcronymWhole
+[       OK ] TestGameNameParser.KeepsAnAcronymWhole (0 ms)
+[ RUN      ] TestGameNameParser.SeparatesADigitFromTheWordBeforeIt
+[       OK ] TestGameNameParser.SeparatesADigitFromTheWordBeforeIt (0 ms)
+[ RUN      ] TestGameNameParser.DropsATagThatNeverCloses
+[       OK ] TestGameNameParser.DropsATagThatNeverCloses (0 ms)
+[ RUN      ] TestGameNameParser.LeavesEveryOtherConventionAlone
+[       OK ] TestGameNameParser.LeavesEveryOtherConventionAlone (0 ms)
+[ RUN      ] TestGameNameParser.ReadsAWhdLoadNameThroughParse
+[       OK ] TestGameNameParser.ReadsAWhdLoadNameThroughParse (0 ms)
+[ RUN      ] TestGameNameParser.StillReadsATosecName
+[       OK ] TestGameNameParser.StillReadsATosecName (0 ms)
+[----------] 7 tests from TestGameNameParser (0 ms total)
+
+[----------] 2 tests from TestGameFileIdentity
+[ RUN      ] TestGameFileIdentity.HashesTheGameInsideAnArchive
+[       OK ] TestGameFileIdentity.HashesTheGameInsideAnArchive (10 ms)
+[ RUN      ] TestGameFileIdentity.ReadsAnArchivedGameWithoutExtractingIt
+[       OK ] TestGameFileIdentity.ReadsAnArchivedGameWithoutExtractingIt (7 ms)
+[----------] 2 tests from TestGameFileIdentity (18 ms total)
+
 [----------] 10 tests from TestGameInfoTagLoader
 [ RUN      ] TestGameInfoTagLoader.ReadsTheNFOBesideAGame
 [       OK ] TestGameInfoTagLoader.ReadsTheNFOBesideAGame (0 ms)
@@ -2677,7 +2811,7 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestGameThumbLoader.DoesNotTakeAnotherGamesArtwork (0 ms)
 [ RUN      ] TestGameThumbLoader.FindsNothingWhenThereIsNoArtwork
 [       OK ] TestGameThumbLoader.FindsNothingWhenThereIsNoArtwork (0 ms)
-[----------] 13 tests from TestGameThumbLoader (2 ms total)
+[----------] 13 tests from TestGameThumbLoader (1 ms total)
 
 [----------] 27 tests from TestGameManual
 [ RUN      ] TestGameManual.OffersEveryManualFormatBesideTheGame
@@ -2734,7 +2868,7 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestGameManual.DoesNotOpenADifferentGamesManual (0 ms)
 [ RUN      ] TestGameManual.FindsNothingWhenThereIsNoManual
 [       OK ] TestGameManual.FindsNothingWhenThereIsNoManual (0 ms)
-[----------] 27 tests from TestGameManual (1 ms total)
+[----------] 27 tests from TestGameManual (0 ms total)
 
 [----------] 15 tests from TestDiscManagerDiscSortUtils
 [ RUN      ] TestDiscManagerDiscSortUtils.ParsesParenthesizedDiscSuffix
@@ -2853,18 +2987,16 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestControllerState.OverwriteValues (0 ms)
 [----------] 7 tests from TestControllerState (0 ms total)
 
-[----------] 5 tests from TestControllerActivity
+[----------] 4 tests from TestControllerActivity
 [ RUN      ] TestControllerActivity.MouseMotionActivates
 [       OK ] TestControllerActivity.MouseMotionActivates (150 ms)
 [ RUN      ] TestControllerActivity.MotionPersistsWithButton
 [       OK ] TestControllerActivity.MotionPersistsWithButton (150 ms)
-[ RUN      ] TestControllerActivity.MotionTimeoutReset
-[       OK ] TestControllerActivity.MotionTimeoutReset (160 ms)
 [ RUN      ] TestControllerActivity.MotionPersistsMultipleButtons
 [       OK ] TestControllerActivity.MotionPersistsMultipleButtons (150 ms)
 [ RUN      ] TestControllerActivity.MultiplePointers
 [       OK ] TestControllerActivity.MultiplePointers (155 ms)
-[----------] 5 tests from TestControllerActivity (765 ms total)
+[----------] 4 tests from TestControllerActivity (605 ms total)
 
 [----------] 6 tests from TestGameClientTopology
 [ RUN      ] TestGameClientTopology.Construtor
@@ -2961,6 +3093,19 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestGameClientDiscM3U.SaveCreatesPerGameStateFile (0 ms)
 [----------] 12 tests from TestGameClientDiscM3U (1 ms total)
 
+[----------] 5 tests from TestGameClientCheevos
+[ RUN      ] TestGameClientCheevos.FirstUnlockChangesStateAndNotifies
+[       OK ] TestGameClientCheevos.FirstUnlockChangesStateAndNotifies (0 ms)
+[ RUN      ] TestGameClientCheevos.EarnedAchievementWithoutEncoreIsSuppressed
+[       OK ] TestGameClientCheevos.EarnedAchievementWithoutEncoreIsSuppressed (0 ms)
+[ RUN      ] TestGameClientCheevos.EarnedAchievementWithEncoreNotifiesWithoutChangingState
+[       OK ] TestGameClientCheevos.EarnedAchievementWithEncoreNotifiesWithoutChangingState (0 ms)
+[ RUN      ] TestGameClientCheevos.UnknownAchievementWithEncoreIsSuppressed
+[       OK ] TestGameClientCheevos.UnknownAchievementWithEncoreIsSuppressed (0 ms)
+[ RUN      ] TestGameClientCheevos.EncoreEventAfterGameClosesIsSuppressed
+[       OK ] TestGameClientCheevos.EncoreEventAfterGameClosesIsSuppressed (0 ms)
+[----------] 5 tests from TestGameClientCheevos (0 ms total)
+
 [----------] 3 tests from TestSMBFileRecovery
 [ RUN      ] TestSMBFileRecovery.ReconnectableReadErrors
 [       OK ] TestSMBFileRecovery.ReconnectableReadErrors (0 ms)
@@ -2970,15 +3115,30 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [       OK ] TestSMBFileRecovery.ZeroBytesAtOrBeyondKnownFileEndIsValidEof (0 ms)
 [----------] 3 tests from TestSMBFileRecovery (0 ms total)
 
+[----------] 6 tests from TestCurlHttpClientNetwork
+[ RUN      ] TestCurlHttpClientNetwork.ServerIsRunning
+[       OK ] TestCurlHttpClientNetwork.ServerIsRunning (0 ms)
+[ RUN      ] TestCurlHttpClientNetwork.GetReturnsBody
+[       OK ] TestCurlHttpClientNetwork.GetReturnsBody (0 ms)
+[ RUN      ] TestCurlHttpClientNetwork.PostEchoesBody
+[       OK ] TestCurlHttpClientNetwork.PostEchoesBody (1 ms)
+[ RUN      ] TestCurlHttpClientNetwork.GetViaFactoryInterface
+[       OK ] TestCurlHttpClientNetwork.GetViaFactoryInterface (0 ms)
+[ RUN      ] TestCurlHttpClientNetwork.SetUserAgentIsForwardedInRequest
+[       OK ] TestCurlHttpClientNetwork.SetUserAgentIsForwardedInRequest (0 ms)
+[ RUN      ] TestCurlHttpClientNetwork.SetRefererIsForwardedInRequest
+[       OK ] TestCurlHttpClientNetwork.SetRefererIsForwardedInRequest (0 ms)
+[----------] 6 tests from TestCurlHttpClientNetwork (4 ms total)
+
 [----------] 9 tests from TestHTTPDirectory
 [ RUN      ] TestHTTPDirectory.IsStarted
 [       OK ] TestHTTPDirectory.IsStarted (0 ms)
 [ RUN      ] TestHTTPDirectory.ApacheDefaultIndex
-[       OK ] TestHTTPDirectory.ApacheDefaultIndex (4 ms)
+[       OK ] TestHTTPDirectory.ApacheDefaultIndex (3 ms)
 [ RUN      ] TestHTTPDirectory.ApacheFancyIndex
-[       OK ] TestHTTPDirectory.ApacheFancyIndex (2 ms)
+[       OK ] TestHTTPDirectory.ApacheFancyIndex (1 ms)
 [ RUN      ] TestHTTPDirectory.ApacheHtmlIndex
-[       OK ] TestHTTPDirectory.ApacheHtmlIndex (2 ms)
+[       OK ] TestHTTPDirectory.ApacheHtmlIndex (1 ms)
 [ RUN      ] TestHTTPDirectory.BasicIndex
 [       OK ] TestHTTPDirectory.BasicIndex (1 ms)
 [ RUN      ] TestHTTPDirectory.BasicMultilineIndex
@@ -2986,10 +3146,10 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [ RUN      ] TestHTTPDirectory.LighttpDefaultIndex
 [       OK ] TestHTTPDirectory.LighttpDefaultIndex (1 ms)
 [ RUN      ] TestHTTPDirectory.NginxDefaultIndex
-[       OK ] TestHTTPDirectory.NginxDefaultIndex (1 ms)
+[       OK ] TestHTTPDirectory.NginxDefaultIndex (0 ms)
 [ RUN      ] TestHTTPDirectory.NginxFancyIndex
-[       OK ] TestHTTPDirectory.NginxFancyIndex (1 ms)
-[----------] 9 tests from TestHTTPDirectory (16 ms total)
+[       OK ] TestHTTPDirectory.NginxFancyIndex (0 ms)
+[----------] 9 tests from TestHTTPDirectory (11 ms total)
 
 [----------] 4 tests from TestStreamParser
 [ RUN      ] TestStreamParser.StreamsComeFromThePlaylistNotTheSharedClip
@@ -3044,7 +3204,7 @@ Reference file generated at '/tmp/xbmctempCFaysQ/xbmctempfileOP1f2O.xml'
 [ RUN      ] TestZipFile.Stat
 [       OK ] TestZipFile.Stat (0 ms)
 [ RUN      ] TestZipFile.CorruptedFile
-Reference file generated at '/tmp/xbmctempG6bGYT/xbmctempfilecF8AWp.zip'
+Reference file generated at '/tmp/xbmctempd3F3gF/xbmctempfilegLrNLQ.zip'
 file->GetLength(): 1616
 file->Seek(file->GetLength() / 2, SEEK_CUR) return value: 808
 file->Seek(0, SEEK_END) return value: 1616
@@ -3157,17 +3317,33 @@ File contents:
 [ RUN      ] TestZipFile.Read64
 [       OK ] TestZipFile.Read64 (0 ms)
 [ RUN      ] TestZipFile.BigRead64
-/home/chris/xbmc-hcmerge/xbmc/filesystem/test/TestZipFile.cpp:280: Failure
+/home/chris/xbmc-gamelib-merge/xbmc/filesystem/test/TestZipFile.cpp:280: Failure
 Value of: file.Open(strpathinzip)
   Actual: false
 Expected: true
 
-[  FAILED  ] TestZipFile.BigRead64 (2483 ms)
+[  FAILED  ] TestZipFile.BigRead64 (2063 ms)
 [ RUN      ] TestZipFile.Zip64DirectoryListing
 [       OK ] TestZipFile.Zip64DirectoryListing (0 ms)
 [ RUN      ] TestZipFile.Zip64ExtendedInformation
 [       OK ] TestZipFile.Zip64ExtendedInformation (0 ms)
-[----------] 9 tests from TestZipFile (2486 ms total)
+[----------] 9 tests from TestZipFile (2065 ms total)
+
+[----------] 2 tests from TestHttpClientFactory
+[ RUN      ] TestHttpClientFactory.CreateReturnsNonNull
+[       OK ] TestHttpClientFactory.CreateReturnsNonNull (0 ms)
+[ RUN      ] TestHttpClientFactory.CreateReturnsCurlHttpClient
+[       OK ] TestHttpClientFactory.CreateReturnsCurlHttpClient (0 ms)
+[----------] 2 tests from TestHttpClientFactory (0 ms total)
+
+[----------] 3 tests from TestCurlHttpClient
+[ RUN      ] TestCurlHttpClient.GetPropertyOnIdleClientReturnsEmpty
+[       OK ] TestCurlHttpClient.GetPropertyOnIdleClientReturnsEmpty (0 ms)
+[ RUN      ] TestCurlHttpClient.CancelAndResetLeaveIdleClientUsable
+[       OK ] TestCurlHttpClient.CancelAndResetLeaveIdleClientUsable (0 ms)
+[ RUN      ] TestCurlHttpClient.SettersDispatchThroughInterface
+[       OK ] TestCurlHttpClient.SettersDispatchThroughInterface (0 ms)
+[----------] 3 tests from TestCurlHttpClient (0 ms total)
 
 [----------] 2 tests from TestFileFactory
 [ RUN      ] TestFileFactory.Read
@@ -3178,7 +3354,7 @@ Expected: true
 
 [----------] 10 tests from TestFile
 [ RUN      ] TestFile.Read
-[       OK ] TestFile.Read (7 ms)
+[       OK ] TestFile.Read (5 ms)
 [ RUN      ] TestFile.Write
 [       OK ] TestFile.Write (0 ms)
 [ RUN      ] TestFile.Exists
@@ -3197,7 +3373,7 @@ Expected: true
 [       OK ] TestFile.ReadLineRaw (0 ms)
 [ RUN      ] TestFile.ReadLine
 [       OK ] TestFile.ReadLine (0 ms)
-[----------] 10 tests from TestFile (8 ms total)
+[----------] 10 tests from TestFile (5 ms total)
 
 [----------] 95 tests from TestDiscDirectoryHelper
 [ RUN      ] TestDiscDirectoryHelper.GetEpisodePlaylists_EmptyInputs
@@ -3390,7 +3566,7 @@ Expected: true
 [       OK ] TestDiscDirectoryHelper.GetMoviePlaylists_Resolution_UnknownAndMainPlaylist (0 ms)
 [ RUN      ] TestDiscDirectoryHelper.GetMoviePlaylists_SeamlesslyBranchedDisc
 [       OK ] TestDiscDirectoryHelper.GetMoviePlaylists_SeamlesslyBranchedDisc (0 ms)
-[----------] 95 tests from TestDiscDirectoryHelper (7 ms total)
+[----------] 95 tests from TestDiscDirectoryHelper (6 ms total)
 
 [----------] 25 tests from TestDirectoryCache
 [ RUN      ] TestDirectoryCache.EmptyCache
@@ -3468,16 +3644,16 @@ Expected: true
 [ RUN      ] TestAudioBookFileDirectory.KeepsTheTrackNumberAChapterGivesItself
 [       OK ] TestAudioBookFileDirectory.KeepsTheTrackNumberAChapterGivesItself (0 ms)
 [ RUN      ] TestAudioBookFileDirectory.IgnoresTagsFromAnEditionItDidNotSelect
-[matroska,webm @ 0x56211ca6ff80] The tags at index 4 refer to a non-existent chapter 2001.
+[matroska,webm @ 0x5a69f4521ac0] The tags at index 4 refer to a non-existent chapter 2001.
 [       OK ] TestAudioBookFileDirectory.IgnoresTagsFromAnEditionItDidNotSelect (0 ms)
 [ RUN      ] TestAudioBookFileDirectory.KeepsTagsOfAChapterTwoEditionsShare
 [       OK ] TestAudioBookFileDirectory.KeepsTagsOfAChapterTwoEditionsShare (0 ms)
 [ RUN      ] TestAudioBookFileDirectory.KeepsEveryValueOfARepeatedTag
 [       OK ] TestAudioBookFileDirectory.KeepsEveryValueOfARepeatedTag (0 ms)
 [ RUN      ] TestAudioBookFileDirectory.ExpandsAFileWhoseChaptersDeclareNoUid
-[matroska,webm @ 0x56211ca6ff80] The tags at index 1 refer to a non-existent chapter 1001.
-[matroska,webm @ 0x56211ca6ff80] The tags at index 2 refer to a non-existent chapter 1002.
-[matroska,webm @ 0x56211ca6ff80] The tags at index 3 refer to a non-existent chapter 1003.
+[matroska,webm @ 0x5a69f4521ac0] The tags at index 1 refer to a non-existent chapter 1001.
+[matroska,webm @ 0x5a69f4521ac0] The tags at index 2 refer to a non-existent chapter 1002.
+[matroska,webm @ 0x5a69f4521ac0] The tags at index 3 refer to a non-existent chapter 1003.
 [       OK ] TestAudioBookFileDirectory.ExpandsAFileWhoseChaptersDeclareNoUid (0 ms)
 [ RUN      ] TestAudioBookFileDirectory.RefusesAChapteredFileThatNamesNoAlbum
 [       OK ] TestAudioBookFileDirectory.RefusesAChapteredFileThatNamesNoAlbum (0 ms)
@@ -3486,11 +3662,11 @@ Expected: true
 [ RUN      ] TestAudioBookFileDirectory.ExpandsAnAlbumTaggedWithNoLevel
 [       OK ] TestAudioBookFileDirectory.ExpandsAnAlbumTaggedWithNoLevel (0 ms)
 [ RUN      ] TestAudioBookFileDirectory.KeepsTheLastTrackOfAFileThatDeclaresNoLength
-[matroska,webm @ 0x56211ca6ff80] Estimating duration from bitrate, this may be inaccurate
+[matroska,webm @ 0x5a69f4521ac0] Estimating duration from bitrate, this may be inaccurate
 [       OK ] TestAudioBookFileDirectory.KeepsTheLastTrackOfAFileThatDeclaresNoLength (0 ms)
 [ RUN      ] TestAudioBookFileDirectory.ReadsTheSecondFileWhenReusedAcrossURLs
 [       OK ] TestAudioBookFileDirectory.ReadsTheSecondFileWhenReusedAcrossURLs (0 ms)
-[----------] 15 tests from TestAudioBookFileDirectory (3 ms total)
+[----------] 15 tests from TestAudioBookFileDirectory (4 ms total)
 
 [----------] 1 test from TestNodeTitleMovies
 [ RUN      ] TestNodeTitleMovies.General
@@ -3516,22 +3692,45 @@ Expected: true
 
 [----------] 8 tests from TestVideoPlayer
 [ RUN      ] TestVideoPlayer.GetPreviousBookmark
-[       OK ] TestVideoPlayer.GetPreviousBookmark (2002 ms)
+[       OK ] TestVideoPlayer.GetPreviousBookmark (2001 ms)
 [ RUN      ] TestVideoPlayer.GetNextBookmark
 [       OK ] TestVideoPlayer.GetNextBookmark (2001 ms)
 [ RUN      ] TestVideoPlayer.GetBookmarkPos
-[       OK ] TestVideoPlayer.GetBookmarkPos (2001 ms)
+[       OK ] TestVideoPlayer.GetBookmarkPos (2000 ms)
 [ RUN      ] TestVideoPlayer.UpdateHasVideoAudioClearsStaleVideoFlag
-[       OK ] TestVideoPlayer.UpdateHasVideoAudioClearsStaleVideoFlag (2001 ms)
+[       OK ] TestVideoPlayer.UpdateHasVideoAudioClearsStaleVideoFlag (2000 ms)
 [ RUN      ] TestVideoPlayer.UpdateHasVideoAudioKeepsFlagsWhenStreamsOpen
-[       OK ] TestVideoPlayer.UpdateHasVideoAudioKeepsFlagsWhenStreamsOpen (2001 ms)
+[       OK ] TestVideoPlayer.UpdateHasVideoAudioKeepsFlagsWhenStreamsOpen (2000 ms)
 [ RUN      ] TestVideoPlayer.CalcTimeOrPercentSeekTargetCompat
 [       OK ] TestVideoPlayer.CalcTimeOrPercentSeekTargetCompat (0 ms)
 [ RUN      ] TestVideoPlayer.CalcTimeOrPercentSeekTargetPercent
 [       OK ] TestVideoPlayer.CalcTimeOrPercentSeekTargetPercent (0 ms)
 [ RUN      ] TestVideoPlayer.CalcTimeOrPercentSeekTargetSmooth
 [       OK ] TestVideoPlayer.CalcTimeOrPercentSeekTargetSmooth (0 ms)
-[----------] 8 tests from TestVideoPlayer (10007 ms total)
+[----------] 8 tests from TestVideoPlayer (10005 ms total)
+
+[----------] 2 tests from TestVideoCodecPictureFormat
+[ RUN      ] TestVideoCodecPictureFormat.AV1ReportsItsPixelFormatAndBitDepth
+Input #0, matroska,webm, from '/home/chris/xbmc-gamelib-merge/build/xbmc/cores/VideoPlayer/test/testdata/av1_10bit_320x240.mkv':
+  Metadata:
+    ENCODER         : Lavf62.12.101
+  Duration: 00:00:02.00, start: 0.000000, bitrate: 9 kb/s
+  Stream #0:0: Video: av1 (libdav1d) (Main), yuv420p10le(tv, bt470bg/unknown/unknown, progressive), 320x240 [SAR 1:1 DAR 4:3], 10 fps, 10 tbr, 1k tbn
+    Metadata:
+      ENCODER         : Lavc62.28.101 libaom-av1
+      DURATION        : 00:00:02.000000000
+[       OK ] TestVideoCodecPictureFormat.AV1ReportsItsPixelFormatAndBitDepth (6 ms)
+[ RUN      ] TestVideoCodecPictureFormat.H264ReportsItsPixelFormatAndBitDepth
+Input #0, matroska,webm, from '/home/chris/xbmc-gamelib-merge/build/xbmc/cores/VideoPlayer/test/testdata/h264_8bit_320x240.mkv':
+  Metadata:
+    ENCODER         : Lavf62.12.101
+  Duration: 00:00:02.00, start: 0.000000, bitrate: 12 kb/s
+  Stream #0:0: Video: h264 (High), yuv420p(tv, bt470bg/unknown/unknown, progressive), 320x240 [SAR 1:1 DAR 4:3], 10 fps, 10 tbr, 1k tbn
+    Metadata:
+      ENCODER         : Lavc62.28.101 libx264
+      DURATION        : 00:00:02.000000000
+[       OK ] TestVideoCodecPictureFormat.H264ReportsItsPixelFormatAndBitDepth (1 ms)
+[----------] 2 tests from TestVideoCodecPictureFormat (8 ms total)
 
 [----------] 2 tests from TestConvertMatrix
 [ RUN      ] TestConvertMatrix.YUV2RGB
@@ -3569,7 +3768,7 @@ Expected: true
 [       OK ] TestEdl.TestMergeSmallCommbreaksAdvanced (0 ms)
 [ RUN      ] TestEdl.TestMultipleEpisodeEdlProcess
 [       OK ] TestEdl.TestMultipleEpisodeEdlProcess (0 ms)
-[----------] 14 tests from TestEdl (1 ms total)
+[----------] 14 tests from TestEdl (0 ms total)
 
 [----------] 10 tests from TestParseEditsForEpisode
 [ RUN      ] TestParseEditsForEpisode.EmptyMultiEpisodeResultIsNoOp
@@ -3598,13 +3797,6 @@ Expected: true
 [ RUN      ] TestDVDDemuxUtils.ReadChaptersInvalid
 [       OK ] TestDVDDemuxUtils.ReadChaptersInvalid (0 ms)
 [----------] 1 test from TestDVDDemuxUtils (0 ms total)
-
-[----------] 2 tests from TestVideoBufferDMA
-[ RUN      ] TestVideoBufferDMA.DescriptorIdentityTracksLayout
-[       OK ] TestVideoBufferDMA.DescriptorIdentityTracksLayout (0 ms)
-[ RUN      ] TestVideoBufferDMA.IsValidGateSurvivesCollapse
-[       OK ] TestVideoBufferDMA.IsValidGateSurvivesCollapse (0 ms)
-[----------] 2 tests from TestVideoBufferDMA (0 ms total)
 
 [----------] 11 tests from TestDmaBufIdentityCache
 [ RUN      ] TestDmaBufIdentityCache.MissThenHit
@@ -3695,7 +3887,7 @@ Expected: true
 
 [----------] 2 tests from AddonDatabaseTest
 [ RUN      ] AddonDatabaseTest.TestFindById
-[       OK ] AddonDatabaseTest.TestFindById (1 ms)
+[       OK ] AddonDatabaseTest.TestFindById (0 ms)
 [ RUN      ] AddonDatabaseTest.TestFindByNonExistingId
 [       OK ] AddonDatabaseTest.TestFindByNonExistingId (0 ms)
 [----------] 2 tests from AddonDatabaseTest (1 ms total)
@@ -3714,9 +3906,27 @@ Expected: true
 [       OK ] TestSkinTimers.TestSkinTimerParsing (0 ms)
 [----------] 1 test from TestSkinTimers (0 ms total)
 
-[----------] 12 tests from TestLeaderboardUtils
+[----------] 23 tests from TestLeaderboardUtils
 [ RUN      ] TestLeaderboardUtils.FormatsAScoreTheWayItsLeaderboardMeasures
 [       OK ] TestLeaderboardUtils.FormatsAScoreTheWayItsLeaderboardMeasures (0 ms)
+[ RUN      ] TestLeaderboardUtils.KnowsWhichFormatsAreTimes
+[       OK ] TestLeaderboardUtils.KnowsWhichFormatsAreTimes (0 ms)
+[ RUN      ] TestLeaderboardUtils.ABoardNobodyHasEnteredCountsAsLoaded
+[       OK ] TestLeaderboardUtils.ABoardNobodyHasEnteredCountsAsLoaded (0 ms)
+[ RUN      ] TestLeaderboardUtils.AskingForARedrawReachesWhoeverDrawsTheIndicators
+[       OK ] TestLeaderboardUtils.AskingForARedrawReachesWhoeverDrawsTheIndicators (0 ms)
+[ RUN      ] TestLeaderboardUtils.SigningInAsSomebodyElseDropsTheLastAccountsStandings
+[       OK ] TestLeaderboardUtils.SigningInAsSomebodyElseDropsTheLastAccountsStandings (0 ms)
+[ RUN      ] TestLeaderboardUtils.AnIndicatorWithNothingToDrawDoesNotHideOneBehindIt
+[       OK ] TestLeaderboardUtils.AnIndicatorWithNothingToDrawDoesNotHideOneBehindIt (0 ms)
+[ RUN      ] TestLeaderboardUtils.TheClosestToEarnedIsChosenFromWhatCanBeDrawn
+[       OK ] TestLeaderboardUtils.TheClosestToEarnedIsChosenFromWhatCanBeDrawn (0 ms)
+[ RUN      ] TestLeaderboardUtils.AnAnswerTheLastAccountAskedForIsRefused
+[       OK ] TestLeaderboardUtils.AnAnswerTheLastAccountAskedForIsRefused (0 ms)
+[ RUN      ] TestLeaderboardUtils.ASubmissionLeavesTheSummaryToBeAskedForAgain
+[       OK ] TestLeaderboardUtils.ASubmissionLeavesTheSummaryToBeAskedForAgain (0 ms)
+[ RUN      ] TestLeaderboardUtils.ABoardNobodyHasEnteredIsKeptRatherThanAskedForEverySession
+[       OK ] TestLeaderboardUtils.ABoardNobodyHasEnteredIsKeptRatherThanAskedForEverySession (0 ms)
 [ RUN      ] TestLeaderboardUtils.MedalsOnlyGoToTheTopThree
 [       OK ] TestLeaderboardUtils.MedalsOnlyGoToTheTopThree (0 ms)
 [ RUN      ] TestLeaderboardUtils.ReadsBackWhatItKept
@@ -3724,7 +3934,7 @@ Expected: true
 [ RUN      ] TestLeaderboardUtils.KnowsNothingAboutALeaderboardItNeverSaw
 [       OK ] TestLeaderboardUtils.KnowsNothingAboutALeaderboardItNeverSaw (0 ms)
 [ RUN      ] TestLeaderboardUtils.LookingTwiceLeavesOneRecordNotTwo
-[       OK ] TestLeaderboardUtils.LookingTwiceLeavesOneRecordNotTwo (2 ms)
+[       OK ] TestLeaderboardUtils.LookingTwiceLeavesOneRecordNotTwo (0 ms)
 [ RUN      ] TestLeaderboardUtils.KeepsLeaderboardsApart
 [       OK ] TestLeaderboardUtils.KeepsLeaderboardsApart (0 ms)
 [ RUN      ] TestLeaderboardUtils.ForgetsOneLeaderboardWithoutForgettingTheRest
@@ -3735,11 +3945,15 @@ Expected: true
 [       OK ] TestLeaderboardUtils.ClearsEverythingWhenAsked (0 ms)
 [ RUN      ] TestLeaderboardUtils.RefusesStandingsThatHaveGoneStale
 [       OK ] TestLeaderboardUtils.RefusesStandingsThatHaveGoneStale (0 ms)
+[ RUN      ] TestLeaderboardUtils.PublishingFetchedLeaderboardsLeavesALiveAttemptAlone
+[       OK ] TestLeaderboardUtils.PublishingFetchedLeaderboardsLeavesALiveAttemptAlone (0 ms)
 [ RUN      ] TestLeaderboardUtils.ScoreboardWritesTheStandingBackAndDropsTheStalePage
 [       OK ] TestLeaderboardUtils.ScoreboardWritesTheStandingBackAndDropsTheStalePage (0 ms)
 [ RUN      ] TestLeaderboardUtils.ATotalOfZeroLeavesTheCountAlone
 [       OK ] TestLeaderboardUtils.ATotalOfZeroLeavesTheCountAlone (0 ms)
-[----------] 12 tests from TestLeaderboardUtils (3 ms total)
+[ RUN      ] TestLeaderboardUtils.StandingsKeptForOneAccountAreNotShownToAnother
+[       OK ] TestLeaderboardUtils.StandingsKeptForOneAccountAreNotShownToAnother (0 ms)
+[----------] 23 tests from TestLeaderboardUtils (1 ms total)
 
 [----------] 7 tests from TestVideoUtils/OpticalMediaPathTest
 [ RUN      ] TestVideoUtils/OpticalMediaPathTest.GetOpticalMediaPath/0
@@ -3787,7 +4001,7 @@ Expected: true
 [       OK ] TestVideoUtils/TrailerTest.FindTrailer/12 (0 ms)
 [ RUN      ] TestVideoUtils/TrailerTest.FindTrailer/13
 [       OK ] TestVideoUtils/TrailerTest.FindTrailer/13 (0 ms)
-[----------] 14 tests from TestVideoUtils/TrailerTest (0 ms total)
+[----------] 14 tests from TestVideoUtils/TrailerTest (1 ms total)
 
 [----------] 10 tests from TestVideoUtils/NormaliseEditionNameTest
 [ RUN      ] TestVideoUtils/NormaliseEditionNameTest.NormaliseEditionName/0
@@ -3956,7 +4170,7 @@ Expected: true
 [       OK ] TestVideoFileItemClassify/DiscStubTest.IsDiscStub/3 (0 ms)
 [----------] 4 tests from TestVideoFileItemClassify/DiscStubTest (0 ms total)
 
-[----------] 12 tests from TestVideoFileItemClassify/VideoTest
+[----------] 15 tests from TestVideoFileItemClassify/VideoTest
 [ RUN      ] TestVideoFileItemClassify/VideoTest.IsVideo/0
 [       OK ] TestVideoFileItemClassify/VideoTest.IsVideo/0 (0 ms)
 [ RUN      ] TestVideoFileItemClassify/VideoTest.IsVideo/1
@@ -3981,7 +4195,13 @@ Expected: true
 [       OK ] TestVideoFileItemClassify/VideoTest.IsVideo/10 (0 ms)
 [ RUN      ] TestVideoFileItemClassify/VideoTest.IsVideo/11
 [       OK ] TestVideoFileItemClassify/VideoTest.IsVideo/11 (0 ms)
-[----------] 12 tests from TestVideoFileItemClassify/VideoTest (0 ms total)
+[ RUN      ] TestVideoFileItemClassify/VideoTest.IsVideo/12
+[       OK ] TestVideoFileItemClassify/VideoTest.IsVideo/12 (0 ms)
+[ RUN      ] TestVideoFileItemClassify/VideoTest.IsVideo/13
+[       OK ] TestVideoFileItemClassify/VideoTest.IsVideo/13 (0 ms)
+[ RUN      ] TestVideoFileItemClassify/VideoTest.IsVideo/14
+[       OK ] TestVideoFileItemClassify/VideoTest.IsVideo/14 (0 ms)
+[----------] 15 tests from TestVideoFileItemClassify/VideoTest (0 ms total)
 
 [----------] 11 tests from TestStackDirectory/TestGetStackedTitlePath
 [ RUN      ] TestStackDirectory/TestGetStackedTitlePath.GetStackedTitlePath/0
@@ -4824,7 +5044,7 @@ Expected: true
 [       OK ] TestLanguageTag/FindInTextTester.Find/10 (0 ms)
 [----------] 11 tests from TestLanguageTag/FindInTextTester (0 ms total)
 
-[----------] 8 tests from TestLangCodeExpander/ISO6392ToISO6391Tester
+[----------] 10 tests from TestLangCodeExpander/ISO6392ToISO6391Tester
 [ RUN      ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/0
 [       OK ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/0 (0 ms)
 [ RUN      ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/1
@@ -4841,7 +5061,11 @@ Expected: true
 [       OK ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/6 (0 ms)
 [ RUN      ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/7
 [       OK ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/7 (0 ms)
-[----------] 8 tests from TestLangCodeExpander/ISO6392ToISO6391Tester (0 ms total)
+[ RUN      ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/8
+[       OK ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/8 (0 ms)
+[ RUN      ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/9
+[       OK ] TestLangCodeExpander/ISO6392ToISO6391Tester.Lookup/9 (0 ms)
+[----------] 10 tests from TestLangCodeExpander/ISO6392ToISO6391Tester (0 ms total)
 
 [----------] 19 tests from TestLangCodeExpander/Bcp47ConversionTester
 [ RUN      ] TestLangCodeExpander/Bcp47ConversionTester.Convert/0
@@ -5133,7 +5357,7 @@ Expected: true
 [       OK ] TestArtUtils/GetLocalArtBaseFilenameTest.GetLocalArtBaseFilename/95 (0 ms)
 [ RUN      ] TestArtUtils/GetLocalArtBaseFilenameTest.GetLocalArtBaseFilename/96
 [       OK ] TestArtUtils/GetLocalArtBaseFilenameTest.GetLocalArtBaseFilename/96 (0 ms)
-[----------] 97 tests from TestArtUtils/GetLocalArtBaseFilenameTest (0 ms total)
+[----------] 97 tests from TestArtUtils/GetLocalArtBaseFilenameTest (1 ms total)
 
 [----------] 23 tests from TestArtUtils/GetLocalFanartTest
 [ RUN      ] TestArtUtils/GetLocalFanartTest.GetLocalFanart/0
@@ -5182,7 +5406,7 @@ Expected: true
 [       OK ] TestArtUtils/GetLocalFanartTest.GetLocalFanart/21 (0 ms)
 [ RUN      ] TestArtUtils/GetLocalFanartTest.GetLocalFanart/22
 [       OK ] TestArtUtils/GetLocalFanartTest.GetLocalFanart/22 (0 ms)
-[----------] 23 tests from TestArtUtils/GetLocalFanartTest (0 ms total)
+[----------] 23 tests from TestArtUtils/GetLocalFanartTest (1 ms total)
 
 [----------] 21 tests from TestArtUtils/FillInDefaultIconTest
 [ RUN      ] TestArtUtils/FillInDefaultIconTest.FillInDefaultIcon/0
@@ -8107,7 +8331,7 @@ Expected: true
 
 [----------] 8 tests from EpisodeLabel/TestFileItemEpisodeLabel
 [ RUN      ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/SingleEpisode
-[       OK ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/SingleEpisode (1 ms)
+[       OK ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/SingleEpisode (3 ms)
 [ RUN      ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/ContiguousSingleSeasonRange
 [       OK ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/ContiguousSingleSeasonRange (1 ms)
 [ RUN      ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/NonContiguousSingleSeason
@@ -8122,7 +8346,7 @@ Expected: true
 [       OK ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/MixedEpisodesAndSpecials (1 ms)
 [ RUN      ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/ThreeSegmentList
 [       OK ] EpisodeLabel/TestFileItemEpisodeLabel.FormatsCorrectly/ThreeSegmentList (1 ms)
-[----------] 8 tests from EpisodeLabel/TestFileItemEpisodeLabel (10 ms total)
+[----------] 8 tests from EpisodeLabel/TestFileItemEpisodeLabel (12 ms total)
 
 [----------] 55 tests from EnumerateEpisodeItem/TestEnumerateEpisodes
 [ RUN      ] EnumerateEpisodeItem/TestEnumerateEpisodes.EnumerateEpisodeItem/0
@@ -8561,12 +8785,12 @@ Expected: true
 [ RUN      ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetContentType_WithCredentials
 [       OK ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetContentType_WithCredentials (1 ms)
 [ RUN      ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetContentType_NoCredentials
-[       OK ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetContentType_NoCredentials (1 ms)
+[       OK ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetContentType_NoCredentials (0 ms)
 [ RUN      ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetHttpHeader_WithCredentials
-[       OK ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetHttpHeader_WithCredentials (1 ms)
+[       OK ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetHttpHeader_WithCredentials (0 ms)
 [ RUN      ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetHttpHeader_NoCredentials
 [       OK ] Helpers/TestWebServerAuthHelper.AppliesStoredCredentials/GetHttpHeader_NoCredentials (0 ms)
-[----------] 6 tests from Helpers/TestWebServerAuthHelper (8 ms total)
+[----------] 6 tests from Helpers/TestWebServerAuthHelper (7 ms total)
 
 [----------] 41 tests from TestNetworkFileItemClassify/InternetStreamTest
 [ RUN      ] TestNetworkFileItemClassify/InternetStreamTest.IsInternetStream/0
@@ -9061,18 +9285,18 @@ Expected: true
 
 [----------] 6 tests from TestGUIControlFactory/TestGetInfoLabel
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/0
-[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/0 (2 ms)
+[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/0 (1 ms)
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/1
-[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/1 (2 ms)
+[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/1 (1 ms)
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/2
-[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/2 (2 ms)
+[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/2 (1 ms)
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/3
-[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/3 (2 ms)
+[       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/3 (1 ms)
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/4
 [       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/4 (1 ms)
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/5
 [       OK ] TestGUIControlFactory/TestGetInfoLabel.GetInfoLabel/5 (1 ms)
-[----------] 6 tests from TestGUIControlFactory/TestGetInfoLabel (12 ms total)
+[----------] 6 tests from TestGUIControlFactory/TestGetInfoLabel (7 ms total)
 
 [----------] 4 tests from TestGUIControlFactory/TestGetInfoLabels
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabels.GetInfoLabels/0
@@ -9082,7 +9306,7 @@ Expected: true
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabels.GetInfoLabels/2
 [       OK ] TestGUIControlFactory/TestGetInfoLabels.GetInfoLabels/2 (1 ms)
 [ RUN      ] TestGUIControlFactory/TestGetInfoLabels.GetInfoLabels/3
-[       OK ] TestGUIControlFactory/TestGetInfoLabels.GetInfoLabels/3 (1 ms)
+[       OK ] TestGUIControlFactory/TestGetInfoLabels.GetInfoLabels/3 (2 ms)
 [----------] 4 tests from TestGUIControlFactory/TestGetInfoLabels (5 ms total)
 
 [----------] 6 tests from TestGUIControlFactory/TestGetIntRange
@@ -9384,8 +9608,8 @@ Expected: true
 [----------] 10 tests from TestDVDDemuxUtils/ChapterLoaderTester (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 4137 tests from 320 test suites ran. (18832 ms total)
-[  PASSED  ] 4136 tests.
+[==========] 4222 tests from 333 test suites ran. (18405 ms total)
+[  PASSED  ] 4221 tests.
 [  FAILED  ] 1 test, listed below:
 [  FAILED  ] TestZipFile.BigRead64
 

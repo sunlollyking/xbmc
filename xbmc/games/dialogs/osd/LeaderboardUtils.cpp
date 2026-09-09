@@ -20,7 +20,8 @@
 #include "utils/log.h"
 
 #include <algorithm>
-#include <cmath>
+#include <cctype>
+#include <cstdint>
 
 using namespace KODI::GAME;
 
@@ -28,7 +29,80 @@ namespace
 {
 //! RetroAchievements measures time trials in frames at 60Hz, whatever the
 //! console actually ran at
-constexpr double FRAMES_PER_SECOND = 60.0;
+constexpr unsigned int FRAMES_PER_SECOND = 60;
+
+//! Hours, minutes and seconds out of a count of seconds
+std::string FormatSeconds(uint32_t seconds)
+{
+  uint32_t minutes = seconds / 60;
+  seconds -= minutes * 60;
+
+  if (minutes < 60)
+    return StringUtils::Format("{}:{:02}", minutes, seconds);
+
+  const uint32_t hours = minutes / 60;
+  minutes -= hours * 60;
+
+  return StringUtils::Format("{}h{:02}:{:02}", hours, minutes, seconds);
+}
+
+std::string FormatCentiseconds(uint32_t centiseconds)
+{
+  const uint32_t seconds = centiseconds / 100;
+  return StringUtils::Format("{}.{:02}", FormatSeconds(seconds), centiseconds - seconds * 100);
+}
+
+std::string FormatMinutes(uint32_t minutes)
+{
+  const uint32_t hours = minutes / 60;
+  return StringUtils::Format("{}h{:02}", hours, minutes - hours * 60);
+}
+
+//! A scaled value writes its own trailing zeroes, but zero itself stays "0"
+std::string FormatScaled(int32_t value, const char* zeroes)
+{
+  if (value == 0)
+    return "0";
+
+  return StringUtils::Format("{}{}", value, zeroes);
+}
+
+std::string FormatFixed(int32_t value, int32_t factor, size_t decimals)
+{
+  // Widened before negating, so the most negative value does not overflow
+  const int64_t magnitude = value < 0 ? -static_cast<int64_t>(value) : value;
+
+  // The sign is written separately: below the factor the whole part is zero,
+  // which cannot carry it. rcheevos prints "0.50" for -50 in FIXED2; this is
+  // the one place we knowingly differ from it.
+  return StringUtils::Format("{}{}.{:0{}}", value < 0 ? "-" : "", magnitude / factor,
+                             magnitude % factor, decimals);
+}
+
+//! Thousands separators through the leading run of digits, the way
+//! rc_format_insert_commas does, leaving any unit or fraction after it alone
+std::string InsertCommas(const std::string& text)
+{
+  size_t start = (!text.empty() && text.front() == '-') ? 1 : 0;
+
+  size_t end = start;
+  while (end < text.size() && std::isdigit(static_cast<unsigned char>(text[end])) != 0)
+    ++end;
+
+  if (end - start < 4)
+    return text;
+
+  std::string digits = text.substr(start, end - start);
+  std::string grouped;
+  for (size_t i = 0; i < digits.size(); ++i)
+  {
+    if (i > 0 && (digits.size() - i) % 3 == 0)
+      grouped += ',';
+    grouped += digits[i];
+  }
+
+  return text.substr(0, start) + grouped + text.substr(end);
+}
 
 constexpr std::time_t SECONDS_PER_DAY = 24 * 60 * 60;
 
@@ -37,30 +111,54 @@ constexpr std::time_t DAYS_PER_MONTH = 30;
 constexpr std::time_t DAYS_PER_YEAR = 365;
 } // namespace
 
-std::string KODI::GAME::FormatLeaderboardScore(unsigned int score, const std::string& format)
+bool KODI::GAME::IsTimeFormat(const std::string& format)
 {
+  return format == "TIME" || format == "FRAMES" || format == "MILLISECS" || format == "TIMESECS" ||
+         format == "SECS" || format == "SECS_AS_MINS" || format == "MINUTES";
+}
+
+std::string KODI::GAME::FormatLeaderboardScore(int score, const std::string& format)
+{
+  const auto unsignedScore = static_cast<uint32_t>(score);
+
+  // A score is a plain count of points, written to six places and never
+  // grouped. Every other format reads as a quantity and is grouped below.
+  if (format == "SCORE" || format == "POINTS" || format == "OTHER")
+    return StringUtils::Format("{:06}", score);
+
+  std::string formatted;
+
   if (format == "TIME" || format == "FRAMES")
-  {
-    const double totalSeconds = static_cast<double>(score) / FRAMES_PER_SECOND;
-    const auto minutes = static_cast<unsigned int>(totalSeconds) / 60;
-    const auto seconds = static_cast<unsigned int>(totalSeconds) % 60;
-    const auto centiseconds =
-        static_cast<unsigned int>((totalSeconds - std::floor(totalSeconds)) * 100);
+    formatted = FormatCentiseconds(unsignedScore * 10 / 6);
+  else if (format == "MILLISECS")
+    formatted = FormatCentiseconds(unsignedScore);
+  else if (format == "TIMESECS" || format == "SECS")
+    formatted = FormatSeconds(unsignedScore);
+  else if (format == "SECS_AS_MINS")
+    formatted = FormatMinutes(unsignedScore / FRAMES_PER_SECOND);
+  else if (format == "MINUTES")
+    formatted = FormatMinutes(unsignedScore);
+  else if (format == "TENS")
+    formatted = FormatScaled(score, "0");
+  else if (format == "HUNDREDS")
+    formatted = FormatScaled(score, "00");
+  else if (format == "THOUSANDS")
+    formatted = FormatScaled(score, "000");
+  else if (format == "UNSIGNED")
+    formatted = std::to_string(unsignedScore);
+  else if (format == "FIXED1")
+    formatted = FormatFixed(score, 10, 1);
+  else if (format == "FIXED2")
+    formatted = FormatFixed(score, 100, 2);
+  else if (format == "FIXED3")
+    formatted = FormatFixed(score, 1000, 3);
+  else if (format.size() == 6 && format.compare(0, 5, "FLOAT") == 0 && format[5] >= '1' &&
+           format[5] <= '6')
+    formatted = StringUtils::Format("{:.{}f}", static_cast<double>(score), format[5] - '0');
+  else
+    formatted = std::to_string(score);
 
-    return StringUtils::Format("{}:{:02d}.{:02d}", minutes, seconds, centiseconds);
-  }
-
-  if (format == "TIMESECS")
-    return StringUtils::Format("{}:{:02d}", score / 60, score % 60);
-
-  if (format == "FIXED1")
-    return StringUtils::Format("{:.1f}", static_cast<double>(score) / 10.0);
-  if (format == "FIXED2")
-    return StringUtils::Format("{:.2f}", static_cast<double>(score) / 100.0);
-  if (format == "FIXED3")
-    return StringUtils::Format("{:.3f}", static_cast<double>(score) / 1000.0);
-
-  return std::to_string(score);
+  return InsertCommas(formatted);
 }
 
 std::string KODI::GAME::FormatRelativeDate(std::time_t submitted, std::time_t now)
@@ -142,10 +240,11 @@ std::string CachePath()
 } // namespace
 
 void KODI::GAME::SaveLeaderboardEntries(unsigned int leaderboardId,
+                                        const std::string& account,
                                         const std::vector<LeaderboardEntry>& entries)
 {
   const std::string path = CachePath();
-  if (path.empty() || entries.empty())
+  if (path.empty())
     return;
 
   CXBMCTinyXML2 doc;
@@ -193,6 +292,7 @@ void KODI::GAME::SaveLeaderboardEntries(unsigned int leaderboardId,
 
   auto* board = doc.NewElement(BOARD_ELEMENT);
   board->SetAttribute("id", leaderboardId);
+  board->SetAttribute("account", account.c_str());
   board->SetAttribute("fetched", static_cast<int64_t>(std::time(nullptr)));
 
   for (const LeaderboardEntry& entry : entries)
@@ -255,6 +355,7 @@ void KODI::GAME::ClearLeaderboardEntries()
 }
 
 bool KODI::GAME::LoadLeaderboardEntries(unsigned int leaderboardId,
+                                        const std::string& account,
                                         std::vector<LeaderboardEntry>& entries)
 {
   const std::string path = CachePath();
@@ -274,6 +375,12 @@ bool KODI::GAME::LoadLeaderboardEntries(unsigned int leaderboardId,
   {
     if (board->UnsignedAttribute("id") != leaderboardId)
       continue;
+
+    // The rows carry the account's own standing - which one is the player, and
+    // the entry appended for them - so another account's copy is not ours
+    const char* cached = board->Attribute("account");
+    if (cached == nullptr || account != cached)
+      return false;
 
     int64_t fetched = 0;
     board->QueryInt64Attribute("fetched", &fetched);
@@ -301,7 +408,9 @@ bool KODI::GAME::LoadLeaderboardEntries(unsigned int leaderboardId,
       entries.push_back(std::move(entry));
     }
 
-    return !entries.empty();
+    // A board nobody has entered was fetched and came back with none, so the
+    // record standing for it is an answer rather than a gap
+    return true;
   }
 
   return false;

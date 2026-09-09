@@ -10,6 +10,8 @@
 
 #include "guilib/GUIDialog.h"
 
+#include <atomic>
+
 namespace KODI
 {
 namespace GAME
@@ -24,17 +26,16 @@ namespace GAME
  *
  * \section indicator_why_a_dialog Why this is a dialog
  *
- * These began as controls in the skin's fullscreen window, which never once
- * appeared. Where the game has its own DRM plane - the direct-to-plane path
- * every LibreELEC box takes - CGUIWindowFullScreen deliberately stops marking
- * itself dirty each frame, and CApplication then skips compositing the GUI
- * layer entirely while nothing else dirties it. A control quietly becoming
- * visible was not enough to bring the layer back.
+ * Where the game has its own DRM plane - the direct-to-plane path every
+ * LibreELEC box takes - CGUIWindowFullScreen deliberately stops marking itself
+ * dirty each frame, and CApplication then skips compositing the GUI layer
+ * entirely while nothing else dirties it. A control in that window becoming
+ * visible is not enough to bring the layer back; opening a dialog is, which is
+ * why notifications show over a running game.
  *
- * Opening a dialog is, which is why notifications have always shown over games
- * and these did not. While it is up this marks itself dirty each frame so the
- * layer keeps being composited; it is only up while there is something to show,
- * so the saving that optimisation exists for is kept the rest of the time.
+ * While it is up this marks itself dirty each frame so the layer keeps being
+ * composited; it is only up while there is something to show, so the saving
+ * that optimisation exists for is kept the rest of the time.
  *
  * Modeless: the player is still playing, and must keep their input.
  */
@@ -46,6 +47,10 @@ public:
 
   // Implementation of CGUIControl via CGUIDialog
   void Process(unsigned int currentTime, CDirtyRegionList& dirtyregions) override;
+
+  // Implementation of CGUIWindow via CGUIDialog
+  void OnInitWindow() override;
+  void OnDeinitWindow(int nextWindowID) override;
 
   /*!
    * \brief Start listening for indicators worth showing
@@ -65,6 +70,15 @@ private:
   static void Show();
 
   static bool AnythingToShow();
+
+  //! Whether the dialog is up, cleared the moment closing is decided so an
+  //! indicator arriving mid-close still opens it again. Kept here because
+  //! Show() runs on the game's thread, which cannot ask the window manager.
+  static std::atomic<bool> m_showing;
+
+  //! Whether an activation has been posted and not yet arrived. Without it a
+  //! burst of updates before the window opens posts one message each.
+  static std::atomic<bool> m_activating;
 };
 } // namespace GAME
 } // namespace KODI

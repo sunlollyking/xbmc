@@ -566,18 +566,9 @@ bool CReversiblePlayback::RunaheadFrameEvent(unsigned int frames)
   // this work is done.
   const bool bProtectAchievements = !m_gameClient->RunsSpeculativeFrames();
 
-  size_t achievementSize = 0;
   bool achievementsSaved = false;
   if (bProtectAchievements)
-  {
-    achievementSize = m_gameClient->GetAchievementStateSize();
-    if (achievementSize > 0)
-    {
-      m_runaheadAchievementState.resize(achievementSize);
-      achievementsSaved =
-          m_gameClient->SerializeAchievements(m_runaheadAchievementState.data(), achievementSize);
-    }
-  }
+    achievementsSaved = m_gameClient->SerializeAchievementState(m_runaheadAchievementState);
 
   // Look into the future. These frames deliberately do not poll: they have to
   // answer to the same input as the frame that committed, or the picture the
@@ -611,7 +602,8 @@ bool CReversiblePlayback::RunaheadFrameEvent(unsigned int frames)
   }
 
   if (achievementsSaved)
-    m_gameClient->DeserializeAchievements(m_runaheadAchievementState.data(), achievementSize);
+    m_gameClient->DeserializeAchievements(m_runaheadAchievementState.data(),
+                                          m_runaheadAchievementState.size());
 
   // The client is back at the state just serialized, so hand it to the rewind
   // buffer rather than asking for it a second time

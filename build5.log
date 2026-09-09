@@ -1,95 +1,304 @@
-make: Entering directory '/home/chris/xbmc-hcmerge/build'
-[  0%] Performing build step for 'buildtexturepacker'
+[  0%] Built target build-libdvdcss
 [  1%] Built target build-ffmpeg
-[  1%] Built target build-crossguid
 [  1%] Built target build-JsonSchemaBuilder
-[  1%] Built target build-poppler
-[  1%] Built target build-libdvdcss
+[  1%] Built target build-crossguid
 [  1%] Built target wrapper
+[  1%] Performing build step for 'buildtexturepacker'
 [  1%] Built target compileinfo
-[  2%] Built target build-utfcpp
-[100%] Built target TexturePacker
-[  2%] Built target generate-wayland-extra-protocols
+[  1%] Built target build-utfcpp
 Generating xbmc.json/addon.xml
-[  2%] Built target gen_system_addons
-[  2%] No install step for 'buildtexturepacker'
-[  2%] Built target retroplayer_messages
-[  3%] Built target sse4
-[  7%] Built target upnp
-[  7%] Completed 'buildtexturepacker'
-[  7%] Built target generate_json_header
-[  8%] Built target build-libdvdread
-[  8%] Built target build-taglib
-[  8%] Built target build-libdvdnav
-[  8%] Built target wrapper.def
-[  8%] Built target buildtexturepacker
-[  8%] Copying files into build tree
-[  8%] Built target rp-process-gbm
-[  8%] Built target network_httprequesthandlers_python
-[  8%] Built target windowing_gbm
-[ 10%] Built target processGBM
-[ 10%] Built target rp-process-wayland
-[ 10%] Built target processWayland
-[ 11%] Built target windowing_gbm_drm
-[ 12%] Built target cores
-[ 13%] Built target windowing_WAYLAND
-[ 13%] Built target dllloader
-[ 13%] Built target dllexports
-[ 15%] Built target audioengine
-[ 15%] Built target exports_utils
-[ 15%] Built target externalplayer
-[ 15%] Built target paplayer
-[ 15%] Built target playercorefactory
-[ 15%] Built target export-files
-[ 15%] Built target events
-[ 15%] Built target events_windows
-[ 16%] Built target bluray
-[ 17%] Built target musicdatabasedirectory
-[ 17%] Building CXX object build/games/CMakeFiles/games.dir/GameSettings.cpp.o
-[ 17%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o
-[ 17%] Built target gamecheevos
-[ 18%] Built target videodatabasedirectory
-[ 18%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientSubsystem.cpp.o
-[ 18%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientTranslator.cpp.o
+[  1%] Built target gen_system_addons
+[  1%] Built target retroplayer_messages
+[  1%] Built target sse4
+[100%] Built target TexturePacker
+[  6%] Built target upnp
+[  7%] Built target build-libdvdread
+[  9%] Built target kodi-xrandr
+[  9%] Built target generate_json_header
+[  9%] No install step for 'buildtexturepacker'
+[  9%] Built target build-libdvdnav
+[  9%] Built target wrapper.def
+[  9%] Built target build-taglib
+[ 10%] Completed 'buildtexturepacker'
+[ 10%] Copying files into build tree
+[ 10%] Built target wrap_libdvdnav
+[ 10%] Built target processX11
+[ 10%] Built target network_httprequesthandlers_python
+[ 10%] Built target rp-process-x11
+[ 10%] Built target buildtexturepacker
+[ 10%] Built target cores
+[ 10%] Built target dllloader
+[ 11%] Built target windowing_X11
+[ 12%] Built target audioengine
+[ 12%] Built target exports_utils
+[ 12%] Built target dllexports
+[ 12%] Built target export-files
+[ 12%] Built target externalplayer
+[ 12%] Built target paplayer
+[ 14%] Built target playercorefactory
+[ 14%] Built target events_windows
+[ 14%] Built target events
+[ 14%] Built target bluray
+[ 15%] Built target musicdatabasedirectory
+[ 15%] Building CXX object build/games/CMakeFiles/games.dir/GameUtils.cpp.o
+[ 15%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o
+[ 16%] Built target videodatabasedirectory
+[ 16%] Building CXX object build/filesystem/CMakeFiles/filesystem.dir/AddonsDirectory.cpp.o
+[ 16%] Building CXX object build/games/addons/cheevos/CMakeFiles/gamecheevos.dir/GameClientCheevos.cpp.o
+[ 16%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientInGameSaves.cpp.o
+[ 16%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscs.cpp.o
+[ 16%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscTransport.cpp.o
+[ 16%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientProperties.cpp.o
+[ 16%] Linking CXX static library gamediscs.a
+[ 16%] Built target gamediscs
+[ 16%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientHardware.cpp.o
+[ 16%] Linking CXX static library gamecheevos.a
+[ 16%] Built target gamecheevos
+[ 16%] Building CXX object build/games/addons/streams/CMakeFiles/game_addon_streams.dir/GameClientStreams.cpp.o
+[ 16%] Building CXX object build/games/addons/CMakeFiles/gameaddons.dir/GameClientSubsystem.cpp.o
+[ 16%] Linking CXX static library games.a
+[ 18%] Built target games
+[ 18%] Building CXX object build/games/agents/input/CMakeFiles/games_agents_input.dir/AgentInput.cpp.o
+[ 18%] Linking CXX static library filesystem.a
 [ 23%] Built target filesystem
-[ 23%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscs.cpp.o
-[ 23%] Building CXX object build/games/addons/disc/CMakeFiles/gamediscs.dir/GameClientDiscTransport.cpp.o
-[ 23%] Building CXX object build/games/CMakeFiles/games.dir/GameUtils.cpp.o
-[ 23%] Building CXX object build/games/CMakeFiles/games.dir/VideoFilters.cpp.o
-[ 23%] Linking CXX static library gamediscs.a
-[ 23%] Built target gamediscs
-[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientController.cpp.o
-/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1331:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
- 1331 | void CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE kodiInstance,
-      |      ^~~~~~~~~~~
-/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1331:6: note: no functions named ‘void KODI::GAME::CGameClient::cb_rc_on_progress_indicator(KODI_HANDLE, const game_rc_progress_indicator*)’
-In file included from /home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:9:
-/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
-  118 | class CGameClient : public ADDON::CAddonDll,
-      |       ^~~~~~~~~~~
-/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.cpp:1341:6: error: no declaration matches ‘void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_challenge_indicator*)’
- 1341 | void CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
-      |      ^~~~~~~~~~~
-/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:377:15: note: candidate is: ‘static void KODI::GAME::CGameClient::cb_rc_on_challenge_indicator(KODI_HANDLE, const game_rc_achievement_challenge*, bool)’
-  377 |   static void cb_rc_on_challenge_indicator(KODI_HANDLE kodiInstance,
-      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/chris/xbmc-hcmerge/xbmc/games/addons/GameClient.h:118:7: note: ‘class KODI::GAME::CGameClient’ defined here
-  118 | class CGameClient : public ADDON::CAddonDll,
-      |       ^~~~~~~~~~~
-make[2]: *** [build/games/addons/CMakeFiles/gameaddons.dir/build.make:79: build/games/addons/CMakeFiles/gameaddons.dir/GameClient.cpp.o] Error 1
-make[1]: *** [CMakeFiles/Makefile2:9333: build/games/addons/CMakeFiles/gameaddons.dir/all] Error 2
-make[1]: *** Waiting for unfinished jobs....
-[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientDevice.cpp.o
-[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientHardware.cpp.o
 [ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientInput.cpp.o
 [ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientJoystick.cpp.o
-[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientKeyboard.cpp.o
-[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientMouse.cpp.o
-[ 23%] Linking CXX static library games.a
-[ 23%] Built target games
-[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientPort.cpp.o
-[ 23%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientTopology.cpp.o
-[ 23%] Linking CXX static library gameinput.a
-[ 23%] Built target gameinput
-make: *** [Makefile:146: all] Error 2
-make: Leaving directory '/home/chris/xbmc-hcmerge/build'
+[ 24%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientKeyboard.cpp.o
+[ 24%] Linking CXX static library gameaddons.a
+[ 25%] Built target gameaddons
+[ 25%] Building CXX object build/games/cheats/CMakeFiles/games_cheats.dir/CheatRuntime.cpp.o
+[ 25%] Linking CXX static library game_addon_streams.a
+[ 25%] Built target game_addon_streams
+[ 25%] Building CXX object build/games/agents/windows/CMakeFiles/games_agents_windows.dir/GUIAgentControllerList.cpp.o
+[ 25%] Building CXX object build/games/addons/input/CMakeFiles/gameinput.dir/GameClientMouse.cpp.o
+[ 27%] Built target games_controller
+[ 27%] Built target games_controller_dialogs
+[ 27%] Building CXX object build/games/controllers/guicontrols/CMakeFiles/games_controller_guicontrols.dir/GUIGameControllerList.cpp.o
+[ 27%] Linking CXX static library games_cheats.a
+[ 27%] Built target games_cheats
+[ 27%] Built target games_controller_listproviders
+[ 28%] Built target games_controller_input
+[ 28%] Building CXX object build/games/agents/windows/CMakeFiles/games_agents_windows.dir/GUIAgentWindow.cpp.o
+[ 28%] Built target games_controller_types
+[ 28%] Building CXX object build/games/controllers/windows/CMakeFiles/games_controller_windows.dir/GUIControllerList.cpp.o
+[ 28%] Linking CXX static library games_agents_input.a
+[ 28%] Built target games_agents_input
+[ 29%] Built target games_database
+[ 29%] Building CXX object build/games/dialogs/CMakeFiles/gamedialogs.dir/GUIDialogGameContentSettings.cpp.o
+[ 29%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DialogGameDiscManager.cpp.o
+[ 29%] Linking CXX static library gameinput.a
+[ 29%] Built target gameinput
+[ 29%] Building CXX object build/games/dialogs/CMakeFiles/gamedialogs.dir/GUIDialogSelectGameClient.cpp.o
+[ 29%] Linking CXX static library games_agents_windows.a
+[ 29%] Built target games_agents_windows
+[ 29%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerActions.cpp.o
+[ 29%] Linking CXX static library games_controller_guicontrols.a
+[ 29%] Built target games_controller_guicontrols
+[ 29%] Building CXX object build/games/controllers/windows/CMakeFiles/games_controller_windows.dir/GUIControllerWindow.cpp.o
+[ 29%] Building CXX object build/games/controllers/windows/CMakeFiles/games_controller_windows.dir/GUIFeatureList.cpp.o
+[ 29%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerDiscList.cpp.o
+[ 29%] Building CXX object build/games/dialogs/disc/CMakeFiles/game_disc_dialog.dir/DiscManagerGame.cpp.o
+[ 29%] Linking CXX static library gamedialogs.a
+[ 29%] Built target gamedialogs
+[ 29%] Building CXX object build/games/dialogs/osd/CMakeFiles/gameosddialogs.dir/DialogGameSaves.cpp.o
+[ 29%] Built target games_library
+[ 29%] Built target games_manual
+[ 29%] Building CXX object build/games/ports/guicontrols/CMakeFiles/games_ports_guicontrols.dir/GUIActivePortList.cpp.o
+[ 29%] Building CXX object build/games/ports/input/CMakeFiles/games_ports_input.dir/PortInput.cpp.o
+[ 29%] Linking CXX static library games_controller_windows.a
+[ 29%] Built target games_controller_windows
+[ 29%] Built target games_ports_types
+[ 29%] Building CXX object build/games/ports/windows/CMakeFiles/games_ports_windows.dir/GUIPortList.cpp.o
+[ 29%] Built target gametags
+[ 29%] Built target gameswindows
+[ 29%] Building CXX object build/games/ports/windows/CMakeFiles/games_ports_windows.dir/GUIPortWindow.cpp.o
+[ 29%] Linking CXX static library gameosddialogs.a
+[ 29%] Built target gameosddialogs
+[ 31%] Built target input
+[ 31%] Built target input_actions
+[ 31%] Built target input_joystick
+[ 31%] Built target input_joystick_dialogs
+[ 31%] Built target input_joystick_generic
+[ 32%] Built target input_joystick_mapping
+[ 32%] Built target input_keyboard
+[ 32%] Built target input_keyboard_generic
+[ 32%] Built target input_keymaps
+[ 33%] Built target input_keymaps_generic
+[ 33%] Built target input_keymaps_joysticks
+[ 33%] Built target input_keymaps_keyboard
+[ 33%] Built target input_keymaps_remote
+[ 33%] Built target input_keymaps_touch
+[ 33%] Built target input_mouse
+[ 33%] Built target input_mouse_generic
+[ 33%] Built target interfaces
+[ 35%] Built target interfaces_builtins
+[ 35%] Built target generic_interface
+[ 35%] Built target info_interface
+[ 36%] Built target jsonrpc_interface
+[ 36%] Linking CXX static library games_ports_input.a
+[ 36%] Built target media
+[ 36%] Linking CXX static library games_ports_guicontrols.a
+[ 36%] Built target drm
+[ 36%] Built target games_ports_input
+[ 36%] Built target games_ports_guicontrols
+[ 36%] Built target music_dialogs
+[ 37%] Built target music
+[ 37%] Built target music_infoscanner
+[ 37%] Built target music_jobs
+[ 38%] Built target music_tags
+[ 38%] Built target music_windows
+[ 38%] Built target network
+[ 38%] Built target network_websockets
+[ 38%] Built target peripherals
+[ 40%] Built target peripherals_bus
+[ 40%] Built target peripherals_addons
+[ 40%] Built target peripheral_bus_virtual
+[ 40%] Built target peripherals_dialogs
+[ 40%] Built target peripherals_events
+[ 40%] Built target peripherals_devices
+[ 40%] Built target profiles
+[ 40%] Built target profiles_dialogs
+[ 40%] Built target profiles_windows
+[ 40%] Built target pvr_addons
+[ 41%] Built target pvr
+[ 42%] Built target pvr_channels
+[ 42%] Built target pvr_filesystem
+[ 42%] Built target pvr_dialogs
+[ 44%] Built target pvr_epg
+[ 44%] Built target pvr_providers
+[ 44%] Built target pvr_guilib_guiinfo
+[ 45%] Built target pvr_guilib
+[ 45%] Built target pvr_recordings
+[ 46%] Built target pvr_settings
+[ 46%] Built target pvr_timers
+[ 46%] Built target pvr_utils
+[ 46%] Building CXX object build/cores/RetroPlayer/CMakeFiles/retroplayer.dir/RetroPlayer.cpp.o
+[ 48%] Built target pvr_windows
+[ 48%] Built target rp_audio
+[ 48%] Built target rp-buffers-video
+[ 48%] Built target rp-buffers
+[ 49%] Built target retroplayer_guicontrols
+[ 49%] Built target retroplayer_guibridge
+[ 49%] Built target retroplayer_guiplayback
+[ 49%] Built target retroplayer_guiwindows
+[ 49%] Building CXX object build/cores/RetroPlayer/playback/CMakeFiles/retroplayer_playback.dir/ReversiblePlayback.cpp.o
+[ 49%] Built target rp-process
+[ 50%] Built target rp-rendering
+[ 50%] Built target rp-videorenderers
+[ 50%] Built target retroplayer_savestates
+[ 50%] Built target rp-shaders
+[ 51%] Built target retroplayer_streams
+[ 51%] Built target retroplayer_memory
+[ 53%] Built target settings
+[ 54%] Built target settings_dialogs
+[ 54%] Built target settings_lib
+[ 55%] Built target settings_windows
+[ 58%] Built target xbmc
+[ 58%] Building CXX object build/addons/CMakeFiles/addons.dir/AddonBuilder.cpp.o
+[ 58%] Built target addons_addoninfo
+[ 59%] Built target addons_binary-addons
+[ 59%] Building CXX object build/addons_gui/CMakeFiles/addons_gui.dir/GUIDialogAddonSettings.cpp.o
+[ 59%] Linking CXX static library games_ports_windows.a
+[ 59%] Linking CXX static library game_disc_dialog.a
+[ 59%] Built target games_ports_windows
+[ 59%] Built target addons_gui_skin
+[ 59%] Built target game_disc_dialog
+[ 59%] Built target addons_interfaces_gui
+[ 59%] Built target addons_interfaces
+[ 61%] Built target addons_interfaces_gui_dialogs
+[ 61%] Built target addons_interfaces_gui_controls
+[ 62%] Built target addons_settings
+[ 62%] Built target application
+[ 62%] Built target commons
+[ 63%] Built target dbwrappers
+[ 63%] Built target favourites
+[ 64%] Built target dialogs
+[ 64%] Building CXX object build/guilib_guiinfo/CMakeFiles/guilib_guiinfo.dir/GamesGUIInfo.cpp.o
+[ 68%] Built target guilib
+[ 68%] Built target guilib_announcement_handlers
+[ 70%] Built target guilib_listproviders
+[ 70%] Built target imagefiles
+[ 70%] Built target jobs
+[ 70%] Built target messaging
+[ 70%] Built target messagingHelpers
+[ 71%] Built target pictures
+[ 71%] Built target pictures_metadata
+[ 71%] Built target platform_common
+[ 71%] Built target playlists
+[ 71%] Built target powermanagement
+[ 71%] Built target programs
+[ 71%] Built target rendering
+[ 71%] Built target rendering_capture
+[ 71%] Built target resources
+[ 71%] Built target storage
+[ 71%] Built target threads
+[ 76%] Built target utils
+[ 76%] Built target utils_guilib
+[ 76%] Built target utils_i18n
+[ 76%] Built target utils_i18n_Bcp47Registry
+[ 77%] Built target view
+[ 77%] Built target weather
+[ 77%] Built target windowing
+[ 77%] Built target windows
+[ 79%] Built target video
+[ 79%] Built target video_dialogs
+[ 80%] Built target video_guilib
+[ 80%] Built target video_jobs
+[ 80%] Built target video_tags
+[ 80%] Built target video_windows
+[ 81%] Built target VideoPlayer
+[ 81%] Built target videoplayer-buffers
+[ 81%] Built target dvdcodecs
+[ 83%] Built target dvdaudiocodecs
+[ 84%] Built target dvdoverlaycodecs
+[ 84%] Built target dvdvideocodecs
+[ 84%] Built target dvddemuxers
+[ 84%] Built target dvdinputstreams
+[ 84%] Built target dvdsubtitles
+[ 84%] Built target subtitles_webvtt
+[ 84%] Built target process
+[ 85%] Built target videorenderers
+[ 85%] Built target videoshaders
+[ 85%] Built target rp-shaders-gl
+[ 85%] Built target input_touch
+[ 87%] Built target input_touch_generic
+[ 87%] Built target platform_common_speech
+[ 88%] Built target linuxsupport
+[ 88%] Built target platform_linux_network
+[ 88%] Built target platform_linux_peripherals
+[ 88%] Built target platform_linux_powermanagement
+[ 88%] Built target platform_linux_storage
+[ 88%] Built target platform_linux_threads
+[ 89%] Built target platform_posix
+[ 89%] Built target platform_posix_filesystem
+[ 89%] Built target platform_posix_network
+[ 89%] Built target platform_posix_storage_discs
+[ 89%] Built target platform_posix_threads
+[ 89%] Built target platform_posix_utils
+[ 89%] Built target windowing_linux
+[ 90%] Built target platform_linux_network_zeroconf
+[ 90%] Built target cdrip
+[ 90%] Built target network_dacp
+[ 92%] Built target rendering_gl
+[ 93%] Built target legacy_interface
+[ 93%] Built target legacy_interface_wsgi
+[ 94%] Built target python_interface
+[ 94%] Built target python_binding
+[ 94%] Built target network_upnp
+[ 96%] Built target network_httprequesthandlers
+[ 96%] Built target kodi-libraries
+[ 97%] Built target gen_skin_pack
+[ 97%] Built target generate-packaging
+[ 97%] Linking CXX static library retroplayer_playback.a
+[ 97%] Built target retroplayer_playback
+[ 97%] Linking CXX static library addons.a
+[ 98%] Built target addons
+[ 98%] Linking CXX static library retroplayer.a
+[ 98%] Built target retroplayer
+[ 98%] Linking CXX static library addons_gui.a
+[ 98%] Built target addons_gui
+[ 98%] Linking CXX static library guilib_guiinfo.a
+[100%] Built target guilib_guiinfo
+[100%] Built target libkodi
+[100%] Linking CXX executable kodi-x11
+[100%] Built target kodi

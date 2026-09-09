@@ -276,8 +276,9 @@ TEST_F(TestGamesGUIInfo, ShowsNothingOnceTheAttemptEnds)
   indicator.title = "Beat Lavos without dying";
   achievementRuntime.SetChallenge(indicator, true);
 
-  // The runtime names no achievement when an attempt ends
-  achievementRuntime.SetChallenge({}, false);
+  // The runtime names the achievement whose attempt ended, which is how the
+  // add-on reports it: the challenge is matched by id and removed
+  achievementRuntime.SetChallenge(indicator, false);
 
   CGamesGUIInfo gamesGUIInfo{achievementRuntime};
 

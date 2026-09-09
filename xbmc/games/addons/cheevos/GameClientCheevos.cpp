@@ -17,6 +17,8 @@
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
+#include "games/dialogs/DialogGameDefines.h"
+#include "games/dialogs/osd/DialogGameIndicators.h"
 #include "games/dialogs/osd/LeaderboardUtils.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
@@ -30,6 +32,7 @@
 #include <algorithm>
 #include <array>
 #include <ctime>
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -87,40 +90,23 @@ CDateTime UnlockTime(int64_t unixTime)
 using namespace KODI;
 using namespace GAME;
 
-CGameClientCheevos::CGameClientCheevos(CGameClient& gameClient, AddonInstance_Game& addonStruct)
+CGameClientCheevos::CGameClientCheevos(CGameClient& gameClient,
+                                       AddonInstance_Game& addonStruct,
+                                       CCriticalSection& clientAccess)
   : m_gameClient(gameClient),
-    m_struct(addonStruct)
+    m_struct(addonStruct),
+    m_clientAccess(clientAccess)
 {
 }
 
-CGameClientCheevos::~CGameClientCheevos()
-{
-  // Registration is tied to the game session, not to this object: the
-  // subsystems are built while CGameServices itself is still being
-  // constructed, so the settings cannot be reached from the constructor.
-  if (m_observingSettings && CServiceBroker::IsServiceManagerUp())
-    CServiceBroker::GetGameServices().GameSettings().UnregisterObserver(this);
-}
-
-void CGameClientCheevos::Notify(const Observable& obs, const ObservableMessage msg)
-{
-  if (msg != ObservableMessageSettingsChanged)
-    return;
-
-  const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
-
-  // Hardcore switched on part-way through a session has to reach the client,
-  // which resets the game: RetroAchievements does not allow a session begun in
-  // casual mode to carry on into hardcore.
-  m_gameClient.SetHardcoreEnabled(gameSettings.GetAchievementsHardcore());
-
-  // Encore is read when a game loads and ignored until the next one, so this
-  // only keeps the client in step for that
-  m_gameClient.SetEncoreModeEnabled(gameSettings.GetAchievementsEncore());
-}
+CGameClientCheevos::~CGameClientCheevos() = default;
 
 void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
 {
+  // Done here rather than at start-up: the runtime lives in the game services,
+  // and this is the first point a game is known to be using it
+  CDialogGameIndicators::Register();
+
   const std::string gameTitle = SafeString(data.title);
 
   const size_t achievementCount = data.achievements != nullptr ? data.achievement_count : 0;
@@ -195,6 +181,14 @@ void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
 
 void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data)
 {
+  OnAchievementTriggered(data, CServiceBroker::GetGameServices().AchievementRuntime(),
+                         m_encoreModeEnabled);
+}
+
+void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data,
+                                                CAchievementRuntime& runtime,
+                                                bool encoreModeEnabled)
+{
   const std::string title = SafeString(data.title);
 
   // The add-on carries no timestamp, so the date is "now" - formatted like the
@@ -202,12 +196,16 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   const CDateTime unlockedDate = CDateTime::GetCurrentDateTime();
 
   bool newlyEarned = false;
-  CServiceBroker::GetGameServices().AchievementRuntime().MarkEarned(data.id, unlockedDate,
-                                                                    newlyEarned);
+  const AchievementState state = runtime.MarkEarned(data.id, unlockedDate, newlyEarned);
 
-  // The runtime re-reports achievements that were already earned in an earlier
-  // session, so only announce the ones that changed state
-  if (!newlyEarned)
+  // Encore re-arms achievements already earned, so a re-trigger is announced
+  // even though the runtime has nothing left to change
+  const bool encoreTrigger = encoreModeEnabled && state.loaded &&
+                             std::any_of(state.achievements.begin(), state.achievements.end(),
+                                         [&data](const AchievementInfo& achievement)
+                                         { return achievement.id == data.id; });
+
+  if (!newlyEarned && !encoreTrigger)
   {
     CLog::Log(LOGDEBUG, "CGameClientCheevos: achievement {} \"{}\" was already earned", data.id,
               title);
@@ -217,7 +215,9 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   CLog::Log(LOGINFO, "CGameClientCheevos: earned achievement {} \"{}\" ({} points){}", data.id,
             title, data.points, data.hardcore ? " in hardcore mode" : "");
 
-  NotifyDialogs();
+  // Nothing changed for an encore re-trigger, so there is nothing to redraw
+  if (newlyEarned)
+    NotifyDialogs();
 
   // "Achievement Unlocked" - the one notification that plays a sound
   CGUIDialogKaiToast::QueueNotification(SafeString(data.badge_url), Localize(35281),
@@ -339,11 +339,7 @@ void CGameClientCheevos::OnLoginResult(const game_rc_login_result& data)
 
 void CGameClientCheevos::OnGameClosed()
 {
-  if (m_observingSettings)
-  {
-    CServiceBroker::GetGameServices().GameSettings().UnregisterObserver(this);
-    m_observingSettings = false;
-  }
+  m_encoreModeEnabled = false;
 
   CServiceBroker::GetGameServices().AchievementRuntime().Clear();
 
@@ -352,6 +348,9 @@ void CGameClientCheevos::OnGameClosed()
 
 bool CGameClientCheevos::SendCredentials()
 {
+  // Cleared up front so the paths that return early leave nothing behind
+  m_encoreModeEnabled = false;
+
   CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
   const std::string username = gameSettings.GetRAUsername();
@@ -364,33 +363,21 @@ bool CGameClientCheevos::SendCredentials()
   //
   // The token is what the add-on signs in with; the password never leaves Kodi
   if (username.empty() || token.empty())
-    return m_gameClient.SetRetroAchievementsCredentials("", "");
+    return SetRetroAchievementsCredentials("", "");
 
-  if (!m_observingSettings)
-  {
-    gameSettings.RegisterObserver(this);
-    m_observingSettings = true;
-  }
+  // Encore goes with them: the client reads it as it identifies the game, and
+  // only a client that accepted it will re-arm anything
+  const bool encoreModeEnabled = gameSettings.GetAchievementsEncore();
+  m_encoreModeEnabled = SetEncoreModeEnabled(encoreModeEnabled) && encoreModeEnabled;
 
-  // The modes go with them: the client's runtime has to agree with the
-  // frontend about which is in force before it identifies the game
-  m_gameClient.SetHardcoreEnabled(gameSettings.GetAchievementsHardcore());
-  m_gameClient.SetEncoreModeEnabled(gameSettings.GetAchievementsEncore());
-
-  return m_gameClient.SetRetroAchievementsCredentials(username, token);
+  return SetRetroAchievementsCredentials(username, token);
 }
 
 void CGameClientCheevos::OnChallengeIndicator(const game_rc_achievement_challenge& data, bool show)
 {
-  // Logged because there is no other way to tell whether this ever fired: the
-  // indicator is a skin element that simply does not appear, which looks the
-  // same as the event never arriving
   CLog::Log(LOGDEBUG, "CGameClientCheevos: challenge indicator {} for achievement {} \"{}\"",
             show ? "shown" : "hidden", data.id, SafeString(data.title));
 
-  // Published to the runtime rather than raised as a notification: this fires
-  // and clears repeatedly during play, so it belongs in an on-screen indicator
-  // the skin can show and hide, not in the notification queue
   AchievementChallenge challenge;
   challenge.id = data.id;
   challenge.title = SafeString(data.title);
@@ -406,9 +393,6 @@ void CGameClientCheevos::OnAchievementProgressIndicator(
             show ? "shown" : "hidden", data.id, SafeString(data.title),
             SafeString(data.measured_progress));
 
-  // Published to the runtime rather than raised as a notification: this ticks
-  // up many times a second while the player works towards it, so it belongs in
-  // an on-screen indicator the skin can show and hide
   AchievementProgressIndicator indicator;
   indicator.id = data.id;
   indicator.title = SafeString(data.title);
@@ -449,8 +433,7 @@ void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" submitted {}", data.id, title,
             value);
 
-  // The value is worth more than the title here - "1:24.60" is what the player
-  // wants to see - so it leads, with the leaderboard named after it
+  // "1:24.60" is what the player wants to see, so it leads
   const std::string message =
       value.empty() ? title : StringUtils::Format("{}  ·  {}", value, title);
 
@@ -461,14 +444,9 @@ void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
 
 void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show)
 {
-  // Same reasoning as the challenge indicator: silence here is indistinguishable
-  // from the event never arriving
   CLog::Log(LOGDEBUG, "CGameClientCheevos: leaderboard tracker {} = \"{}\"",
             show ? "shown" : "hidden", SafeString(data.display));
 
-  // Published to the runtime rather than raised as a notification: this updates
-  // many times a second while an attempt runs, so it belongs in an on-screen
-  // indicator the skin can show and hide
   LeaderboardTracker tracker;
   tracker.id = data.id;
   tracker.display = SafeString(data.display);
@@ -494,6 +472,15 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
   // back in and show the player a table they are no longer in the right place in
   ForgetLeaderboardEntries(data.id);
 
+  // A dialog already open holds the rows it drew, so it is told to build them
+  // again from what the submission just changed
+  for (int windowId : {WINDOW_DIALOG_GAME_LEADERBOARDS, WINDOW_DIALOG_GAME_LEADERBOARD_ENTRIES})
+  {
+    CGUIMessage refresh(GUI_MSG_NOTIFY_ALL, windowId, 0, GUI_MSG_REFRESH_LIST,
+                        REFRESH_STANDINGS_INVALIDATED);
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(refresh, windowId);
+  }
+
   // "Your rank: {0:d} of {1:d}"
   std::string message = StringUtils::Format(Localize(35357), data.new_rank, data.num_entries);
 
@@ -509,9 +496,8 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
 
 void CGameClientCheevos::OnReset()
 {
-  // RetroAchievements does not allow a session started in casual mode to
-  // continue into hardcore, so the runtime asks for a reset when hardcore is
-  // switched on. Honouring it is a hardcore compliance requirement.
+  // The runtime asks for this when a mode change invalidates the session in
+  // progress; RetroAchievements requires the frontend to honour it
   CLog::Log(LOGINFO, "CGameClientCheevos: achievement runtime requested a game reset");
 
   m_gameClient.Reset();
@@ -524,4 +510,40 @@ void CGameClientCheevos::OnSubsetCompleted(const std::string& title)
   // "Subset completed"
   CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35307), title,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+}
+
+bool CGameClientCheevos::SetRetroAchievementsCredentials(const std::string& username,
+                                                         const std::string& token)
+{
+  std::unique_lock lock(m_clientAccess);
+
+  try
+  {
+    return m_gameClient.LogError(m_struct.toAddon->SetRetroAchievementsCredentials(
+                                     &m_struct, username.c_str(), token.c_str()),
+                                 "SetRetroAchievementsCredentials()");
+  }
+  catch (...)
+  {
+    m_gameClient.LogException("SetRetroAchievementsCredentials()");
+  }
+
+  return false;
+}
+
+bool CGameClientCheevos::SetEncoreModeEnabled(bool enabled)
+{
+  std::unique_lock lock(m_clientAccess);
+
+  try
+  {
+    return m_gameClient.LogError(m_struct.toAddon->RCSetEncoreModeEnabled(&m_struct, enabled),
+                                 "RCSetEncoreModeEnabled()");
+  }
+  catch (...)
+  {
+    m_gameClient.LogException("RCSetEncoreModeEnabled()");
+  }
+
+  return false;
 }

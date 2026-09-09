@@ -21,7 +21,7 @@ using namespace KODI::GAME;
 
 CDialogGameIndicators::CDialogGameIndicators()
   : CGUIDialog(
-        WINDOW_DIALOG_GAME_INDICATORS, "DialogGameIndicators.xml", DialogModalityType::MODELESS)
+        WINDOW_DIALOG_GAME_INDICATORS, "DialogGameControllers.xml", DialogModalityType::MODELESS)
 {
   m_loadType = KEEP_IN_MEMORY;
 }
@@ -33,14 +33,13 @@ void CDialogGameIndicators::Process(unsigned int currentTime, CDirtyRegionList& 
   // itself.
   if (!AnythingToShow())
   {
+    // Said here rather than in OnDeinitWindow, which runs once the close has
+    // played out. An indicator arriving in between would otherwise be dropped.
+    m_showing = false;
     Close();
     return;
   }
 
-  // Where the game has its own DRM plane the GUI layer is only composited when
-  // something dirties it, and a label quietly changing its text is not reliably
-  // enough. This is only reached while an indicator is up, so the rest of the
-  // session still gets the saving that optimisation exists for.
   MarkDirtyRegion();
 
   CGUIDialog::Process(currentTime, dirtyregions);
@@ -51,13 +50,16 @@ bool CDialogGameIndicators::AnythingToShow()
   auto& gameServices = CServiceBroker::GetGameServices();
   const auto& runtime = gameServices.AchievementRuntime();
 
+  // Asked for the same one the skin will draw, so an indicator it has nothing
+  // to show for cannot hold an empty dialog open compositing the GUI layer
+
   // The challenge indicator is the one a player can turn off, so it only counts
   // towards keeping this open when they have left it on
   const bool challenge =
-      gameServices.GameSettings().GetChallengeIndicator() && !runtime.GetChallenges().empty();
+      gameServices.GameSettings().GetChallengeIndicator() && runtime.GetShownChallenge().id != 0;
 
   return challenge || runtime.GetProgressIndicator().id != 0 ||
-         !runtime.GetLeaderboardTrackers().empty();
+         !runtime.GetShownLeaderboardTracker().display.empty();
 }
 
 void CDialogGameIndicators::Register()
@@ -68,9 +70,33 @@ void CDialogGameIndicators::Register()
   CServiceBroker::GetGameServices().AchievementRuntime().SetIndicatorCallback([]() { Show(); });
 }
 
+std::atomic<bool> CDialogGameIndicators::m_showing{false};
+std::atomic<bool> CDialogGameIndicators::m_activating{false};
+
+void CDialogGameIndicators::OnInitWindow()
+{
+  m_showing = true;
+  m_activating = false;
+  CGUIDialog::OnInitWindow();
+}
+
+void CDialogGameIndicators::OnDeinitWindow(int nextWindowID)
+{
+  m_showing = false;
+  m_activating = false;
+  CGUIDialog::OnDeinitWindow(nextWindowID);
+}
+
 void CDialogGameIndicators::Show()
 {
   if (!AnythingToShow())
+    return;
+
+  // An indicator on screen reports every value it takes, many times a second.
+  // Asking again for a window already up, or already asked for, would queue one
+  // message per update for the window manager to take its locks over and throw
+  // away.
+  if (m_showing || m_activating.exchange(true))
     return;
 
   // Only ever opens. Closing is the dialog's own business, above, which is what

@@ -20,7 +20,6 @@ namespace KODI
 {
 namespace GAME
 {
-
 /*!
  * \ingroup games
  *
@@ -43,9 +42,8 @@ namespace GAME
  *  - \c Leaderboards.Status      Set while loading, or when there is nothing
  *                                to show. A skin shows the list only when this
  *                                is empty.
- *  - \c Leaderboards.PlayerBest  Where the player stands, as a whole sentence,
- *                                including the case where they have never set
- *                                a time. Empty if not signed in.
+ *  - \c Leaderboards.PlayerBest  The player's rank and score, or "Not submitted".
+ *                                Empty until the standings arrive.
  *
  * On each row:
  *
@@ -68,6 +66,7 @@ public:
 
   // Implementation of CGUIControl via CGUIDialog
   bool OnMessage(CGUIMessage& message) override;
+  void Process(unsigned int currentTime, CDirtyRegionList& dirtyregions) override;
 
   // Implementation of CGUIWindow via CGUIDialog
   void OnWindowLoaded() override;
@@ -84,6 +83,13 @@ protected:
 private:
   //! Build the list from whatever the runtime holds for this leaderboard
   void PopulateList();
+
+  /*!
+   * \brief Ask RetroAchievements for this leaderboard's standings
+   *
+   * Does nothing if they are already held.
+   */
+  void FetchEntries();
 
   //! Publish the heading and status for the skin
   void SetStatus(const std::string& status);

@@ -25,15 +25,27 @@ struct LeaderboardEntry;
  *
  * RetroAchievements sends scores as plain integers and says separately how to
  * read them: 9000 is nine thousand points on one leaderboard and two and a half
- * minutes on another. Both leaderboard dialogs need this, which is why it is
- * here rather than duplicated in each.
+ * minutes on another. Both leaderboard dialogs need this.
+ *
+ * Follows rcheevos, which is what formats the same game's live tracker inside
+ * the add-on. The two would otherwise write one leaderboard's values two ways.
  *
  * \param score The value as sent
- * \param format The leaderboard's format - TIME, TIMESECS, FRAMES, SCORE,
- *        FIXED1, FIXED2, FIXED3. Anything unrecognised is shown as a number,
- *        since a wrong unit reads worse than none.
+ * \param format The leaderboard's format, as the server names it. Anything
+ *        unrecognised is shown as a plain number, since a wrong unit reads
+ *        worse than none.
  */
-std::string FormatLeaderboardScore(unsigned int score, const std::string& format);
+/*!
+ * \ingroup games
+ *
+ * \brief Whether a leaderboard measures a duration rather than a quantity
+ *
+ * Every format FormatLeaderboardScore() reads as a time is named here, so that
+ * what a value looks like and what the board is called cannot disagree.
+ */
+bool IsTimeFormat(const std::string& format);
+
+std::string FormatLeaderboardScore(int score, const std::string& format);
 
 /*!
  * \ingroup games
@@ -76,9 +88,11 @@ std::string RankMedal(unsigned int rank);
  * small, and losing them costs one refetch.
  *
  * \param leaderboardId The leaderboard
+ * \param account The RetroAchievements account the standings were read for
  * \param entries Its standings, as fetched
  */
 void SaveLeaderboardEntries(unsigned int leaderboardId,
+                            const std::string& account,
                             const std::vector<LeaderboardEntry>& entries);
 
 /*!
@@ -87,11 +101,14 @@ void SaveLeaderboardEntries(unsigned int leaderboardId,
  * \brief Read back standings kept from a previous session
  *
  * \param leaderboardId The leaderboard
+ * \param account The RetroAchievements account the standings were read for
  * \param[out] entries Filled in if anything was kept and it is still fresh
  *
  * \return False if nothing was kept, or what was kept has gone stale
  */
-bool LoadLeaderboardEntries(unsigned int leaderboardId, std::vector<LeaderboardEntry>& entries);
+bool LoadLeaderboardEntries(unsigned int leaderboardId,
+                            const std::string& account,
+                            std::vector<LeaderboardEntry>& entries);
 
 /*!
  * \ingroup games

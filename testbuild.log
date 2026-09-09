@@ -1,0 +1,431 @@
+[  0%] Built target build-libdvdcss
+[  1%] Built target build-ffmpeg
+[  1%] Built target compileinfo
+[  1%] Performing build step for 'buildtexturepacker'
+[  1%] Built target build-crossguid
+[  1%] Built target build-utfcpp
+[  1%] Built target retroplayer_messages
+[  1%] Built target build-JsonSchemaBuilder
+[  1%] Built target build-taglib
+[  5%] Built target upnp
+[  7%] Built target build-libdvdread
+[  7%] Built target gen_system_addons
+Generating xbmc.json/addon.xml
+[100%] Built target TexturePacker
+[  7%] Built target build-libdvdnav
+[  7%] No install step for 'buildtexturepacker'
+[  7%] Built target rp-process-x11
+[  7%] Built target generate_json_header
+[  7%] Copying files into build tree
+[  8%] Completed 'buildtexturepacker'
+[  8%] Built target processX11
+[  8%] Built target network_httprequesthandlers_python
+[  8%] Built target buildtexturepacker
+[  8%] Built target cores
+[  9%] Built target windowing_X11
+[  9%] Built target dllloader
+[  9%] Built target dllexports
+[ 10%] Built target audioengine
+[ 10%] Built target exports_utils
+[ 10%] Built target paplayer
+[ 10%] Built target export-files
+[ 10%] Built target externalplayer
+[ 10%] Built target events_windows
+[ 10%] Built target events
+[ 11%] Built target playercorefactory
+[ 11%] Built target bluray
+[ 13%] Built target musicdatabasedirectory
+[ 13%] Built target gamecheevos
+[ 14%] Built target gameaddons
+[ 15%] Built target videodatabasedirectory
+[ 15%] Built target gamediscs
+[ 16%] Built target games
+[ 16%] Built target games_agents_input
+[ 16%] Built target games_cheats
+[ 16%] Built target games_agents_windows
+[ 16%] Built target game_addon_streams
+[ 17%] Built target gameinput
+[ 17%] Built target games_controller_dialogs
+[ 19%] Built target games_controller
+[ 20%] Built target games_controller_guicontrols
+[ 20%] Built target games_controller_input
+[ 20%] Built target games_controller_types
+[ 20%] Built target games_controller_listproviders
+[ 25%] Built target filesystem
+[ 25%] Built target games_controller_windows
+[ 26%] Built target games_database
+[ 26%] Built target gamedialogs
+[ 26%] Built target gameosddialogs
+[ 26%] Built target games_manual
+[ 26%] Built target game_disc_dialog
+[ 26%] Built target games_ports_guicontrols
+[ 26%] Built target games_library
+[ 26%] Built target gameswindows
+[ 26%] Built target games_ports_windows
+[ 26%] Built target games_ports_types
+[ 26%] Built target games_ports_input
+[ 26%] Built target gametags
+[ 27%] Built target input
+[ 27%] Built target input_joystick
+[ 27%] Built target input_joystick_generic
+[ 27%] Built target input_actions
+[ 27%] Built target input_joystick_dialogs
+[ 27%] Built target input_keyboard_generic
+[ 27%] Built target input_keyboard
+[ 28%] Built target input_joystick_mapping
+[ 28%] Built target input_keymaps
+[ 29%] Built target input_keymaps_generic
+[ 29%] Built target input_keymaps_touch
+[ 29%] Built target input_keymaps_keyboard
+[ 29%] Built target input_keymaps_joysticks
+[ 29%] Built target input_mouse_generic
+[ 29%] Built target input_keymaps_remote
+[ 29%] Built target input_mouse
+[ 29%] Built target media
+[ 29%] Built target interfaces
+[ 29%] Built target info_interface
+[ 29%] Built target generic_interface
+[ 30%] Built target interfaces_builtins
+[ 30%] Built target drm
+[ 30%] Built target music_infoscanner
+[ 30%] Built target music_dialogs
+[ 30%] Built target music_jobs
+[ 32%] Built target jsonrpc_interface
+[ 33%] Built target music
+[ 33%] Built target music_windows
+[ 34%] Built target music_tags
+[ 34%] Built target network_websockets
+[ 34%] Built target peripherals_addons
+[ 34%] Built target peripherals
+[ 34%] Built target network
+[ 35%] Built target peripherals_bus
+[ 35%] Built target peripherals_devices
+[ 35%] Built target peripheral_bus_virtual
+[ 35%] Built target profiles_dialogs
+[ 35%] Built target profiles
+[ 35%] Built target peripherals_events
+[ 35%] Built target peripherals_dialogs
+[ 35%] Built target profiles_windows
+[ 35%] Built target pvr_addons
+[ 36%] Built target pvr_channels
+[ 38%] Built target pvr
+[ 38%] Built target pvr_filesystem
+[ 38%] Built target pvr_dialogs
+[ 39%] Built target pvr_epg
+[ 39%] Built target pvr_guilib_guiinfo
+[ 40%] Built target pvr_guilib
+[ 40%] Built target pvr_timers
+[ 40%] Built target pvr_providers
+[ 40%] Built target pvr_utils
+[ 40%] Built target pvr_recordings
+[ 41%] Built target pvr_settings
+[ 42%] Built target pvr_windows
+[ 42%] Built target rp_audio
+[ 42%] Built target retroplayer
+[ 42%] Built target rp-buffers-video
+[ 42%] Built target rp-buffers
+[ 42%] Built target retroplayer_guibridge
+[ 44%] Built target retroplayer_guicontrols
+[ 44%] Built target retroplayer_guiplayback
+[ 44%] Built target retroplayer_guiwindows
+[ 44%] Built target rp-process
+[ 44%] Built target retroplayer_playback
+[ 44%] Built target rp-videorenderers
+[ 45%] Built target rp-rendering
+[ 45%] Built target retroplayer_savestates
+[ 45%] Built target rp-shaders
+[ 46%] Built target retroplayer_streams
+[ 46%] Built target retroplayer_memory
+[ 47%] Built target settings_dialogs
+[ 48%] Built target settings
+[ 50%] Built target settings_windows
+[ 50%] Built target settings_lib
+[ 50%] Built target addons_addoninfo
+[ 51%] Built target addons_gui_skin
+[ 51%] Built target addons_binary-addons
+[ 53%] Built target xbmc
+[ 53%] Built target addons_interfaces
+[ 53%] Built target addons_gui
+[ 54%] Built target addons
+[ 54%] Built target addons_interfaces_gui
+[ 54%] Built target addons_interfaces_gui_dialogs
+[ 55%] Built target addons_interfaces_gui_controls
+[ 57%] Built target addons_settings
+[ 58%] Built target commons
+[ 58%] Built target dbwrappers
+[ 58%] Built target favourites
+[ 58%] Built target application
+[ 58%] Built target guilib_announcement_handlers
+[ 58%] Built target imagefiles
+[ 59%] Built target dialogs
+[ 60%] Built target guilib_listproviders
+[ 60%] Built target jobs
+[ 64%] Built target guilib
+[ 64%] Built target messagingHelpers
+[ 65%] Built target guilib_guiinfo
+[ 65%] Built target messaging
+[ 66%] Built target pictures
+[ 66%] Built target platform_common
+[ 66%] Built target pictures_metadata
+[ 66%] Built target playlists
+[ 66%] Built target powermanagement
+[ 66%] Built target rendering
+[ 66%] Built target programs
+[ 66%] Built target rendering_capture
+[ 66%] Built target resources
+[ 66%] Built target utils_guilib
+[ 66%] Built target storage
+[ 66%] Built target utils_i18n
+[ 66%] Built target threads
+[ 67%] Built target view
+[ 67%] Built target utils_i18n_Bcp47Registry
+[ 69%] Built target weather
+[ 72%] Built target utils
+[ 72%] Built target windowing
+[ 72%] Built target windows
+[ 73%] Built target video
+[ 73%] Built target video_jobs
+[ 75%] Built target video_guilib
+[ 75%] Built target video_dialogs
+[ 75%] Built target video_windows
+[ 75%] Built target video_tags
+[ 75%] Built target videoplayer-buffers
+[ 76%] Built target VideoPlayer
+[ 76%] Built target dvdcodecs
+[ 77%] Built target dvdoverlaycodecs
+[ 78%] Built target dvdaudiocodecs
+[ 78%] Built target dvdvideocodecs
+[ 78%] Built target dvddemuxers
+[ 78%] Built target subtitles_webvtt
+[ 78%] Built target process
+[ 78%] Built target dvdinputstreams
+[ 78%] Built target dvdsubtitles
+[ 78%] Built target rp-shaders-gl
+[ 79%] Built target videorenderers
+[ 79%] Built target input_touch
+[ 80%] Built target input_touch_generic
+[ 80%] Built target videoshaders
+[ 80%] Built target platform_common_speech
+[ 80%] Built target platform_linux_network
+[ 80%] Built target platform_linux_storage
+[ 82%] Built target linuxsupport
+[ 82%] Built target platform_linux_powermanagement
+[ 82%] Built target platform_linux_peripherals
+[ 83%] Built target platform_posix
+[ 83%] Built target platform_linux_threads
+[ 83%] Built target platform_posix_network
+[ 83%] Built target platform_posix_filesystem
+[ 83%] Built target platform_posix_threads
+[ 83%] Built target platform_posix_storage_discs
+[ 84%] Built target platform_linux_network_zeroconf
+[ 84%] Built target cdrip
+[ 84%] Built target windowing_linux
+[ 84%] Built target platform_posix_utils
+[ 85%] Built target rendering_gl
+[ 85%] Built target network_dacp
+[ 85%] Built target legacy_interface_wsgi
+[ 86%] Built target network_httprequesthandlers
+[ 86%] Built target python_binding
+[ 88%] Built target python_interface
+[ 89%] Built target legacy_interface
+[ 89%] Built target network_upnp
+[ 90%] Built target gen_skin_pack
+[ 90%] Built target generate-packaging
+[ 90%] Built target libkodi
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestVideoUtils.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestVideoStreamSelect.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/network/upnp/test/TestUPnPInternal.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/network/upnp/test/TestUPnPPlayer.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/xbmc-test.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/platform/linux/test/TestSysfsPath.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestVideoInfoTag.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestVideoFileItemClassify.cpp.o
+[ 90%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestVideoDbUrl.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestVideoDatabase.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestStacks.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestPlayerControllerActions.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestFilenameAttributes.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/video/test/TestBookmark.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestBluray.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestXMLUtils.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestXBMCTinyXML2.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestXBMCTinyXML.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestVariant.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestUrlParsing.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestUrlOptions.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestURIUtils.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestSystemInfo.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestStringUtils.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestStreamUtils.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestStreamDetails.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestStopwatch.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestSortUtils.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestSet.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestScraperUrl.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestScraperParser.cpp.o
+[ 91%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestRssReader.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestRingBuffer.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestRegExp.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestPOUtils.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestMp4ChplReader.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestMime.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestMathUtils.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestMap.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/Testlog.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestLocale.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestLanguageTag.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestLangCodeExpander.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestLabelFormatter.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestJSONVariantWriter.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestJSONVariantParser.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestJobManager.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestHttpResponse.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestHttpRangeUtils.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestHttpParser.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestHttpHeader.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestHTMLUtil.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestGPUInfo.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestGlobalsHandling.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestFileUtils.cpp.o
+[ 92%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestFileOperationJob.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestFileExtensionProvider.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestExecString.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestEndianSwap.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestDigest.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestDatabaseUtils.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestCrc32.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestContentUtils.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestComponentContainer.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestCPUInfo.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestCharsetConverter.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestBitstreamStats.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestBase64.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestArtUtils.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestArchive.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestAliasShortcutUtils.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/test/TestAlarmClock.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestListFormatter.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestI18nUtils.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestIso639_2.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestIso639_1.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestIso3166_1.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestBcp47Parser.cpp.o
+[ 94%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestBcp47Formatter.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/test/TestBcp47.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/Bcp47Registry/test/TestSubTagsCollection.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/Bcp47Registry/test/TestSubTagRegistryTypes.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/Bcp47Registry/test/TestSubTagRegistryManager.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/Bcp47Registry/test/TestSubTagRegistryFile.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/utils/i18n/Bcp47Registry/test/TestSubTagLoader.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/threads/test/TestEndTime.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/threads/test/TestSharedSection.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/threads/test/TestEvent.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestUtils.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestUtil.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestURL.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestPlayListPlayer.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestPasswordManager.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestMediaSource.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestLangInfo.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestFileItem.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestEpisodeUtils.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestDateTimeSpan.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestDateTime.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestCueDocument.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestBasicEnvironment.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/test/TestAutoSwitch.cpp.o
+[ 95%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/settings/test/TestMediaSourceSettings.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/settings/lib/test/TestSettingsMigrationPrimitive.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/settings/lib/test/TestSettingsMigration.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/settings/lib/test/TestSettingsManager.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/rendering/capture/test/TestCaptureService.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/rendering/capture/test/TestCaptureReadback.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/rendering/capture/test/TestCaptureConvert.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/pvr/channels/test/TestPVRChannelsPath.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/playlists/test/TestPlayListXSPF.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/playlists/test/TestPlayListXML.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/playlists/test/TestPlayListWPL.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/playlists/test/TestPlayListFileItemClassify.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/playlists/test/TestPlayListFactory.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/playlists/test/TestPlayListB4S.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/playlists/test/TestPlayListASX.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/pictures/metadata/test/TestMetadataExtraction.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/network/test/TestWebServer.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/network/test/TestNetworkFileItemClassify.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/network/test/TestNetwork.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/music/test/TestMusicFileItemClassify.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/music/tags/test/TestTagLoaderTagLib.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/music/tags/test/TestMusicInfoTagLoaderMatroska.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/music/tags/test/TestMatroskaTagReaderFFmpeg.cpp.o
+[ 96%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/music/tags/test/TestMatroskaTagMapping.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/music/tags/test/TestMatroskaTagChapterRanges.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/interfaces/python/test/TestPythonBindings.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/interfaces/json-rpc/test/TestVideoLibrarySetSourceContent.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/interfaces/json-rpc/test/TestJSONRPCStatus.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/interfaces/json-rpc/test/TestJSONRPCPermission.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/interfaces/json-rpc/test/TestFileOperations.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/interfaces/json-rpc/test/TestAddonsExecuteAddon.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/input/keyboard/test/TestKeyboardTranslator.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/imagefiles/test/TestImageFileURL.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/guilib/test/TestSkinMapManager.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/guilib/test/TestGUIWindowOnAction.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/guilib/test/TestGUITextLayout.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/guilib/test/TestGUILabel.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/guilib/test/TestGUIFixedListContainer.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/guilib/test/TestGamesGUIInfo.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/guilib/test/TestGUIControlFactory.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/library/test/TestGameNameParser.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/library/test/TestGameFileIdentity.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/tags/test/TestGameInfoTagLoader.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/test/TestGameThumbLoader.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/test/TestGameManual.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/dialogs/disc/test/TestDiscManagerSortUtils.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/controllers/test/TestControllerTreeXML.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/controllers/test/TestControllerDigest.cpp.o
+[ 97%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/controllers/input/test/TestDefaultKeyboardTranslator.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/controllers/input/test/TestPortNodeInput.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/controllers/input/test/TestDefaultMouseTranslator.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/controllers/input/test/TestControllerState.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/controllers/input/test/TestControllerActivity.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/addons/input/test/TestGameClientTopology.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/addons/disc/test/TestGameClientDiscXML.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/addons/disc/test/TestGameClientDiscModel.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/addons/disc/test/TestGameClientDiscMergeUtils.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/addons/disc/test/TestGameClientDiscM3U.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/addons/cheevos/test/TestGameClientCheevos.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestSMBFile.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestNfsFile.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestCurlHttpClientNetwork.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestHTTPDirectory.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestStreamParser.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestBlurayDirectory.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestZipManager.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestZipFile.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestCurlHttpClient.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestFileFactory.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestFile.cpp.o
+[ 98%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestDiscDirectoryHelper.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestDirectoryCache.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestDirectory.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/test/TestAudioBookFileDirectory.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/VideoDatabaseDirectory/test/TestNodeTitleMovies.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/VideoDatabaseDirectory/test/TestNodeRecentlyAddedMovies.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/VideoDatabaseDirectory/test/TestNodeMovieAssetTypes.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/filesystem/VideoDatabaseDirectory/test/TestNodeMovieAssets.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/dbwrappers/test/TestVPrepare.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/VideoPlayer/test/TestVideoPlayer.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/VideoPlayer/test/TestVideoCodecPictureFormat.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/test/TestConversionMatrix.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/VideoPlayer/Edl/test/TestEdl.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/VideoPlayer/DVDDemuxers/test/TestDVDDemuxUtils.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/VideoPlayer/Buffers/test/TestDmaBufIdentityCache.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/VideoPlayer/Buffers/test/TestDmaBufIdentity.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/cores/AudioEngine/Sinks/test/TestActiveAEDeviceChange.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/addons/test/TestAddonVersion.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/addons/test/TestAddonInfoBuilder.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/addons/test/TestAddonDatabase.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/addons/test/TestAddonBuilder.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/addons/gui/skin/test/TestSkinTimers.cpp.o
+[100%] Building CXX object CMakeFiles/kodi-test.dir/xbmc/games/dialogs/osd/test/TestLeaderboardUtils.cpp.o
+[100%] Linking CXX executable kodi-test
+[100%] Built target kodi-test

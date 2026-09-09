@@ -41,17 +41,28 @@ using namespace KODI::GAME;
 namespace
 {
 constexpr const char* PROPERTY_STATUS = "Leaderboards.Status";
+constexpr const char* PROPERTY_GAME_TITLE = "Leaderboards.GameTitle";
+
+constexpr const char* PROPERTY_ITEM_LEADERBOARD_ID = "LeaderboardId";
+constexpr const char* PROPERTY_ITEM_FORMAT = "Format";
+constexpr const char* PROPERTY_ITEM_TOP_USERNAME = "TopUsername";
+constexpr const char* PROPERTY_ITEM_TOP_SCORE = "TopScore";
+constexpr const char* PROPERTY_ITEM_PLAYER_STANDING = "PlayerStanding";
+constexpr const char* PROPERTY_ITEM_PLAYER_SCORE = "PlayerScore";
+constexpr const char* PROPERTY_ITEM_TOTAL_ENTRIES = "TotalEntries";
 
 constexpr int CONTROL_LEADERBOARD_LIST = 3;
 
 //! How long to wait on RetroAchievements before giving up on one leaderboard
 constexpr int REQUEST_TIMEOUT_SECS = 10;
 
-constexpr const char* PATCH_URL =
-    "https://retroachievements.org/dorequest.php?r=patch&u={}&t={}&g={}";
+//! Sent as a POST body, never a query string: CURL::GetRedacted() hides a
+//! URL's password but not its parameters, so a token in one reaches the log
+constexpr const char* DOREQUEST_URL = "https://retroachievements.org/dorequest.php";
 
-constexpr const char* LBINFO_URL =
-    "https://retroachievements.org/dorequest.php?r=lbinfo&i={}&u={}&t={}&c=1&o=0";
+constexpr const char* PATCH_BODY = "r=patch&u={}&t={}&g={}";
+
+constexpr const char* LBINFO_BODY = "r=lbinfo&i={}&u={}&t={}&c=1&o=0";
 
 /*!
  * \brief Fetches which leaderboards a game has, off the GUI thread
@@ -76,14 +87,14 @@ public:
 
   bool DoWork() override
   {
-    const std::string url =
-        StringUtils::Format(PATCH_URL, CURL::Encode(m_username), CURL::Encode(m_token), m_gameId);
+    const std::string body =
+        StringUtils::Format(PATCH_BODY, CURL::Encode(m_username), CURL::Encode(m_token), m_gameId);
 
     XFILE::CCurlFile curl;
     curl.SetTimeout(REQUEST_TIMEOUT_SECS);
 
     std::string response;
-    if (!curl.Get(url, response))
+    if (!curl.Post(DOREQUEST_URL, body, response))
       return false;
 
     CVariant data;
@@ -143,11 +154,13 @@ public:
   CLeaderboardStandingsJob(unsigned int leaderboardId,
                            std::string format,
                            std::string username,
-                           std::string token)
+                           std::string token,
+                           unsigned int accountGeneration)
     : m_id(leaderboardId),
       m_format(std::move(format)),
       m_username(std::move(username)),
-      m_token(std::move(token))
+      m_token(std::move(token)),
+      m_accountGeneration(accountGeneration)
   {
   }
 
@@ -155,14 +168,14 @@ public:
 
   bool DoWork() override
   {
-    const std::string url =
-        StringUtils::Format(LBINFO_URL, m_id, CURL::Encode(m_username), CURL::Encode(m_token));
+    const std::string body =
+        StringUtils::Format(LBINFO_BODY, m_id, CURL::Encode(m_username), CURL::Encode(m_token));
 
     XFILE::CCurlFile curl;
     curl.SetTimeout(REQUEST_TIMEOUT_SECS);
 
     std::string response;
-    if (!curl.Get(url, response))
+    if (!curl.Post(DOREQUEST_URL, body, response))
       return false;
 
     CVariant data;
@@ -177,8 +190,7 @@ public:
     {
       const CVariant& top = *entries.begin_array();
       m_topUsername = top["User"].asString();
-      m_topScore = FormatLeaderboardScore(
-          static_cast<unsigned int>(top["Score"].asUnsignedInteger()), m_format);
+      m_topScore = FormatLeaderboardScore(static_cast<int>(top["Score"].asInteger()), m_format);
     }
 
     // Only present once the player has submitted to this leaderboard
@@ -186,14 +198,15 @@ public:
     if (playerEntry.isObject() && !playerEntry["Rank"].isNull())
     {
       m_playerRank = static_cast<unsigned int>(playerEntry["Rank"].asUnsignedInteger());
-      m_playerScore = FormatLeaderboardScore(
-          static_cast<unsigned int>(playerEntry["Score"].asUnsignedInteger()), m_format);
+      m_playerScore =
+          FormatLeaderboardScore(static_cast<int>(playerEntry["Score"].asInteger()), m_format);
     }
 
     return true;
   }
 
   unsigned int GetLeaderboardId() const { return m_id; }
+  unsigned int GetAccountGeneration() const { return m_accountGeneration; }
   unsigned int GetTotalEntries() const { return m_totalEntries; }
   unsigned int GetPlayerRank() const { return m_playerRank; }
   const std::string& GetPlayerScore() const { return m_playerScore; }
@@ -205,6 +218,7 @@ private:
   const std::string m_format;
   const std::string m_username;
   const std::string m_token;
+  const unsigned int m_accountGeneration;
 
   unsigned int m_totalEntries{0};
   unsigned int m_playerRank{0};
@@ -225,6 +239,10 @@ CDialogGameLeaderboards::~CDialogGameLeaderboards() = default;
 void CDialogGameLeaderboards::OnWindowLoaded()
 {
   CGUIDialog::OnWindowLoaded();
+
+  // The shared shell defaults to this list; Process() focuses it once it is ready.
+  if (m_defaultControl == CONTROL_LEADERBOARD_LIST)
+    m_defaultControl = 0;
 
   m_viewControl.Reset();
   m_viewControl.SetParentWindow(GetID());
@@ -268,6 +286,7 @@ void CDialogGameLeaderboards::OnInitWindow()
     return;
   }
 
+  SetProperty(PROPERTY_STATUS, "");
   m_viewControl.SetCurrentView(DEFAULT_VIEW_LIST);
 
   PopulateList();
@@ -277,13 +296,13 @@ void CDialogGameLeaderboards::OnInitWindow()
   if (m_lastSelected >= 0)
     m_viewControl.SetSelectedItem(m_lastSelected);
 
-  if (state.leaderboards.empty())
+  if (!state.loaded)
   {
-    // "Loading standings…" while the list itself is fetched
+    // "Loading standings..." while the list itself is fetched
     SetProperty(PROPERTY_STATUS, strings.Get(35342));
     FetchList(gameId);
   }
-  else
+  else if (!state.leaderboards.empty())
   {
     FetchStandings();
   }
@@ -297,10 +316,10 @@ void CDialogGameLeaderboards::OnDeinitWindow(int nextWindowID)
   {
     std::unique_lock lock(m_section);
     m_items.Clear();
+    m_requested.clear();
   }
 
   m_lastFetched = -1;
-  m_requested.clear();
 
   m_viewControl.Clear();
 
@@ -322,14 +341,22 @@ void CDialogGameLeaderboards::FetchList(unsigned int gameId)
 void CDialogGameLeaderboards::FetchStandings()
 {
   const auto& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+  auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+
+  // Read either side of the credentials so the two describe one account. Taken
+  // afterwards, a sign-in between them would send the last account's token
+  // under the new one's generation and the answer would be accepted.
+  const unsigned int generation = runtime.GetAccountGeneration();
 
   const std::string username = gameSettings.GetRAUsername();
   const std::string token = gameSettings.GetRAToken();
   if (username.empty() || token.empty())
     return;
 
-  const LeaderboardState state =
-      CServiceBroker::GetGameServices().AchievementRuntime().GetLeaderboardState();
+  if (generation != runtime.GetAccountGeneration())
+    return;
+
+  const LeaderboardState state = runtime.GetLeaderboardState();
 
   // Only what is on screen, and only once. Standings are a request each, and a
   // game like Super Mario Bros. has thirty-six leaderboards - asking for them
@@ -342,37 +369,63 @@ void CDialogGameLeaderboards::FetchStandings()
     if (queued >= STANDINGS_PREFETCH)
       break;
 
-    if (leaderboard.totalEntries > 0 || m_requested.count(leaderboard.id) > 0)
+    if (leaderboard.standingsLoaded)
       continue;
 
-    m_requested.insert(leaderboard.id);
-    AddJob(new CLeaderboardStandingsJob(leaderboard.id, leaderboard.format, username, token));
+    {
+      // Asked and inserted under one hold, so a leaderboard cannot be
+      // requested twice
+      std::unique_lock lock(m_section);
+      if (!m_requested.insert(leaderboard.id).second)
+        continue;
+    }
+
+    AddJob(new CLeaderboardStandingsJob(leaderboard.id, leaderboard.format, username, token,
+                                        generation));
     ++queued;
   }
 }
 
 void CDialogGameLeaderboards::FetchStandingsFor(unsigned int leaderboardId)
 {
-  if (leaderboardId == 0 || m_requested.count(leaderboardId) > 0)
+  if (leaderboardId == 0)
     return;
 
+  {
+    std::unique_lock lock(m_section);
+    if (m_requested.count(leaderboardId) > 0)
+      return;
+  }
+
   const auto& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+  auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+
+  // Read either side of the credentials, as in FetchStandings()
+  const unsigned int generation = runtime.GetAccountGeneration();
 
   const std::string username = gameSettings.GetRAUsername();
   const std::string token = gameSettings.GetRAToken();
   if (username.empty() || token.empty())
     return;
 
-  const LeaderboardState state =
-      CServiceBroker::GetGameServices().AchievementRuntime().GetLeaderboardState();
+  if (generation != runtime.GetAccountGeneration())
+    return;
+
+  const LeaderboardState state = runtime.GetLeaderboardState();
 
   for (const LeaderboardInfo& leaderboard : state.leaderboards)
   {
-    if (leaderboard.id != leaderboardId || leaderboard.totalEntries > 0)
+    if (leaderboard.id != leaderboardId || leaderboard.standingsLoaded)
       continue;
 
-    m_requested.insert(leaderboardId);
-    AddJob(new CLeaderboardStandingsJob(leaderboard.id, leaderboard.format, username, token));
+    {
+      std::unique_lock lock(m_section);
+      if (!m_requested.insert(leaderboardId).second)
+        return;
+    }
+
+    AddJob(new CLeaderboardStandingsJob(leaderboard.id, leaderboard.format, username, token,
+                                        generation));
     return;
   }
 }
@@ -405,23 +458,15 @@ void CDialogGameLeaderboards::OnJobComplete(unsigned int jobID, bool success, CJ
   {
     const auto* standings = static_cast<CLeaderboardStandingsJob*>(job);
 
-    auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
-    LeaderboardState state = runtime.GetLeaderboardState();
+    LeaderboardSummary summary;
+    summary.totalEntries = standings->GetTotalEntries();
+    summary.playerRank = standings->GetPlayerRank();
+    summary.playerScore = standings->GetPlayerScore();
+    summary.topUsername = standings->GetTopUsername();
+    summary.topScore = standings->GetTopScore();
 
-    for (LeaderboardInfo& leaderboard : state.leaderboards)
-    {
-      if (leaderboard.id != standings->GetLeaderboardId())
-        continue;
-
-      leaderboard.totalEntries = standings->GetTotalEntries();
-      leaderboard.playerRank = standings->GetPlayerRank();
-      leaderboard.playerScore = standings->GetPlayerScore();
-      leaderboard.topUsername = standings->GetTopUsername();
-      leaderboard.topScore = standings->GetTopScore();
-      break;
-    }
-
-    runtime.SetLeaderboardState(state);
+    CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardSummary(
+        standings->GetLeaderboardId(), standings->GetAccountGeneration(), summary);
 
     // Rebuilding a list control is only safe on the GUI thread, so the
     // rebuild is asked for rather than done here
@@ -445,8 +490,8 @@ void CDialogGameLeaderboards::Process(unsigned int currentTime, CDirtyRegionList
     std::unique_lock lock(m_section);
     if (selected >= 0 && selected < m_items.Size())
     {
-      const auto leaderboardId =
-          static_cast<unsigned int>(m_items[selected]->GetProperty("LeaderboardId").asInteger());
+      const auto leaderboardId = static_cast<unsigned int>(
+          m_items[selected]->GetProperty(PROPERTY_ITEM_LEADERBOARD_ID).asInteger());
       lock.unlock();
 
       FetchStandingsFor(leaderboardId);
@@ -454,6 +499,12 @@ void CDialogGameLeaderboards::Process(unsigned int currentTime, CDirtyRegionList
   }
 
   CGUIDialog::Process(currentTime, dirtyregions);
+
+  // The list cannot take initial focus until its asynchronous load completes.
+  const auto* list = GetControl(CONTROL_LEADERBOARD_LIST);
+  const auto* focused = GetFocusedControl();
+  if ((!focused || !focused->CanFocus()) && list && list->CanFocus())
+    m_viewControl.SetFocused();
 }
 
 bool CDialogGameLeaderboards::OnMessage(CGUIMessage& message)
@@ -481,7 +532,7 @@ bool CDialogGameLeaderboards::OnMessage(CGUIMessage& message)
         if (selected >= 0 && selected < m_items.Size())
         {
           const auto leaderboardId = static_cast<unsigned int>(
-              m_items[selected]->GetProperty("LeaderboardId").asInteger());
+              m_items[selected]->GetProperty(PROPERTY_ITEM_LEADERBOARD_ID).asInteger());
           lock.unlock();
 
           m_lastSelected = selected;
@@ -509,7 +560,7 @@ std::string CDialogGameLeaderboards::DescribeFormat(const std::string& format, b
 {
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
 
-  if (format == "TIME" || format == "TIMESECS" || format == "FRAMES")
+  if (IsTimeFormat(format))
   {
     // "Fastest time" / "Longest time"
     return strings.Get(lowerIsBetter ? 35335 : 35336);
@@ -526,6 +577,8 @@ void CDialogGameLeaderboards::PopulateList()
   const LeaderboardState state =
       CServiceBroker::GetGameServices().AchievementRuntime().GetLeaderboardState();
 
+  SetProperty(PROPERTY_GAME_TITLE, state.gameTitle);
+
   std::unique_lock lock(m_section);
 
   m_items.Clear();
@@ -536,31 +589,32 @@ void CDialogGameLeaderboards::PopulateList()
     item->SetLabel(leaderboard.title);
     item->SetLabel2(leaderboard.description);
 
-    item->SetProperty("LeaderboardId", static_cast<int>(leaderboard.id));
-    item->SetProperty("Format", DescribeFormat(leaderboard.format, leaderboard.lowerIsBetter));
-    item->SetProperty("TopUsername", leaderboard.topUsername);
-    item->SetProperty("TopScore", leaderboard.topScore);
+    item->SetProperty(PROPERTY_ITEM_LEADERBOARD_ID, static_cast<int>(leaderboard.id));
+    item->SetProperty(PROPERTY_ITEM_FORMAT,
+                      DescribeFormat(leaderboard.format, leaderboard.lowerIsBetter));
+    item->SetProperty(PROPERTY_ITEM_TOP_USERNAME, leaderboard.topUsername);
+    item->SetProperty(PROPERTY_ITEM_TOP_SCORE, leaderboard.topScore);
 
-    // Left empty rather than shown as zero: a leaderboard whose standings have
-    // not arrived yet, and one nobody has entered, should not read the same
-    if (leaderboard.totalEntries > 0)
+    if (leaderboard.standingsLoaded)
     {
-      // "{0:d} entries"
-      item->SetProperty("TotalEntries",
-                        StringUtils::Format(strings.Get(35339), leaderboard.totalEntries));
-    }
+      if (leaderboard.playerRank > 0)
+      {
+        item->SetProperty(
+            PROPERTY_ITEM_PLAYER_STANDING,
+            StringUtils::Format("#{}", StringUtils::FormatNumber(leaderboard.playerRank)));
+        item->SetProperty(PROPERTY_ITEM_PLAYER_SCORE, leaderboard.playerScore);
+      }
+      else
+      {
+        // "Not ranked"
+        item->SetProperty(PROPERTY_ITEM_PLAYER_STANDING, strings.Get(35341));
+      }
 
-    if (leaderboard.playerRank > 0)
-    {
-      // "Your rank: {0:d}"
-      item->SetProperty("PlayerRank",
-                        StringUtils::Format(strings.Get(35340), leaderboard.playerRank));
-      item->SetProperty("PlayerScore", leaderboard.playerScore);
-    }
-    else if (leaderboard.totalEntries > 0)
-    {
-      // "Not ranked"
-      item->SetProperty("PlayerRank", strings.Get(35341));
+      // "{0} entry" / "{0} entries"
+      const std::string entries =
+          StringUtils::Format(strings.Get(leaderboard.totalEntries == 1 ? 35372 : 35373),
+                              StringUtils::FormatNumber(leaderboard.totalEntries));
+      item->SetProperty(PROPERTY_ITEM_TOTAL_ENTRIES, entries);
     }
 
     m_items.Add(std::move(item));
@@ -572,7 +626,14 @@ void CDialogGameLeaderboards::PopulateList()
 
   m_viewControl.SetItems(m_items);
 
-  // "This game has no leaderboards" once the fetch has been and gone
-  SetProperty(PROPERTY_STATUS,
-              empty ? CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35334) : "");
+  // A game with none and a fetch that failed both arrive with an empty list
+  std::string status;
+  if (!state.loaded)
+    // "The leaderboards could not be loaded"
+    status = strings.Get(35370);
+  else if (empty)
+    // "This game has no leaderboards"
+    status = strings.Get(35334);
+
+  SetProperty(PROPERTY_STATUS, status);
 }

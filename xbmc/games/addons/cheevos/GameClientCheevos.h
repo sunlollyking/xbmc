@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include "utils/Observer.h"
-
+#include <atomic>
 #include <string>
+
+class CCriticalSection;
 
 struct AddonInstance_Game;
 struct game_rc_achievement_challenge;
@@ -29,19 +30,19 @@ namespace KODI
 namespace GAME
 {
 
+class CAchievementRuntime;
 class CGameClient;
 
 /*!
  * \ingroup games
  */
-class CGameClientCheevos : public Observer
+class CGameClientCheevos
 {
 public:
-  CGameClientCheevos(CGameClient& gameClient, AddonInstance_Game& addonStruct);
-  ~CGameClientCheevos() override;
-
-  // Implementation of Observer
-  void Notify(const Observable& obs, const ObservableMessage msg) override;
+  CGameClientCheevos(CGameClient& gameClient,
+                     AddonInstance_Game& addonStruct,
+                     CCriticalSection& clientAccess);
+  ~CGameClientCheevos();
 
   /*!
    * \name RetroAchievements events received from the add-on
@@ -52,6 +53,9 @@ public:
   //@{
   void OnGameLoaded(const game_rc_game_loaded& data);
   void OnAchievementTriggered(const game_rc_achievement_triggered& data);
+  static void OnAchievementTriggered(const game_rc_achievement_triggered& data,
+                                     CAchievementRuntime& runtime,
+                                     bool encoreModeEnabled);
   void OnGameCompleted(const std::string& title, bool hardcore);
   void OnRichPresenceUpdated(const std::string& evaluation);
   void OnLoginResult(const game_rc_login_result& data);
@@ -103,11 +107,29 @@ public:
   bool SendCredentials();
 
 private:
+  /*!
+   * \brief Give the client the RetroAchievements account to sign in with
+   *
+   * The account is held by Kodi, which owns the settings it is entered in.
+   */
+  bool SetRetroAchievementsCredentials(const std::string& username, const std::string& token);
+
+  /*!
+   * \brief Tell the client that earned achievements are armed again
+   *
+   * Read when a game loads, so a client told once forgets by the next one.
+   */
+  bool SetEncoreModeEnabled(bool enabled);
+
   CGameClient& m_gameClient;
   AddonInstance_Game& m_struct;
+  CCriticalSection& m_clientAccess;
 
-  //! Only while a game is open; see the destructor for why not from construction
-  bool m_observingSettings{false};
+  //! Whether the add-on accepted encore before the current game loaded; a
+  //! setting change applies to the next one. Atomic because the achievement
+  //! callbacks read it on the add-on's thread while loading and closing a game
+  //! write it on Kodi's.
+  std::atomic<bool> m_encoreModeEnabled{false};
 };
 } // namespace GAME
 } // namespace KODI

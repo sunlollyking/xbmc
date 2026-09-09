@@ -18,8 +18,13 @@
 #include "events/NotificationEvent.h"
 #include "filesystem/CurlFile.h"
 #include "filesystem/File.h"
+#include "games/AchievementRuntime.h"
+#include "games/GameServices.h"
 #include "games/library/GameLibraryQueue.h"
 #include "games/manual/ManualCache.h"
+#include "guilib/GUIComponent.h"
+#include "guilib/GUIWindowManager.h"
+#include "guilib/WindowIDs.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
 #include "settings/Settings.h"
@@ -44,6 +49,7 @@ const std::string SETTING_GAMES_SHOW_OSD_HELP = "gamesgeneral.showosdhelp";
 const std::string SETTING_GAMES_ENABLEAUTOSAVE = "gamesgeneral.enableautosave";
 const std::string SETTING_GAMES_ENABLEREWIND = "gamesgeneral.enablerewind";
 const std::string SETTING_GAMES_REWINDTIME = "gamesgeneral.rewindtime";
+const std::string SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT = "gamesachievements.createaccount";
 const std::string SETTING_GAMES_ENABLERUNAHEAD = "gamesgeneral.enablerunahead";
 const std::string SETTING_GAMES_RUNAHEADFRAMES = "gamesgeneral.runaheadframes";
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
@@ -88,6 +94,7 @@ CGameSettings::CGameSettings()
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
        SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
        SETTING_GAMES_ACHIEVEMENTS_HARDCORE, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
+       SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT,
        SETTING_GAMES_CLEAR_MANUAL_CACHE});
 
   // A person should say who they are once. The scrapers keep fields of their
@@ -223,6 +230,8 @@ void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setti
     }
     CGameLibraryQueue::GetInstance().RefreshAchievementProgress();
   }
+  else if (setting->GetId() == SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT)
+    CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_DIALOG_GAME_ACHIEVEMENTS);
 }
 
 void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& setting)
@@ -236,6 +245,15 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
       settingId == SETTING_GAMES_ACHIEVEMENTS_API_KEY)
     ShareAchievementCredentials();
 
+  // Signing in or out changes who the kept standings describe, and the runtime
+  // holds them per game rather than per account. Settings outlive the services
+  // that read them, so the runtime is only reached while it is there.
+  if (CServiceBroker::IsServiceManagerUp() && (settingId == SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN ||
+                                               settingId == SETTING_GAMES_ACHIEVEMENTS_USERNAME))
+  {
+    CServiceBroker::GetGameServices().AchievementRuntime().ForgetPlayerLeaderboardData();
+  }
+
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
       settingId == SETTING_GAMES_ENABLERUNAHEAD || settingId == SETTING_GAMES_RUNAHEADFRAMES ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
@@ -246,6 +264,13 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
     // rewindable for the rest of the session
     SetChanged();
     NotifyObservers(ObservableMessageSettingsChanged);
+  }
+  else if (settingId == SETTING_GAMES_ACHIEVEMENTS_INDICATOR)
+  {
+    // Turning it on has to bring back an attempt that is already running, and
+    // no event is coming to say so
+    if (CServiceBroker::IsServiceManagerUp())
+      CServiceBroker::GetGameServices().AchievementRuntime().NotifyIndicatorsChanged();
   }
   else if (settingId == SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN &&
            std::dynamic_pointer_cast<const CSettingBool>(setting)->GetValue())
@@ -296,9 +321,8 @@ std::string CGameSettings::LoginToRA(const std::string& username,
 
   CLog::Log(LOGDEBUG, "CGameSettings::LoginToRA -- logging in as '{}'", username);
 
-  // The server answers a wrong user or password with 401 and a JSON body
-  // saying so. CCurlFile fails on any 4xx by default and throws the body away,
-  // which turned every mistyped password into "failed to contact server"
+  // The server names the reason in the body of a 401, which CCurlFile
+  // discards for any error status unless asked not to
   CURL url{LOGIN_TO_RETRO_ACHIEVEMENTS_URL};
   url.SetProtocolOption("failonerror", "false");
 

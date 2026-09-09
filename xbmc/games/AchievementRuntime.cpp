@@ -26,6 +26,7 @@ void CAchievementRuntime::Clear()
   // The leaderboards belong to the game that just went away too, and a stale
   // selection would point the entries dialog at nothing
   m_leaderboards = LeaderboardState{};
+  m_trackers.clear();
   m_selectedLeaderboard = 0;
 }
 
@@ -128,12 +129,6 @@ void CAchievementRuntime::SetChallenge(const AchievementChallenge& challenge, bo
       if (it == m_state.challenges.end())
         m_state.challenges.emplace_back(challenge);
     }
-    else if (challenge.id == 0)
-    {
-      // The runtime names no achievement with a hide, so an id of zero means
-      // every attempt has ended, as it does for the progress indicators
-      m_state.challenges.clear();
-    }
     else if (it != m_state.challenges.end())
     {
       m_state.challenges.erase(it);
@@ -191,13 +186,41 @@ AchievementProgressIndicator CAchievementRuntime::GetProgressIndicator() const
   const auto& indicators = m_state.progressIndicators;
 
   // A game can count several things at once, and a corner indicator has room
-  // for one: the closest to being earned.
-  const auto best = std::max_element(
-      indicators.begin(), indicators.end(),
-      [](const AchievementProgressIndicator& a, const AchievementProgressIndicator& b)
-      { return a.measuredPercent < b.measuredPercent; });
+  // for one: the closest to being earned. One with no title is skipped rather
+  // than chosen, since a skin draws the title and would show an empty corner.
+  AchievementProgressIndicator best;
+  for (const AchievementProgressIndicator& indicator : indicators)
+  {
+    if (indicator.title.empty())
+      continue;
 
-  return (best != indicators.end()) ? *best : AchievementProgressIndicator{};
+    if (best.id == 0 || indicator.measuredPercent > best.measuredPercent)
+      best = indicator;
+  }
+
+  return best;
+}
+
+AchievementChallenge CAchievementRuntime::GetShownChallenge() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  const auto shown =
+      std::find_if(m_state.challenges.begin(), m_state.challenges.end(),
+                   [](const AchievementChallenge& challenge) { return !challenge.title.empty(); });
+
+  return (shown != m_state.challenges.end()) ? *shown : AchievementChallenge{};
+}
+
+LeaderboardTracker CAchievementRuntime::GetShownLeaderboardTracker() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  const auto shown =
+      std::find_if(m_trackers.begin(), m_trackers.end(),
+                   [](const LeaderboardTracker& tracker) { return !tracker.display.empty(); });
+
+  return (shown != m_trackers.end()) ? *shown : LeaderboardTracker{};
 }
 
 void CAchievementRuntime::SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active)
@@ -205,7 +228,7 @@ void CAchievementRuntime::SetLeaderboardTracker(const LeaderboardTracker& tracke
   {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    auto it = std::find_if(m_leaderboards.trackers.begin(), m_leaderboards.trackers.end(),
+    auto it = std::find_if(m_trackers.begin(), m_trackers.end(),
                            [&tracker](const LeaderboardTracker& existing)
                            { return existing.id == tracker.id; });
 
@@ -213,14 +236,14 @@ void CAchievementRuntime::SetLeaderboardTracker(const LeaderboardTracker& tracke
     {
       // Show and update are the same thing here: an attempt already on screen is
       // given its new value rather than added twice
-      if (it != m_leaderboards.trackers.end())
+      if (it != m_trackers.end())
         it->display = tracker.display;
       else
-        m_leaderboards.trackers.emplace_back(tracker);
+        m_trackers.emplace_back(tracker);
     }
-    else if (it != m_leaderboards.trackers.end())
+    else if (it != m_trackers.end())
     {
-      m_leaderboards.trackers.erase(it);
+      m_trackers.erase(it);
     }
   }
 
@@ -230,7 +253,7 @@ void CAchievementRuntime::SetLeaderboardTracker(const LeaderboardTracker& tracke
 std::vector<LeaderboardTracker> CAchievementRuntime::GetLeaderboardTrackers() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  return m_leaderboards.trackers;
+  return m_trackers;
 }
 
 void CAchievementRuntime::SetLeaderboardState(const LeaderboardState& state)
@@ -246,9 +269,13 @@ LeaderboardState CAchievementRuntime::GetLeaderboardState() const
 }
 
 bool CAchievementRuntime::SetLeaderboardEntries(unsigned int leaderboardId,
+                                                unsigned int accountGeneration,
                                                 const std::vector<LeaderboardEntry>& entries)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
+
+  if (accountGeneration != m_accountGeneration)
+    return false;
 
   for (LeaderboardInfo& leaderboard : m_leaderboards.leaderboards)
   {
@@ -256,10 +283,62 @@ bool CAchievementRuntime::SetLeaderboardEntries(unsigned int leaderboardId,
       continue;
 
     leaderboard.entries = entries;
+    leaderboard.entriesLoaded = true;
     return true;
   }
 
   // The game changed while the standings were being fetched
+  return false;
+}
+
+void CAchievementRuntime::ForgetPlayerLeaderboardData()
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  for (LeaderboardInfo& leaderboard : m_leaderboards.leaderboards)
+  {
+    leaderboard.playerRank = 0;
+    leaderboard.playerScore.clear();
+    leaderboard.entries.clear();
+    leaderboard.entriesLoaded = false;
+    leaderboard.standingsLoaded = false;
+  }
+
+  ++m_accountGeneration;
+}
+
+unsigned int CAchievementRuntime::GetAccountGeneration() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return m_accountGeneration;
+}
+
+bool CAchievementRuntime::SetLeaderboardSummary(unsigned int leaderboardId,
+                                                unsigned int accountGeneration,
+                                                const LeaderboardSummary& summary)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  // Checked against the write rather than before it, so the account cannot
+  // move in between
+  if (accountGeneration != m_accountGeneration)
+    return false;
+
+  for (LeaderboardInfo& leaderboard : m_leaderboards.leaderboards)
+  {
+    if (leaderboard.id != leaderboardId)
+      continue;
+
+    leaderboard.totalEntries = summary.totalEntries;
+    leaderboard.playerRank = summary.playerRank;
+    leaderboard.playerScore = summary.playerScore;
+    leaderboard.topUsername = summary.topUsername;
+    leaderboard.topScore = summary.topScore;
+    leaderboard.standingsLoaded = true;
+
+    return true;
+  }
+
   return false;
 }
 
@@ -280,9 +359,17 @@ bool CAchievementRuntime::SetLeaderboardStanding(unsigned int leaderboardId,
     if (totalEntries > 0)
       leaderboard.totalEntries = totalEntries;
 
+    // The summary is now stale rather than fetched: a scoreboard says where the
+    // player landed and nothing about who leads, so a submission taking first
+    // place would leave the old leader on the list until it is asked again
+    leaderboard.standingsLoaded = false;
+
     // The standings that were fetched no longer include this submission, and
-    // guessing where it slots in would be wrong as often as right
+    // guessing where it slots in would be wrong as often as right. The flag
+    // goes with them: an empty list on its own does not say whether the page
+    // still needs fetching.
     leaderboard.entries.clear();
+    leaderboard.entriesLoaded = false;
 
     return true;
   }

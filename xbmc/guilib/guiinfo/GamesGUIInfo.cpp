@@ -524,27 +524,15 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
         return true;
       }
 
-      // Only the first attempt is surfaced. More than one at a time is rare,
-      // and a corner indicator has room for one.
-      const std::vector<AchievementChallenge> challenges = AchievementRuntime().GetChallenges();
-      if (challenges.empty())
-      {
-        value.clear();
-        return true;
-      }
+      const AchievementChallenge challenge = AchievementRuntime().GetShownChallenge();
 
-      value = (info.GetInfo() == RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE)
-                  ? challenges.front().title
-                  : challenges.front().badgeUrl;
+      value = (info.GetInfo() == RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE) ? challenge.title
+                                                                           : challenge.badgeUrl;
       return true;
     }
     case RETROPLAYER_LEADERBOARD_TRACKER:
     {
-      // First only, as with the challenge indicator above
-      const std::vector<LeaderboardTracker> trackers =
-          AchievementRuntime().GetLeaderboardTrackers();
-
-      value = trackers.empty() ? "" : trackers.front().display;
+      value = AchievementRuntime().GetShownLeaderboardTracker().display;
       return true;
     }
     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE:

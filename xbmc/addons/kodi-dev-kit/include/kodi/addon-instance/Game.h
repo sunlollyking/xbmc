@@ -1112,6 +1112,7 @@ public:
   virtual GAME_ERROR RCSetHardcoreEnabled(bool enabled) { return GAME_ERROR_NOT_IMPLEMENTED; }
   //----------------------------------------------------------------------------
 
+  //============================================================================
   //----------------------------------------------------------------------------
   //============================================================================
   /// @brief Activate an achievement
@@ -1405,7 +1406,6 @@ public:
   ///
   void RCOnReset() { m_instanceData->toKodi->RCOnReset(m_instanceData->toKodi->kodiInstance); }
 
-
   //============================================================================
   /// @brief **Callback to Kodi Function**\n
   /// Notify Kodi that every achievement of a subset has been earned
@@ -1439,7 +1439,7 @@ public:
   /// @note Added in Game API 8.1.0
   ///
   void RCOnAchievementProgressIndicator(const game_rc_achievement_progress_indicator& data,
-                                            bool show)
+                                        bool show)
   {
     if (show)
       m_instanceData->toKodi->RCOnAchievementProgressShow(m_instanceData->toKodi->kodiInstance,
@@ -1472,8 +1472,6 @@ public:
       m_instanceData->toKodi->RCOnLeaderboardTrackerHide(m_instanceData->toKodi->kodiInstance,
                                                          &data);
   }
-
-
 
   //----------------------------------------------------------------------------
 

@@ -46,8 +46,11 @@ constexpr int REQUEST_TIMEOUT_SECS = 10;
 //! player's own row, and more than this cannot be read from a sofa anyway.
 constexpr unsigned int ENTRY_COUNT = 50;
 
-constexpr const char* LBINFO_URL =
-    "https://retroachievements.org/dorequest.php?r=lbinfo&i={}&u={}&t={}&c={}&o=0";
+//! Sent as a POST body, never a query string: CURL::GetRedacted() hides a
+//! URL's password but not its parameters, so a token in one reaches the log
+constexpr const char* DOREQUEST_URL = "https://retroachievements.org/dorequest.php";
+
+constexpr const char* LBINFO_BODY = "r=lbinfo&i={}&u={}&t={}&c={}&o=0";
 
 //! Where RetroAchievements serves player avatars from
 constexpr const char* USER_PIC_URL = "https://i.retroachievements.org/UserPic/{}.png";
@@ -56,6 +59,14 @@ constexpr const char* PROPERTY_TITLE = "Leaderboards.Title";
 constexpr const char* PROPERTY_DESCRIPTION = "Leaderboards.Description";
 constexpr const char* PROPERTY_STATUS = "Leaderboards.Status";
 constexpr const char* PROPERTY_PLAYER_BEST = "Leaderboards.PlayerBest";
+
+constexpr const char* PROPERTY_ITEM_RANK = "Rank";
+constexpr const char* PROPERTY_ITEM_RANK_LABEL = "RankLabel";
+constexpr const char* PROPERTY_ITEM_SCORE = "Score";
+constexpr const char* PROPERTY_ITEM_MEDAL = "Medal";
+constexpr const char* PROPERTY_ITEM_DATE = "Date";
+constexpr const char* PROPERTY_ITEM_DATE_RELATIVE = "DateRelative";
+constexpr const char* PROPERTY_ITEM_IS_PLAYER = "IsPlayer";
 
 /*!
  * \brief Fetches one leaderboard's standings, off the GUI thread
@@ -66,11 +77,13 @@ public:
   CLeaderboardEntriesJob(unsigned int leaderboardId,
                          std::string format,
                          std::string username,
-                         std::string token)
+                         std::string token,
+                         unsigned int accountGeneration)
     : m_id(leaderboardId),
       m_format(std::move(format)),
       m_username(std::move(username)),
-      m_token(std::move(token))
+      m_token(std::move(token)),
+      m_accountGeneration(accountGeneration)
   {
   }
 
@@ -78,14 +91,14 @@ public:
 
   bool DoWork() override
   {
-    const std::string url = StringUtils::Format(LBINFO_URL, m_id, CURL::Encode(m_username),
-                                                CURL::Encode(m_token), ENTRY_COUNT);
+    const std::string body = StringUtils::Format(LBINFO_BODY, m_id, CURL::Encode(m_username),
+                                                 CURL::Encode(m_token), ENTRY_COUNT);
 
     XFILE::CCurlFile curl;
     curl.SetTimeout(REQUEST_TIMEOUT_SECS);
 
     std::string response;
-    if (!curl.Get(url, response))
+    if (!curl.Post(DOREQUEST_URL, body, response))
       return false;
 
     CVariant data;
@@ -102,8 +115,7 @@ public:
       LeaderboardEntry entry;
       entry.rank = static_cast<unsigned int>(row["Rank"].asUnsignedInteger());
       entry.username = row["User"].asString();
-      entry.score = FormatLeaderboardScore(
-          static_cast<unsigned int>(row["Score"].asUnsignedInteger()), m_format);
+      entry.score = FormatLeaderboardScore(static_cast<int>(row["Score"].asInteger()), m_format);
       // Sent as a unix timestamp. Shown raw it is a meaningless ten digit
       // number, so it is turned into whatever date format the player has set.
       entry.submitted = static_cast<std::time_t>(row["DateSubmitted"].asInteger());
@@ -129,8 +141,8 @@ public:
         LeaderboardEntry entry;
         entry.rank = rank;
         entry.username = m_username;
-        entry.score = FormatLeaderboardScore(
-            static_cast<unsigned int>(playerEntry["Score"].asUnsignedInteger()), m_format);
+        entry.score =
+            FormatLeaderboardScore(static_cast<int>(playerEntry["Score"].asInteger()), m_format);
         entry.submitted = static_cast<std::time_t>(playerEntry["DateSubmitted"].asInteger());
         entry.isPlayer = true;
 
@@ -142,6 +154,8 @@ public:
   }
 
   unsigned int GetLeaderboardId() const { return m_id; }
+  unsigned int GetAccountGeneration() const { return m_accountGeneration; }
+  const std::string& GetUsername() const { return m_username; }
   const std::vector<LeaderboardEntry>& GetEntries() const { return m_entries; }
 
 private:
@@ -149,6 +163,7 @@ private:
   const std::string m_format;
   const std::string m_username;
   const std::string m_token;
+  const unsigned int m_accountGeneration;
 
   std::vector<LeaderboardEntry> m_entries;
 };
@@ -165,6 +180,10 @@ CDialogGameLeaderboardEntries::~CDialogGameLeaderboardEntries() = default;
 void CDialogGameLeaderboardEntries::OnWindowLoaded()
 {
   CGUIDialog::OnWindowLoaded();
+
+  // The shared shell defaults to this list; Process() focuses it once it is ready.
+  if (m_defaultControl == CONTROL_ENTRY_LIST)
+    m_defaultControl = 0;
 
   m_viewControl.Reset();
   m_viewControl.SetParentWindow(GetID());
@@ -213,30 +232,55 @@ void CDialogGameLeaderboardEntries::OnInitWindow()
 
   CGUIDialog::OnInitWindow();
 
-  // Already looked at this session, so there is nothing to wait for
-  if (!leaderboard->entries.empty())
+  FetchEntries();
+}
+
+void CDialogGameLeaderboardEntries::FetchEntries()
+{
+  auto& runtime = CServiceBroker::GetGameServices().AchievementRuntime();
+
+  const LeaderboardState state = runtime.GetLeaderboardState();
+
+  const auto board = std::find_if(state.leaderboards.begin(), state.leaderboards.end(),
+                                  [this](const LeaderboardInfo& candidate)
+                                  { return candidate.id == m_leaderboardId; });
+  if (board == state.leaderboards.end())
     return;
 
-  // Nor if a previous session kept them and they are still fresh
-  std::vector<LeaderboardEntry> remembered;
-  if (LoadLeaderboardEntries(m_leaderboardId, remembered))
-  {
-    runtime.SetLeaderboardEntries(m_leaderboardId, remembered);
-    PopulateList();
+  // Already looked at this session, so there is nothing to wait for. An empty
+  // list is a real answer, a board nobody has entered, so the flag is what
+  // says whether the fetch happened.
+  if (board->entriesLoaded)
     return;
-  }
 
   const auto& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+
+  // Read either side of the credentials so the two describe one account. Taken
+  // afterwards, a sign-in between them would pair the last account's name with
+  // the new one's generation and the rows would be accepted as the new one's.
+  const unsigned int generation = runtime.GetAccountGeneration();
 
   const std::string username = gameSettings.GetRAUsername();
   const std::string token = gameSettings.GetRAToken();
   if (username.empty() || token.empty())
     return;
 
-  // "Loading standings…"
+  if (generation != runtime.GetAccountGeneration())
+    return;
+
+  // Nor if a previous session kept them and they are still fresh
+  std::vector<LeaderboardEntry> remembered;
+  if (LoadLeaderboardEntries(m_leaderboardId, username, remembered))
+  {
+    runtime.SetLeaderboardEntries(m_leaderboardId, generation, remembered);
+    PopulateList();
+    return;
+  }
+
+  // "Loading standings..."
   SetStatus(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35342));
 
-  AddJob(new CLeaderboardEntriesJob(m_leaderboardId, leaderboard->format, username, token));
+  AddJob(new CLeaderboardEntriesJob(m_leaderboardId, board->format, username, token, generation));
 }
 
 void CDialogGameLeaderboardEntries::OnDeinitWindow(int nextWindowID)
@@ -269,9 +313,11 @@ void CDialogGameLeaderboardEntries::OnJobComplete(unsigned int jobID, bool succe
     if (success)
     {
       CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardEntries(
-          entriesJob->GetLeaderboardId(), entriesJob->GetEntries());
+          entriesJob->GetLeaderboardId(), entriesJob->GetAccountGeneration(),
+          entriesJob->GetEntries());
 
-      SaveLeaderboardEntries(entriesJob->GetLeaderboardId(), entriesJob->GetEntries());
+      SaveLeaderboardEntries(entriesJob->GetLeaderboardId(), entriesJob->GetUsername(),
+                             entriesJob->GetEntries());
     }
     else
     {
@@ -287,11 +333,29 @@ void CDialogGameLeaderboardEntries::OnJobComplete(unsigned int jobID, bool succe
   CJobQueue::OnJobComplete(jobID, success, job);
 }
 
+void CDialogGameLeaderboardEntries::Process(unsigned int currentTime,
+                                            CDirtyRegionList& dirtyregions)
+{
+  CGUIDialog::Process(currentTime, dirtyregions);
+
+  const auto* list = GetControl(CONTROL_ENTRY_LIST);
+  const auto* focused = GetFocusedControl();
+  if ((!focused || !focused->CanFocus()) && list && list->CanFocus())
+    m_viewControl.SetFocused();
+}
+
 bool CDialogGameLeaderboardEntries::OnMessage(CGUIMessage& message)
 {
   if (message.GetMessage() == GUI_MSG_NOTIFY_ALL && message.GetParam1() == GUI_MSG_REFRESH_LIST)
   {
     PopulateList();
+
+    // Only when something dropped the page. A refresh that follows a fetch of
+    // our own must not ask again, or a failed one would be retried for as long
+    // as the dialog stays open.
+    if (message.GetParam2() == REFRESH_STANDINGS_INVALIDATED)
+      FetchEntries();
+
     return true;
   }
 
@@ -311,11 +375,13 @@ void CDialogGameLeaderboardEntries::PopulateList()
       CServiceBroker::GetGameServices().AchievementRuntime().GetLeaderboardState();
 
   std::vector<LeaderboardEntry> entries;
+  bool loaded = false;
   for (const LeaderboardInfo& leaderboard : state.leaderboards)
   {
     if (leaderboard.id == m_leaderboardId)
     {
       entries = leaderboard.entries;
+      loaded = leaderboard.entriesLoaded;
       break;
     }
   }
@@ -337,13 +403,13 @@ void CDialogGameLeaderboardEntries::PopulateList()
       if (!entry.username.empty())
         item->SetArt("icon", StringUtils::Format(USER_PIC_URL, CURL::Encode(entry.username)));
 
-      item->SetProperty("Rank", static_cast<int>(entry.rank));
-      item->SetProperty("RankLabel", StringUtils::Format("{}", entry.rank));
-      item->SetProperty("Score", entry.score);
+      item->SetProperty(PROPERTY_ITEM_RANK, static_cast<int>(entry.rank));
+      item->SetProperty(PROPERTY_ITEM_RANK_LABEL, StringUtils::Format("{}", entry.rank));
+      item->SetProperty(PROPERTY_ITEM_SCORE, entry.score);
 
       // "gold" / "silver" / "bronze" for the top three, so a skin can mark
       // them however suits it rather than being handed a drawn medal
-      item->SetProperty("Medal", RankMedal(entry.rank));
+      item->SetProperty(PROPERTY_ITEM_MEDAL, RankMedal(entry.rank));
 
       // Both forms: the age is what gets read at a glance, the date is there
       // for anyone who wants to know exactly when
@@ -351,12 +417,12 @@ void CDialogGameLeaderboardEntries::PopulateList()
       {
         CDateTime when;
         when.SetFromUTCDateTime(entry.submitted);
-        item->SetProperty("Date", when.GetAsLocalizedDate());
-        item->SetProperty("DateRelative", FormatRelativeDate(entry.submitted, now));
+        item->SetProperty(PROPERTY_ITEM_DATE, when.GetAsLocalizedDate());
+        item->SetProperty(PROPERTY_ITEM_DATE_RELATIVE, FormatRelativeDate(entry.submitted, now));
       }
 
       // So a skin can pick the player's own row out of the table
-      item->SetProperty("IsPlayer", entry.isPlayer ? "true" : "");
+      item->SetProperty(PROPERTY_ITEM_IS_PLAYER, entry.isPlayer ? "true" : "");
 
       m_items.Add(std::move(item));
     }
@@ -370,23 +436,26 @@ void CDialogGameLeaderboardEntries::PopulateList()
                                    [](const LeaderboardEntry& e) { return e.isPlayer; });
   if (player != entries.end())
   {
-    // "Your best"
-    SetProperty(PROPERTY_PLAYER_BEST,
-                StringUtils::Format("{}  ·  {}  ·  {}", strings.Get(35350),
-                                    StringUtils::Format(strings.Get(35340), player->rank),
-                                    player->score));
+    SetProperty(
+        PROPERTY_PLAYER_BEST,
+        StringUtils::Format("#{}  ·  {}", StringUtils::FormatNumber(player->rank), player->score));
   }
-  else if (!entries.empty())
+  else if (loaded)
   {
-    // "You have not set a time on this leaderboard yet"
-    SetProperty(PROPERTY_PLAYER_BEST, strings.Get(35351));
+    // "Not submitted"
+    SetProperty(PROPERTY_PLAYER_BEST, strings.Get(35376));
   }
   else
   {
     SetProperty(PROPERTY_PLAYER_BEST, "");
   }
 
-  // "The standings could not be loaded" only once there is nothing to show and
-  // nothing still coming
-  SetStatus(entries.empty() ? strings.Get(35343) : "");
+  if (!entries.empty())
+    SetStatus("");
+  else if (loaded)
+    // "Nobody has submitted an entry to this leaderboard yet"
+    SetStatus(strings.Get(35369));
+  else
+    // "The standings could not be loaded"
+    SetStatus(strings.Get(35343));
 }

@@ -157,6 +157,9 @@
 #include "games/dialogs/osd/DialogGameLeaderboardEntries.h"
 #include "games/dialogs/osd/DialogGameLeaderboards.h"
 #include "games/dialogs/osd/DialogGameAdvancedSettings.h"
+#include "games/dialogs/osd/DialogGameIndicators.h"
+#include "games/dialogs/osd/DialogGameLeaderboardEntries.h"
+#include "games/dialogs/osd/DialogGameLeaderboards.h"
 #include "games/dialogs/osd/DialogGameOSD.h"
 #include "games/dialogs/osd/DialogGameSaves.h"
 #include "games/dialogs/osd/DialogGameStretchMode.h"
@@ -366,12 +369,12 @@ void CGUIWindowManager::CreateWindows()
   Add(new GAME::CGUIAgentWindow);
   Add(new GAME::CDialogGameDiscManager);
   Add(new GAME::CDialogGameAchievements);
+  Add(new GAME::CDialogGameLeaderboards);
+  Add(new GAME::CDialogGameLeaderboardEntries);
   Add(new GAME::CDialogGameIndicators);
   Add(new GAME::CDialogGameCheats);
   Add(new GAME::CGUIWindowGameManual);
   Add(new GAME::CGUIDialogGameManuals);
-  Add(new GAME::CDialogGameLeaderboards);
-  Add(new GAME::CDialogGameLeaderboardEntries);
   Add(new RETRO::CGameWindowFullScreen);
 }
 

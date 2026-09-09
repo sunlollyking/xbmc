@@ -12,24 +12,28 @@
 #include "FileItemList.h"
 #include "ServiceBroker.h"
 #include "URL.h"
-#include "filesystem/CurlFile.h"
-#include "games/tags/GameInfoTag.h"
-#include "guilib/GUIComponent.h"
-#include "guilib/GUIWindowManager.h"
-#include "guilib/guiinfo/GUIInfoLabels.h"
-#include "utils/JSONVariantParser.h"
-#include "utils/log.h"
+#include "application/ApplicationComponents.h"
+#include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogKaiToast.h"
+#include "filesystem/CurlFile.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/dialogs/DialogGameDefines.h"
+#include "games/tags/GameInfoTag.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
+#include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
+#include "guilib/guiinfo/GUIInfoLabels.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
+#include "utils/JSONVariantParser.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
+#include "utils/log.h"
 #include "view/GUIViewControl.h"
 #include "view/ViewState.h"
 
@@ -223,13 +227,10 @@ void CDialogGameAchievements::OnWindowUnload()
 void CDialogGameAchievements::OnInitWindow()
 {
   const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
-  if (!gameSettings.GetAchievementsLoggedIn())
+  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
+  if (!gameSettings.GetAchievementsLoggedIn() || !appPlayer->IsPlayingGame())
   {
-    // "RetroAchievements", "Log in to RetroAchievements in Settings to use this feature."
-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, Localize(35264),
-                                          Localize(35285), TOAST_DISPLAY_TIME_MS, false,
-                                          TOAST_MESSAGE_TIME_MS);
-    Abort();
+    CGUIDialog::OnInitWindow();
     return;
   }
 
@@ -295,6 +296,20 @@ bool CDialogGameAchievements::OnMessage(CGUIMessage& message)
 {
   switch (message.GetMessage())
   {
+    case GUI_MSG_CLICKED:
+    {
+      const int control = message.GetSenderId();
+      if (control == CONTROL_CHEEVOS_ENCORE || control == CONTROL_CHEEVOS_CHALLENGE_INDICATOR)
+      {
+        const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+        settings->ToggleBool(control == CONTROL_CHEEVOS_ENCORE
+                                 ? "gamesachievements.encore"
+                                 : "gamesachievements.challengeindicator");
+        settings->Save();
+        return true;
+      }
+      break;
+    }
     case GUI_MSG_NOTIFY_ALL:
     {
       if (message.GetParam1() == GUI_MSG_REFRESH_LIST)
@@ -385,6 +400,8 @@ void CDialogGameAchievements::RefreshList()
     {
       item->SetProperty(ACHIEVEMENT_MEASURED, true);
       item->SetProperty(ACHIEVEMENT_MEASURED_PROGRESS, achievement.measuredProgress);
+      if (achievement.measuredPercent == 0.0f)
+        item->SetProperty(ACHIEVEMENT_MEASURED_ZERO, true);
     }
 
     // Set on every row: a list layout shares one progress control, which keeps
@@ -446,6 +463,8 @@ void CDialogGameAchievements::RefreshList()
     header += " (" + progress + ")";
 
   SetProperty("Header", header);
+  SetProperty("Achievements.GameTitle", state.gameTitle);
+  SetProperty("Achievements.Progress", progress);
 }
 
 AchievementState CDialogGameAchievements::CurrentState() const

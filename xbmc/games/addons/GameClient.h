@@ -281,35 +281,12 @@ public:
   bool RestoreState(const uint8_t* data, size_t size);
 
   /*!
-   * \brief How many bytes the client's achievement state needs right now
-   *
-   * Kept beside the emulator's state rather than inside it: a savestate whose
-   * emulator memory does not match what the client reports is refused before
-   * the client sees it, so appending would make a state written with
-   * achievements on unloadable with them off.
-   *
-   * \return The size, or 0 if the client has no achievement state to save
-   */
-  size_t GetAchievementStateSize() const;
-
-  bool SerializeAchievements(uint8_t* data, size_t size);
-
-  /*!
    * \brief Restore the client's achievement state after a savestate load
    *
    * Called for every load, including savestates that carry no achievement
    * data: the client has to know the machine state jumped either way.
    */
   bool DeserializeAchievements(const uint8_t* data, size_t size);
-
-  /*!
-   * \brief Tell the client which achievement modes are in force
-   *
-   * The frontend enforces what hardcore forbids; the client is told so its
-   * runtime agrees and so it can refuse what only it can do.
-   */
-  bool SetHardcoreEnabled(bool enabled);
-  bool SetEncoreModeEnabled(bool enabled);
 
   // Implementation of IHwFramebufferCallback
   void HardwareContextReset() override;

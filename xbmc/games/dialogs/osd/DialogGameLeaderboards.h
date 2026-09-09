@@ -20,7 +20,6 @@ namespace KODI
 {
 namespace GAME
 {
-
 /*!
  * \ingroup games
  *
@@ -43,6 +42,7 @@ namespace GAME
  *
  * On the window, \c Leaderboards.Status, set while loading or when the game
  * has none. A skin shows the list only when it is empty.
+ * \c Leaderboards.GameTitle is the RetroAchievements title.
  *
  * On each row:
  *
@@ -53,7 +53,7 @@ namespace GAME
  *  - \c TopUsername        Who holds first place, once the standings arrive
  *  - \c TopScore           Their score
  *  - \c TotalEntries       How many have set one
- *  - \c PlayerRank         Where the player stands, or the text for unranked
+ *  - \c PlayerStanding     Localized rank (e.g. #47), or the text for unranked
  *  - \c PlayerScore        Their score, if they have one
  *
  * Everything from \c TopUsername down arrives later than the row does: the
@@ -106,7 +106,7 @@ private:
   CGUIViewControl m_viewControl;
   CFileItemList m_items;
 
-  //! Guards the list against the job thread
+  //! Guards dialog state shared with the job thread
   CCriticalSection m_section;
 
   //! Where the player was, so reopening after looking at one leaderboard does

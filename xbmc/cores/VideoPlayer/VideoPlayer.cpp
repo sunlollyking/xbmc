@@ -2128,11 +2128,25 @@ void CVideoPlayer::HandlePlaySpeed()
         SetCaching(CACHESTATE_INIT);
     }
 
-    // if audio stream stalled, wait until demux queue filled 10%
-    if (m_pInputStream->IsRealtime() &&
-        (m_CurrentAudio.id < 0 || m_VideoPlayerAudio->GetLevel() > 10))
+    // if audio stream stalled, wait until demux queues have filled to 10% before
+    // resuming playback. Both audio AND video need to be checked here - checking
+    // audio alone means buffering can end while video hasn't recovered at all
+    if (m_pInputStream->IsRealtime())
     {
-      SetCaching(CACHESTATE_INIT);
+      const bool audioReady = m_CurrentAudio.id < 0 || m_VideoPlayerAudio->GetLevel() > 10;
+      const bool videoReady = m_CurrentVideo.id < 0 || m_processInfo->GetLevelVQ() > 10;
+
+      if (audioReady && (videoReady || m_cachingTimer.IsTimePast()))
+      {
+        if (!videoReady)
+        {
+          CLog::Log(LOGDEBUG,
+                    "Stream stalled, caching timeout reached before video recovered. "
+                    "Audio: {} - Video: {}",
+                    m_VideoPlayerAudio->GetLevel(), m_processInfo->GetLevelVQ());
+        }
+        SetCaching(CACHESTATE_INIT);
+      }
     }
   }
 
@@ -4230,6 +4244,14 @@ bool CVideoPlayer::OpenStream(CCurrentStream& current, int64_t demuxerId, int iS
       }
       break;
     case StreamType::SUBTITLE:
+      // A PGS palette carries no colorimetry of its own; it is authored to
+      // match the video stream it accompanies, per BD-ROM Part 3.
+      if (hint.codec == AV_CODEC_ID_HDMV_PGS_SUBTITLE)
+      {
+        hint.colorSpace = m_CurrentVideo.hint.colorSpace;
+        hint.colorPrimaries = m_CurrentVideo.hint.colorPrimaries;
+        hint.colorTransferCharacteristic = m_CurrentVideo.hint.colorTransferCharacteristic;
+      }
       res = OpenSubtitleStream(hint);
       break;
     case StreamType::TELETEXT:

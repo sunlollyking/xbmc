@@ -131,6 +131,15 @@ struct LeaderboardInfo
   //! Filled in only once the standings have been fetched for this one, which
   //! happens when the player opens it rather than when the game loads
   std::vector<LeaderboardEntry> entries;
+
+  //! Whether the standings have been fetched. An empty list means nothing on
+  //! its own: a board nobody has entered and one whose request failed both
+  //! arrive with none.
+  bool entriesLoaded{false};
+
+  //! Whether the summary above was fetched for the account now signed in. The
+  //! entry count is the game's and outlives a sign-out, so it cannot say this.
+  bool standingsLoaded{false};
 };
 
 /*!
@@ -175,14 +184,22 @@ struct LeaderboardTracker
 /*!
  * \brief The leaderboards of the loaded game
  */
+/*!
+ * \brief What a standings request answers with for one leaderboard
+ */
+struct LeaderboardSummary
+{
+  unsigned int totalEntries{0};
+  unsigned int playerRank{0};
+  std::string playerScore;
+  std::string topUsername;
+  std::string topScore;
+};
+
 struct LeaderboardState
 {
   std::string gameTitle;
   std::vector<LeaderboardInfo> leaderboards;
-
-  //! Usually empty, and rarely more than one at a time
-  std::vector<LeaderboardTracker> trackers;
-
   bool loaded{false};
 };
 
@@ -276,6 +293,11 @@ public:
   /*!
    * \brief Add or remove an achievement from the list being attempted
    *
+   * Indicators are published to the runtime rather than raised as
+   * notifications: they update many times a second during play, which belongs
+   * on screen where the skin can show and hide it, not in the notification
+   * queue.
+   *
    * \param challenge The achievement
    * \param active True while the attempt is live, false once it has ended
    */
@@ -288,12 +310,24 @@ public:
 
   /*!
    * \brief Show or hide how far along a measured achievement is
-   *
-   * Published to the runtime rather than raised as a notification, for the same
-   * reason as the challenge indicator: this updates many times a second while
-   * the player works towards one.
    */
   void SetProgressIndicator(const AchievementProgressIndicator& indicator, bool active);
+
+  /*!
+   * \brief The attempt worth a corner indicator, if any
+   *
+   * The first the skin has something to draw for. More than one at a time is
+   * rare and a corner has room for one, and the add-on may send an attempt
+   * with no title, which would show as an empty corner if it were chosen.
+   */
+  AchievementChallenge GetShownChallenge() const;
+
+  /*!
+   * \brief The leaderboard attempt worth a corner indicator, if any
+   *
+   * \sa GetShownChallenge()
+   */
+  LeaderboardTracker GetShownLeaderboardTracker() const;
 
   /*!
    * \brief The measured achievement worth showing, if any
@@ -305,10 +339,6 @@ public:
 
   /*!
    * \brief Show or hide a leaderboard attempt's live value
-   *
-   * Published to the runtime rather than raised as a notification: an attempt
-   * updates many times a second, which belongs in an on-screen indicator the
-   * skin can show and hide.
    */
   void SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active);
 
@@ -332,7 +362,28 @@ public:
    *
    * \return False if that leaderboard is not in the loaded game
    */
+  /*!
+   * \brief Which account the runtime's standings belong to
+   *
+   * Taken when a request is made and handed back when it answers. Signing out
+   * leaves the account's name set, so the name cannot say the account moved,
+   * and a number lets the check happen inside the write it guards.
+   */
+  unsigned int GetAccountGeneration() const;
+
+  /*!
+   * \brief Store the summary fetched for one leaderboard
+   *
+   * \param accountGeneration What GetAccountGeneration() said when it was asked
+   *
+   * \return False if the game or the account moved on while it was in flight
+   */
+  bool SetLeaderboardSummary(unsigned int leaderboardId,
+                             unsigned int accountGeneration,
+                             const LeaderboardSummary& summary);
+
   bool SetLeaderboardEntries(unsigned int leaderboardId,
+                             unsigned int accountGeneration,
                              const std::vector<LeaderboardEntry>& entries);
 
   /*!
@@ -371,10 +422,27 @@ public:
    */
   void SetIndicatorCallback(std::function<void()> callback);
 
-private:
-  //! Tell whoever draws the indicators that one of them moved
+  /*!
+   * \brief Forget what the standings said about whoever was signed in
+   *
+   * A leaderboard's definition belongs to the game and stays. Where the player
+   * stands, and which row in a fetched page is theirs, belong to the account,
+   * so signing in as somebody else has to ask again rather than show them what
+   * the last account saw.
+   */
+  void ForgetPlayerLeaderboardData();
+
+  /*!
+   * \brief Tell whoever draws the indicators to look again
+   *
+   * Every indicator change already reports through here. A setting that
+   * decides whether one is drawn is such a change, so flipping it back on
+   * while an attempt is live brings the indicator back without waiting for
+   * the add-on to send anything.
+   */
   void NotifyIndicatorsChanged();
 
+private:
   mutable std::mutex m_mutex;
 
   //! Whatever draws the on-screen indicators, told whenever one changes. Held
@@ -383,7 +451,16 @@ private:
   std::function<void()> m_indicatorCallback;
   AchievementState m_state;
   LeaderboardState m_leaderboards;
+
+  //! Owned by the add-on's event stream rather than by the fetched list, so
+  //! that publishing one cannot drop an attempt already on screen. Usually
+  //! empty, and rarely more than one at a time.
+  std::vector<LeaderboardTracker> m_trackers;
   unsigned int m_selectedLeaderboard{0};
+
+  //! Moved on whenever the signed-in account does, so an answer asked for by
+  //! the last one is recognised and dropped
+  unsigned int m_accountGeneration{0};
 };
 
 } // namespace KODI::GAME

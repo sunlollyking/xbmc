@@ -146,7 +146,6 @@ bool CGUIWindow::LoadXML(const std::string &strPath, const std::string &strLower
     {
       CLog::Log(LOGERROR, "Unable to load window XML: {}. Line {}\n{}", strPath, xmlDoc.ErrorRow(),
                 xmlDoc.ErrorDesc());
-      SetID(WINDOW_INVALID);
       return false;
     }
 
@@ -348,11 +347,15 @@ void CGUIWindow::DoProcess(unsigned int currentTime, CDirtyRegionList &dirtyregi
   CGUIControlGroup::DoProcess(currentTime, dirtyregions);
   CServiceBroker::GetWinSystem()->GetGfxContext().RemoveTransform();
 
-  // check if currently focused control can have it
-  // and fallback to default control if not
-  CGUIControl* focusedControl = GetFocusedControl();
-  if (focusedControl && !focusedControl->CanFocus() && focusedControl->GetID() != m_defaultControl)
-    SET_CONTROL_FOCUS(m_defaultControl, 0);
+  if (m_active)
+  {
+    // check if currently focused control can have it
+    // and fallback to default control if not
+    CGUIControl* focusedControl = GetFocusedControl();
+    if (focusedControl && !focusedControl->CanFocus() &&
+        focusedControl->GetID() != m_defaultControl)
+      SET_CONTROL_FOCUS(m_defaultControl, 0);
+  }
 }
 
 void CGUIWindow::DoRender()
