@@ -51,6 +51,17 @@ KODI_CONSTRUCT(XBMCAddon::xbmcvfs, Stat)
     SWIG_fail;
 }
 
+// Python hands __exit__ the exception it is leaving with -- three arguments,
+// None when there is none -- and a wrapper generated straight from the C++
+// signature accepts none, so every "with xbmcvfs.File(...)" raised on the way
+// out. The arguments are taken and ignored; closing is the whole contract.
+%extend XBMCAddon::xbmcvfs::File {
+  void __exit__(PyObject* type = Py_None, PyObject* value = Py_None, PyObject* traceback = Py_None)
+  {
+    $self->close();
+  }
+}
+
 %include "interfaces/legacy/File.h"
 
 %rename ("st_atime") XBMCAddon::xbmcvfs::Stat::atime;

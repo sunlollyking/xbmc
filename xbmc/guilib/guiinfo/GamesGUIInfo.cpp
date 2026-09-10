@@ -187,6 +187,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case LISTITEM_REGION:
     case LISTITEM_RELEASE_COUNT:
     case LISTITEM_ACHIEVEMENTS_TOTAL:
+    case LISTITEM_ACHIEVEMENTS_GAME_ID:
     case LISTITEM_ACHIEVEMENTS_EARNED:
     case LISTITEM_ACHIEVEMENTS_PERCENT:
     case LISTITEM_ACHIEVEMENTS_PROGRESS:
@@ -345,6 +346,12 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
             return true;
           }
           break;
+        // The service's own id for the game. A count of achievements is only
+        // known once one has been asked for; the id says the game can be asked
+        // about at all, which is what decides whether the list is offered.
+        case LISTITEM_ACHIEVEMENTS_GAME_ID:
+          value = tag->GetUniqueID("retroachievements");
+          return !value.empty();
         case LISTITEM_ACHIEVEMENTS_EARNED:
           if (tag->HasAchievements())
           {
