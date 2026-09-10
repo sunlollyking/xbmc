@@ -215,9 +215,13 @@ namespace swig {
         int kr = SWIG_AsVal_std_string(k, &key);
         if (!SWIG_IsOK(kr)) { delete d; return SWIG_ERROR; }
         try {
-          /* Values are StringOrInt: the Groovy generator keyed on that typedef
-             name to coerce numbers with str(). The typedef is a no-op in C++,
-             so stock SWIG cannot see it and an int value would be rejected.
+          /* Add-ons build these dictionaries by comprehension, so a key whose
+             value is missing arrives as None. Skipping it keeps the keys that
+             do have values; refusing would lose the whole dictionary. */
+          if (v == Py_None)
+            continue;
+          /* StringOrInt is a typedef for String, so it is a no-op in C++ and
+             SWIG cannot see that a number is meant to be accepted here.
              Scrapers pass ints routinely, e.g. setInfo("video", {"year": 2020}). */
           if (PyLong_Check(v) || PyFloat_Check(v)) {
             SwigVar_PyObject sv = PyObject_Str(v);
