@@ -286,8 +286,11 @@ bool CRenderBufferPoolFBO::CreateContext(const HwContextProperties& properties)
 
 bool CRenderBufferPoolFBO::BeginClientFrame()
 {
+  // Nothing to bind yet, which is not a failure: a client negotiates hardware
+  // rendering before it opens the stream that creates the context, and builds
+  // resources in between.
   if (m_eglContext == EGL_NO_CONTEXT)
-    return false;
+    return true;
 
   const std::thread::id thisThread = std::this_thread::get_id();
 
