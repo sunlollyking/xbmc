@@ -238,9 +238,11 @@ void CDialogGameAchievements::OnWindowUnload()
 
 void CDialogGameAchievements::OnInitWindow()
 {
+  // Progress is the signed-in person's own, so there is nothing to show
+  // without a sign-in. Whether a game is playing is not a condition: the
+  // dialog is opened from the library as well, where none is.
   const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
-  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-  if (!gameSettings.GetAchievementsLoggedIn() || !appPlayer->IsPlayingGame())
+  if (!gameSettings.GetAchievementsLoggedIn())
   {
     CGUIDialog::OnInitWindow();
     return;
@@ -505,11 +507,22 @@ AchievementState CDialogGameAchievements::CurrentState() const
 
 bool CDialogGameAchievements::FetchForLibraryGame()
 {
-  // The game whose panel the list was opened over
-  CGUIWindow* const parent = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog());
-  const CFileItemPtr item = parent != nullptr ? parent->GetCurrentListItem() : CFileItemPtr();
-  if (!item || !item->HasGameInfoTag())
+  // The game whose panel the list was opened over. This dialog is itself the
+  // topmost one by the time it is initialised, so the panel underneath has to
+  // be named rather than asked for as the active window.
+  CGUIWindowManager& windowManager = CServiceBroker::GetGUI()->GetWindowManager();
+  CFileItemPtr item;
+  for (int windowId : {WINDOW_DIALOG_GAME_INFO, windowManager.GetActiveWindowOrDialog()})
+  {
+    CGUIWindow* const window = windowManager.GetWindow(windowId);
+    if (window == nullptr)
+      continue;
+    item = window->GetCurrentListItem();
+    if (item && item->HasGameInfoTag())
+      break;
+    item.reset();
+  }
+  if (!item)
     return false;
 
   // Every game the catalogues recognised carries the service's own id for it,
