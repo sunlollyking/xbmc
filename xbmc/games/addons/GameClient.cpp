@@ -313,8 +313,14 @@ bool CGameClient::OpenFile(const CFileItem& file,
   {
     {
       CClientFrameScope hwScope(Streams());
-      LogError(error = m_ifc.game->toAddon->LoadGame(m_ifc.game, path.c_str()), "LoadGame()");
+      if (!hwScope.IsBound())
+      {
+        CLog::Log(LOGERROR, "GameClient: Failed to make the client's context current");
+        error = GAME_ERROR_FAILED;
       }
+      else
+        LogError(error = m_ifc.game->toAddon->LoadGame(m_ifc.game, path.c_str()), "LoadGame()");
+    }
   }
   catch (...)
   {
@@ -368,8 +374,14 @@ bool CGameClient::OpenStandalone(RETRO::IStreamManager& streamManager, IGameInpu
   {
     {
       CClientFrameScope hwScope(Streams());
-      LogError(error = m_ifc.game->toAddon->LoadStandalone(m_ifc.game), "LoadStandalone()");
+      if (!hwScope.IsBound())
+      {
+        CLog::Log(LOGERROR, "GameClient: Failed to make the client's context current");
+        error = GAME_ERROR_FAILED;
       }
+      else
+        LogError(error = m_ifc.game->toAddon->LoadStandalone(m_ifc.game), "LoadStandalone()");
+    }
   }
   catch (...)
   {
@@ -444,8 +456,11 @@ bool CGameClient::LoadGameInfo()
     // A hardware-rendering client builds its GPU resources off the back of
     // this call, once it has geometry to size them by, so it needs its context
     CClientFrameScope hwScope(Streams());
-    bSuccess =
-        LogError(m_ifc.game->toAddon->GetGameTiming(m_ifc.game, &timingInfo), "GetGameTiming()");
+    if (!hwScope.IsBound())
+      CLog::Log(LOGERROR, "GameClient: Failed to make the client's context current");
+    else
+      bSuccess =
+          LogError(m_ifc.game->toAddon->GetGameTiming(m_ifc.game, &timingInfo), "GetGameTiming()");
   }
   catch (...)
   {
@@ -593,8 +608,11 @@ void CGameClient::Reset()
     try
     {
       {
-      CClientFrameScope hwScope(Streams());
-      LogError(m_ifc.game->toAddon->Reset(m_ifc.game), "Reset()");
+        CClientFrameScope hwScope(Streams());
+        if (!hwScope.IsBound())
+          CLog::Log(LOGERROR, "GameClient: Failed to make the client's context current");
+        else
+          LogError(m_ifc.game->toAddon->Reset(m_ifc.game), "Reset()");
       }
     }
     catch (...)
@@ -641,7 +659,10 @@ void CGameClient::CloseFile()
       // client's cleanup and for whatever unloading the game does after it --
       // but a client told only afterwards has already dismantled the state its
       // context_destroy then walks, and YabaSanshiro segfaults exactly there.
-      Streams().DestroyHwContext();
+      if (hwScope.IsBound())
+        Streams().DestroyHwContext();
+      else
+        CLog::Log(LOGERROR, "GameClient: No context to tell the client is going");
 
       LogError(m_ifc.game->toAddon->UnloadGame(m_ifc.game), "UnloadGame()");
       }

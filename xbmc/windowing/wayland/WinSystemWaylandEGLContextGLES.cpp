@@ -11,7 +11,9 @@
 #include "OptionalsReg.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererDMAOpenGLES.h"
+#if HAS_GLES == 3
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererFBO.h"
+#endif
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererOpenGLES.h"
 #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.h"
 #include "cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIMEGLES.h"
@@ -50,8 +52,11 @@ bool CWinSystemWaylandEGLContextGLES::InitWindowSystem()
 
   RETRO::CRPProcessInfo::RegisterRendererFactory(new RETRO::CRendererFactoryDMAOpenGLES);
   RETRO::CRPProcessInfo::RegisterRendererFactory(new RETRO::CRendererFactoryOpenGLES);
-  // Registered last, see CRendererFactoryFBO
+#if HAS_GLES == 3
+  // Registered last, see CRendererFactoryFBO. Absent under GLES 2.0, which has
+  // neither glBlitFramebuffer nor fence syncs.
   RETRO::CRPProcessInfo::RegisterRendererFactory(new RETRO::CRendererFactoryFBO);
+#endif
 
   bool general, deepColor;
   m_vaapiProxy.reset(WAYLAND::VaapiProxyCreate());

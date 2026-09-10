@@ -68,6 +68,11 @@ bool CRetroPlayerRendering::OpenStream(const StreamProperties& properties)
   if (!Configure(m_hwProperties->maxWidth, m_hwProperties->maxHeight))
   {
     CLog::Log(LOGERROR, "RetroPlayer[RENDERING]: Failed to configure rendering stream");
+
+    // The context was created above, and CloseStream() will not run for a
+    // stream that never opened, so it is released here
+    m_renderManager.DestroyContext();
+    m_hwProperties.reset();
     m_bOpen = false;
     return false;
   }

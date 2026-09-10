@@ -37,7 +37,18 @@ endif()
 # from DMA and no particular windowing system. The renderer itself is common to
 # desktop GL and GLES: it uses no vertex array objects, and reaches shaders and
 # matrices through the render context rather than either API directly.
-if((TARGET ${APP_NAME_LC}::OpenGl OR TARGET ${APP_NAME_LC}::OpenGLES) AND TARGET ${APP_NAME_LC}::EGL)
+# GLES 2.0 has neither glBlitFramebuffer nor fence syncs, both of which the
+# copy path needs, so this is built for desktop GL and for GLES 3.0 upwards
+set(FBO_GL_SUPPORTED FALSE)
+if(TARGET ${APP_NAME_LC}::OpenGl)
+  set(FBO_GL_SUPPORTED TRUE)
+elseif(TARGET ${APP_NAME_LC}::OpenGLES)
+  get_target_property(FBO_GLES_DEFS ${APP_NAME_LC}::OpenGLES INTERFACE_COMPILE_DEFINITIONS)
+  if(FBO_GLES_DEFS MATCHES "HAS_GLES=3")
+    set(FBO_GL_SUPPORTED TRUE)
+  endif()
+endif()
+if(FBO_GL_SUPPORTED AND TARGET ${APP_NAME_LC}::EGL)
   list(APPEND SOURCES RPRendererFBO.cpp)
   list(APPEND HEADERS RPRendererFBO.h)
 endif()

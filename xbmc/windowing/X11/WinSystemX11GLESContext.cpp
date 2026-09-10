@@ -15,7 +15,9 @@
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationSkinHandling.h"
 #include "cores/RetroPlayer/process/X11/RPProcessInfoX11.h"
+#if HAS_GLES == 3
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererFBO.h"
+#endif
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererOpenGLES.h"
 #include "cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.h"
 #include "cores/VideoPlayer/Process/X11/ProcessInfoX11.h"
@@ -297,9 +299,12 @@ bool CWinSystemX11GLESContext::RefreshGLContext(bool force)
   VIDEOPLAYER::CProcessInfoX11::Register();
   RETRO::CRPProcessInfoX11::Register();
   RETRO::CRPProcessInfoX11::RegisterRendererFactory(new RETRO::CRendererFactoryOpenGLES);
+#if HAS_GLES == 3
   // Registered after the others: renderer selection takes the first factory
   // that accepts the stream, and only a hardware-rendered one reaches this.
+  // Absent under GLES 2.0, which has neither glBlitFramebuffer nor fence syncs.
   RETRO::CRPProcessInfoX11::RegisterRendererFactory(new RETRO::CRendererFactoryFBO);
+#endif
   CDVDFactoryCodec::ClearHWAccels();
   VIDEOPLAYER::CRendererFactory::ClearRenderer();
   CLinuxRendererGLES::Register();

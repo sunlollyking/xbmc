@@ -43,12 +43,11 @@ class CRenderContext;
  * draws the texture that framebuffer is backed by, so the frame never leaves
  * the GPU.
  *
- * \note Desktop OpenGL only. A client that renders with OpenGL ES is not
- *       supported: this pool is built only where both desktop GL and EGL are
- *       available, and a build without it has no pool that reports
- *       SupportsHardwareRendering(), so such clients are told during
- *       negotiation that hardware rendering is unavailable and can fall back to
- *       software rather than failing later.
+ * \note Desktop OpenGL and OpenGL ES 3.0 or newer. The copy path needs
+ *       glBlitFramebuffer and fence syncs, neither of which GLES 2.0 has, so a
+ *       GLES 2.0 build has no pool that reports SupportsHardwareRendering() and
+ *       such clients are told during negotiation that hardware rendering is
+ *       unavailable, and can fall back to software rather than failing later.
  */
 class CRenderBufferPoolFBO : public CBaseRenderBufferPool
 {
@@ -63,7 +62,7 @@ public:
   IRenderBuffer* CreateRenderBuffer(void* header = nullptr) override;
   bool ConfigureInternal() override;
 
-  bool SupportsHardwareRendering() const override { return true; }
+  bool SupportsHardwareRendering() const override;
   bool CreateContext(const HwContextProperties& properties) override;
   bool BeginClientFrame() override;
   void EndClientFrame() override;

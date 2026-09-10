@@ -39,6 +39,12 @@ void CGameClientStreams::Initialize(RETRO::IStreamManager& streamManager)
 void CGameClientStreams::Deinitialize()
 {
   m_streamManager = nullptr;
+
+  // Negotiation is per-game: left standing, the next game inherits this one's
+  // context and any refusal, and is asked about or reported on the wrong terms
+  m_hwProperties = {};
+  m_hwRefusedWanted.clear();
+  m_hwRefusedAvailable.clear();
 }
 
 IGameClientStream* CGameClientStreams::OpenStream(const game_stream_properties& properties)
@@ -197,8 +203,12 @@ bool CGameClientStreams::EnableHardwareRendering(const game_hw_rendering_propert
     }
   }
 
-  // Store hardware rendering properties
+  // Store hardware rendering properties, and drop any earlier refusal: this
+  // request was granted, so the reason a previous one was turned down no longer
+  // describes the client
   m_hwProperties = properties;
+  m_hwRefusedWanted.clear();
+  m_hwRefusedAvailable.clear();
 
   return true;
 }
