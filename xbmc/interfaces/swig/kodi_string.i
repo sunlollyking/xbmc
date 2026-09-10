@@ -18,10 +18,17 @@
    SWIG_AsVal_std_string is stock, supplied by std_string.i. */
 %typemap(in, fragment=SWIG_AsVal_frag(std::string)) const std::string & (std::string swig_temp)
 {
-  /* The shipped bindings coerce None to the empty string (PyXBMCGetUnicodeString
-     returns XBMCAddon::emptyString for Py_None). Scrapers rely on it: they pass
-     dict.get(...) straight into setters, and a missing key is None. */
-  if ($input != Py_None)
+  /* Bytes are taken verbatim, as PyXBMCGetUnicodeString took them. Add-ons
+     store binary through the string API -- simpleplugin3 keeps its window
+     storage as pickle protocol 0 -- and decoding would corrupt it. */
+  if (PyBytes_Check($input))
+  {
+    swig_temp.assign(PyBytes_AS_STRING($input), PyBytes_GET_SIZE($input));
+  }
+  /* None is the empty string, as PyXBMCGetUnicodeString returned emptyString
+     for it. Scrapers rely on it: they pass dict.get(...) straight into setters,
+     and a missing key is None. */
+  else if ($input != Py_None)
   {
     int swig_res = SWIG_AsVal_std_string($input, &swig_temp);
     if (!SWIG_IsOK(swig_res))
