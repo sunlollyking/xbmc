@@ -82,11 +82,18 @@ public:
 
     std::string response;
     if (!curl.Get(url, response))
+    {
+      CLog::Log(LOGERROR, "CDialogGameAchievements: no answer for game {}", m_gameId);
       return false;
+    }
 
     CVariant data;
     if (!CJSONVariantParser::Parse(response, data) || !data.isObject())
+    {
+      CLog::Log(LOGERROR, "CDialogGameAchievements: game {} answered {} bytes that are not an object",
+                m_gameId, response.size());
       return false;
+    }
 
     m_state.gameTitle = data["Title"].asString();
     m_state.gameId = static_cast<unsigned int>(data["ID"].asUnsignedInteger());
@@ -132,6 +139,8 @@ public:
     }
 
     m_state.loaded = true;
+    CLog::Log(LOGINFO, "CDialogGameAchievements: game {} has {} achievements, {} earned",
+              m_gameId, m_state.totalAchievements, m_state.unlockedAchievements);
     return true;
   }
 
@@ -322,6 +331,17 @@ bool CDialogGameAchievements::OnMessage(CGUIMessage& message)
     {
       if (message.GetParam1() == GUI_MSG_REFRESH_LIST)
       {
+        // The service has answered about a game it knows but has no set for.
+        // An empty list says nothing; the toast the runtime path uses says it.
+        if (m_fetched && m_fetched->achievements.empty())
+        {
+          // "RetroAchievements", "This game doesn't support RetroAchievements"
+          CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35264),
+                                                Localize(35286), TOAST_DISPLAY_TIME_MS, false,
+                                                TOAST_MESSAGE_TIME_MS);
+          Close();
+          return true;
+        }
         // A targeted thread message reaches this window whether or not it is
         // open, and every unlock sends one. Rebuilding would sort the whole
         // set and construct a CFileItem per achievement on the GUI thread
@@ -497,6 +517,7 @@ bool CDialogGameAchievements::FetchForLibraryGame()
   const std::string gameId = item->GetGameInfoTag()->GetUniqueID("retroachievements");
   if (gameId.empty())
     return false;
+  CLog::Log(LOGINFO, "CDialogGameAchievements: asking about game {}", gameId);
 
   const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
   const std::string username = gameSettings.GetRAUsername();
@@ -514,9 +535,11 @@ void CDialogGameAchievements::OnJobComplete(unsigned int jobID, bool success, CJ
   {
     const auto* fetchJob = static_cast<CLibraryAchievementsJob*>(job);
 
-    if (success && !fetchJob->GetState().achievements.empty())
+    CLog::Log(LOGINFO, "CDialogGameAchievements: answer for game arrived, success={}, {} achievements",
+              success, fetchJob->GetState().achievements.size());
+    if (success)
       m_fetched = fetchJob->GetState();
-    else if (!success)
+    else
       CLog::Log(LOGERROR, "CDialogGameAchievements: could not fetch achievements from the service");
 
     // Rebuilding a list control is only safe on the GUI thread
