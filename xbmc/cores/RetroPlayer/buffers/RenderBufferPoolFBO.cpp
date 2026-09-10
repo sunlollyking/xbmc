@@ -459,6 +459,13 @@ IRenderBuffer* CRenderBufferPoolFBO::CaptureClientFrame(IRenderBuffer* clientBuf
 
   const uintptr_t dstFramebuffer = target->GetCurrentFramebuffer();
 
+  // Kodi may itself be rendering through a framebuffer, so what was bound is
+  // put back rather than assuming the default was current
+  GLint prevRead = 0;
+  GLint prevDraw = 0;
+  glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevRead);
+  glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevDraw);
+
   glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(srcFramebuffer));
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, static_cast<GLuint>(dstFramebuffer));
 
@@ -468,11 +475,8 @@ IRenderBuffer* CRenderBufferPoolFBO::CaptureClientFrame(IRenderBuffer* clientBuf
                     static_cast<GLint>(width), static_cast<GLint>(height), GL_COLOR_BUFFER_BIT,
                     GL_NEAREST);
 
-  // Back to the default framebuffer rather than to whatever was bound on
-  // entry: this runs inside the client's frame, so what was bound is the
-  // client's own FBO, and leaving that bound sends Kodi's drawing into it.
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(prevRead));
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, static_cast<GLuint>(prevDraw));
 
   m_captureIndex = (m_captureIndex + 1) % 2;
 
