@@ -173,7 +173,7 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         items.Add(playlists);
       }
       // Inside a platform these all belong to that machine, and none of them
-      // has art of its own. Lend them the machine's, so a skin's art panel
+      // has art of its own. Lend the list the machine's, so a skin's art panel
       // shows what is being browsed rather than a folder with no picture.
       if (dbUrl.HasPlatform())
       {
@@ -182,23 +182,17 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         if (dbUrl.GetOption("platformid", platformId) &&
             db.GetArtForItem(static_cast<int>(platformId.asInteger()), MediaTypeGamePlatform, art))
         {
-          for (const auto& item : items)
+          // On the list and not on the rows: a row carries the glyph that says
+          // where it leads and nothing else, because a skin handed the
+          // machine's art as well picks whichever type it prefers and draws the
+          // same picture on every row.
+          for (const auto& [type, url] : art)
           {
-            // Merged rather than assigned, and not over what the node draws
-            // itself with. The machine's art is the backdrop here; the glyph
-            // says where the row leads, and a skin reading ListItem.Icon
-            // resolves that through the thumb.
-            for (const auto& [type, url] : art)
-            {
-              // Only the backdrop, and only that. Lending every type hands a
-              // skin the machine's photo or its controller to draw as the row's
-              // own picture, and then every way into the platform looks the
-              // same as every other. Types arrive numbered too -- fanart1,
-              // fanart2 -- so the digits come off before the comparison.
-              const std::string kind = type.substr(0, type.find_last_not_of("0123456789") + 1);
-              if (kind == "fanart")
-                item->SetArt(type, url);
-            }
+            // Only the backdrop, and only that. Types arrive numbered too --
+            // fanart1, fanart2 -- so the digits come off before the comparison.
+            const std::string kind = type.substr(0, type.find_last_not_of("0123456789") + 1);
+            if (kind == "fanart")
+              items.SetArt(type, url);
           }
         }
       }
