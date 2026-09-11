@@ -23,6 +23,7 @@
 #include "filesystem/VideoDatabaseDirectory/DirectoryNode.h"
 #include "filesystem/VideoDatabaseDirectory/QueryParams.h"
 #include "games/GameUtils.h"
+#include "games/database/GameDatabase.h"
 #include "games/tags/GameInfoTag.h"
 #include "games/tags/GameInfoTagLoader.h"
 #include "music/Album.h"
@@ -2133,6 +2134,29 @@ bool CFileItem::LoadGameTag()
 
 bool CFileItem::LoadDetails()
 {
+  // A raw dump is told apart from a video by what the library knows, not by
+  // its extension: a Mega Drive ROM is .bin, which is also a VideoCD track,
+  // and classified by extension alone it is handed to the video player. A
+  // file the game library has a game for is that game. Anything the library
+  // does not know falls through, so a real VideoCD is unaffected.
+  if (!HasGameInfoTag() && CGameUtils::HasGameExtension(GetDynPath()))
+  {
+    CGameDatabase db;
+    if (db.Open())
+    {
+      const int idGame = db.GetGameIdByFile(GetDynPath());
+      // Filled in first and only kept once it is known to be a game: asking
+      // the item for its tag would create one, and an empty game tag on a
+      // video is exactly the misclassification this is here to prevent
+      CGameInfoTag tag;
+      if (idGame > 0 && db.GetGameInfo(idGame, tag))
+      {
+        *GetGameInfoTag() = tag;
+        return true;
+      }
+    }
+  }
+
   if (VIDEO::IsVideoDb(*this))
   {
     if (HasVideoInfoTag())
