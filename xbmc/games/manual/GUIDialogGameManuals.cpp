@@ -128,6 +128,16 @@ void CGUIDialogGameManuals::OnInitWindow()
   SetProperty(PROPERTY_GAME, game);
 
   m_results.Clear();
+
+  // A manual the library already knows about needs no provider: fetching it is
+  // the only thing left to do, and offering a search first would be asking a
+  // question that has already been answered.
+  if (!m_knownManual.empty())
+  {
+    Download(CFileItem(m_knownManual, false));
+    return;
+  }
+
   FillProviders();
 
   if (!m_provider.empty())
@@ -146,6 +156,7 @@ void CGUIDialogGameManuals::OnDeinitWindow(int nextWindowID)
   }
 
   m_gamePath.clear();
+  m_knownManual.clear();
   m_downloadTarget.clear();
 
   // Only ours: ClearProperties() would take the window's own "xmlfile" with
@@ -426,6 +437,8 @@ bool CGUIDialogGameManuals::OnMessage(CGUIMessage& message)
       const std::string path = message.GetStringParam();
       if (!path.empty())
         m_gamePath = path;
+
+      m_knownManual = message.GetStringParam(1);
 
       break;
     }

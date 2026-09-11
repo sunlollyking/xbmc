@@ -97,6 +97,10 @@ private:
 
   std::string m_gamePath;
 
+  //! A manual already known about, so that no provider has to be searched.
+  //! The library stores one against a game when a catalogue reported it.
+  std::string m_knownManual;
+
   //! The provider being asked, and the one to ask again next time
   std::string m_provider;
 

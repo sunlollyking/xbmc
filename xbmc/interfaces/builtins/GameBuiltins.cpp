@@ -54,12 +54,18 @@ std::string GetGameName(const CFileItem& item)
   return item.GetLabel();
 }
 
-/*! \brief Show the manual for the game being played.
- *  \param params (ignored)
+/*! \brief Show the manual for a game.
+ *  \param params[0] (optional) the game, defaulting to the one being played
+ *  \param params[1] (optional) a manual already known about, to be fetched
+ *                   rather than searched for
  */
 int ShowGameManual(const std::vector<std::string>& params)
 {
-  const CFileItem& item = g_application.CurrentFileItem();
+  // Named by the caller when the manual is asked for from the library, where
+  // nothing is playing to ask about.
+  const bool named = !params.empty() && !params[0].empty();
+  const CFileItem item = named ? CFileItem(params[0], false) : g_application.CurrentFileItem();
+  const std::string knownManual = params.size() > 1 ? params[1] : std::string();
   const std::string gameName = GetGameName(item);
 
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
@@ -77,7 +83,7 @@ int ShowGameManual(const std::vector<std::string>& params)
     if (!gamePath.empty())
     {
       CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_DIALOG_GAME_MANUALS,
-                                                                 gamePath);
+                                                                 {gamePath, knownManual});
       return 0;
     }
 

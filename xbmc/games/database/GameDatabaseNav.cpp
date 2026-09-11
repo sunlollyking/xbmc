@@ -364,7 +364,12 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
         item->SetProperty("matchedby", matched);
 
       if (!game.GetManual().empty())
+      {
         item->SetProperty("hasmanual", true);
+        // The catalogues report a manual as somewhere to fetch it from, so the
+        // address is carried through for whoever opens it
+        item->SetProperty("manual", game.GetManual());
+      }
       if (game.IsFavourite())
         item->SetProperty("favourite", true);
       if (game.IsCompleted())
