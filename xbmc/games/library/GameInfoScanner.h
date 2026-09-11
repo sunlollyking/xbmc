@@ -90,6 +90,8 @@ public:
     std::vector<std::string> files; // every file of the release, path first
     std::string folder;
     bool isFolder{false};
+    //! The folder names the game, because it holds only this one
+    bool nameFromFolder{false};
   };
 
   /*!

@@ -120,6 +120,14 @@ bool SameRelease(const GameRelease& a, const GameRelease& b)
  * name them after the game: a GDI beside "Crazy Taxi.gdi" usually points at
  * track01.bin, which is why the names have to be read rather than guessed.
  */
+//! \brief The name of a folder itself, not of anything inside it
+std::string FolderName(const std::string& folder)
+{
+  std::string path = folder;
+  URIUtils::RemoveSlashAtEnd(path);
+  return URIUtils::GetFileName(path);
+}
+
 std::vector<std::string> ReadSheet(const std::string& path)
 {
   std::vector<std::string> tracks;
@@ -483,11 +491,12 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   if (m_handle != nullptr)
     m_handle->SetText(platform.name);
 
-  // A root folder's own picture stands in for the platform until one is scraped
   bool foundDirectly = false;
   GamePathContent own;
-  if (m_database.GetPathContent(folder, own, foundDirectly) && foundDirectly &&
-      m_database.GetArtForItem(platform.id, MediaTypeGamePlatform, "thumb").empty())
+  const bool isSource = m_database.GetPathContent(folder, own, foundDirectly) && foundDirectly;
+
+  // A root folder's own picture stands in for the platform until one is scraped
+  if (isSource && m_database.GetArtForItem(platform.id, MediaTypeGamePlatform, "thumb").empty())
   {
     for (const char* name : {"folder.jpg", "folder.png"})
     {
@@ -517,7 +526,14 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   bool found = false;
   if (hash != storedHash)
   {
-    const std::vector<Entry> entries = GroupEntries(items, content.useFolderNames);
+    std::vector<Entry> entries = GroupEntries(items, content.useFolderNames);
+
+    // A folder reached by recursion that holds a single game is that game. The
+    // file inside is named for the dump rather than the title often enough --
+    // disc.gdi, track01.bin, ip.bin -- that several such folders would
+    // otherwise resolve to one name and be taken for the same game.
+    if (!isSource && entries.size() == 1 && !entries.front().isFolder)
+      entries.front().nameFromFolder = true;
     m_itemCount = static_cast<int>(entries.size());
     m_currentItem = 0;
 
@@ -922,9 +938,9 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     }
   }
 
-  const std::string nameSource =
-      entry.isFolder ? URIUtils::GetFileName(URIUtils::GetDirectory(entry.folder + "x"))
-                     : URIUtils::GetFileName(playPath);
+  const std::string nameSource = (entry.isFolder || entry.nameFromFolder)
+                                     ? FolderName(entry.folder)
+                                     : URIUtils::GetFileName(playPath);
   const ParsedGameName parsed = CGameNameParser::Parse(nameSource);
   if (parsed.displayTitle.empty())
     return false;
