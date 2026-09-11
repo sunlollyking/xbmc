@@ -423,9 +423,17 @@ std::vector<CGameInfoScanner::Entry> CGameInfoScanner::GroupEntries(const CFileI
   }
 
   // Everything else stands alone, unless its folder is the game
+  const bool hasSheet = std::ranges::any_of(
+      entries, [](const Entry& e) { return HasExtension(e.path, sheetExtensions); });
+
   for (const std::string& path : files)
   {
     if (claimed.contains(path))
+      continue;
+    // A track beside a sheet belongs to that disc even when the sheet does not
+    // name it. A Dreamcast image carries ip.bin and motiondb.bin next to its
+    // tracks, and neither is a game.
+    if (hasSheet && HasExtension(path, trackExtensions))
       continue;
     if (useFolderNames)
       continue;
