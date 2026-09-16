@@ -13,6 +13,7 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "dbwrappers/dataset.h"
+#include "games/GameManual.h"
 #include "games/library/GameDbUrl.h"
 #include "games/tags/GameInfoTag.h"
 #include "playlists/SmartPlayList.h"
@@ -307,6 +308,10 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
 
     items.Reserve(results.size());
     const dbiplus::query_data& data = m_pDS->get_result_set().records;
+
+    // Shared across the listing so that each folder is read once, not once per
+    // game that lives in it
+    CManualIndex manuals;
     for (const auto& result : results)
     {
       const auto row = static_cast<unsigned int>(result.at(Field::ROW).asInteger());
@@ -363,12 +368,15 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       if (!matched.empty())
         item->SetProperty("matchedby", matched);
 
-      if (!game.GetManual().empty())
+      // A manual already on disk counts as much as one a catalogue knows
+      // where to fetch, and is the only kind that works offline
+      if (!game.GetManual().empty() || manuals.HasManual(game.GetURL()))
       {
         item->SetProperty("hasmanual", true);
         // The catalogues report a manual as somewhere to fetch it from, so the
         // address is carried through for whoever opens it
-        item->SetProperty("manual", game.GetManual());
+        if (!game.GetManual().empty())
+          item->SetProperty("manual", game.GetManual());
       }
       if (game.IsFavourite())
         item->SetProperty("favourite", true);

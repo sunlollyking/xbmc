@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -109,6 +111,37 @@ public:
    * \param name A filename with no extension
    */
   static std::string NormaliseName(const std::string& name);
+};
+
+/*!
+ * \ingroup games
+ *
+ * \brief Which games in a listing have a manual sitting beside them
+ *
+ * Asking CGameManual per game would read a directory per game: the manuals in
+ * a real collection carry different region and revision tags from the games
+ * they belong to, so the exact-name check almost never settles it and the
+ * listing fallback almost always runs. Each folder is read once here instead
+ * and remembered, which makes a listing cost one read per folder.
+ *
+ * Held for as long as the listing being built and then discarded, so a manual
+ * added while Kodi is running is picked up the next time the folder is opened.
+ */
+class CManualIndex
+{
+public:
+  /*!
+   * \brief Whether a manual belonging to this game is on disk
+   *
+   * \param gamePath The game's own file path
+   */
+  bool HasManual(const std::string& gamePath);
+
+private:
+  //! The reduced names of the manuals in a folder, reading it if not yet seen
+  const std::set<std::string>& Names(const std::string& folder);
+
+  std::map<std::string, std::set<std::string>> m_folders;
 };
 
 } // namespace KODI::GAME

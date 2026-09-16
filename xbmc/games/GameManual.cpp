@@ -118,6 +118,57 @@ std::string FindByNormalisedName(const std::string& folder, const std::string& n
 }
 } // namespace
 
+bool CManualIndex::HasManual(const std::string& gamePath)
+{
+  if (!CanHaveManual(gamePath))
+    return false;
+
+  const std::string normalised = CGameManual::NormaliseName(GetGameStem(gamePath));
+  if (normalised.empty())
+    return false;
+
+  return Names(URIUtils::GetDirectory(gamePath)).contains(normalised);
+}
+
+const std::set<std::string>& CManualIndex::Names(const std::string& folder)
+{
+  const auto seen = m_folders.find(folder);
+  if (seen != m_folders.end())
+    return seen->second;
+
+  // Inserted before the folders are read, so that one that cannot be read is
+  // remembered as holding nothing rather than being tried again per game
+  std::set<std::string>& names = m_folders[folder];
+
+  std::vector<std::string> directories{folder};
+  for (const char* subfolder : MANUAL_SUBFOLDERS)
+    directories.emplace_back(URIUtils::AddFileToFolder(folder, subfolder));
+
+  // Filtered by the directory layer rather than here: a platform folder can
+  // hold thousands of games, and without a mask every one of them becomes an
+  // item just to be discarded
+  std::string mask;
+  for (const char* extension : MANUAL_EXTENSIONS)
+    mask += std::string(extension) + "|";
+  mask.pop_back();
+
+  for (const std::string& directory : directories)
+  {
+    CFileItemList items;
+    if (!XFILE::CDirectory::GetDirectory(directory, items, mask, XFILE::DIR_FLAG_NO_FILE_DIRS))
+      continue;
+
+    for (int i = 0; i < items.Size(); ++i)
+    {
+      const CFileItemPtr& item = items[i];
+      if (!item->IsFolder())
+        names.insert(CGameManual::NormaliseName(GetGameStem(item->GetPath())));
+    }
+  }
+
+  return names;
+}
+
 std::string CGameManual::NormaliseName(const std::string& name)
 {
   std::string result;

@@ -329,3 +329,50 @@ TEST(TestGameManual, FindsNothingWhenThereIsNoManual)
 
   EXPECT_TRUE(CGameManual::GetManualPath(fixture.Path("Game (USA).md")).empty());
 }
+
+// CManualIndex answers the same question as GetManualPath for a whole listing,
+// so what matters is that it agrees with it - particularly on the loose match,
+// which is what a real collection almost always needs.
+
+TEST(TestGameManual, IndexFindsAManualTaggedDifferentlyFromTheGame)
+{
+  const CManualFixture fixture;
+  fixture.Touch("Game (USA) (Rev A).md");
+  fixture.Touch("Game.pdf");
+
+  CManualIndex index;
+  EXPECT_TRUE(index.HasManual(fixture.Path("Game (USA) (Rev A).md")));
+}
+
+TEST(TestGameManual, IndexFindsAManualInTheManualsFolder)
+{
+  const CManualFixture fixture;
+  fixture.Touch("Game (USA).md");
+  fixture.Touch("manuals/Game (USA).cbz");
+
+  CManualIndex index;
+  EXPECT_TRUE(index.HasManual(fixture.Path("Game (USA).md")));
+}
+
+TEST(TestGameManual, IndexReportsNothingWhenNoManualIsThere)
+{
+  const CManualFixture fixture;
+  fixture.Touch("Game (USA).md");
+
+  CManualIndex index;
+  EXPECT_FALSE(index.HasManual(fixture.Path("Game (USA).md")));
+}
+
+TEST(TestGameManual, IndexAnswersTheSameWayTwiceForOneFolder)
+{
+  const CManualFixture fixture;
+  fixture.Touch("Game (USA).md");
+  fixture.Touch("Other (USA).md");
+  fixture.Touch("Game.pdf");
+
+  // The second call is served from what the first read, so it must not differ
+  CManualIndex index;
+  EXPECT_TRUE(index.HasManual(fixture.Path("Game (USA).md")));
+  EXPECT_TRUE(index.HasManual(fixture.Path("Game (USA).md")));
+  EXPECT_FALSE(index.HasManual(fixture.Path("Other (USA).md")));
+}
