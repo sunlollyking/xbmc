@@ -85,6 +85,21 @@ bool HasExtension(const std::string& path, const auto& extensions)
   return std::ranges::any_of(extensions, [&ext](const char* e) { return ext == e; });
 }
 
+//! Whether a track names itself after a whole image sitting beside it
+bool NamedAfterImage(const std::string& track, const std::vector<std::string>& files)
+{
+  const std::string stem = Stem(track);
+  return std::ranges::any_of(files,
+                             [&stem](const std::string& file)
+                             {
+                               if (HasExtension(file, trackExtensions) ||
+                                   HasExtension(file, sheetExtensions))
+                                 return false;
+                               const std::string image = Stem(file);
+                               return image != stem && stem.starts_with(image);
+                             });
+}
+
 std::string ExtensionMask(const PlatformInfo& platform)
 {
   std::vector<std::string> extensions = platform.extensions;
@@ -434,6 +449,11 @@ std::vector<CGameInfoScanner::Entry> CGameInfoScanner::GroupEntries(const CFileI
     // name it. A Dreamcast image carries ip.bin and motiondb.bin next to its
     // tracks, and neither is a game.
     if (hasSheet && HasExtension(path, trackExtensions))
+      continue;
+    // The same holds beside a whole image, where there is no sheet to go by: a
+    // Switch dump keeps its certificate and initial data in small files named
+    // after the .xci they were taken from.
+    if (HasExtension(path, trackExtensions) && NamedAfterImage(path, files))
       continue;
     if (useFolderNames)
       continue;
