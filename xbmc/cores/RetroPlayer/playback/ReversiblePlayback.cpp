@@ -17,6 +17,7 @@
 #include "cores/RetroPlayer/savestates/SavestateDatabase.h"
 #include "cores/RetroPlayer/streams/RPStreamManager.h"
 #include "cores/RetroPlayer/streams/memory/DeltaPairMemoryStream.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/File.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
@@ -24,7 +25,10 @@
 #include "games/addons/GameClient.h"
 #include "games/addons/disc/GameClientDiscModel.h"
 #include "games/addons/disc/GameClientDiscs.h"
+#include "resources/LocalizeStrings.h"
+#include "resources/ResourcesComponent.h"
 #include "utils/MathUtils.h"
+#include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -52,6 +56,36 @@ namespace
  * measured rather than left as a permanent ceiling.
  */
 constexpr size_t MAX_RUNAHEAD_STATE_SIZE = 2 * 1024 * 1024;
+
+constexpr unsigned int TOAST_DISPLAY_TIME_MS = 5000;
+
+/*!
+ * \brief Whether hardcore mode is currently blocking gameplay assistance
+ *
+ * RetroAchievements requires save state loading, rewind, slow motion and
+ * cheats to be unavailable while hardcore is on. Saving states is still
+ * allowed, and so is fast forward.
+ */
+bool HardcoreRestrictionsApply()
+{
+  return CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+}
+
+/*!
+ * \brief Tell the player why what they asked for didn't happen
+ *
+ * Silently ignoring the request would read as a broken control.
+ */
+void NotifyBlockedByHardcore(uint32_t featureStringId)
+{
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+
+  // "Hardcore mode", "{0:s} is not available". The mode heads the toast so the
+  // longest feature name still fits the notification's fixed width.
+  CGUIDialogKaiToast::QueueNotification(
+      CServiceBroker::GetGameServices().GameSettings().GetRAUserPicUrl(), strings.Get(35700),
+      StringUtils::Format(strings.Get(35305), strings.Get(featureStringId)), TOAST_DISPLAY_TIME_MS);
+}
 } // namespace
 
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
@@ -142,6 +176,27 @@ double CReversiblePlayback::GetSpeed() const
 
 void CReversiblePlayback::SetSpeed(double speedFactor)
 {
+  if (HardcoreRestrictionsApply())
+  {
+    // Rewind runs the game backwards, so it arrives here as a negative speed
+    if (speedFactor < 0.0)
+    {
+      CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Refusing to rewind in hardcore mode");
+      NotifyBlockedByHardcore(35309); // "Rewind"
+      m_gameLoop.SetSpeed(1.0);
+      return;
+    }
+
+    // Slow motion is withheld, fast forward is not. Pausing is fine.
+    if (speedFactor > 0.0 && speedFactor < 1.0)
+    {
+      CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Refusing to slow down in hardcore mode");
+      NotifyBlockedByHardcore(35701); // "Slow motion"
+      m_gameLoop.SetSpeed(1.0);
+      return;
+    }
+  }
+
   std::unique_lock lock(m_mutex);
   if (speedFactor != 0.0)
   {
@@ -361,6 +416,16 @@ void CReversiblePlayback::CommitSavestate(bool autosave,
 
 bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
 {
+  // Every route that loads a state comes through here - the in-game dialog,
+  // JSON-RPC, the Python player API - so hardcore is answered once, rather
+  // than at each caller. Creating a state is still allowed.
+  if (HardcoreRestrictionsApply())
+  {
+    CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Refusing to load a savestate in hardcore mode");
+    NotifyBlockedByHardcore(35308); // "Loading save states"
+    return false;
+  }
+
   const size_t memorySize =
       m_gameClient->GetSerializeSize(GAME::CGameClient::SerializeSizeMode::Restore);
 
@@ -722,7 +787,11 @@ void CReversiblePlayback::UpdateMemoryStream()
 
   GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
-  const bool rewindEnabled = gameSettings.RewindEnabled();
+  // Hardcore forbids rewind, so the buffer isn't merely unused - it shouldn't
+  // be allocated at all. It costs a fraction of the savestate size for every
+  // frame of the rewind window, which is not free on consoles with large
+  // states.
+  const bool rewindEnabled = gameSettings.RewindEnabled() && !HardcoreRestrictionsApply();
   const size_t memorySize = rewindEnabled ? m_gameClient->GetSerializeSize() : 0;
 
   if (rewindEnabled && memorySize > 0)

@@ -55,6 +55,7 @@ const std::string SETTING_GAMES_RUNAHEADFRAMES = "gamesgeneral.runaheadframes";
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
+const std::string SETTING_GAMES_ACHIEVEMENTS_HARDCORE = "gamesachievements.hardcore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_INDICATOR = "gamesachievements.challengeindicator";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
@@ -92,8 +93,9 @@ CGameSettings::CGameSettings()
        SETTING_GAMES_RUNAHEADFRAMES, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
        SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
-       SETTING_GAMES_ACHIEVEMENTS_ENCORE, SETTING_GAMES_ACHIEVEMENTS_INDICATOR,
-       SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT, SETTING_GAMES_CLEAR_MANUAL_CACHE});
+       SETTING_GAMES_ACHIEVEMENTS_HARDCORE, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
+       SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT,
+       SETTING_GAMES_CLEAR_MANUAL_CACHE});
 
   // A person should say who they are once. The scrapers keep fields of their
   // own so they still work for anyone driving them directly, but while these
@@ -254,8 +256,12 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
       settingId == SETTING_GAMES_ENABLERUNAHEAD || settingId == SETTING_GAMES_RUNAHEADFRAMES ||
+      settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_ENCORE)
   {
+    // Hardcore belongs here as much as the rewind settings do: turning it on
+    // has to drop the rewind buffer, or the frames already in it stay
+    // rewindable for the rest of the session
     SetChanged();
     NotifyObservers(ObservableMessageSettingsChanged);
   }
@@ -414,6 +420,17 @@ std::string CGameSettings::GetRAUserPicUrl() const
     return {};
 
   return StringUtils::Format(RA_USER_PIC_URL_TEMPLATE, CURL::Encode(username));
+}
+
+bool CGameSettings::GetAchievementsHardcore() const
+{
+  return CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+      SETTING_GAMES_ACHIEVEMENTS_HARDCORE);
+}
+
+void CGameSettings::SetAchievementsHardcore(bool hardcore)
+{
+  m_settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE, hardcore);
 }
 
 bool CGameSettings::GetAchievementsEncore() const
