@@ -19589,7 +19589,59 @@ msgctxt "#35307"
 msgid "Subset completed"
 msgstr ""
 
-#empty strings from id 35313 to 35319
+#. Label of the Manual action in the game OSD, and heading of its notifications
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35310"
+msgid "Manual"
+msgstr ""
+
+#. Notification shown when a game has no manual beside it. {0:s} is the game
+#: xbmc/interfaces/builtins/GameBuiltins.cpp
+msgctxt "#35311"
+msgid "No manual found for {0:s}"
+msgstr ""
+
+#. Page position in the manual viewer. {0:d} is the page, {1:d} the page count
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35313"
+msgid "Page {0:d} of {1:d}"
+msgstr ""
+
+#. Notification shown when a manual has been opened but a page will not render
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35314"
+msgid "This page could not be displayed"
+msgstr ""
+
+#. Shown in the manual viewer while the document is being opened
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35315"
+msgid "Opening manual…"
+msgstr ""
+
+#. Zoom level in the manual viewer. {0:d} is a percentage
+#: xbmc/games/manual/GUIWindowGameManual.cpp
+msgctxt "#35316"
+msgid "Zoom {0:d}%"
+msgstr ""
+
+#. Heading of the dialog that finds a manual for a game
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35317"
+msgid "Find a manual"
+msgstr ""
+
+#. Footer hint in the find-a-manual dialog
+#: addons/skin.estuary/xml/DialogGameManuals.xml
+msgctxt "#35318"
+msgid "Choose a manual to download it"
+msgstr ""
+
+#. Label for which add-on is being asked for manuals
+#: addons/skin.estuary/xml/DialogGameManuals.xml
+msgctxt "#35319"
+msgid "Provider"
+msgstr ""
 
 #. Label of the Cheats button in the game OSD, heading of the cheats dialog, and
 #. of the cheats group in settings
@@ -19643,7 +19695,16 @@ msgctxt "#35328"
 msgid "0 cheats available"
 msgstr ""
 
-#empty strings from id 35329 to 35330
+#. Label of the setting bounding the disk downloaded manuals may use
+msgctxt "#35329"
+msgid "Maximum size of downloaded manuals"
+msgstr ""
+
+#. Help text for the downloaded manual size limit
+#: system/settings/settings.xml
+msgctxt "#35330"
+msgid "How much disk space downloaded game manuals may use. Once past this, the manuals you have gone longest without opening are removed. Manuals you added yourself are never removed."
+msgstr ""
 
 #. Label of the game OSD button that opens the leaderboards
 #: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
@@ -19802,6 +19863,16 @@ msgctxt "#35358"
 msgid "Your best is still {0:s}"
 msgstr ""
 
+#. Settings button that deletes every downloaded game manual
+msgctxt "#35359"
+msgid "Clear cached manuals"
+msgstr ""
+
+#. Help text for the clear cached manuals button
+msgctxt "#35360"
+msgid "Delete every manual that has been downloaded. They will be fetched again when next opened."
+msgstr ""
+
 #. Setting to show the achievement being attempted over the game
 msgctxt "#35364"
 msgid "Challenge indicator"
@@ -19929,7 +20000,39 @@ msgctxt "#35511"
 msgid "Current"
 msgstr ""
 
-#empty strings from id 35512 to 35999
+#empty strings from id 35512 to 35719
+
+#. Shown when no add-on is installed that can look for manuals
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35720"
+msgid "No add-on is installed that can find manuals"
+msgstr ""
+
+#. Shown while a manual is being looked for
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35721"
+msgid "Searching…"
+msgstr ""
+
+#. Shown when the search for a manual came back with nothing
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35722"
+msgid "No manual was found for this game"
+msgstr ""
+
+#. Shown while a chosen manual is being fetched
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35723"
+msgid "Downloading…"
+msgstr ""
+
+#. Shown when a manual was found but could not be fetched
+#: xbmc/games/manual/GUIDialogGameManuals.cpp
+msgctxt "#35724"
+msgid "The manual could not be downloaded"
+msgstr ""
+
+#empty strings from id 35725 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

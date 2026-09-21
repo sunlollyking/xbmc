@@ -150,6 +150,12 @@
 							<onclick>ActivateWindow(GameAchievements)</onclick>
 						</include>
 						<include content="GameOSDMenuButton">
+							<param name="id" value="1119" />
+							<param name="label" value="$LOCALIZE[35310]" />
+							<param name="icon" value="osd/fullscreen/buttons/information.png" />
+							<onclick>ShowGameManual</onclick>
+						</include>
+						<include content="GameOSDMenuButton">
 							<param name="id" value="1118" />
 							<param name="label" value="$LOCALIZE[35320]" />
 							<param name="icon" value="osd/fullscreen/buttons/cheats.png" />
