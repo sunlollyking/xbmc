@@ -102,7 +102,7 @@ bool CFileUtils::RenameFile(const std::string &strFile)
 
 bool CFileUtils::RemoteAccessAllowed(const std::string &strPath)
 {
-  std::string SourceNames[] = { "programs", "files", "video", "music", "pictures" };
+  std::string SourceNames[] = {"programs", "files", "video", "music", "pictures", "games"};
 
   std::string realPath = URIUtils::GetRealPath(strPath);
   // for rar:// and zip:// paths we need to extract the path to the archive
@@ -116,6 +116,12 @@ bool CFileUtils::RemoteAccessAllowed(const std::string &strPath)
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "videodb://"))
     return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "gamedb://"))
+    return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "library://games"))
+    return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "sources://games"))
+    return true;
   else if (StringUtils::StartsWithNoCase(realPath, "library://video"))
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "library://music"))
@@ -127,6 +133,8 @@ bool CFileUtils::RemoteAccessAllowed(const std::string &strPath)
   else if (StringUtils::StartsWithNoCase(realPath, "special://profile/playlists"))
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "special://videoplaylists"))
+    return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "special://gameplaylists"))
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "special://skin"))
     return true;

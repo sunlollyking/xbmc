@@ -17,6 +17,7 @@
 #include "games/addons/disc/GameClientDiscModel.h"
 #include "games/addons/disc/GameClientDiscTransport.h"
 #include "games/addons/disc/GameClientDiscXML.h"
+#include "games/database/GameDatabase.h"
 #include "utils/FileUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -137,6 +138,21 @@ void CGameClientDiscs::Initialize(const std::string& gamePath, bool usePersisted
     m_discM3u->Load(gamePath, sourceModel);
     PruneExtensions(sourceModel, supportedExtensions);
   }
+
+  // A game of several discs is one game in the library, so the set it belongs
+  // to is what the disc manager is given, not just the file that was launched
+  if (sourceModel.Empty())
+  {
+    CGameDatabase db;
+    if (db.Open())
+    {
+      for (const std::string& disc : db.GetDiscsForFile(gamePath))
+        sourceModel.AddDisc(disc);
+    }
+    if (!sourceModel.Empty())
+      PruneExtensions(sourceModel, supportedExtensions);
+  }
+
   if (sourceModel.Empty())
     sourceModel.AddDisc(gamePath);
 

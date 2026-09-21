@@ -20000,7 +20000,737 @@ msgctxt "#35511"
 msgid "Current"
 msgstr ""
 
-#empty strings from id 35512 to 35719
+#empty strings from id 35512 to 35519
+
+#: xbmc/games/library
+msgctxt "#35520"
+msgid "Platforms"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35521"
+msgid "Developers"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35522"
+msgid "Publishers"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35523"
+msgid "Collections"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35524"
+msgid "Regions"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35525"
+msgid "Players"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35526"
+msgid "Age ratings"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35527"
+msgid "Categories"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35528"
+msgid "Recently added games"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35529"
+msgid "Recently played games"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35530"
+msgid "Never played"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35531"
+msgid "Completed"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35532"
+msgid "Multiplayer"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35533"
+msgid "Co-op"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35534"
+msgid "With achievements"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35535"
+msgid "In progress"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35536"
+msgid "Hacks"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35537"
+msgid "Homebrew"
+msgstr ""
+
+#empty strings from id 35538 to 35539
+
+#: xbmc/games/library
+msgctxt "#35540"
+msgid "Scan to library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35541"
+msgid "Show hacks and homebrew"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35542"
+msgid "Include ROM hacks, fan games and homebrew in every list, rather than only under their own headings."
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35543"
+msgid "Releases"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35544"
+msgid "All games"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35545"
+msgid "Games library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35546"
+msgid "Scanning game library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35547"
+msgid "Cleaning game library"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35548"
+msgid "The folder holds games for this platform. Games in subfolders are scanned too."
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35549"
+msgid "Platform"
+msgstr ""
+
+#: xbmc/addons/Scraper.cpp
+msgctxt "#35550"
+msgid "Games"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35551"
+msgid "Set as default release"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35552"
+msgid "Preferred regions"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35553"
+msgid "Regions in order of preference, separated by commas, such as Europe, World, USA, Japan. When a game has several releases, the one from the first region listed here plays."
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35554"
+msgid "Prefer retail releases"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35555"
+msgid "Prefer the newest revision"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35556"
+msgid "Prefer verified dumps"
+msgstr ""
+
+#: xbmc/games/library
+msgctxt "#35557"
+msgid "Decides which of a game's releases plays by default. Choosing a release in the game's releases list always wins."
+msgstr ""
+
+#empty strings from id 35558 to 35559
+
+#: xbmc/games/library/GameInfoScanner.cpp
+msgctxt "#35560"
+msgid "Select game:"
+msgstr ""
+
+#: xbmc/games/library/GameInfoScanner.cpp
+msgctxt "#35561"
+msgid "Enter the game name"
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35562"
+msgid "Needs attention"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35563"
+msgid "game"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35564"
+msgid "games"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35565"
+msgid "Game"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35566"
+msgid "platform"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35567"
+msgid "platforms"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35568"
+msgid "release"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35569"
+msgid "releases"
+msgstr ""
+
+#: xbmc/media/MediaType.cpp
+msgctxt "#35570"
+msgid "Release"
+msgstr ""
+
+#. Label of the company that made a games platform, shown in the games library
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35571"
+msgid "Manufacturer"
+msgstr ""
+
+#. The three states a game can be in, shown on the game information dialog
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35572"
+msgid "Not started"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35573"
+msgid "In progress"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35574"
+msgid "Completed"
+msgstr ""
+
+#. The kinds of picture a game has, listed by the artwork button
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35575"
+msgid "Artwork"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35576"
+msgid "Box front"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35577"
+msgid "Box back"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35578"
+msgid "Cartridge"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35579"
+msgid "Disc"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35580"
+msgid "Title screen"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35581"
+msgid "Screenshot"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35582"
+msgid "Logo"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35583"
+msgid "Banner"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35584"
+msgid "Spine"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35585"
+msgid "Manual"
+msgstr ""
+
+#. Label of the setting choosing which classification board's rating is shown
+#: system/settings/settings.xml
+msgctxt "#35586"
+msgid "Ratings boards in order of preference"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35587"
+msgid "Which board's classification a game shows, when it carries several. Separate them with commas, such as PEGI, BBFC, ESRB. A board that is not listed here is shown only when a game has no other."
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35588"
+msgid "Achievements"
+msgstr ""
+
+#. Games entry in the Manage sources list
+#: system/settings/settings.xml
+msgctxt "#35589"
+msgid "Games..."
+msgstr ""
+
+#. Heading of the game library settings
+#: system/settings/settings.xml
+msgctxt "#35590"
+msgid "Game Library"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35591"
+msgid "Download information from the internet"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35592"
+msgid "Scans read the offline catalogue whatever this says. With this on they also ask the providers your scraper is set up for, which is where descriptions, artwork and achievement counts come from."
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35593"
+msgid "Leave out hacks, prototypes and BIOS files"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35594"
+msgid "A collection often holds translations, prototypes, demos and BIOS images beside the games. With this on they are left out of the library; the files stay where they are."
+msgstr ""
+
+#. Help text of the Games category in the media settings
+#: system/settings/settings.xml
+msgctxt "#35595"
+msgid "This category contains the settings for how the game library is filled and what it shows."
+msgstr ""
+
+#. What a game is, where it is not a game as it was sold
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35596"
+msgid "Demo"
+msgstr ""
+
+#. What a game is, where it is not a game as it was sold
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35597"
+msgid "BIOS"
+msgstr ""
+
+#. What a game is, where it is not a game as it was sold
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35598"
+msgid "Application"
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35599"
+msgid "Co-op"
+msgstr ""
+
+#empty string with id 35600
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35601"
+msgid "Languages"
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35602"
+msgid "Revision"
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35603"
+msgid "Serial"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35604"
+msgid "Marquee"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35605"
+msgid "3D box"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35606"
+msgid "Box texture"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35607"
+msgid "Flyer"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35608"
+msgid "Map"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35609"
+msgid "Bezel"
+msgstr ""
+
+#: xbmc/games/dialogs/GUIDialogGameInfo.cpp
+msgctxt "#35610"
+msgid "Composed picture"
+msgstr ""
+
+#empty string with id 35611
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35612"
+msgid "Console"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35613"
+msgid "Handheld"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35614"
+msgid "Computer"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35615"
+msgid "Arcade"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35616"
+msgid "Pinball"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35617"
+msgid "Virtual machine"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35618"
+msgid "Tape"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35619"
+msgid "Floppy disk"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35620"
+msgid "Card"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35621"
+msgid "Download"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35622"
+msgid "Machine"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35623"
+msgid "Medium"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35624"
+msgid "In production"
+msgstr ""
+
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35625"
+msgid "File types"
+msgstr ""
+
+#: addons/skin.estuary/xml/View_59_GameMachines.xml
+msgctxt "#35626"
+msgid "Controller"
+msgstr ""
+
+#: addons/skin.estuary/xml/View_59_GameMachines.xml
+msgctxt "#35627"
+msgid "Illustration"
+msgstr ""
+
+#empty string with id 35628
+
+#: system/settings/settings.xml
+msgctxt "#35629"
+msgid "Refresh achievement progress"
+msgstr ""
+
+#. Description of setting with label #35629 "Refresh achievement progress"
+#: system/settings/settings.xml
+msgctxt "#35630"
+msgid "Ask the service how far you have got with each game, and record it beside them in the library. This also happens whenever the game library is updated."
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35631"
+msgid "Export game library"
+msgstr ""
+
+#. Description of setting with label #14248 "Export library"
+#: system/settings/settings.xml
+msgctxt "#35632"
+msgid "Write the game library out as XML, either as one file for the whole library or as an NFO beside each game. What you did with a game -- how often you played it, whether it is a favourite, your own rating -- travels with it."
+msgstr ""
+
+#. Description of setting with label #14249 "Import library"
+#: system/settings/settings.xml
+msgctxt "#35633"
+msgid "Read back a game library that was exported as a single file. A game is matched by the file it came from, then by whichever catalogue named it; only what a rescan cannot recover is restored."
+msgstr ""
+
+#: xbmc/games/database/GameDatabaseExport.cpp
+msgctxt "#35634"
+msgid "Import game library"
+msgstr ""
+
+#: xbmc/games/GameSettings.cpp
+msgctxt "#35635"
+msgid "Sign in to RetroAchievements first"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35636"
+msgid "Web API key"
+msgstr ""
+
+#. Description of setting with label #35636 "Web API key"
+#: system/settings/settings.xml
+msgctxt "#35637"
+msgid "The key the scraper reads your achievements with, from the \"Keys\" section of your control panel on the RetroAchievements website. It is not the password above: that signs you in to play, while this reads the catalogue. Keep it as private as a password."
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35638"
+msgid "Toggle between [Choose], [Play] (default) and [Show information].[CR][Choose] will ask which of them you want.[CR][Play] will start the game.[CR][Show information] will open the game's information dialog."
+msgstr ""
+
+#empty string with id 35639
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35640"
+msgid "Every game for this machine."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35641"
+msgid "Games grouped by the kind of game they are."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35642"
+msgid "Games grouped by the year they came out."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35643"
+msgid "Games grouped by who made them."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35644"
+msgid "Games grouped by who published them."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35645"
+msgid "Games that belong to a series."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35646"
+msgid "Games grouped by the tags you have given them."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35647"
+msgid "Games grouped by the region they were sold in."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35648"
+msgid "Games grouped by how many people can play at once."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35649"
+msgid "Games grouped by the age they were rated for."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35650"
+msgid "Games grouped by how they were released, such as sold, given away or never finished."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35651"
+msgid "The games added to the library most recently."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35652"
+msgid "The games you played most recently."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35653"
+msgid "Games you have never started."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35654"
+msgid "The games you have marked as favourites."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35655"
+msgid "Games you have marked as finished."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35656"
+msgid "Games more than one person can play."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35657"
+msgid "Games two or more people can play together, rather than against each other."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35658"
+msgid "Games that have a set of achievements to earn."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35659"
+msgid "Games you have started but not finished."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35660"
+msgid "Fan-made alterations of other games."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35661"
+msgid "Games written by enthusiasts rather than released commercially."
+msgstr ""
+
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35662"
+msgid "Games the library could not identify, or that are missing something needed to play."
+msgstr ""
+
+#empty string with id 35663
+
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35664"
+msgid "Preferred title"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35665"
+msgid "Which name to show for a game. The catalogue title is the name it is best known by, the original title is the name it was sold under in its own language, and as named on disk is what the file is called."
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35666"
+msgid "Catalogue title"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35667"
+msgid "Original title"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35668"
+msgid "As named on disk"
+msgstr ""
+
+#empty strings from id 35669 to 35719
 
 #. Shown when no add-on is installed that can look for manuals
 #: xbmc/games/manual/GUIDialogGameManuals.cpp
@@ -20032,7 +20762,25 @@ msgctxt "#35724"
 msgid "The manual could not be downloaded"
 msgstr ""
 
-#empty strings from id 35725 to 35999
+#empty string with id 35725
+
+#. Label of the context menu item that sets the video filter for a game or folder
+#: xbmc/games/windows/GUIWindowGames.cpp
+msgctxt "#35726"
+msgid "Default video filter"
+msgstr ""
+
+#. Publisher of a game, shown in its information
+msgctxt "#35727"
+msgid "Publisher"
+msgstr ""
+
+#. Developer of a game, shown in its information
+msgctxt "#35728"
+msgid "Developer"
+msgstr ""
+
+#empty strings from id 35729 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

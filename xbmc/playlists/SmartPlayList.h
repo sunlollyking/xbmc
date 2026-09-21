@@ -122,6 +122,7 @@ public:
   const std::string& GetType() const { return m_playlistType; }
   bool IsVideoType() const;
   bool IsMusicType() const;
+  bool IsGameType() const;
 
   void SetMatchAllRules(bool matchAll)
   {
@@ -174,6 +175,7 @@ public:
 
   static bool IsVideoType(const std::string &type);
   static bool IsMusicType(const std::string &type);
+  static bool IsGameType(const std::string& type);
   static bool CheckTypeCompatibility(const std::string &typeLeft, const std::string &typeRight);
 
   bool IsEmpty(bool ignoreSortAndLimit = true) const;

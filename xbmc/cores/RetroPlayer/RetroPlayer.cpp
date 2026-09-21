@@ -30,13 +30,17 @@
 #include "cores/RetroPlayer/savestates/ISavestate.h"
 #include "cores/RetroPlayer/savestates/SavestateDatabase.h"
 #include "cores/RetroPlayer/streams/RPStreamManager.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/GameUtils.h"
 #include "games/addons/GameClient.h"
 #include "games/addons/disc/GameClientDiscs.h"
 #include "games/addons/input/GameClientInput.h"
+#include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryTypes.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -48,6 +52,7 @@
 #include "messaging/ApplicationMessenger.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "settings/MediaSettings.h"
 #include "utils/StringUtils.h"
 #include "utils/log.h"
 #include "windowing/WinSystem.h"
@@ -73,6 +78,38 @@ CRetroPlayer::~CRetroPlayer()
   CloseFile();
 }
 
+void CRetroPlayer::SetVideoFilterForGame(const std::string& gamePath)
+{
+  if (gamePath.empty())
+    return;
+
+  GAME::CGameDatabase db;
+  if (!db.Open())
+    return;
+
+  std::string videoFilter = db.VideoFilters().GetVideoFilterForGame(gamePath);
+  if (videoFilter.empty())
+  {
+    // What the machine plays with, where neither the game nor its folder said
+    const int idPlatform = db.GetPlatformIdForGame(gamePath);
+    GAME::PlatformInfo platform;
+    if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+      videoFilter = platform.defaultVideoFilter;
+  }
+  if (videoFilter.empty())
+    return;
+
+  ::CGameSettings& gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
+  if (gameSettings.VideoFilter() == videoFilter)
+    return;
+
+  CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Using video filter {} for {}", videoFilter,
+            CURL::GetRedacted(gamePath));
+
+  gameSettings.SetVideoFilter(videoFilter);
+  gameSettings.NotifyObservers(ObservableMessageSettingsChanged);
+}
+
 bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options)
 {
   CFileItem fileCopy(file);
@@ -92,6 +129,14 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
 
   // Check if we should open in standalone mode
   const bool bStandalone = fileCopy.GetPath().empty();
+
+  // A game is drawn with whatever filter was chosen for it, or failing that
+  // the nearest folder above it that has one - a handheld wants something very
+  // different to a home console, and a collection is already a folder per
+  // system. A preset that has since been uninstalled fails to load and the
+  // game draws unfiltered, which is the right answer for a filter that is gone.
+  if (!bStandalone)
+    SetVideoFilterForGame(fileCopy.GetDynPath());
 
   m_processInfo = CRPProcessInfo::CreateInstance();
   if (!m_processInfo)
@@ -199,6 +244,9 @@ bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options
     RegisterWindowCallbacks();
     m_playbackControl = std::make_unique<CGUIPlaybackControl>(*this);
     m_callback.OnPlayBackStarted(fileCopy);
+
+    if (CGameDatabase library; library.Open())
+      library.MarkPlayed(fileCopy.GetPath());
     m_callback.OnAVStarted(fileCopy);
     if (!bStandalone)
       m_autoSave = std::make_unique<CRetroPlayerAutoSave>(*this, m_gameServices.GameSettings());

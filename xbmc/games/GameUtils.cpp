@@ -25,8 +25,11 @@
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/AddonsDirectory.h"
 #include "filesystem/SpecialProtocol.h"
+#include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
 #include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryTypes.h"
+#include "utils/Variant.h"
 #include "games/dialogs/GUIDialogSelectGameClient.h"
 #include "games/dialogs/GUIDialogSelectSavestate.h"
 #include "games/tags/GameInfoTag.h"
@@ -161,7 +164,16 @@ std::string CGameUtils::GetDefaultGameClient(const std::string& path,
   if (!db.Open())
     return "";
 
-  const std::string gameClient = db.GameClients().GetGameClientForGame(path);
+  std::string gameClient = db.GameClients().GetGameClientForGame(path);
+  if (gameClient.empty())
+  {
+    // A library game plays with what its platform plays with: a collection is
+    // arranged by machine, and the emulator belongs to the machine
+    const int idPlatform = db.GetPlatformIdForGame(path);
+    PlatformInfo platform;
+    if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+      gameClient = platform.defaultGameClient;
+  }
   if (gameClient.empty())
     return "";
 
@@ -195,6 +207,12 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   if (path.empty())
     return false;
 
+  // A platform in the library is not a folder on a disk, so what is chosen for
+  // it is stored against the machine
+  const int idPlatform = item.HasProperty("platformid")
+                             ? static_cast<int>(item.GetProperty("platformid").asInteger())
+                             : -1;
+
   // A folder can be given anything later, so it offers every emulator that is
   // installed. A game only offers the ones that can open it.
   GameClientVector emulators;
@@ -221,7 +239,10 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   if (!db.Open())
     return false;
 
-  const std::string currentGameClient = db.GameClients().GetGameClient(path);
+  PlatformInfo platform;
+  const bool forPlatform = idPlatform > 0 && db.GetPlatform(idPlatform, platform);
+  const std::string currentGameClient =
+      forPlatform ? platform.defaultGameClient : db.GameClients().GetGameClient(path);
 
   dialog->Reset();
   dialog->SetHeading(CVariant{35510}); // "Default emulator"
@@ -262,13 +283,96 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   // An empty path is the "None" entry, which forgets rather than stores
   const std::string gameClient = items[selectedIndex]->GetPath();
 
-  if (!db.GameClients().SetGameClient(path, gameClient))
+  const bool stored = forPlatform
+                          ? db.SetPlatformDefaults(idPlatform, gameClient, platform.defaultVideoFilter)
+                          : db.GameClients().SetGameClient(path, gameClient);
+  if (!stored)
     return false;
 
   if (gameClient.empty())
     CLog::Log(LOGDEBUG, "GAME: Forgot the emulator for {}", CURL::GetRedacted(path));
   else
     CLog::Log(LOGDEBUG, "GAME: Remembered emulator {} for {}", gameClient, CURL::GetRedacted(path));
+
+  return true;
+}
+
+bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
+{
+  const std::string path = item.GetPath();
+  if (path.empty())
+    return false;
+
+  CGUIDialogSelect* dialog =
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+          WINDOW_DIALOG_SELECT);
+  if (dialog == nullptr)
+    return false;
+
+  CGameDatabase db;
+  if (!db.Open())
+    return false;
+
+  PlatformInfo platform;
+  const int idPlatform = item.HasProperty("platformid")
+                             ? static_cast<int>(item.GetProperty("platformid").asInteger())
+                             : -1;
+  const bool forPlatform = idPlatform > 0 && db.GetPlatform(idPlatform, platform);
+  const std::string currentVideoFilter =
+      forPlatform ? platform.defaultVideoFilter : db.VideoFilters().GetVideoFilter(path);
+
+  dialog->Reset();
+  dialog->SetHeading(CVariant{35726}); // "Default video filter"
+  dialog->SetUseDetails(true);
+
+  CFileItemList items;
+
+  // First, so that clearing is as easy to reach as setting
+  {
+    CFileItemPtr noneItem = std::make_shared<CFileItem>(
+        CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(231)); // "None"
+    noneItem->SetProperty("game.videofilter", CVariant{""});
+    items.Add(std::move(noneItem));
+  }
+
+  // No game is running, so nothing can say which scaling methods it supports
+  GetVideoFilters(items);
+
+  for (int i = 0; i < items.Size(); ++i)
+  {
+    if (items[i]->GetProperty("game.videofilter").asString() == currentVideoFilter &&
+        !currentVideoFilter.empty())
+    {
+      items[i]->SetLabel2(
+          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35511)); // "Current"
+      items[i]->Select(true);
+    }
+  }
+
+  dialog->SetItems(items);
+  dialog->Open();
+
+  if (!dialog->IsConfirmed())
+    return false;
+
+  const int selectedIndex = dialog->GetSelectedItem();
+  if (selectedIndex < 0 || selectedIndex >= items.Size())
+    return false;
+
+  // An empty filter is the "None" entry, which forgets rather than stores
+  const std::string videoFilter = items[selectedIndex]->GetProperty("game.videofilter").asString();
+
+  const bool stored =
+      forPlatform ? db.SetPlatformDefaults(idPlatform, platform.defaultGameClient, videoFilter)
+                  : db.VideoFilters().SetVideoFilter(path, videoFilter);
+  if (!stored)
+    return false;
+
+  if (videoFilter.empty())
+    CLog::Log(LOGDEBUG, "GAME: Forgot the video filter for {}", CURL::GetRedacted(path));
+  else
+    CLog::Log(LOGDEBUG, "GAME: Remembered video filter {} for {}", videoFilter,
+              CURL::GetRedacted(path));
 
   return true;
 }

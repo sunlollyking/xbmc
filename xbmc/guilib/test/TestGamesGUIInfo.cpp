@@ -66,6 +66,18 @@ TEST_F(TestGamesGUIInfo, TranslatesRetroPlayerLabels)
             RETROPLAYER_ACHIEVEMENTS_LOGGED_IN);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.HasCheats"), RETROPLAYER_HAS_CHEATS);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.SupportsCheats"), RETROPLAYER_SUPPORTS_CHEATS);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorTitle"),
+            RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorProgress"),
+            RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorPercent"),
+            RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorBadge"),
+            RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsChallengeTitle"),
+            RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsChallengeBadge"),
+            RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsProgress"),
             RETROPLAYER_ACHIEVEMENTS_PROGRESS);
 }
@@ -197,4 +209,213 @@ TEST_F(TestGamesGUIInfo, InitCurrentItemSetsTitleFromVfsHostnamePath)
   const CGameInfoTag* tag = item.GetGameInfoTag();
   ASSERT_NE(tag, nullptr);
   EXPECT_EQ(tag->GetTitle(), "test");
+}
+
+TEST_F(TestGamesGUIInfo, ShowsTheAchievementTheRuntimeIndicated)
+{
+  CAchievementRuntime achievementRuntime;
+  achievementRuntime.SetState(MakeAchievementState());
+
+  AchievementProgressIndicator indicator;
+  indicator.id = 3;
+  indicator.title = "Collect 180 rings";
+  indicator.badgeUrl = "https://example.invalid/badge.png";
+  indicator.measuredProgress = "130/180";
+  indicator.measuredPercent = 72.0f;
+  achievementRuntime.SetProgressIndicator(indicator, true);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Collect 180 rings");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS), nullptr));
+  EXPECT_EQ(value, "130/180");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE), nullptr));
+  EXPECT_EQ(value, "https://example.invalid/badge.png");
+
+  int percent = 0;
+  EXPECT_TRUE(gamesGUIInfo.GetInt(percent, nullptr, 0,
+                                  CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT)));
+  EXPECT_EQ(percent, 72);
+}
+
+TEST_F(TestGamesGUIInfo, ShowsTheAchievementBeingAttempted)
+{
+  CAchievementRuntime achievementRuntime;
+  achievementRuntime.SetState(MakeAchievementState());
+
+  AchievementChallenge indicator;
+  indicator.id = 5;
+  indicator.title = "Beat Lavos without dying";
+  indicator.badgeUrl = "https://example.invalid/badge.png";
+  achievementRuntime.SetChallenge(indicator, true);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE), nullptr));
+  EXPECT_EQ(value, "Beat Lavos without dying");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE), nullptr));
+  EXPECT_EQ(value, "https://example.invalid/badge.png");
+}
+
+TEST_F(TestGamesGUIInfo, ShowsNothingOnceTheAttemptEnds)
+{
+  CAchievementRuntime achievementRuntime;
+  achievementRuntime.SetState(MakeAchievementState());
+
+  AchievementChallenge indicator;
+  indicator.id = 5;
+  indicator.title = "Beat Lavos without dying";
+  achievementRuntime.SetChallenge(indicator, true);
+
+  // The runtime names the achievement whose attempt ended, which is how the
+  // add-on reports it: the challenge is matched by id and removed
+  achievementRuntime.SetChallenge(indicator, false);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+}
+
+TEST_F(TestGamesGUIInfo, ShowsNothingOnceTheIndicatorIsCleared)
+{
+  CAchievementRuntime achievementRuntime;
+  achievementRuntime.SetState(MakeAchievementState());
+
+  AchievementProgressIndicator indicator;
+  indicator.id = 3;
+  indicator.title = "Collect 180 rings";
+  indicator.measuredProgress = "130/180";
+  indicator.measuredPercent = 72.0f;
+  achievementRuntime.SetProgressIndicator(indicator, true);
+  achievementRuntime.SetProgressIndicator({}, false);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+
+  int percent = -1;
+  EXPECT_TRUE(gamesGUIInfo.GetInt(percent, nullptr, 0,
+                                  CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT)));
+  EXPECT_EQ(percent, 0);
+}
+
+TEST_F(TestGamesGUIInfo, ShowsTheClosestOfTwoAchievementsCountingAtOnce)
+{
+  CAchievementRuntime achievementRuntime;
+  achievementRuntime.SetState(MakeAchievementState());
+
+  AchievementProgressIndicator behind;
+  behind.id = 4;
+  behind.title = "Trip Pop Pro";
+  behind.measuredProgress = "1/25";
+  behind.measuredPercent = 4.0f;
+
+  AchievementProgressIndicator ahead;
+  ahead.id = 5;
+  ahead.title = "Orange Ace";
+  ahead.measuredProgress = "18/20";
+  ahead.measuredPercent = 90.0f;
+
+  // Announced separately, as the runtime does, and in the order that would
+  // leave the wrong one showing if the latest simply replaced the last
+  achievementRuntime.SetProgressIndicator(ahead, true);
+  achievementRuntime.SetProgressIndicator(behind, true);
+
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Orange Ace");
+
+  // The one that finished stops counting without taking the other with it
+  achievementRuntime.SetProgressIndicator(ahead, false);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(
+      value, nullptr, 0, CGUIInfo(RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE), nullptr));
+  EXPECT_EQ(value, "Trip Pop Pro");
+}
+
+TEST_F(TestGamesGUIInfo, AListItemAnswersForItsOwnGame)
+{
+  //
+  // Spec: a row describes the game it holds. RetroPlayer.* deliberately
+  // describes the game being played instead, so a listing asks through
+  // ListItem.* the way it would for anything else
+  //
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  CFileItem item{"/roms/zelda.n64", false};
+  item.GetGameInfoTag()->SetOverview("A boy, a sword, and a great deal of walking.");
+  item.GetGameInfoTag()->SetGenres({"Adventure", "Action"});
+  item.GetGameInfoTag()->SetPublisher("Nintendo");
+  item.GetGameInfoTag()->SetYear(1998);
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_PLOT), nullptr));
+  EXPECT_EQ(value, "A boy, a sword, and a great deal of walking.");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_GENRE), nullptr));
+  EXPECT_EQ(value, "Adventure, Action");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_STUDIO), nullptr));
+  EXPECT_EQ(value, "Nintendo");
+
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_YEAR), nullptr));
+  EXPECT_EQ(value, "1998");
+}
+
+TEST_F(TestGamesGUIInfo, AnItemWithNoGameTagIsPassedOn)
+{
+  //
+  // Spec: most of a listing is not games. The question has to be refused so it
+  // reaches the provider that can answer it, and asking must not create a tag,
+  // since anything carrying one answers CFileItem::IsGame()
+  //
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  CFileItem item{"/roms/Some Folder/", true};
+  ASSERT_FALSE(item.HasGameInfoTag());
+
+  std::string value{"untouched"};
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_PLOT), nullptr));
+  EXPECT_EQ(value, "untouched");
+  EXPECT_FALSE(item.HasGameInfoTag());
+}
+
+TEST_F(TestGamesGUIInfo, AnEmptyFieldIsPassedOn)
+{
+  //
+  // Spec: a game tag carrying nothing for a field must not claim the label,
+  // or a row would show blank where another provider had something to say
+  //
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  CFileItem item{"/roms/zelda.n64", false};
+  item.GetGameInfoTag()->SetTitle("Has a title, nothing else");
+
+  std::string value;
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_PLOT), nullptr));
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_GENRE), nullptr));
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_YEAR), nullptr));
+  EXPECT_FALSE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_STUDIO), nullptr));
 }

@@ -16,7 +16,9 @@
 #include "utils/Observer.h"
 
 #include <future>
+#include <atomic>
 #include <memory>
+#include <vector>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -71,7 +73,7 @@ public:
   void Notify(const Observable& obs, const ObservableMessage msg) override;
 
 private:
-  void AddFrame();
+  void AddFrame(const std::vector<uint8_t>& serialized = {});
   void UpdateFrameRate();
   GAME::RestoreResult RewindFrames(uint64_t frames);
   GAME::RestoreResult AdvanceFrames(uint64_t frames);

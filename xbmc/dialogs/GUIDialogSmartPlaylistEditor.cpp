@@ -67,7 +67,8 @@ static const translateType types[] = { { CGUIDialogSmartPlaylistEditor::TYPE_SON
                                        { CGUIDialogSmartPlaylistEditor::TYPE_MUSICVIDEOS, "musicvideos", 20389 },
                                        { CGUIDialogSmartPlaylistEditor::TYPE_MOVIES, "movies", 20342 },
                                        { CGUIDialogSmartPlaylistEditor::TYPE_TVSHOWS, "tvshows", 20343 },
-                                       { CGUIDialogSmartPlaylistEditor::TYPE_EPISODES, "episodes", 20360 }
+                                       { CGUIDialogSmartPlaylistEditor::TYPE_EPISODES, "episodes", 20360 },
+                                       { CGUIDialogSmartPlaylistEditor::TYPE_GAMES, "games", 35545 }
                                      };
 
 CGUIDialogSmartPlaylistEditor::CGUIDialogSmartPlaylistEditor(void)
@@ -171,6 +172,8 @@ bool CGUIDialogSmartPlaylistEditor::OnMessage(CGUIMessage& message)
             PLAYLIST_TYPE type = ConvertType(m_playlist.GetType());
             if (type == TYPE_SONGS || type == TYPE_ALBUMS || type == TYPE_ARTISTS)
               m_mode = "music";
+            else if (type == TYPE_GAMES)
+              m_mode = "games";
             else
               m_mode = "video";
           }
@@ -669,6 +672,10 @@ std::vector<CGUIDialogSmartPlaylistEditor::PLAYLIST_TYPE> CGUIDialogSmartPlaylis
     allowedTypes.push_back(TYPE_EPISODES);
     allowedTypes.push_back(TYPE_MUSICVIDEOS);
     allowedTypes.push_back(TYPE_MIXED);
+  }
+  else if (mode == "games")
+  {
+    allowedTypes.push_back(TYPE_GAMES);
   }
   return allowedTypes;
 }

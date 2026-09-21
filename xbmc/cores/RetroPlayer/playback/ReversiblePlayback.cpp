@@ -502,7 +502,7 @@ void CReversiblePlayback::EndEvent()
   // while the client is unloading and its context is still current.
 }
 
-void CReversiblePlayback::AddFrame()
+void CReversiblePlayback::AddFrame(const std::vector<uint8_t>& serialized /* = {} */)
 {
   std::unique_lock lock(m_mutex);
 
