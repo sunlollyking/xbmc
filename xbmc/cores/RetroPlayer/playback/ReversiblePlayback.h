@@ -35,6 +35,7 @@ namespace RETRO
 {
 class CGUIGameMessenger;
 class CRPRenderManager;
+class CRPStreamManager;
 class CSavestateDatabase;
 class CDeltaPairMemoryStream;
 
@@ -45,7 +46,8 @@ public:
                       CRPRenderManager& renderManager,
                       CGUIGameMessenger& guiMessenger,
                       double fps,
-                      size_t serializeSize);
+                      size_t serializeSize,
+                      CRPStreamManager* streamManager = nullptr);
 
   ~CReversiblePlayback() override;
 
@@ -81,11 +83,26 @@ private:
   void LatchRestoreFailure();
   void UpdatePlaybackStats();
   void UpdateMemoryStream();
+
+  /*!
+   * \brief Run the frame that is really happening, then the frames ahead of it
+   *
+   * \return True if the frame was handled, false to run it the ordinary way
+   */
+  bool RunaheadFrameEvent(unsigned int frames);
+
+  /*!
+   * \brief How many frames ahead to run right now, or 0 not to
+   */
+  unsigned int GetRunaheadFrames() const;
+
+  void UpdateRunahead();
   void CommitSavestate(bool autosave, const std::string& savePath, const CDateTime& nowUTC);
 
   // Construction parameter
   GAME::CGameClient* const m_gameClient;
   CRPRenderManager& m_renderManager;
+  CRPStreamManager* const m_streamManager; // Run-ahead needs it; without one it stays off
   CGUIGameMessenger& m_guiMessenger;
 
   // Gameplay functionality
@@ -98,6 +115,15 @@ private:
 
   //! Retry after each frame until serialization becomes available, or rewind is disabled.
   bool m_memoryStreamSized{false};
+
+  // Run-ahead. The settings are read on the GUI thread and the buffers are
+  // only touched by the game loop, which is what lets them go unlocked.
+  std::atomic<bool> m_runaheadEnabled{false};
+  std::atomic<unsigned int> m_runaheadFrameCount{0};
+  std::atomic<bool> m_runaheadFailed{false};
+  mutable std::atomic<bool> m_runaheadStateTooLarge{false};
+  std::vector<uint8_t> m_runaheadState;
+  std::vector<uint8_t> m_runaheadAchievementState;
 
   // Savestate functionality
   std::unique_ptr<CSavestateDatabase> m_savestateDatabase;
