@@ -20758,7 +20758,19 @@ msgctxt "#35668"
 msgid "As named on disk"
 msgstr ""
 
-#empty strings from id 35669 to 35699
+msgctxt "#35669"
+msgid "Mark as completed"
+msgstr ""
+
+msgctxt "#35670"
+msgid "Mark as not completed"
+msgstr ""
+
+msgctxt "#35671"
+msgid "Time played"
+msgstr ""
+
+#empty strings from id 35672 to 35699
 
 #. Label of the setting that enables RetroAchievements hardcore mode
 #: system/settings/settings.xml

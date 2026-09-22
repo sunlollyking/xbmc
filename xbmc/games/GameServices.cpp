@@ -15,6 +15,7 @@
 #include "games/GameSettings.h"
 #include "games/GameUtils.h"
 #include "games/agents/input/AgentInput.h"
+#include "games/database/GameDatabase.h"
 #include "profiles/ProfileManager.h"
 #include "utils/FileExtensionProvider.h"
 
@@ -96,4 +97,28 @@ void CGameServices::OnAddonRepoInstalled()
 
   // Update game extensions
   m_fileExtensionProvider.RegisterGameExtensions(CGameUtils::GetGameExtensions());
+}
+
+void CGameServices::StartPlaySession(const std::string& gamePath)
+{
+  m_playSessionPath = gamePath;
+  m_playSessionStart = std::chrono::steady_clock::now();
+}
+
+void CGameServices::EndPlaySession()
+{
+  if (m_playSessionPath.empty())
+    return;
+
+  const std::string gamePath = m_playSessionPath;
+  m_playSessionPath.clear();
+
+  const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(
+                           std::chrono::steady_clock::now() - m_playSessionStart)
+                           .count();
+  if (seconds <= 0)
+    return;
+
+  if (CGameDatabase library; library.Open())
+    library.AddPlayTime(gamePath, static_cast<unsigned int>(seconds));
 }

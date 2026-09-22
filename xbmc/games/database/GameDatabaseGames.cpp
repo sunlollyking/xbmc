@@ -523,6 +523,7 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
 
   details.SetReleaseCount(record->at(GAMEDB_RELEASE_COUNT).get_asInt());
   details.SetPlayCount(record->at(GAMEDB_PLAY_COUNT).get_asInt());
+  details.SetPlayTime(record->at(GAMEDB_PLAY_TIME).get_asInt());
   details.SetLastPlayed(record->at(GAMEDB_LAST_PLAYED).get_asString());
 
   const std::string path = record->at(GAMEDB_PATH).get_asString();

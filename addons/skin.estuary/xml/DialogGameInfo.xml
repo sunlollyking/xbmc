@@ -182,6 +182,15 @@
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.Property(playtime),$LOCALIZE[35671] ,]</label>
+						</control>
+						<control type="label">
+							<top>210</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
 							<label>$INFO[ListItem.Mpaa]</label>
 						</control>
 					</control>

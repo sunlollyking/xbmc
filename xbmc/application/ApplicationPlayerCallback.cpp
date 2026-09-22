@@ -18,6 +18,7 @@
 #include "application/ApplicationStackHelper.h"
 #ifdef HAVE_LIBBLURAY
 #include "filesystem/BlurayDirectory.h"
+#include "games/GameServices.h"
 #endif
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
@@ -49,6 +50,8 @@ using namespace std::chrono_literals;
 void CApplicationPlayerCallback::OnPlayBackEnded()
 {
   CLog::LogF(LOGDEBUG, "call");
+
+  CServiceBroker::GetGameServices().EndPlaySession();
 
   CGUIMessage msg(GUI_MSG_PLAYBACK_ENDED, 0, 0);
   CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
@@ -432,6 +435,8 @@ void CApplicationPlayerCallback::OnPlayBackResumed()
 void CApplicationPlayerCallback::OnPlayBackStopped()
 {
   CLog::LogF(LOGDEBUG, "call");
+
+  CServiceBroker::GetGameServices().EndPlaySession();
 
   CGUIMessage msg(GUI_MSG_PLAYBACK_STOPPED, 0, 0);
   CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
