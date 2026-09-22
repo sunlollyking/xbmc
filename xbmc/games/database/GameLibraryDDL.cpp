@@ -284,6 +284,8 @@ void CGameLibraryDDL::CreateViews(CDatabase& db)
       "r.idRelease WHERE r.idGame = game.idGame) AS playCount, "
       "(SELECT MAX(f.lastPlayed) FROM files f JOIN gamerelease r ON f.idRelease = r.idRelease "
       "WHERE r.idGame = game.idGame) AS lastPlayed, "
+      "(SELECT COALESCE(SUM(f.playTime), 0) FROM files f JOIN gamerelease r ON f.idRelease = "
+      "r.idRelease WHERE r.idGame = game.idGame) AS playTime, "
       "df.idFile AS idFile, "
       "df.strFilename AS strFilename, "
       "dp.strPath AS strPath "
@@ -374,4 +376,13 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   // mod -- which is worth saying on the game itself
   if (version < 5)
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN edition text");
+
+  // 6: how long a game has been played. The views report it, so they are
+  // dropped here and rebuilt by the CreateAnalytics that follows an update
+  if (version < 6)
+  {
+    db.ExecuteQuery("DROP VIEW IF EXISTS platform_view");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
+    db.ExecuteQuery("DROP VIEW IF EXISTS release_view");
+  }
 }

@@ -11,6 +11,7 @@
 #include "controllers/ControllerTypes.h"
 
 #include <future>
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -73,6 +74,19 @@ public:
   ControllerVector GetControllers();
 
   /*!
+   * \brief Start timing a game, so that the library can be told how long it
+   *        was played for
+   *
+   * The player is closed more than once for a single game, so the timing is
+   * owned here: the first close records the session and the rest find nothing
+   * to record.
+   */
+  void StartPlaySession(const std::string& gamePath);
+
+  //! \brief Record the time played and forget the session, if one is open
+  void EndPlaySession();
+
+  /*!
    * \brief Translate a feature on a controller into its localized name
    *
    * \param controllerId The controller ID that the feature belongs to
@@ -109,6 +123,9 @@ private:
   RETRO::CGUIGameRenderManager& m_gameRenderManager;
   const CProfileManager& m_profileManager;
   CFileExtensionProvider& m_fileExtensionProvider;
+
+  std::string m_playSessionPath;
+  std::chrono::steady_clock::time_point m_playSessionStart;
 
   // Game services
   std::unique_ptr<CAchievementRuntime> m_achievementRuntime;

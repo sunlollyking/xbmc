@@ -241,6 +241,10 @@ public:
   int GetPlayCount() const { return m_playCount; }
   void SetPlayCount(int count) { m_playCount = count; }
 
+  //! \brief How long the game has been played for, in seconds
+  int GetPlayTime() const { return m_playTime; }
+  void SetPlayTime(int seconds) { m_playTime = seconds; }
+
   const std::string& GetLastPlayed() const { return m_strLastPlayed; }
   void SetLastPlayed(const std::string& date) { m_strLastPlayed = date; }
 
@@ -359,6 +363,7 @@ private:
 
   // The user's own state
   int m_playCount;
+  int m_playTime;
   std::string m_strLastPlayed;
   std::string m_strDateAdded;
   int m_userRating;
