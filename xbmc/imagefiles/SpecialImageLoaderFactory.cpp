@@ -11,6 +11,9 @@
 #include "guilib/Texture.h"
 #include "imagefiles/ImageFileURL.h"
 #include "music/MusicEmbeddedImageFileLoader.h"
+#if defined(HAVE_POPPLER)
+#include "games/manual/PdfImageFileLoader.h"
+#endif
 #include "pictures/PictureFolderImageFileLoader.h"
 #include "pvr/PVRChannelGroupImageFileLoader.h"
 #include "video/VideoEmbeddedImageFileLoader.h"
@@ -26,6 +29,9 @@ CSpecialImageLoaderFactory::CSpecialImageLoaderFactory()
   m_specialImageLoaders[2] = std::make_unique<VIDEO::CVideoGeneratedImageFileLoader>();
   m_specialImageLoaders[3] = std::make_unique<CPictureFolderImageFileLoader>();
   m_specialImageLoaders[4] = std::make_unique<PVR::CPVRChannelGroupImageFileLoader>();
+#if defined(HAVE_POPPLER)
+  m_specialImageLoaders[5] = std::make_unique<GAME::CPdfImageFileLoader>();
+#endif
 }
 
 std::unique_ptr<CTexture> CSpecialImageLoaderFactory::Load(const CImageFileURL& imageFile) const
@@ -34,6 +40,10 @@ std::unique_ptr<CTexture> CSpecialImageLoaderFactory::Load(const CImageFileURL& 
     return {};
   for (auto& loader : m_specialImageLoaders)
   {
+    // A loader can be absent when the library it needs was not built in
+    if (!loader)
+      continue;
+
     if (loader->CanLoad(imageFile.GetSpecialType()))
     {
       auto val = loader->Load(imageFile);
