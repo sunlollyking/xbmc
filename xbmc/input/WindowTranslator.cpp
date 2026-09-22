@@ -178,6 +178,8 @@ const CWindowTranslator::WindowMapByName CWindowTranslator::WindowMappingByName 
     {"gamediscmanager", WINDOW_DIALOG_GAME_DISC_MANAGER},
     {"gameachievements", WINDOW_DIALOG_GAME_ACHIEVEMENTS},
     {"gameindicators", WINDOW_DIALOG_GAME_INDICATORS},
+    {"gamemanual", WINDOW_GAME_MANUAL},
+    {"gamemanuals", WINDOW_DIALOG_GAME_MANUALS},
     {"gameleaderboards", WINDOW_DIALOG_GAME_LEADERBOARDS},
     {"gameleaderboardentries", WINDOW_DIALOG_GAME_LEADERBOARD_ENTRIES},
     {"gamecheats", WINDOW_DIALOG_GAME_CHEATS},

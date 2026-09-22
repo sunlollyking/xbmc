@@ -1,0 +1,7 @@
+LIBNAME=poppler
+VERSION=26.01.0
+ARCHIVE=$(LIBNAME)-$(VERSION).tar.xz
+SHA512=bf00f12eb73e164d7a73756aa03ea40f66d1b5c5677acef86b1bb450289e0aa0ab7a00cac4482e08e89dfa6fead71907bc36a70ba4b0c47e30a9fd9e61451921
+BASE_URL=https://poppler.freedesktop.org
+BYPRODUCT=libpoppler-cpp.a
+BYPRODUCT_WIN=poppler-cpp.lib

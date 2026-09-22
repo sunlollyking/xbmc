@@ -16,6 +16,7 @@
 #include "filesystem/File.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
+#include "games/manual/ManualCache.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
@@ -50,6 +51,7 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_INDICATOR = "gamesachievements.challengeindicator";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
+const std::string SETTING_GAMES_CLEAR_MANUAL_CACHE = "gamesgeneral.clearmanualcache";
 
 constexpr auto LOGIN_TO_RETRO_ACHIEVEMENTS_URL =
     "https://retroachievements.org/dorequest.php?r=login2";
@@ -74,7 +76,8 @@ CGameSettings::CGameSettings()
       this, {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME,
              SETTING_GAMES_ACHIEVEMENTS_USERNAME, SETTING_GAMES_ACHIEVEMENTS_PASSWORD,
              SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
-             SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT});
+             SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT,
+             SETTING_GAMES_CLEAR_MANUAL_CACHE});
 
   // On startup reset logged-in flag if token is missing
   const std::string token = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
@@ -146,7 +149,12 @@ std::string CGameSettings::GetRAToken() const
 
 void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setting)
 {
-  if (setting && setting->GetId() == SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT)
+  if (setting == nullptr)
+    return;
+
+  if (setting->GetId() == SETTING_GAMES_CLEAR_MANUAL_CACHE)
+    CManualCache::GetInstance().Clear();
+  else if (setting->GetId() == SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT)
     CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_DIALOG_GAME_ACHIEVEMENTS);
 }
 
