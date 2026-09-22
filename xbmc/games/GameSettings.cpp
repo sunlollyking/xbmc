@@ -50,6 +50,8 @@ const std::string SETTING_GAMES_ENABLEAUTOSAVE = "gamesgeneral.enableautosave";
 const std::string SETTING_GAMES_ENABLEREWIND = "gamesgeneral.enablerewind";
 const std::string SETTING_GAMES_REWINDTIME = "gamesgeneral.rewindtime";
 const std::string SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT = "gamesachievements.createaccount";
+const std::string SETTING_GAMES_ENABLERUNAHEAD = "gamesgeneral.enablerunahead";
+const std::string SETTING_GAMES_RUNAHEADFRAMES = "gamesgeneral.runaheadframes";
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
@@ -86,7 +88,8 @@ CGameSettings::CGameSettings()
 
   m_settings->RegisterCallback(
       this,
-      {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
+      {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ENABLERUNAHEAD,
+       SETTING_GAMES_RUNAHEADFRAMES, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
        SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
        SETTING_GAMES_ACHIEVEMENTS_ENCORE, SETTING_GAMES_ACHIEVEMENTS_INDICATOR,
@@ -153,6 +156,18 @@ unsigned int CGameSettings::MaxRewindTimeSec()
   int rewindTimeSec = m_settings->GetInt(SETTING_GAMES_REWINDTIME);
 
   return static_cast<unsigned int>(std::max(rewindTimeSec, 0));
+}
+
+bool CGameSettings::RunaheadEnabled()
+{
+  return m_settings->GetBool(SETTING_GAMES_ENABLERUNAHEAD);
+}
+
+unsigned int CGameSettings::RunaheadFrames()
+{
+  const int runaheadFrames = m_settings->GetInt(SETTING_GAMES_RUNAHEADFRAMES);
+
+  return static_cast<unsigned int>(std::max(runaheadFrames, 0));
 }
 
 std::string CGameSettings::GetRAUsername() const
@@ -238,6 +253,7 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
   }
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
+      settingId == SETTING_GAMES_ENABLERUNAHEAD || settingId == SETTING_GAMES_RUNAHEADFRAMES ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_ENCORE)
   {
     SetChanged();

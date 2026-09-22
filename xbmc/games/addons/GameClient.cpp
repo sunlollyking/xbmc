@@ -741,7 +741,7 @@ void CGameClient::PollInput()
     input->PollInput();
 }
 
-void CGameClient::RunFrame(bool pollInput)
+void CGameClient::RunFrame(bool pollInput /* = true */, bool speculative /* = false */)
 {
   if (pollInput)
     PollInput();
@@ -754,7 +754,65 @@ void CGameClient::RunFrame(bool pollInput)
     {
       {
         CClientFrameScope hwScope(Streams());
-        if (!hwScope.IsBound() ||
+        if (!hwScope.IsBound())
+          return;
+
+        // A speculative frame is one the client is about to be rewound past,
+        // so it must advance the emulator and leave everything else alone.
+        // Asked for once, at the first speculative frame, and remembered: a
+        // client that does not offer it is run the ordinary way and the caller
+        // deals with the consequences itself.
+        //
+        // The null check is what lets this be added without forcing every
+        // add-on to be rebuilt. The entry sits at the end of the function
+        // table and Kodi zeroes the table before the client fills it, so a
+        // client built against an older Game API leaves this one null rather
+        // than pointing it somewhere unfortunate.
+        bool bRanSpeculative = false;
+        if (speculative && m_speculativeFrames != SpeculativeSupport::UNSUPPORTED)
+        {
+          const bool bFirstAnswer = (m_speculativeFrames == SpeculativeSupport::UNKNOWN);
+
+          if (m_ifc.game->toAddon->RunFrameSpeculative == nullptr)
+          {
+            // Said out loud rather than quietly falling back: silence here reads
+            // exactly like the feature working.
+            if (bFirstAnswer)
+            {
+              CLog::Log(LOGINFO,
+                        "GAME: {} was built before speculative frames existed; run-ahead will "
+                        "save and restore its achievement state instead",
+                        ID());
+            }
+            m_speculativeFrames = SpeculativeSupport::UNSUPPORTED;
+          }
+          else
+          {
+            const GAME_ERROR error = m_ifc.game->toAddon->RunFrameSpeculative(m_ifc.game);
+            if (error == GAME_ERROR_NOT_IMPLEMENTED)
+            {
+              if (bFirstAnswer)
+              {
+                CLog::Log(LOGINFO,
+                          "GAME: {} does not run speculative frames; run-ahead will save and "
+                          "restore its achievement state instead",
+                          ID());
+              }
+              m_speculativeFrames = SpeculativeSupport::UNSUPPORTED;
+            }
+            else
+            {
+              if (bFirstAnswer)
+                CLog::Log(LOGINFO, "GAME: {} runs speculative frames", ID());
+
+              m_speculativeFrames = SpeculativeSupport::SUPPORTED;
+              LogError(error, "RunFrameSpeculative()");
+              bRanSpeculative = true;
+            }
+          }
+        }
+
+        if (!bRanSpeculative &&
             !LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()"))
           return;
         m_hasFrameRun = true;
@@ -775,6 +833,29 @@ void CGameClient::RunFrame(bool pollInput)
       LogException("RunFrame()");
     }
   }
+}
+
+bool CGameClient::RestoreState(const uint8_t* data, size_t size)
+{
+  if (data == nullptr || size == 0 || !m_bIsPlaying)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    CClientFrameScope hwScope(Streams());
+    if (!hwScope.IsBound())
+      return false;
+
+    return LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
+  }
+  catch (...)
+  {
+    LogException("Deserialize()");
+  }
+
+  return false;
 }
 
 size_t CGameClient::GetSerializeSize(SerializeSizeMode mode) const

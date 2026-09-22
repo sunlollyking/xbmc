@@ -20730,7 +20730,34 @@ msgctxt "#35668"
 msgid "As named on disk"
 msgstr ""
 
-#empty strings from id 35669 to 35719
+#empty strings from id 35669 to 35709
+
+#. Setting to run the emulator ahead of itself to hide input latency
+msgctxt "#35710"
+msgid "Enable run-ahead"
+msgstr ""
+
+#. Help text for the run-ahead setting
+msgctxt "#35711"
+msgid "Make games respond sooner to the controller by running the emulator ahead of itself and showing you a frame from the future. Very demanding: the emulator has to run twice over for every frame you see, or three times at two frames ahead. Works well on 8-bit and 16-bit systems; emulators with large save states, such as disc-based consoles, keep their own speed instead and are left alone."
+msgstr ""
+
+#. Setting for how many frames to run ahead
+msgctxt "#35712"
+msgid "Frames to run ahead"
+msgstr ""
+
+#. Help text for the run-ahead frames setting
+msgctxt "#35713"
+msgid "How far into the future to look. Each frame removes about one frame's worth of delay and costs another full run of the emulator. Start at one and only raise it if the game still runs at full speed."
+msgstr ""
+
+#. Label for the run-ahead frames slider, e.g. "2 frames"
+msgctxt "#35714"
+msgid "{0:d} frames"
+msgstr ""
+
+#empty strings from id 35715 to 35719
 
 #. Shown when no add-on is installed that can look for manuals
 #: xbmc/games/manual/GUIDialogGameManuals.cpp

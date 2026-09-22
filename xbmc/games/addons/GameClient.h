@@ -175,7 +175,30 @@ public:
   double GetFrameRate() const { return m_framerate.load(); }
   double GetSampleRate() const { return m_samplerate.load(); }
   void PollInput();
-  void RunFrame(bool pollInput = true);
+  /*!
+   * \brief Run one frame of the game
+   *
+   * \param pollInput Whether to drain the peripheral event queue first
+   * \param speculative Whether the frame is about to be rewound past
+   *
+   * A speculative frame also asks the client to advance the emulator and
+   * nothing else, so that work whose effect outlives the rollback -- announcing
+   * an achievement, posting rich presence -- does not happen for a frame that
+   * never really did. Clients that cannot do this are run the ordinary way.
+   */
+  void RunFrame(bool pollInput = true, bool speculative = false);
+
+  /*!
+   * \brief Whether the client can run a frame without side effects
+   *
+   * Only meaningful once a speculative frame has been attempted; before that
+   * the answer is not yet known and this reports false, which is the safe
+   * direction -- the caller then protects the achievement state itself.
+   */
+  bool RunsSpeculativeFrames() const
+  {
+    return m_speculativeFrames == SpeculativeSupport::SUPPORTED;
+  }
 
   /*!
    * \brief Tell the client what speed the player is running at
@@ -232,6 +255,20 @@ public:
    * data: the client has to know the machine state jumped either way.
    */
   bool DeserializeAchievements(const uint8_t* data, size_t size);
+
+  /*!
+   * \brief Put back a state this client itself produced moments ago
+   *
+   * Deserialize() treats the incoming state as foreign: it may have come from
+   * disc, from another session, or from a client that had not run yet, so it
+   * does the disc handling a loaded savestate needs and may run a frame to
+   * retry. All of that is right for loading a savestate and wrong sixty times a
+   * second -- for a rollback the disc has not moved since the state was taken
+   * moments earlier by the same client.
+   *
+   * \return True if the client accepted the state
+   */
+  bool RestoreState(const uint8_t* data, size_t size);
 
   // Implementation of IHwFramebufferCallback
   bool HardwareContextReset() override;
@@ -355,9 +392,18 @@ private:
   std::string m_platforms;
   bool m_supportsDiscControl{false};
 
+  //! \brief Whether the client answers RunFrameSpeculative(), asked once
+  enum class SpeculativeSupport
+  {
+    UNKNOWN,
+    SUPPORTED,
+    UNSUPPORTED,
+  };
+
   // Properties of the current playing file
   std::atomic_bool m_bIsPlaying; // True between OpenFile() and CloseFile()
   std::atomic_bool m_hasFrameRun{false};
+  std::atomic<SpeculativeSupport> m_speculativeFrames{SpeculativeSupport::UNKNOWN};
   // The speed the player is running at, as a multiple of normal speed. Written
   // by the thread that changes the speed and read by the client's own, so it is
   // atomic; a client asks for it from inside a call of its own, which can be on
