@@ -16,6 +16,7 @@
 #include "games/GameManual.h"
 #include "games/library/GameDbUrl.h"
 #include "games/tags/GameInfoTag.h"
+#include "guilib/GUIListItem.h"
 #include "playlists/SmartPlayList.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
@@ -24,6 +25,7 @@
 #include "utils/DatabaseUtils.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/TimeFormat.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -381,7 +383,14 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       if (game.IsFavourite())
         item->SetProperty("favourite", true);
       if (game.IsCompleted())
+      {
         item->SetProperty("completed", true);
+        // The same tick the video library puts on something watched
+        item->SetOverlayImage(CGUIListItem::ICON_OVERLAY_WATCHED);
+      }
+      if (game.GetPlayTime() > 0)
+        item->SetProperty("playtime", StringUtils::SecondsToTimeString(game.GetPlayTime(),
+                                                                       TIME_FORMAT_HH_MM));
       if (game.GetAchievementsEarned() > 0)
         item->SetProperty("achievementsearned", game.GetAchievementsEarned());
       item->SetLabelPreformatted(true);

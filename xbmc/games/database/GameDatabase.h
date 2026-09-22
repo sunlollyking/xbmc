@@ -153,6 +153,14 @@ public:
    * \brief Count a play of a file, now
    */
   bool MarkPlayed(const std::string& fileNameAndPath);
+
+  /*!
+   * \brief Add to the time a game file has been played for
+   *
+   * \param fileNameAndPath The file that was played
+   * \param seconds How long this session lasted
+   */
+  bool AddPlayTime(const std::string& fileNameAndPath, unsigned int seconds);
   ///@}
 
   /*!
@@ -355,7 +363,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 5; }
+  int GetSchemaVersion() const override { return 6; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

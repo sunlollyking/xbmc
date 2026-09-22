@@ -366,3 +366,16 @@ bool CGameDatabase::MarkPlayed(const std::string& fileNameAndPath)
       PrepareSQL("UPDATE files SET playCount = playCount + 1, lastPlayed = '%s' WHERE idFile = %i",
                  Now().c_str(), idFile));
 }
+
+bool CGameDatabase::AddPlayTime(const std::string& fileNameAndPath, unsigned int seconds)
+{
+  if (seconds == 0)
+    return true;
+
+  const int idFile = GetFileId(fileNameAndPath);
+  if (idFile <= 0)
+    return false;
+
+  return ExecuteQuery(PrepareSQL("UPDATE files SET playTime = playTime + %u WHERE idFile = %i",
+                                 seconds, idFile));
+}

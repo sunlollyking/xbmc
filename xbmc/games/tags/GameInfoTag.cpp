@@ -75,6 +75,7 @@ void CGameInfoTag::Reset()
   m_releaseCount = 0;
 
   m_playCount = 0;
+  m_playTime = 0;
   m_strLastPlayed.clear();
   m_strDateAdded.clear();
   m_userRating = 0;
@@ -139,6 +140,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_releaseCount = tag.m_releaseCount;
 
     m_playCount = tag.m_playCount;
+    m_playTime = tag.m_playTime;
     m_strLastPlayed = tag.m_strLastPlayed;
     m_strDateAdded = tag.m_strDateAdded;
     m_userRating = tag.m_userRating;
@@ -177,7 +179,8 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_tags == tag.m_tags && m_playersMin == tag.m_playersMin &&
          m_playersMax == tag.m_playersMax && m_coop == tag.m_coop &&
          m_category == tag.m_category && m_uniqueIds == tag.m_uniqueIds &&
-         m_playCount == tag.m_playCount && m_strLastPlayed == tag.m_strLastPlayed &&
+         m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
+         m_strLastPlayed == tag.m_strLastPlayed &&
          m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
          m_completed == tag.m_completed;
 }
@@ -361,6 +364,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     }
     ar << m_strDefaultUniqueId;
     ar << m_playCount;
+    ar << m_playTime;
     ar << m_strLastPlayed;
     ar << m_strDateAdded;
     ar << m_userRating;
@@ -452,6 +456,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     }
     ar >> m_strDefaultUniqueId;
     ar >> m_playCount;
+    ar >> m_playTime;
     ar >> m_strLastPlayed;
     ar >> m_strDateAdded;
     ar >> m_userRating;
@@ -549,6 +554,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   }
 
   value["playcount"] = m_playCount;
+  value["playtime"] = m_playTime;
   value["lastplayed"] = m_strLastPlayed;
   value["dateadded"] = m_strDateAdded;
   value["userrating"] = m_userRating;
@@ -754,6 +760,8 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
   // another box and the part a rescan cannot recover
   if (m_playCount > 0)
     XMLUtils::SetInt(game, "playcount", m_playCount);
+  if (m_playTime > 0)
+    XMLUtils::SetInt(game, "playtime", m_playTime);
   if (!m_strLastPlayed.empty())
     XMLUtils::SetString(game, "lastplayed", m_strLastPlayed);
   if (!m_strDateAdded.empty())
@@ -886,6 +894,9 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
   if (const std::string value = ChildText(element, "playcount");
       StringUtils::IsNaturalNumber(value) && !value.empty())
     m_playCount = std::stoi(value);
+  if (const std::string value = ChildText(element, "playtime");
+      StringUtils::IsNaturalNumber(value) && !value.empty())
+    m_playTime = std::stoi(value);
   if (const std::string value = ChildText(element, "lastplayed"); !value.empty())
     m_strLastPlayed = value;
   if (const std::string value = ChildText(element, "dateadded"); !value.empty())
