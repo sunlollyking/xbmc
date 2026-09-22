@@ -9,6 +9,7 @@
 #include "guilib/guiinfo/GamesGUIInfo.h"
 
 #include "FileItem.h"
+#include "XBDateTime.h"
 #include "GUIInfoManager.h"
 #include "ServiceBroker.h"
 #include "Util.h"
@@ -24,11 +25,15 @@
 #include "games/GameUtils.h"
 #include "games/addons/GameClient.h"
 #include "games/addons/cheats/GameClientCheats.h"
+#include "games/library/GameLibraryTypes.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
+#include "media/MediaType.h"
 #include "settings/MediaSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -76,6 +81,22 @@ const CAchievementRuntime& CGamesGUIInfo::AchievementRuntime() const
     return *m_achievementRuntime;
 
   return CServiceBroker::GetGameServices().AchievementRuntime();
+}
+
+bool CGamesGUIInfo::ShowIndicators()
+{
+  const auto settingsComponent = CServiceBroker::GetSettingsComponent();
+  if (settingsComponent == nullptr)
+    return true;
+
+  const auto settings = settingsComponent->GetSettings();
+  if (settings == nullptr)
+    return true;
+
+  // Answered here rather than recorded when the runtime reports one, so turning
+  // it off during an attempt clears the screen at once and the achievements
+  // dialog still knows what is being attempted
+  return settings->GetBool(SETTING_GAMES_ACHIEVEMENTS_ONSCREEN_INDICATORS);
 }
 
 bool CGamesGUIInfo::InitCurrentItem(CFileItem* item)
@@ -131,6 +152,253 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           CMediaSettings::GetInstance().GetCurrentGameSettings().RotationDegCCW();
       value = std::to_string(rotationDegCCW);
       return true;
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // LISTITEM_*
+    //
+    // A row in a listing, answered from the item's own tag rather than from the
+    // game being played. RetroPlayer.* deliberately describes the latter, the
+    // way VideoPlayer.* does, so a browsing skin asks through ListItem.* as it
+    // would for anything else.
+    //
+    // Refused where the item carries no game tag, so the question passes to the
+    // provider that can answer it.
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    case LISTITEM_TITLE:
+    case LISTITEM_PLOT:
+    case LISTITEM_GENRE:
+    case LISTITEM_YEAR:
+    case LISTITEM_STUDIO:
+    case LISTITEM_ORIGINALTITLE:
+    case LISTITEM_RATING:
+    case LISTITEM_VOTES:
+    case LISTITEM_USER_RATING:
+    case LISTITEM_PLAYCOUNT:
+    case LISTITEM_LASTPLAYED:
+    case LISTITEM_DATE_ADDED:
+    case LISTITEM_MPAA:
+    case LISTITEM_SET:
+    case LISTITEM_TAG:
+    case LISTITEM_TRAILER:
+    case LISTITEM_PREMIERED:
+    case LISTITEM_PLATFORM:
+    case LISTITEM_DEVELOPER:
+    case LISTITEM_PUBLISHER:
+    case LISTITEM_PLAYERS:
+    case LISTITEM_REGION:
+    case LISTITEM_RELEASE_COUNT:
+    case LISTITEM_ACHIEVEMENTS_TOTAL:
+    case LISTITEM_ACHIEVEMENTS_GAME_ID:
+    case LISTITEM_ACHIEVEMENTS_EARNED:
+    case LISTITEM_ACHIEVEMENTS_PERCENT:
+    case LISTITEM_ACHIEVEMENTS_PROGRESS:
+    case LISTITEM_GAME_CATEGORY:
+    case LISTITEM_GAME_CLIENT:
+    case LISTITEM_DBID:
+    case LISTITEM_DBTYPE:
+    {
+      // A node in the library -- all games, hacks, needs attention -- is not a
+      // game and has no tag, but it can still say what is down there. A folder
+      // has nowhere else to carry that.
+      if (info.GetInfo() == LISTITEM_PLOT && item != nullptr && !item->HasGameInfoTag())
+      {
+        // Refusing has to leave value as it was, so write it only on success
+        const std::string description = item->GetProperty("description").asString();
+        if (!description.empty())
+        {
+          value = description;
+          return true;
+        }
+      }
+
+      // Const access, so asking does not create a tag on an item that has none
+      if (item == nullptr || !item->HasGameInfoTag())
+        break;
+
+      const CGameInfoTag* tag = item->GetGameInfoTag();
+
+      switch (info.GetInfo())
+      {
+        case LISTITEM_TITLE:
+          value = tag->GetTitle();
+          return !value.empty();
+        case LISTITEM_PLOT:
+          value = tag->GetOverview();
+          return !value.empty();
+        case LISTITEM_GENRE:
+          value = StringUtils::Join(tag->GetGenres(), ", ");
+          return !value.empty();
+        case LISTITEM_PREMIERED:
+        {
+          // The day it was sold where the library knows it, the year otherwise
+          CDateTime date;
+          date.SetFromDBDate(tag->GetReleaseDate());
+          if (date.IsValid())
+          {
+            value = date.GetAsLocalizedDate();
+            return true;
+          }
+          if (tag->GetYear() > 0)
+          {
+            value = std::to_string(tag->GetYear());
+            return true;
+          }
+          break;
+        }
+        case LISTITEM_YEAR:
+          if (tag->GetYear() > 0)
+          {
+            value = std::to_string(tag->GetYear());
+            return true;
+          }
+          break;
+        case LISTITEM_STUDIO:
+        case LISTITEM_PUBLISHER:
+          value = tag->GetPublishers().empty() ? tag->GetPublisher()
+                                               : StringUtils::Join(tag->GetPublishers(), ", ");
+          return !value.empty();
+        case LISTITEM_DEVELOPER:
+          value = tag->GetDevelopers().empty() ? tag->GetDeveloper()
+                                               : StringUtils::Join(tag->GetDevelopers(), ", ");
+          return !value.empty();
+        case LISTITEM_ORIGINALTITLE:
+          value = tag->GetOriginalTitle();
+          return !value.empty();
+        case LISTITEM_RATING:
+          if (tag->GetRating().rating > 0.0f)
+          {
+            value = StringUtils::FormatNumber(tag->GetRating().rating);
+            return true;
+          }
+          break;
+        case LISTITEM_VOTES:
+          if (tag->GetRating().votes > 0)
+          {
+            value = std::to_string(tag->GetRating().votes);
+            return true;
+          }
+          break;
+        case LISTITEM_USER_RATING:
+          if (tag->GetUserRating() > 0)
+          {
+            value = std::to_string(tag->GetUserRating());
+            return true;
+          }
+          break;
+        case LISTITEM_PLAYCOUNT:
+          if (tag->GetPlayCount() > 0)
+          {
+            value = std::to_string(tag->GetPlayCount());
+            return true;
+          }
+          break;
+        case LISTITEM_LASTPLAYED:
+        case LISTITEM_DATE_ADDED:
+        {
+          CDateTime date;
+          date.SetFromDBDateTime(info.GetInfo() == LISTITEM_LASTPLAYED ? tag->GetLastPlayed()
+                                                                        : tag->GetDateAdded());
+          if (date.IsValid())
+          {
+            value = date.GetAsLocalizedDate();
+            return true;
+          }
+          break;
+        }
+        case LISTITEM_MPAA:
+          value = tag->GetAgeRating();
+          return !value.empty();
+        case LISTITEM_SET:
+          value = tag->GetCollections().empty() ? "" : tag->GetCollections().front();
+          return !value.empty();
+        case LISTITEM_TAG:
+          value = StringUtils::Join(tag->GetTags(), ", ");
+          return !value.empty();
+        case LISTITEM_TRAILER:
+          value = tag->GetTrailer();
+          return !value.empty();
+        case LISTITEM_PLATFORM:
+          value = tag->GetPlatform();
+          return !value.empty();
+        case LISTITEM_PLAYERS:
+          if (tag->GetPlayersMax() > 0)
+          {
+            value = tag->GetPlayersMin() > 0 && tag->GetPlayersMin() < tag->GetPlayersMax()
+                        ? StringUtils::Format("{}-{}", tag->GetPlayersMin(), tag->GetPlayersMax())
+                        : std::to_string(tag->GetPlayersMax());
+            return true;
+          }
+          break;
+        case LISTITEM_REGION:
+          // Stored as a list; read as a sentence
+          value = StringUtils::Join(StringUtils::Split(tag->GetRegion(), ","), ", ");
+          return !value.empty();
+        case LISTITEM_RELEASE_COUNT:
+          if (tag->GetReleaseCount() > 0)
+          {
+            value = std::to_string(tag->GetReleaseCount());
+            return true;
+          }
+          break;
+        case LISTITEM_ACHIEVEMENTS_TOTAL:
+          if (tag->HasAchievements())
+          {
+            value = std::to_string(tag->GetAchievementsTotal());
+            return true;
+          }
+          break;
+        // The service's own id for the game. A count of achievements is only
+        // known once one has been asked for; the id says the game can be asked
+        // about at all, which is what decides whether the list is offered.
+        case LISTITEM_ACHIEVEMENTS_GAME_ID:
+          value = tag->GetUniqueID("retroachievements");
+          return !value.empty();
+        case LISTITEM_ACHIEVEMENTS_EARNED:
+          if (tag->HasAchievements())
+          {
+            value = std::to_string(tag->GetAchievementsEarned());
+            return true;
+          }
+          break;
+        case LISTITEM_ACHIEVEMENTS_PROGRESS:
+          // How much of the set is earned, or how big it is where none is
+          if (tag->HasAchievements())
+          {
+            value = tag->GetAchievementsEarned() > 0
+                        ? StringUtils::Format("{} / {}", tag->GetAchievementsEarned(),
+                                              tag->GetAchievementsTotal())
+                        : std::to_string(tag->GetAchievementsTotal());
+            return true;
+          }
+          break;
+        case LISTITEM_ACHIEVEMENTS_PERCENT:
+          // What a profile on the service shows: how much of the set is earned
+          if (tag->GetAchievementsTotal() > 0 && tag->GetAchievementsEarned() > 0)
+          {
+            value = std::to_string(100 * tag->GetAchievementsEarned() / tag->GetAchievementsTotal());
+            return true;
+          }
+          break;
+        case LISTITEM_GAME_CATEGORY:
+          value = std::string(CGameLibraryTypes::ToString(tag->GetCategory()));
+          return !value.empty();
+        case LISTITEM_GAME_CLIENT:
+          value = tag->GetGameClient();
+          return !value.empty();
+        case LISTITEM_DBID:
+          if (tag->HasDatabaseId())
+          {
+            value = std::to_string(tag->GetDatabaseId());
+            return true;
+          }
+          break;
+        case LISTITEM_DBTYPE:
+          value = MediaTypeGame;
+          return true;
+        default:
+          break;
+      }
+      break;
     }
     case RETROPLAYER_TITLE:
     {
@@ -258,7 +526,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     {
       // Answered empty rather than never recorded, so that turning it off while
       // an attempt is live takes the indicator off screen at once
-      if (!CServiceBroker::GetGameServices().GameSettings().GetChallengeIndicator())
+      if (!ShowIndicators())
       {
         value.clear();
         return true;
@@ -319,6 +587,23 @@ bool CGamesGUIInfo::GetInt(int& value,
                            int contextWindow,
                            const CGUIInfo& info) const
 {
+  switch (info.GetInfo())
+  {
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // RETROPLAYER_*
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PERCENT:
+    {
+      // Answered here as well as on GetLabel so a progress control can be bound
+      // to it directly
+      const AchievementProgressIndicator indicator = AchievementRuntime().GetProgressIndicator();
+      value = indicator.id == 0 ? 0 : static_cast<int>(indicator.measuredPercent);
+      return true;
+    }
+    default:
+      break;
+  }
+
   return false;
 }
 

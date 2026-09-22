@@ -20,6 +20,8 @@
 #include "dialogs/GUIDialogContextMenu.h"
 #include "dialogs/GUIDialogOK.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "games/GameServices.h"
+#include "games/GameSettings.h"
 #include "games/dialogs/DialogGameDefines.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIMessage.h"

@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<onload>SetFocus(5000,0,absolute)</onload>
+	<onload>SetProperty(infobackground,$ESCINFO[ListItem.Art(fanart)],home)</onload>
+	<onunload>ClearProperty(infobackground,home)</onunload>
+	<controls>
+		<control type="image">
+			<description>Backdrop</description>
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="DD000000">colors/black.png</texture>
+			<animation effect="fade" time="200">WindowOpen</animation>
+			<animation effect="fade" time="200">WindowClose</animation>
+		</control>
+		<control type="button" id="14">
+			<include>HiddenObject</include>
+		</control>
+		<control type="button" id="15">
+			<include>HiddenObject</include>
+		</control>
+		<control type="group">
+			<centertop>50%</centertop>
+			<height>1080</height>
+			<centerleft>50%</centerleft>
+			<width>1920</width>
+			<control type="group">
+				<description>Box art</description>
+				<top>150</top>
+				<left>66</left>
+				<include>OpenClose_Left</include>
+				<control type="image">
+					<depth>DepthContentPopout</depth>
+					<left>4</left>
+					<top>4</top>
+					<width>526</width>
+					<height>801</height>
+					<aspectratio align="center" aligny="center">keep</aspectratio>
+					<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+					<bordersize>20</bordersize>
+					<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+					<visible>String.IsEmpty(ListItem.Art(boxback))</visible>
+				</control>
+				<!-- Both faces of the case, where the back was scraped -->
+				<control type="group">
+					<depth>DepthContentPopout</depth>
+					<visible>!String.IsEmpty(ListItem.Art(boxback))</visible>
+					<control type="image">
+						<left>4</left>
+						<top>4</top>
+						<width>526</width>
+						<height>390</height>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+						<bordersize>20</bordersize>
+						<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+					</control>
+					<control type="image">
+						<left>4</left>
+						<top>415</top>
+						<width>526</width>
+						<height>390</height>
+						<aspectratio align="center" aligny="center">keep</aspectratio>
+						<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+						<bordersize>20</bordersize>
+						<texture background="true">$INFO[ListItem.Art(boxback)]</texture>
+					</control>
+				</control>
+			</control>
+			<control type="group">
+				<include>OpenClose_Right</include>
+				<left>620</left>
+				<top>-30</top>
+				<control type="group" id="140">
+					<top>180</top>
+					<control type="image">
+						<width>1244</width>
+						<height>280</height>
+						<texture border="21">dialogs/dialog-bg.png</texture>
+					</control>
+					<control type="grouplist" id="4000">
+						<description>Facts</description>
+						<left>40</left>
+						<top>20</top>
+						<width>1170</width>
+						<height>250</height>
+						<itemgap>0</itemgap>
+						<orientation>vertical</orientation>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35549]" />
+							<param name="info" value="ListItem.Platform" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[562]" />
+							<param name="info" value="ListItem.Year" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35521]" />
+							<param name="info" value="ListItem.Developer" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35522]" />
+							<param name="info" value="ListItem.Publisher" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[135]" />
+							<param name="info" value="ListItem.Genre" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35525]" />
+							<param name="info" value="ListItem.Players" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35524]" />
+							<param name="info" value="ListItem.Region" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35543]" />
+							<param name="info" value="ListItem.ReleaseCount" />
+						</include>
+						<control type="group">
+							<height>31</height>
+							<visible>!String.IsEmpty(ListItem.AchievementsTotal)</visible>
+							<control type="label">
+								<width>260</width>
+								<height>31</height>
+								<font>font12</font>
+								<textcolor>grey</textcolor>
+								<label>$LOCALIZE[35588]</label>
+							</control>
+							<control type="label">
+								<left>260</left>
+								<width>560</width>
+								<height>31</height>
+								<font>font12</font>
+								<label>$INFO[ListItem.AchievementsEarned,, / ]$INFO[ListItem.AchievementsTotal]</label>
+							</control>
+						</control>
+					</control>
+					<control type="group">
+						<description>Rating and play state</description>
+						<left>860</left>
+						<top>20</top>
+						<control type="label">
+							<width>340</width>
+							<height>50</height>
+							<font>font45_title</font>
+							<align>right</align>
+							<label>$INFO[ListItem.Rating]</label>
+							<visible>!String.IsEmpty(ListItem.Rating)</visible>
+						</control>
+						<control type="label">
+							<top>50</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.UserRating,$LOCALIZE[38023] ,]</label>
+						</control>
+						<control type="label">
+							<top>90</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.PlayCount,$LOCALIZE[567] ,]</label>
+						</control>
+						<control type="label">
+							<top>130</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.LastPlayed,$LOCALIZE[568] ,]</label>
+						</control>
+						<control type="label">
+							<top>170</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.Mpaa]</label>
+						</control>
+					</control>
+				</control>
+				<control type="group" id="141">
+					<top>468</top>
+					<control type="button" id="138">
+						<width>1244</width>
+						<height>236</height>
+						<textoffsetx>40</textoffsetx>
+						<textoffsety>20</textoffsety>
+						<aligny>bottom</aligny>
+						<label></label>
+						<onclick>SetProperty(TextViewer_Header,$LOCALIZE[207],home)</onclick>
+						<onclick>SetProperty(TextViewer_Text,$ESCINFO[ListItem.Plot],home)</onclick>
+						<onclick>ActivateWindow(1102)</onclick>
+						<onup>4000</onup>
+						<ondown>5000</ondown>
+						<texturenofocus border="21">dialogs/dialog-bg.png</texturenofocus>
+						<texturefocus border="21">dialogs/dialog-bg.png</texturefocus>
+					</control>
+					<control type="textbox">
+						<left>40</left>
+						<top>26</top>
+						<width>1164</width>
+						<height>190</height>
+						<font>font13</font>
+						<label>$INFO[ListItem.Plot]</label>
+						<autoscroll delay="8000" time="3000" repeat="10000">Control.HasFocus(138)</autoscroll>
+					</control>
+					<control type="group">
+						<description>Every other picture the library holds; the Artwork button opens them whole</description>
+						<top>218</top>
+						<control type="label">
+							<left>40</left>
+							<top>0</top>
+							<width>1164</width>
+							<height>36</height>
+							<font>font12</font>
+							<textcolor>grey</textcolor>
+							<label>$LOCALIZE[35575]</label>
+							<visible>!(String.IsEmpty(ListItem.Art(boxback)) + String.IsEmpty(ListItem.Art(cartridge)) + String.IsEmpty(ListItem.Art(disc)) + String.IsEmpty(ListItem.Art(clearlogo)) + String.IsEmpty(ListItem.Art(titlescreen)) + String.IsEmpty(ListItem.Art(screenshot)) + String.IsEmpty(ListItem.Art(marquee)) + String.IsEmpty(ListItem.Art(box3d)) + String.IsEmpty(ListItem.Art(boxspine)) + String.IsEmpty(ListItem.Art(boxfull)) + String.IsEmpty(ListItem.Art(banner)) + String.IsEmpty(ListItem.Art(flyer)) + String.IsEmpty(ListItem.Art(map)) + String.IsEmpty(ListItem.Art(bezel)) + String.IsEmpty(ListItem.Art(mix)) + String.IsEmpty(ListItem.Art(fanart)))</visible>
+						</control>
+						<control type="grouplist">
+							<left>40</left>
+							<top>42</top>
+							<width>1164</width>
+							<height>128</height>
+							<itemgap>10</itemgap>
+							<orientation>horizontal</orientation>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="boxback" />
+								<param name="label" value="$LOCALIZE[35577]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="cartridge" />
+								<param name="label" value="$LOCALIZE[35578]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="disc" />
+								<param name="label" value="$LOCALIZE[35579]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="clearlogo" />
+								<param name="label" value="$LOCALIZE[35582]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="titlescreen" />
+								<param name="label" value="$LOCALIZE[35580]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="screenshot" />
+								<param name="label" value="$LOCALIZE[35581]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="marquee" />
+								<param name="label" value="$LOCALIZE[35604]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="box3d" />
+								<param name="label" value="$LOCALIZE[35605]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="boxspine" />
+								<param name="label" value="$LOCALIZE[35584]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="boxfull" />
+								<param name="label" value="$LOCALIZE[35606]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="banner" />
+								<param name="label" value="$LOCALIZE[35583]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="flyer" />
+								<param name="label" value="$LOCALIZE[35607]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="map" />
+								<param name="label" value="$LOCALIZE[35608]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="bezel" />
+								<param name="label" value="$LOCALIZE[35609]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="mix" />
+								<param name="label" value="$LOCALIZE[35610]" />
+							</include>
+							<include content="GameArtTile">
+								<param name="w" value="130" />
+							<param name="art" value="fanart" />
+								<param name="label" value="$LOCALIZE[20445]" />
+							</include>
+						</control>
+						<control type="label">
+							<left>40</left>
+							<top>20</top>
+							<width>1164</width>
+							<height>120</height>
+							<font>font13</font>
+							<textcolor>grey</textcolor>
+							<align>center</align>
+							<aligny>center</aligny>
+							<label>$LOCALIZE[19055]</label>
+							<visible>String.IsEmpty(ListItem.Plot) + String.IsEmpty(ListItem.Art(boxback)) + String.IsEmpty(ListItem.Art(cartridge)) + String.IsEmpty(ListItem.Art(disc)) + String.IsEmpty(ListItem.Art(clearlogo)) + String.IsEmpty(ListItem.Art(titlescreen)) + String.IsEmpty(ListItem.Art(screenshot)) + String.IsEmpty(ListItem.Art(marquee)) + String.IsEmpty(ListItem.Art(box3d)) + String.IsEmpty(ListItem.Art(boxspine)) + String.IsEmpty(ListItem.Art(boxfull)) + String.IsEmpty(ListItem.Art(banner)) + String.IsEmpty(ListItem.Art(flyer)) + String.IsEmpty(ListItem.Art(map)) + String.IsEmpty(ListItem.Art(bezel)) + String.IsEmpty(ListItem.Art(mix)) + String.IsEmpty(ListItem.Art(fanart))</visible>
+						</control>
+					</control>
+				</control>
+				<control type="grouplist" id="5000">
+					<description>Buttons</description>
+					<left>0</left>
+					<top>864</top>
+					<width>1244</width>
+					<height>150</height>
+					<itemgap>-19</itemgap>
+					<orientation>horizontal</orientation>
+					<onup>138</onup>
+					<ondown>5000</ondown>
+					<include content="InfoDialogButton">
+						<param name="id" value="8" />
+						<param name="icon" value="icons/infodialogs/play.png" />
+						<param name="label" value="$LOCALIZE[208]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="5" />
+						<param name="icon" value="icons/infodialogs/versions.png" />
+						<param name="label" value="$LOCALIZE[35543]" />
+						<param name="visible" value="Integer.IsGreater(ListItem.ReleaseCount,1)" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="16" />
+						<param name="icon" value="icons/infodialogs/image.png" />
+						<param name="label" value="$LOCALIZE[35575]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="12" />
+						<param name="icon" value="icons/infodialogs/rating.png" />
+						<param name="label" value="$LOCALIZE[14076]" />
+						<param name="visible" value="true" />
+					</include>
+					<control type="radiobutton" id="13">
+						<description>Not started, in progress or completed</description>
+						<width>264</width>
+						<height>142</height>
+						<align>center</align>
+						<aligny>top</aligny>
+						<texturefocus border="21" colordiffuse="button_focus">buttons/button-fo.png</texturefocus>
+						<texturenofocus border="21">buttons/button-nofo.png</texturenofocus>
+						<textoffsetx>22</textoffsetx>
+						<textoffsety>78</textoffsety>
+						<radioposx>108</radioposx>
+						<radioposy>16</radioposy>
+						<radiowidth>48</radiowidth>
+						<font>font12</font>
+						<textcolor>$VAR[GamePlayStateColourVar]</textcolor>
+						<focusedcolor>$VAR[GamePlayStateColourVar]</focusedcolor>
+						<hitrect x="21" y="21" w="245" h="100" />
+						<textureradioonfocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradioonfocus>
+						<textureradioonnofocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradioonnofocus>
+						<textureradioofffocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradioofffocus>
+						<textureradiooffnofocus colordiffuse="D0FFFFFF">icons/infodialogs/enabled.png</textureradiooffnofocus>
+						<textureradiooffdisabled colordiffuse="disabled">icons/infodialogs/enabled.png</textureradiooffdisabled>
+						<textureradioondisabled colordiffuse="disabled">icons/infodialogs/enabled.png</textureradioondisabled>
+					</control>
+					<include content="InfoDialogButton">
+						<param name="id" value="7" />
+						<param name="icon" value="icons/infodialogs/rating.png" />
+						<param name="label" value="$LOCALIZE[38023]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="14" />
+						<param name="icon" value="icons/infodialogs/play.png" />
+						<param name="label" value="$LOCALIZE[35510]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="15" />
+						<param name="icon" value="icons/infodialogs/play.png" />
+						<param name="label" value="$LOCALIZE[35726]" />
+						<param name="visible" value="true" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="6" />
+						<param name="icon" value="icons/infodialogs/update.png" />
+						<param name="label" value="$LOCALIZE[184]" />
+						<param name="visible" value="true" />
+					</include>
+				</control>
+			</control>
+		</control>
+		<include content="InfoDialogTopBarInfo">
+			<param name="main_label" value="$INFO[ListItem.Title]" />
+			<param name="sub_label" value="$INFO[ListItem.Platform]$INFO[ListItem.Year, · ,]" />
+		</include>
+		<include condition="Skin.HasSetting(touchmode)">TouchBackButton</include>
+	</controls>
+</window>

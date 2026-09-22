@@ -116,6 +116,8 @@
 		<value>$INFO[ListItem.Label2]</value>
 	</variable>
 	<variable name="PlotTextBoxVar">
+		<value condition="Container.Content(games) | Container.Content(releases)">$VAR[GameListInfoVar]</value>
+		<value condition="Container.Content(platforms)">$VAR[PlatformListInfoVar]</value>
 		<value condition="!String.IsEmpty(ListItem.PlotOutline)">$INFO[ListItem.PlotOutline]</value>
 		<value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
 		<value condition="String.IsEqual(ListItem.DBType,season)">$INFO[Container.ShowPlot]</value>
@@ -155,12 +157,20 @@
 		<value condition="ListItem.IsParentFolder">special://skin/extras/home-images/movie.jpg</value>
 		<value>$INFO[ListItem.Art(fanart)]</value>
 	</variable>
+	<variable name="GameListInfoVar">
+		<value>$INFO[ListItem.Platform,[COLOR button_focus]$LOCALIZE[35549]: [/COLOR],[CR]]$INFO[ListItem.Year,[COLOR button_focus]$LOCALIZE[345]: [/COLOR],[CR]]$INFO[ListItem.Genre,[COLOR button_focus]$LOCALIZE[515]: [/COLOR],[CR]]$INFO[ListItem.Developer,[COLOR button_focus]$LOCALIZE[35728]: [/COLOR],[CR]]$INFO[ListItem.Publisher,[COLOR button_focus]$LOCALIZE[35727]: [/COLOR],[CR]]$INFO[ListItem.Players,[COLOR button_focus]$LOCALIZE[35525]: [/COLOR],[CR]]$INFO[ListItem.Region,[COLOR button_focus]$LOCALIZE[20026]: [/COLOR],[CR]]$INFO[ListItem.Plot,[CR],]</value>
+	</variable>
+	<variable name="PlatformListInfoVar">
+		<value>$INFO[ListItem.Property(manufacturer),[COLOR button_focus]$LOCALIZE[35571]: [/COLOR],[CR]]$INFO[ListItem.Property(released),[COLOR button_focus]$LOCALIZE[345]: [/COLOR],[CR]]$INFO[ListItem.Property(gamecount),[COLOR button_focus]$LOCALIZE[35550]: [/COLOR],[CR]]$INFO[ListItem.Plot,[CR],]</value>
+	</variable>
 	<variable name="ListBoxInfoVar">
 		<value condition="String.IsEqual(Container.FolderPath,addons://outdated/) + !String.IsEmpty(ListItem.Addonnews)">$INFO[ListItem.Addonnews]</value>
 		<value condition="Container.Content(addons)">$INFO[ListItem.AddonDescription]</value>
 		<value condition="String.IsEqual(listitem.dbtype,album)">$INFO[ListItem.Property(album_description)]</value>
 		<value condition="String.IsEqual(listitem.dbtype,musicvideo) | String.IsEqual(listitem.dbtype,video)">$INFO[ListItem.Genre,[COLOR button_focus]$LOCALIZE[515]: [/COLOR],[CR]]$INFO[ListItem.Plot]</value>
 		<value condition="String.IsEqual(listitem.dbtype,artist)">$INFO[ListItem.Property(artist_description)]</value>
+		<value condition="Container.Content(games) | Container.Content(releases)">$VAR[GameListInfoVar]</value>
+		<value condition="Container.Content(platforms)">$VAR[PlatformListInfoVar]</value>
 		<value condition="!String.IsEmpty(ListItem.PlotOutline)">$INFO[ListItem.PlotOutline]</value>
 		<value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
 		<value condition="String.IsEqual(ListItem.DBType,season)">$INFO[Container.ShowPlot]</value>
@@ -305,6 +315,57 @@
 		<value condition="Container.Content(actors) | Container.Content(directors)">$INFO[Container.ListItem.Art(thumb)]</value>
 		<value condition="!String.IsEmpty(ListItem.Art(tvshow.poster)) + !String.IsEqual(listitem.dbtype,season)">$INFO[ListItem.Art(tvshow.poster)]</value>
 		<value>$INFO[ListItem.Art(poster)]</value>
+	</variable>
+	<variable name="GamePlayStateColourVar">
+		<value condition="String.IsEqual(Window(gameinformation).Property(playstate),completed)">FF66BB6A</value>
+		<value condition="String.IsEqual(Window(gameinformation).Property(playstate),inprogress)">FFFFB300</value>
+		<value>D0FFFFFF</value>
+	</variable>
+	<variable name="GameScreenshotVar">
+		<value condition="!String.IsEmpty(ListItem.Art(screenshot))">$INFO[ListItem.Art(screenshot)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(snap))">$INFO[ListItem.Art(snap)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(titlescreen))">$INFO[ListItem.Art(titlescreen)]</value>
+		<value>$INFO[ListItem.Art(fanart)]</value>
+	</variable>
+	<variable name="GameMediaVar">
+		<value condition="!String.IsEmpty(ListItem.Art(cartridge))">$INFO[ListItem.Art(cartridge)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(disc))">$INFO[ListItem.Art(disc)]</value>
+		<value>$INFO[ListItem.Art(wheel)]</value>
+	</variable>
+	<variable name="GameBackdropVar">
+		<value condition="!String.IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(screenshot))">$INFO[ListItem.Art(screenshot)]</value>
+		<value>$INFO[ListItem.Art(titlescreen)]</value>
+	</variable>
+	<variable name="GameFactsLineVar">
+		<value>$INFO[ListItem.Platform]$INFO[ListItem.Year,  ·  ,]$INFO[ListItem.Genre,  ·  ,]$INFO[ListItem.Publisher,  ·  ,]$INFO[ListItem.Players,  ·  $LOCALIZE[35525]: ,]$INFO[ListItem.AchievementsTotal,  ·  , $LOCALIZE[35588]]</value>
+	</variable>
+	<variable name="MachineLogoVar">
+		<value condition="!String.IsEmpty(ListItem.Art(clearlogo))">$INFO[ListItem.Art(clearlogo)]</value>
+		<value>$INFO[ListItem.Art(logo)]</value>
+	</variable>
+	<variable name="MachinePhotoVar">
+		<value condition="!String.IsEmpty(ListItem.Art(photo))">$INFO[ListItem.Art(photo)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(illustration))">$INFO[ListItem.Art(illustration)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(controller))">$INFO[ListItem.Art(controller)]</value>
+		<value>$INFO[ListItem.Art(fanart)]</value>
+	</variable>
+	<variable name="MachineBackdropVar">
+		<value condition="!String.IsEmpty(ListItem.Art(fanart))">$INFO[ListItem.Art(fanart)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(illustration))">$INFO[ListItem.Art(illustration)]</value>
+		<value>$INFO[ListItem.Art(photo)]</value>
+	</variable>
+	<variable name="GameWallVar">
+		<value condition="!String.IsEmpty(ListItem.Art(boxfront))">$INFO[ListItem.Art(boxfront)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(thumb))">$INFO[ListItem.Art(thumb)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(screenshot))">$INFO[ListItem.Art(screenshot)]</value>
+		<value>$INFO[ListItem.Art(titlescreen)]</value>
+	</variable>
+	<variable name="GameInfoBoxVar">
+		<value condition="!String.IsEmpty(ListItem.Art(boxfront))">$INFO[ListItem.Art(boxfront)]</value>
+		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+		<value>$INFO[ListItem.Art(thumb)]</value>
 	</variable>
 	<variable name="InfoDialogPosterVar">
 		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
@@ -488,6 +549,9 @@
 		<value condition="!String.IsEmpty(Skin.String(HomeFanart.path))">$INFO[Skin.String(HomeFanart.path)]weather$INFO[Skin.String(HomeFanart.ext)]</value>
 	</variable>
 	<variable name="ListWatchedIconVar">
+		<!-- The ways into a platform each carry their own glyph; a folder
+		     overlay would say the same thing about all twenty-three -->
+		<value condition="Container.Content(overview) + !ListItem.IsParentFolder + !String.IsEmpty(ListItem.Art(icon))">$INFO[ListItem.Art(icon)]</value>
 		<value condition="ListItem.IsRecording">windows/pvr/record.png</value>
 		<value condition="ListItem.IsCollection">overlays/set.png</value>
 		<value condition="ListItem.HasVideoVersions + !$EXP[videoasset_true]">overlays/versions.png</value>

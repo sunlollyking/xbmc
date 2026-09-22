@@ -13,6 +13,8 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "filesystem/Directory.h"
+#include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryQueue.h"
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
 #include "music/MusicDatabase.h"
@@ -49,6 +51,9 @@ void CLibraryGUIInfo::SetLibraryBool(int condition, bool value)
     case LIBRARY_HAS_MOVIES:
       m_libraryHasMovies = value ? 1 : 0;
       break;
+    case LIBRARY_HAS_GAMES:
+      m_libraryHasGames = value ? 1 : 0;
+      break;
     case LIBRARY_HAS_MOVIE_SETS:
       m_libraryHasMovieSets = value ? 1 : 0;
       break;
@@ -76,6 +81,7 @@ void CLibraryGUIInfo::ResetLibraryBools()
 {
   m_libraryHasMusic = -1;
   m_libraryHasMovies = -1;
+  m_libraryHasGames = -1;
   m_libraryHasTVShows = -1;
   m_libraryHasMusicVideos = -1;
   m_libraryHasMovieSets = -1;
@@ -279,10 +285,30 @@ bool CLibraryGUIInfo::GetBool(bool& value,
       value = CFileUtils::Exists(nodePath);
       return true;
     }
+    case LIBRARY_HAS_GAMES:
+    {
+      if (m_libraryHasGames < 0)
+      {
+        KODI::GAME::CGameDatabase db;
+        if (db.Open())
+        {
+          m_libraryHasGames = db.HasContent() ? 1 : 0;
+          db.Close();
+        }
+      }
+      value = m_libraryHasGames > 0;
+      return true;
+    }
     case LIBRARY_IS_SCANNING:
     {
       value = (CMusicLibraryQueue::GetInstance().IsScanningLibrary() ||
-               CVideoLibraryQueue::GetInstance().IsScanningLibrary());
+               CVideoLibraryQueue::GetInstance().IsScanningLibrary() ||
+               KODI::GAME::CGameLibraryQueue::GetInstance().IsScanningLibrary());
+      return true;
+    }
+    case LIBRARY_IS_SCANNING_GAMES:
+    {
+      value = KODI::GAME::CGameLibraryQueue::GetInstance().IsScanningLibrary();
       return true;
     }
     case LIBRARY_IS_SCANNING_VIDEO:

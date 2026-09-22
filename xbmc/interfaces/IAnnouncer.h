@@ -25,11 +25,12 @@ enum AnnouncementFlag
   Input = 0x080,
   PVR = 0x100,
   Other = 0x200,
+  GameLibrary = 0x1000,
   Info = 0x400,
   Sources = 0x800
 };
 
-const auto ANNOUNCE_ALL = (Player | Playlist | GUI | System | VideoLibrary | AudioLibrary |
+const auto ANNOUNCE_ALL = (Player | Playlist | GUI | System | VideoLibrary | AudioLibrary | GameLibrary |
                            Application | Input | ANNOUNCEMENT::PVR | Other | Info | Sources);
 
 /*!
@@ -54,6 +55,8 @@ inline const char* AnnouncementFlagToString(const AnnouncementFlag& notification
       return "VideoLibrary";
     case AudioLibrary:
       return "AudioLibrary";
+    case GameLibrary:
+      return "GameLibrary";
     case Application:
       return "Application";
     case Input:

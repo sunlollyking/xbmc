@@ -2,7 +2,7 @@
 <window>
 	<defaultcontrol always="true">50</defaultcontrol>
 	<backgroundcolor>background</backgroundcolor>
-	<views>55,51,52,53,54,500,50</views>
+	<views>56,57,58,59,55,51,52,53,54,500,50</views>
 	<menucontrol>9000</menucontrol>
 	<controls>
 		<include>DefaultBackground</include>
@@ -15,6 +15,10 @@
 			<include>View_54_InfoWall</include>
 			<include>View_55_WideList</include>
 			<include>View_500_Wall</include>
+			<include>View_56_GameDetails</include>
+			<include>View_57_GameShelf</include>
+			<include>View_58_GameScreens</include>
+			<include>View_59_GameMachines</include>
 			<include>CommonScrollbars</include>
 			<control type="group">
 				<depth>DepthContentPanel</depth>
@@ -42,13 +46,13 @@
 						<font>font36_title</font>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
-					<control type="textbox">
+					<control type="textbox" id="15510">
 						<left>30</left>
 						<top>240</top>
 						<width>525</width>
 						<bottom>100</bottom>
 						<visible>!ListItem.IsCollection</visible>
-						<label>$INFO[ListItem.Tagline,[I],[/I][CR][CR]]$INFO[ListItem.Plot][CR][CR]</label>
+						<label>$INFO[ListItem.Tagline,[I],[/I][CR][CR]]$VAR[ListBoxInfoVar][CR][CR]</label>
 						<autoscroll delay="10000" time="3000" repeat="10000">Skin.HasSetting(autoscroll)</autoscroll>
 					</control>
 					<control type="textbox">
@@ -61,7 +65,7 @@
 						<font>font27</font>
 						<textcolor>80FFFFFF</textcolor>
 						<label>$LOCALIZE[19055]</label>
-						<visible>String.IsEmpty(Listitem.Plot) + String.IsEmpty(Listitem.Tagline) + !ListItem.IsCollection + !ListItem.IsParentFolder</visible>
+						<visible>String.IsEmpty(Control.GetLabel(15510)) + !ListItem.IsCollection + !ListItem.IsParentFolder</visible>
 					</control>
 					<control type="group">
 						<left>20</left>
@@ -93,7 +97,7 @@
 						<description>Actions</description>
 						<include>MediaMenuLabelCommon</include>
 						<label>$LOCALIZE[31020]</label>
-						<visible>Control.IsVisible(621) | Control.IsVisible(624)</visible>
+						<visible>Control.IsVisible(621) | Control.IsVisible(624) | Control.IsVisible(625) | Control.IsVisible(626) | Control.IsVisible(627)</visible>
 					</control>
 					<control type="button" id="621">
 						<description>Get more</description>
@@ -107,6 +111,29 @@
 						<label>$LOCALIZE[10140]</label>
 						<onclick>Addon.OpenSettings($INFO[Container.PluginName])</onclick>
 						<visible>!String.IsEmpty(Container.PluginName)</visible>
+					</control>
+					<control type="button" id="625">
+						<description>Library</description>
+						<include>MediaMenuItemsCommon</include>
+						<label>$LOCALIZE[14022]</label>
+						<onclick>ActivateWindow(Games,library,return)</onclick>
+						<visible>!String.StartsWith(Container.FolderPath,gamedb://) + Library.HasContent(games)</visible>
+					</control>
+					<control type="button" id="626">
+						<description>Files</description>
+						<include>MediaMenuItemsCommon</include>
+						<label>$LOCALIZE[744]</label>
+						<onclick>ActivateWindow(Games,files,return)</onclick>
+						<visible>String.StartsWith(Container.FolderPath,gamedb://)</visible>
+					</control>
+					<control type="togglebutton" id="627">
+						<description>Update library</description>
+						<include>MediaMenuItemsCommon</include>
+						<label>$LOCALIZE[653]</label>
+						<onclick>UpdateLibrary(games)</onclick>
+						<visible>Library.HasContent(games) + !Container.Content(addons) + String.IsEmpty(Container.PluginName)</visible>
+						<altlabel>$LOCALIZE[13353]</altlabel>
+						<usealttexture>Library.IsScanningGames</usealttexture>
 					</control>
 					<include>MediaMenuNowPlaying</include>
 				</control>
