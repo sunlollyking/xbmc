@@ -28,6 +28,14 @@ public:
 
   void EnableAudio(bool bEnable);
 
+  /*!
+   * \brief Whether frames the client produces reach the screen
+   *
+   * Only one of the video streams exists for a given client -- software or
+   * hardware rendered -- so this addresses whichever was created.
+   */
+  void EnableVideo(bool bEnable);
+
   // Implementation of IStreamManager
   StreamPtr CreateStream(StreamType streamType) override;
   void CloseStream(StreamPtr stream) override;

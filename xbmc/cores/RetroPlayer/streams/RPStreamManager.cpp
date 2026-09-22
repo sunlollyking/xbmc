@@ -37,6 +37,15 @@ void CRPStreamManager::EnableAudio(bool bEnable)
     m_audioStream->Enable(bEnable);
 }
 
+void CRPStreamManager::EnableVideo(bool bEnable)
+{
+  if (m_videoStream != nullptr)
+    m_videoStream->Enable(bEnable);
+
+  if (m_renderingStream != nullptr)
+    m_renderingStream->Enable(bEnable);
+}
+
 StreamPtr CRPStreamManager::CreateStream(StreamType streamType)
 {
   switch (streamType)
