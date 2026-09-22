@@ -19569,7 +19569,11 @@ msgctxt "#35301"
 msgid "Kodi couldn't initialize {0:s} rendering for this game on this display."
 msgstr ""
 
-#empty string with id 35302
+#. Help text for the hardcore mode setting
+#: system/settings/settings.xml
+msgctxt "#35302"
+msgid "Earn achievements worth double points, with rewind, save state loading, cheats and slow motion disabled. Turning this on restarts the game."
+msgstr ""
 
 #. Label of the setting that enables RetroAchievements encore mode
 #: system/settings/settings.xml
@@ -19583,10 +19587,34 @@ msgctxt "#35304"
 msgid "Allow achievements you have already earned to be triggered again.[CR][CR]Applies the next time you load the game."
 msgstr ""
 
+#. Notification shown when hardcore mode blocks a feature, {0:s} is the feature
+#: xbmc/games/GameSettings.cpp
+msgctxt "#35305"
+msgid "{0:s} is not available"
+msgstr ""
+
+#. Notification shown when hardcore mode is turned off during play
+#: xbmc/games/GameSettings.cpp
+msgctxt "#35306"
+msgid "Hardcore mode disabled. Achievements will be earned in casual mode."
+msgstr ""
+
 #. Notification shown when all achievements of a subset are earned, {0:s} is the subset
 #: xbmc/games/addons/cheevos/GameClientCheevos.cpp
 msgctxt "#35307"
 msgid "Subset completed"
+msgstr ""
+
+#. Name of the save state feature, used when hardcore mode blocks it
+#: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
+msgctxt "#35308"
+msgid "Loading save states"
+msgstr ""
+
+#. Name of the rewind feature, used when hardcore mode blocks it
+#: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
+msgctxt "#35309"
+msgid "Rewind"
 msgstr ""
 
 #. Label of the Manual action in the game OSD, and heading of its notifications
@@ -20730,7 +20758,27 @@ msgctxt "#35668"
 msgid "As named on disk"
 msgstr ""
 
-#empty strings from id 35669 to 35709
+#empty strings from id 35669 to 35699
+
+#. Label of the setting that enables RetroAchievements hardcore mode
+#: system/settings/settings.xml
+msgctxt "#35700"
+msgid "Hardcore mode"
+msgstr ""
+
+#. Name of the slow motion feature, used when hardcore mode blocks it
+#: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
+msgctxt "#35701"
+msgid "Slow motion"
+msgstr ""
+
+#. Confirmation shown before turning hardcore mode on during a game
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35702"
+msgid "Starting a hardcore session restarts the game. Any unsaved progress will be lost.[CR][CR]Continue?"
+msgstr ""
+
+#empty strings from id 35703 to 35709
 
 #. Setting to run the emulator ahead of itself to hide input latency
 msgctxt "#35710"

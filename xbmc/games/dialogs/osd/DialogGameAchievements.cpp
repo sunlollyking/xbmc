@@ -313,6 +313,11 @@ bool CDialogGameAchievements::OnMessage(CGUIMessage& message)
     case GUI_MSG_CLICKED:
     {
       const int control = message.GetSenderId();
+      if (control == CONTROL_CHEEVOS_HARDCORE)
+      {
+        OnHardcoreToggled();
+        return true;
+      }
       if (control == CONTROL_CHEEVOS_ENCORE || control == CONTROL_CHEEVOS_CHALLENGE_INDICATOR)
       {
         const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
@@ -558,3 +563,29 @@ void CDialogGameAchievements::OnJobComplete(unsigned int jobID, bool success, CJ
   CJobQueue::OnJobComplete(jobID, success, job);
 }
 
+void CDialogGameAchievements::OnHardcoreToggled()
+{
+  CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+
+  const bool enabling = !gameSettings.GetAchievementsHardcore();
+
+  // Only turning it on is asked about, and only while a game is up: that is
+  // the case that costs the player the session they are in. The radio button
+  // takes its state from the setting, so a refusal here corrects it.
+  //
+  // "Hardcore mode", "Starting a hardcore session restarts the game..."
+  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
+  if (enabling && appPlayer->IsPlayingGame() &&
+      !CGUIDialogYesNo::ShowAndGetInput(CVariant{35700}, CVariant{35702}))
+  {
+    return;
+  }
+
+  gameSettings.SetAchievementsHardcore(enabling);
+  CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
+
+  // The whole OSD goes, not just this dialog: the player asked for the game to
+  // restart, and leaving them on the menu they opened hides it
+  if (enabling)
+    CServiceBroker::GetGameRenderManager().RegisterGameSettingsDialog()->CloseOSD();
+}
