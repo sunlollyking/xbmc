@@ -718,6 +718,21 @@ void CRetroPlayer::CreatePlayback(const std::string& savestatePath)
     {
       CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Loading savestate");
 
+      // RetroAchievements requires a resumed session to drop to casual: the
+      // player did not reach the state being resumed from in this session.
+      // Done before the load, which is otherwise refused while hardcore is on.
+      GAME::CGameSettings& gameSettings = m_gameServices.GameSettings();
+      if (gameSettings.GetAchievementsHardcore())
+      {
+        CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Resuming from a savestate, dropping to casual mode");
+        gameSettings.SetAchievementsHardcore(false);
+
+        // "RetroAchievements", "Hardcore mode turned off. Achievements will be..."
+        const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+        CGUIDialogKaiToast::QueueNotification(gameSettings.GetRAUserPicUrl(), strings.Get(35264),
+                                              strings.Get(35306));
+      }
+
       if (!LoadSavestate(savestatePath))
         CLog::Log(LOGERROR, "RetroPlayer[SAVE]: Failed to load savestate");
     }

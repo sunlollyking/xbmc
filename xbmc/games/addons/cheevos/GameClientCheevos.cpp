@@ -110,7 +110,25 @@ CGameClientCheevos::CGameClientCheevos(CGameClient& gameClient,
 {
 }
 
-CGameClientCheevos::~CGameClientCheevos() = default;
+CGameClientCheevos::~CGameClientCheevos()
+{
+  StopObservingSettings();
+}
+
+void CGameClientCheevos::Notify(const Observable& obs, const ObservableMessage msg)
+{
+  if (msg != ObservableMessageSettingsChanged)
+    return;
+
+  const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+
+  SetHardcoreEnabled(gameSettings.GetAchievementsHardcore());
+
+  // Encore is read as a game is identified and ignored until the next one, so
+  // this only keeps the client in step for that
+  const bool encoreModeEnabled = gameSettings.GetAchievementsEncore();
+  m_encoreModeEnabled = SetEncoreModeEnabled(encoreModeEnabled) && encoreModeEnabled;
+}
 
 void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
 {
@@ -376,8 +394,11 @@ bool CGameClientCheevos::SendCredentials()
   if (username.empty() || token.empty())
     return SetRetroAchievementsCredentials("", "");
 
-  // Encore goes with them: the client reads it as it identifies the game, and
-  // only a client that accepted it will re-arm anything
+  // The modes go with them: the client has to agree with Kodi about which is in
+  // force before it identifies the game. Only a client that accepted encore
+  // will re-arm anything.
+  SetHardcoreEnabled(gameSettings.GetAchievementsHardcore());
+
   const bool encoreModeEnabled = gameSettings.GetAchievementsEncore();
   m_encoreModeEnabled = SetEncoreModeEnabled(encoreModeEnabled) && encoreModeEnabled;
 
@@ -554,6 +575,27 @@ bool CGameClientCheevos::SetRetroAchievementsCredentials(const std::string& user
   return false;
 }
 
+bool CGameClientCheevos::SetHardcoreEnabled(bool enabled)
+{
+  // The lock does more here than serialise the call. Switching hardcore on
+  // makes the client ask for a reset before this returns, and the game loop
+  // holds this same lock for the whole of a frame, so the reset cannot land
+  // while the emulator is running one.
+  std::unique_lock lock(m_clientAccess);
+
+  try
+  {
+    return m_gameClient.LogError(m_struct.toAddon->RCSetHardcoreEnabled(&m_struct, enabled),
+                                 "RCSetHardcoreEnabled()");
+  }
+  catch (...)
+  {
+    m_gameClient.LogException("RCSetHardcoreEnabled()");
+  }
+
+  return false;
+}
+
 bool CGameClientCheevos::SetEncoreModeEnabled(bool enabled)
 {
   std::unique_lock lock(m_clientAccess);
@@ -569,4 +611,25 @@ bool CGameClientCheevos::SetEncoreModeEnabled(bool enabled)
   }
 
   return false;
+}
+
+void CGameClientCheevos::ObserveSettings()
+{
+  if (m_observingSettings)
+    return;
+
+  CServiceBroker::GetGameServices().GameSettings().RegisterObserver(this);
+  m_observingSettings = true;
+}
+
+void CGameClientCheevos::StopObservingSettings()
+{
+  if (!m_observingSettings)
+    return;
+
+  // The game client can outlive the services when Kodi is shutting down
+  if (CServiceBroker::IsServiceManagerUp())
+    CServiceBroker::GetGameServices().GameSettings().UnregisterObserver(this);
+
+  m_observingSettings = false;
 }
