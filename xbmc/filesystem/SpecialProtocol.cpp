@@ -168,6 +168,8 @@ std::string CSpecialProtocol::TranslatePath(const CURL &url)
     translatedPath = URIUtils::AddFileToFolder(CUtil::MusicPlaylistsLocation(), FileName);
   else if (RootDir == "videoplaylists")
     translatedPath = URIUtils::AddFileToFolder(CUtil::VideoPlaylistsLocation(), FileName);
+  else if (RootDir == "gameplaylists")
+    translatedPath = URIUtils::AddFileToFolder(CUtil::GamePlaylistsLocation(), FileName);
   else if (RootDir == "skin")
   {
     auto winSystem = CServiceBroker::GetWinSystem();

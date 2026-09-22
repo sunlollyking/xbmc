@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<!--
+		The machines themselves rather than their games: the logo a shelf is
+		recognised by, a photograph of the hardware where one exists, and what
+		the library knows about it.
+	-->
+	<include name="View_59_GameMachines">
+		<control type="group">
+			<include>OpenClose_Left</include>
+			<visible>Control.IsVisible(59)</visible>
+			<include>Visible_Left</include>
+			<include content="ListContainer">
+				<param name="left" value="-5" />
+				<param name="right" value="1195" />
+				<param name="list_id" value="59" />
+				<param name="viewtype_label" value="$LOCALIZE[31623]" />
+				<param name="visible" value="Container.Content(platforms)" />
+			</include>
+		</control>
+		<control type="group">
+			<depth>DepthContentPanel</depth>
+			<include>OpenClose_Right</include>
+			<visible>Control.IsVisible(59)</visible>
+			<include>Visible_Right</include>
+			<control type="group">
+				<right>-20</right>
+				<width>1235</width>
+				<include content="ContentPanel">
+					<param name="width" value="1235" />
+					<param name="left" value="0" />
+					<param name="top" value="-20" />
+					<param name="flipx" value="true" />
+				</include>
+
+				<control type="image">
+					<left>20</left>
+					<right>30</right>
+					<top>0</top>
+					<bottom>60</bottom>
+					<aspectratio align="center" aligny="center">scale</aspectratio>
+					<fadetime>400</fadetime>
+					<colordiffuse>22FFFFFF</colordiffuse>
+					<texture background="true">$VAR[MachineBackdropVar]</texture>
+				</control>
+
+				<!-- The logo, and the machine itself beside it -->
+				<control type="image">
+					<left>40</left>
+					<top>60</top>
+					<width>560</width>
+					<height>300</height>
+					<aspectratio align="left" aligny="center">keep</aspectratio>
+					<fadetime>300</fadetime>
+					<texture background="true">$VAR[MachineLogoVar]</texture>
+					<visible>!String.IsEmpty(ListItem.Art(clearlogo)) | !String.IsEmpty(ListItem.Art(logo))</visible>
+				</control>
+				<control type="label">
+					<left>40</left>
+					<top>60</top>
+					<width>560</width>
+					<height>300</height>
+					<aligny>center</aligny>
+					<font>font37</font>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>String.IsEmpty(ListItem.Art(clearlogo)) + String.IsEmpty(ListItem.Art(logo))</visible>
+				</control>
+				<control type="image">
+					<left>640</left>
+					<top>60</top>
+					<width>550</width>
+					<height>300</height>
+					<aspectratio align="center" aligny="center">keep</aspectratio>
+					<fadetime>300</fadetime>
+					<texture background="true">$VAR[MachinePhotoVar]</texture>
+				</control>
+
+				<control type="label">
+					<left>40</left>
+					<top>380</top>
+					<width>1150</width>
+					<height>50</height>
+					<font>font30</font>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>!String.IsEmpty(ListItem.Art(clearlogo)) | !String.IsEmpty(ListItem.Art(logo))</visible>
+				</control>
+
+				<control type="group">
+					<left>40</left>
+					<top>440</top>
+					<control type="grouplist">
+						<width>560</width>
+						<height>230</height>
+						<itemgap>0</itemgap>
+						<orientation>vertical</orientation>
+						<include content="GameFactCompact">
+							<param name="label" value="$LOCALIZE[35571]" />
+							<param name="info" value="ListItem.Property(manufacturer)" />
+							<param name="lw" value="190" />
+							<param name="vw" value="370" />
+						</include>
+						<include content="GameFactCompact">
+							<param name="label" value="$LOCALIZE[35622]" />
+							<param name="info" value="ListItem.Property(machine)" />
+							<param name="lw" value="190" />
+							<param name="vw" value="370" />
+						</include>
+						<include content="GameFactCompact">
+							<param name="label" value="$LOCALIZE[35623]" />
+							<param name="info" value="ListItem.Property(medium)" />
+							<param name="lw" value="190" />
+							<param name="vw" value="370" />
+						</include>
+						<include content="GameFactCompact">
+							<param name="label" value="$LOCALIZE[35624]" />
+							<param name="info" value="ListItem.Property(years)" />
+							<param name="lw" value="190" />
+							<param name="vw" value="370" />
+						</include>
+					</control>
+					<control type="grouplist">
+						<left>600</left>
+						<width>550</width>
+						<height>230</height>
+						<itemgap>0</itemgap>
+						<orientation>vertical</orientation>
+						<include content="GameFactCompact">
+							<param name="label" value="$LOCALIZE[15016]" />
+							<param name="info" value="ListItem.Property(gamecount)" />
+							<param name="lw" value="190" />
+							<param name="vw" value="360" />
+						</include>
+						<include content="GameFactCompact">
+							<param name="label" value="$LOCALIZE[35625]" />
+							<param name="info" value="ListItem.Property(extensions)" />
+							<param name="lw" value="190" />
+							<param name="vw" value="360" />
+						</include>
+						<include content="GameFactCompact">
+							<param name="label" value="$LOCALIZE[35510]" />
+							<param name="info" value="ListItem.GameClient" />
+							<param name="lw" value="190" />
+							<param name="vw" value="360" />
+						</include>
+					</control>
+				</control>
+
+				<control type="textbox">
+					<left>40</left>
+					<width>770</width>
+					<top>700</top>
+					<bottom>40</bottom>
+					<font>font13</font>
+					<label>$INFO[ListItem.Plot]</label>
+					<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
+				</control>
+
+				<control type="grouplist">
+					<left>860</left>
+					<top>700</top>
+					<width>330</width>
+					<height>128</height>
+					<itemgap>10</itemgap>
+					<orientation>horizontal</orientation>
+					<align>right</align>
+					<include content="GameArtTile">
+						<param name="art" value="controller" />
+						<param name="label" value="$LOCALIZE[35626]" />
+					</include>
+					<include content="GameArtTile">
+						<param name="art" value="illustration" />
+						<param name="label" value="$LOCALIZE[35627]" />
+					</include>
+					<include content="GameArtTile">
+						<param name="art" value="fanart" />
+						<param name="label" value="$LOCALIZE[20445]" />
+					</include>
+				</control>
+
+				<control type="scrollbar" id="59600">
+					<left>20</left>
+					<top>list_top_offset</top>
+					<width>12</width>
+					<bottom>list_bottom_offset</bottom>
+					<onleft>59</onleft>
+					<onright>59</onright>
+					<orientation>vertical</orientation>
+					<animation effect="zoom" end="50,100" time="300" tween="sine" center="20,0" easing="inout" condition="!Control.HasFocus(59600)">conditional</animation>
+				</control>
+			</control>
+		</control>
+	</include>
+</includes>

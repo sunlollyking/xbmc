@@ -32,6 +32,9 @@ static std::map<std::string, CMediaTypes::MediaTypeInfo> fillDefaultMediaTypes()
   mediaTypes.insert(std::make_pair(MediaTypeSeason,           CMediaTypes::MediaTypeInfo(MediaTypeSeason,          MediaTypeSeason "s",          true,  36904, 36905, 20373, 33054)));
   mediaTypes.insert(std::make_pair(MediaTypeEpisode,          CMediaTypes::MediaTypeInfo(MediaTypeEpisode,         MediaTypeEpisode "s",         false, 36906, 36907, 20359, 20360)));
   mediaTypes.insert(std::make_pair(MediaTypeVideoVersion,     CMediaTypes::MediaTypeInfo(MediaTypeVideoVersion,    MediaTypeVideoVersion "s",    false, 40010, 40011, 40012, 40013)));
+  mediaTypes.insert(std::make_pair(MediaTypeGame,             CMediaTypes::MediaTypeInfo(MediaTypeGame,            MediaTypeGame "s",            false, 35563, 35564, 35565, 35550)));
+  mediaTypes.insert(std::make_pair(MediaTypeGamePlatform,     CMediaTypes::MediaTypeInfo(MediaTypeGamePlatform,    MediaTypeGamePlatform "s",    true,  35566, 35567, 35549, 35520)));
+  mediaTypes.insert(std::make_pair(MediaTypeGameRelease,      CMediaTypes::MediaTypeInfo(MediaTypeGameRelease,     MediaTypeGameRelease "s",     false, 35568, 35569, 35570, 35543)));
   // clang-format on
 
   return mediaTypes;

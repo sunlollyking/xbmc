@@ -25,6 +25,7 @@
 #include "SettingsOperations.h"
 #include "SystemOperations.h"
 #include "TextureOperations.h"
+#include "GameLibrary.h"
 #include "VideoLibrary.h"
 #include "XBMCOperations.h"
 #include "utils/JSONVariantParser.h"
@@ -168,6 +169,24 @@ JsonRpcMethodMap CJSONServiceDescription::m_methodMaps[] = {
   { "VideoLibrary.SetSourceContent",                CVideoLibrary::SetSourceContent },
   { "VideoLibrary.Export",                          CVideoLibrary::Export },
   { "VideoLibrary.Clean",                           CVideoLibrary::Clean },
+
+// Game Library
+  { "GameLibrary.GetPlatforms",                     CGameLibrary::GetPlatforms },
+  { "GameLibrary.GetPlatformDetails",               CGameLibrary::GetPlatformDetails },
+  { "GameLibrary.GetGames",                         CGameLibrary::GetGames },
+  { "GameLibrary.GetGameDetails",                   CGameLibrary::GetGameDetails },
+  { "GameLibrary.GetGenres",                        CGameLibrary::GetFacet },
+  { "GameLibrary.GetDevelopers",                    CGameLibrary::GetFacet },
+  { "GameLibrary.GetPublishers",                    CGameLibrary::GetFacet },
+  { "GameLibrary.GetCollections",                   CGameLibrary::GetFacet },
+  { "GameLibrary.GetTags",                          CGameLibrary::GetFacet },
+  { "GameLibrary.GetYears",                         CGameLibrary::GetFacet },
+  { "GameLibrary.GetRegions",                       CGameLibrary::GetFacet },
+  { "GameLibrary.SetGameDetails",                   CGameLibrary::SetGameDetails },
+  { "GameLibrary.RefreshGame",                      CGameLibrary::RefreshGame },
+  { "GameLibrary.RemoveGame",                       CGameLibrary::RemoveGame },
+  { "GameLibrary.Scan",                             CGameLibrary::Scan },
+  { "GameLibrary.Clean",                            CGameLibrary::Clean },
 
 // Addon operations
   { "Addons.GetAddons",                             CAddonsOperations::GetAddons },
