@@ -149,6 +149,8 @@
 #include "games/agents/windows/GUIAgentWindow.h"
 #include "games/cheats/dialogs/DialogGameCheats.h"
 #include "games/controllers/windows/GUIControllerWindow.h"
+#include "games/dialogs/GUIDialogGameContentSettings.h"
+#include "games/dialogs/GUIDialogGameInfo.h"
 #include "games/dialogs/disc/DialogGameDiscManager.h"
 #include "games/dialogs/osd/DialogGameAchievements.h"
 #include "games/dialogs/osd/DialogGameAdvancedSettings.h"
@@ -274,6 +276,8 @@ void CGUIWindowManager::CreateWindows()
   Add(new CGUIDialogLockSettings);
 
   Add(new CGUIDialogContentSettings);
+  Add(new KODI::GAME::CGUIDialogGameContentSettings);
+  Add(new KODI::GAME::CGUIDialogGameInfo);
 
   Add(new CGUIDialogLibExportSettings);
 

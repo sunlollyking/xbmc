@@ -848,6 +848,27 @@
 					<control type="grouplist" id="17001">
 						<include>WidgetGroupListCommon</include>
 						<pagecontrol>17010</pagecontrol>
+						<include content="WidgetListPoster" condition="Library.HasContent(games) + !Skin.HasSetting(home_no_games_recentlyadded_widget)">
+							<param name="content_path" value="gamedb://recentlyadded/"/>
+							<param name="widget_header" value="$LOCALIZE[35528]"/>
+							<param name="widget_target" value="games"/>
+							<param name="list_id" value="17300"/>
+							<param name="fallback_icon" value="DefaultAddonGame.png"/>
+						</include>
+						<include content="WidgetListPoster" condition="Library.HasContent(games) + !Skin.HasSetting(home_no_games_recentlyplayed_widget)">
+							<param name="content_path" value="gamedb://recentlyplayed/"/>
+							<param name="widget_header" value="$LOCALIZE[35529]"/>
+							<param name="widget_target" value="games"/>
+							<param name="list_id" value="17400"/>
+							<param name="fallback_icon" value="DefaultAddonGame.png"/>
+						</include>
+						<include content="WidgetListPoster" condition="Library.HasContent(games) + !Skin.HasSetting(home_no_games_favourites_widget)">
+							<param name="content_path" value="gamedb://favourites/"/>
+							<param name="widget_header" value="$LOCALIZE[1036]"/>
+							<param name="widget_target" value="games"/>
+							<param name="list_id" value="17500"/>
+							<param name="fallback_icon" value="DefaultAddonGame.png"/>
+						</include>
 						<include content="WidgetListSquare">
 							<param name="content_path" value="addons://sources/game/"/>
 							<param name="widget_header" value="$LOCALIZE[35049]"/>

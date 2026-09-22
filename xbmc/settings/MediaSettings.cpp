@@ -20,6 +20,8 @@
 #include "music/MusicLibraryQueue.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryQueue.h"
 #include "settings/Settings.h"
 #include "settings/dialogs/GUIDialogLibExportSettings.h"
 #include "settings/lib/Setting.h"
@@ -337,6 +339,30 @@ void CMediaSettings::OnSettingAction(const std::shared_ptr<const CSetting>& sett
     {
       if (!CVideoLibraryQueue::GetInstance().CleanLibraryModal())
         HELPERS::ShowOKDialogText(CVariant{700}, CVariant{703});
+    }
+  }
+  else if (settingId == CSettings::SETTING_GAMELIBRARY_CLEANUP)
+  {
+    if (HELPERS::ShowYesNoDialogText(CVariant{313}, CVariant{333}) == DialogResponse::CHOICE_YES)
+      KODI::GAME::CGameLibraryQueue::GetInstance().CleanLibrary({}, true);
+  }
+  else if (settingId == CSettings::SETTING_GAMELIBRARY_EXPORT)
+    CBuiltins::GetInstance().Execute("exportlibrary(games)");
+  else if (settingId == CSettings::SETTING_GAMELIBRARY_IMPORT)
+  {
+    std::string path;
+    std::vector<CMediaSource> shares;
+    CServiceBroker::GetMediaManager().GetLocalDrives(shares);
+    CServiceBroker::GetMediaManager().GetNetworkLocations(shares);
+    CServiceBroker::GetMediaManager().GetRemovableDrives(shares);
+
+    if (CGUIDialogFileBrowser::ShowAndGetDirectory(
+            shares, CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(651), path))
+    {
+      KODI::GAME::CGameDatabase gamedatabase;
+      gamedatabase.Open();
+      gamedatabase.ImportFromXML(path);
+      gamedatabase.Close();
     }
   }
   else if (settingId == CSettings::SETTING_VIDEOLIBRARY_EXPORT)

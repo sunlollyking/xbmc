@@ -46,6 +46,15 @@ public:
 
   // implementation of IPlayer
   bool OpenFile(const CFileItem& file, const CPlayerOptions& options) override;
+
+private:
+  /*!
+   * \brief Apply the video filter remembered for a game, or for the nearest
+   *        folder above it that has one
+   */
+  void SetVideoFilterForGame(const std::string& gamePath);
+
+public:
   bool CloseFile(bool reopen = false) override;
   bool IsPlaying() const override;
   bool CanPause() const override;

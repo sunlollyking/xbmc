@@ -1004,3 +1004,24 @@ msgstr ""
 msgctxt "#31615"
 msgid "Subtitle language"
 msgstr ""
+
+#. Name of the game details view
+msgctxt "#31620"
+msgid "Game details"
+msgstr ""
+
+#. Name of the game shelf view
+msgctxt "#31621"
+msgid "Shelf"
+msgstr ""
+
+#. Name of the view showing a wall of covers
+msgctxt "#31622"
+msgid "Covers"
+msgstr ""
+
+#. Name of the view showing the machines rather than their games
+msgctxt "#31623"
+msgid "Machines"
+msgstr ""
+

@@ -4538,6 +4538,65 @@ constexpr std::array<InfoMap, 88> videoplayer = {{
 ///     @skinning_v22 **[New Infolabel]** \link RetroPlayer_AchievementsProgress `RetroPlayer.AchievementsProgress`\endlink
 ///     <p>
 ///   }
+///   \table_row3{   <b>`RetroPlayer.AchievementsChallengeTitle`</b>,
+///                  \anchor RetroPlayer_AchievementsChallengeTitle
+///                  _string_,
+///     @return The title of the achievement the player is inside an attempt at\,
+///     or an empty string if no attempt is under way or on-screen indicators are
+///     turned off.
+///     <p><hr>
+///     @skinning_v22 **[New Infolabel]** \link RetroPlayer_AchievementsChallengeTitle `RetroPlayer.AchievementsChallengeTitle`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`RetroPlayer.AchievementsChallengeBadge`</b>,
+///                  \anchor RetroPlayer_AchievementsChallengeBadge
+///                  _string_,
+///     @return The badge image of the achievement the player is inside an attempt
+///     at\, or an empty string if no attempt is under way or on-screen indicators
+///     are turned off.
+///     <p><hr>
+///     @skinning_v22 **[New Infolabel]** \link RetroPlayer_AchievementsChallengeBadge `RetroPlayer.AchievementsChallengeBadge`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`RetroPlayer.AchievementsIndicatorTitle`</b>,
+///                  \anchor RetroPlayer_AchievementsIndicatorTitle
+///                  _string_,
+///     @return The title of the measured achievement closest to being earned\, or
+///     an empty string if none is being counted or on-screen indicators are turned
+///     off.
+///     <p><hr>
+///     @skinning_v22 **[New Infolabel]** \link RetroPlayer_AchievementsIndicatorTitle `RetroPlayer.AchievementsIndicatorTitle`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`RetroPlayer.AchievementsIndicatorProgress`</b>,
+///                  \anchor RetroPlayer_AchievementsIndicatorProgress
+///                  _string_,
+///     @return How far along that measured achievement is\, as the client counts
+///     it (e.g. "13/180")\, or an empty string if none is being counted or
+///     on-screen indicators are turned off.
+///     <p><hr>
+///     @skinning_v22 **[New Infolabel]** \link RetroPlayer_AchievementsIndicatorProgress `RetroPlayer.AchievementsIndicatorProgress`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`RetroPlayer.AchievementsIndicatorBadge`</b>,
+///                  \anchor RetroPlayer_AchievementsIndicatorBadge
+///                  _string_,
+///     @return The badge image of that measured achievement\, or an empty string
+///     if none is being counted or on-screen indicators are turned off.
+///     <p><hr>
+///     @skinning_v22 **[New Infolabel]** \link RetroPlayer_AchievementsIndicatorBadge `RetroPlayer.AchievementsIndicatorBadge`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`RetroPlayer.AchievementsIndicatorPercent`</b>,
+///                  \anchor RetroPlayer_AchievementsIndicatorPercent
+///                  _integer_,
+///     @return How far along that measured achievement is as a percentage\, for
+///     driving a progress bar. Zero if none is being counted or on-screen
+///     indicators are turned off.
+///     <p><hr>
+///     @skinning_v22 **[New Infolabel]** \link RetroPlayer_AchievementsIndicatorPercent `RetroPlayer.AchievementsIndicatorPercent`\endlink
+///     <p>
+///   }
 ///   \table_row3{   <b>`RetroPlayer.RichPresence`</b>,
 ///                  \anchor RetroPlayer_RichPresence
 ///                  _string_,
@@ -4626,7 +4685,7 @@ constexpr std::array<InfoMap, 88> videoplayer = {{
 ///
 /// -----------------------------------------------------------------------------
 // clang-format off
-constexpr std::array<InfoMap, 28> retroplayer = {{
+constexpr std::array<InfoMap, 29> retroplayer = {{
     {"title", RETROPLAYER_TITLE},
     {"platform", RETROPLAYER_PLATFORM},
     {"genres", RETROPLAYER_GENRES},
@@ -7866,7 +7925,7 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///
 /// -----------------------------------------------------------------------------
 // clang-format off
-constexpr std::array<InfoMap, 233> listitem_labels = {{
+constexpr std::array<InfoMap, 246> listitem_labels = {{
     {"thumb",                         LISTITEM_THUMB},
     {"icon",                          LISTITEM_ICON},
     {"actualicon",                    LISTITEM_ACTUAL_ICON},
@@ -7977,6 +8036,19 @@ constexpr std::array<InfoMap, 233> listitem_labels = {{
     {"trailer",                       LISTITEM_TRAILER},
     {"sortletter",                    LISTITEM_SORT_LETTER},
     {"tag",                           LISTITEM_TAG},
+    {"platform",                      LISTITEM_PLATFORM},
+    {"developer",                     LISTITEM_DEVELOPER},
+    {"publisher",                     LISTITEM_PUBLISHER},
+    {"players",                       LISTITEM_PLAYERS},
+    {"region",                        LISTITEM_REGION},
+    {"releasecount",                  LISTITEM_RELEASE_COUNT},
+    {"achievementstotal",             LISTITEM_ACHIEVEMENTS_TOTAL},
+                                  {"achievementsgameid",            LISTITEM_ACHIEVEMENTS_GAME_ID},
+    {"achievementsearned",            LISTITEM_ACHIEVEMENTS_EARNED},
+    {"achievementspercent",           LISTITEM_ACHIEVEMENTS_PERCENT},
+    {"achievementsprogress",          LISTITEM_ACHIEVEMENTS_PROGRESS},
+    {"gamecategory",                  LISTITEM_GAME_CATEGORY},
+    {"gameclient",                    LISTITEM_GAME_CLIENT},
     {"set",                           LISTITEM_SET},
     {"setid",                         LISTITEM_SETID},
     {"videocodec",                    LISTITEM_VIDEO_CODEC},
@@ -11333,6 +11405,8 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
         return LIBRARY_IS_SCANNING_VIDEO; //! @todo change to IsScanning(Video)
       else if (prop.Name() == "isscanningmusic")
         return LIBRARY_IS_SCANNING_MUSIC;
+      else if (prop.Name() == "isscanninggames")
+        return LIBRARY_IS_SCANNING_GAMES;
       else if (prop.Name() == "hascontent" && prop.num_params())
       {
         std::string content{prop.param(0)};
@@ -11347,6 +11421,8 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
           return LIBRARY_HAS_TVSHOWS;
         else if (content == "musicvideos")
           return LIBRARY_HAS_MUSICVIDEOS;
+        else if (content == "games")
+          return LIBRARY_HAS_GAMES;
         else if (content == "moviesets")
           return LIBRARY_HAS_MOVIE_SETS;
         else if (content == "singles")

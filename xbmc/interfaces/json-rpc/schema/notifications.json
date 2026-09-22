@@ -1,8 +1,7 @@
 {
   "Player.OnPlay": {
     "type": "notification",
-    "description":
-        "Playback of a media item has been started or the playback speed has changed. If there is no ID available extra information will be provided.",
+    "description": "Playback of a media item has been started or the playback speed has changed. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -19,8 +18,7 @@
   },
   "Player.OnResume": {
     "type": "notification",
-    "description":
-        "Playback of a media item has been resumed. If there is no ID available extra information will be provided.",
+    "description": "Playback of a media item has been resumed. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -37,8 +35,7 @@
   },
   "Player.OnAVStart": {
     "type": "notification",
-    "description":
-        "Playback of a media item has been started and first frame is available. If there is no ID available extra information will be provided.",
+    "description": "Playback of a media item has been started and first frame is available. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -55,8 +52,7 @@
   },
   "Player.OnAVChange": {
     "type": "notification",
-    "description":
-        "Audio- or videostream has changed. If there is no ID available extra information will be provided.",
+    "description": "Audio- or videostream has changed. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -73,8 +69,7 @@
   },
   "Player.OnPause": {
     "type": "notification",
-    "description":
-        "Playback of a media item has been paused. If there is no ID available extra information will be provided.",
+    "description": "Playback of a media item has been paused. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -91,8 +86,7 @@
   },
   "Player.OnStop": {
     "type": "notification",
-    "description":
-        "Playback of a media item has been stopped. If there is no ID available extra information will be provided.",
+    "description": "Playback of a media item has been stopped. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -119,8 +113,7 @@
   },
   "Player.OnSpeedChanged": {
     "type": "notification",
-    "description":
-        "Speed of the playback of a media item has been changed. If there is no ID available extra information will be provided.",
+    "description": "Speed of the playback of a media item has been changed. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -137,8 +130,7 @@
   },
   "Player.OnSeek": {
     "type": "notification",
-    "description":
-        "The playback position has been changed. If there is no ID available extra information will be provided.",
+    "description": "The playback position has been changed. If there is no ID available extra information will be provided.",
     "params": [
       {
         "name": "sender",
@@ -617,8 +609,7 @@
   },
   "VideoLibrary.OnRefresh": {
     "type": "notification",
-    "description":
-        "The video library has been refreshed and a home screen reload might be necessary.",
+    "description": "The video library has been refreshed and a home screen reload might be necessary.",
     "params": [
       {
         "name": "sender",
@@ -629,6 +620,136 @@
         "name": "data",
         "type": "null",
         "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnScanStarted": {
+    "type": "notification",
+    "description": "Scanning the game library has been started.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnScanFinished": {
+    "type": "notification",
+    "description": "Scanning the game library has been finished.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnCleanStarted": {
+    "type": "notification",
+    "description": "Cleaning the game library has been started.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnCleanFinished": {
+    "type": "notification",
+    "description": "Cleaning the game library has been finished.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnUpdate": {
+    "type": "notification",
+    "description": "A game has been updated.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "object",
+        "required": true,
+        "properties": {
+          "id": {
+            "$ref": "Library.Id",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "game",
+              "platform"
+            ],
+            "required": true
+          }
+        }
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnRemove": {
+    "type": "notification",
+    "description": "A game has been removed.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "object",
+        "required": true,
+        "properties": {
+          "id": {
+            "$ref": "Library.Id",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "game",
+              "platform"
+            ],
+            "required": true
+          }
+        }
       }
     ],
     "returns": null

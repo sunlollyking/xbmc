@@ -52,6 +52,7 @@ CViewStateSettings::CViewStateSettings()
   AddViewState("videofiles", DEFAULT_VIEW_AUTO);
   AddViewState("musicfiles", DEFAULT_VIEW_AUTO);
   AddViewState("games", DEFAULT_VIEW_AUTO);
+  AddViewState("gameslibrary", DEFAULT_VIEW_AUTO);
 
   Clear();
 }

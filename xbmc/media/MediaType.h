@@ -28,6 +28,10 @@ using MediaType_view = std::string_view;
 #define MediaTypeSeason           "season"
 #define MediaTypeEpisode          "episode"
 #define MediaTypeVideoVersion "videoversion"
+#define MediaTypeGame "game"
+#define MediaTypeGamePlatform "platform"
+#define MediaTypeGameRelease "release"
+#define MediaTypeGameCollection "gamecollection"
 
 constexpr const char* MediaTypeVideoCollections = "sets";
 constexpr const char* MediaTypeMusicVideos = "musicvideos";

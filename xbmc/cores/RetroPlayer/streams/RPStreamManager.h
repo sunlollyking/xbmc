@@ -15,6 +15,8 @@ namespace KODI
 namespace RETRO
 {
 class CRetroPlayerAudio;
+class CRetroPlayerRendering;
+class CRetroPlayerVideo;
 class CRPProcessInfo;
 class CRPRenderManager;
 
@@ -42,6 +44,8 @@ private:
 
   // Stream parameters
   CRetroPlayerAudio* m_audioStream = nullptr;
+  CRetroPlayerVideo* m_videoStream = nullptr;
+  CRetroPlayerRendering* m_renderingStream = nullptr;
 };
 } // namespace RETRO
 } // namespace KODI

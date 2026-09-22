@@ -10,6 +10,7 @@
 #include "AddonBuiltins.h"
 #include "ApplicationBuiltins.h"
 #include "CECBuiltins.h"
+#include "GameBuiltins.h"
 #include "GUIBuiltins.h"
 #include "GUIContainerBuiltins.h"
 #include "GUIControlBuiltins.h"
@@ -43,6 +44,7 @@ CBuiltins::CBuiltins()
 {
   RegisterCommands<CAddonBuiltins>();
   RegisterCommands<CApplicationBuiltins>();
+  RegisterCommands<CGameBuiltins>();
   RegisterCommands<CGUIBuiltins>();
   RegisterCommands<CGUIContainerBuiltins>();
   RegisterCommands<CGUIControlBuiltins>();

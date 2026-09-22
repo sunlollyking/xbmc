@@ -14,6 +14,8 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/FileDirectoryFactory.h"
+#include "games/database/GameDatabase.h"
+#include "games/library/GameDbUrl.h"
 #include "music/MusicDatabase.h"
 #include "music/MusicDbUrl.h"
 #include "playlists/PlayListTypes.h"
@@ -156,6 +158,41 @@ namespace XFILE
         if (strBaseDir.empty() && mediaType == MediaTypeEpisode && !isGrouped)
           videoUrl.AppendPath("-1/-1/");
         items.SetProperty(PROPERTY_PATH_DB, videoUrl.ToString());
+      }
+    }
+    else if (playlist.IsGameType())
+    {
+      playlistTypeHint = PLAYLIST::Id::TYPE_VIDEO;
+      KODI::GAME::CGameDatabase db;
+      if (db.Open())
+      {
+        std::string baseDir = strBaseDir;
+        if (baseDir.empty())
+        {
+          baseDir = "gamedb://";
+          baseDir += isGrouped ? group : "titles";
+          URIUtils::AddSlashAtEnd(baseDir);
+        }
+
+        KODI::GAME::CGameDbUrl gameUrl;
+        if (!gameUrl.FromString(baseDir))
+          return false;
+
+        std::string xsp;
+        if (!playlist.IsEmpty(filter))
+        {
+          if (!playlist.SaveAsJson(xsp, !filter))
+            return false;
+        }
+
+        if (!xsp.empty())
+          gameUrl.AddOption(option, xsp);
+        else
+          gameUrl.RemoveOption(option);
+
+        success = db.GetGamesByWhere(gameUrl.ToString(), CDatabase::Filter(), items, sorting);
+        db.Close();
+        items.SetProperty(PROPERTY_PATH_DB, gameUrl.ToString());
       }
     }
     else if (playlist.IsMusicType() || playlist.GetType().empty())
@@ -346,7 +383,10 @@ namespace XFILE
   {
     CFileItemList list;
     bool filesExist = false;
-    if (PLAYLIST::CSmartPlaylist::IsMusicType(playlistType))
+    if (PLAYLIST::CSmartPlaylist::IsGameType(playlistType))
+      filesExist =
+          CDirectory::GetDirectory("special://gameplaylists/", list, ".xsp", DIR_FLAG_DEFAULTS);
+    else if (PLAYLIST::CSmartPlaylist::IsMusicType(playlistType))
       filesExist = CDirectory::GetDirectory("special://musicplaylists/", list, ".xsp", DIR_FLAG_DEFAULTS);
     else // all others are video
       filesExist = CDirectory::GetDirectory("special://videoplaylists/", list, ".xsp", DIR_FLAG_DEFAULTS);
