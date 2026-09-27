@@ -670,7 +670,8 @@ bool DatabaseUtils::GetDatabaseResults(const MediaType& mediaType,
 
     result[Field::MEDIA_TYPE] = mediaType;
     if (mediaType == MediaTypeMovie || mediaType == MediaTypeVideoCollection ||
-        mediaType == MediaTypeTvShow || mediaType == MediaTypeMusicVideo)
+        mediaType == MediaTypeTvShow || mediaType == MediaTypeMusicVideo ||
+        mediaType == MediaTypeGame)
       result[Field::LABEL] = result.at(Field::TITLE).asString();
     else if (mediaType == MediaTypeEpisode)
     {
