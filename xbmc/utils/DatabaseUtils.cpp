@@ -261,8 +261,11 @@ std::string DatabaseUtils::GetField(Field field, const MediaType &mediaType, Dat
       return "game_view.overview";
     else if (field == Field::YEAR)
       return "game_view.year";
+    // Catalogues score out of 10, 20 or 100; rules and ordering use the same
+    // out-of-ten figure the game's info tag reports
     else if (field == Field::RATING)
-      return "game_view.rating";
+      return "(CASE WHEN game_view.ratingMax > 0 THEN game_view.rating * 10.0 / "
+             "game_view.ratingMax ELSE game_view.rating END)";
     else if (field == Field::VOTES)
       return "game_view.votes";
     else if (field == Field::USER_RATING)
@@ -651,6 +654,14 @@ bool DatabaseUtils::GetDatabaseResults(const MediaType& mediaType,
       if (!GetFieldValue(resultSet.records[index]->at(fieldIndex), value.second))
         CLog::Log(LOGWARNING, "GetDatabaseResults: unable to retrieve value of field {}",
                   resultSet.record_header[fieldIndex].name);
+
+      if (value.first == Field::RATING && mediaType == MediaTypeGame &&
+          resultSet.record_header.size() > KODI::GAME::GAMEDB_RATING_MAX)
+      {
+        const float max = resultSet.records[index]->at(KODI::GAME::GAMEDB_RATING_MAX).get_asFloat();
+        if (max > 0.0f)
+          value.second = value.second.asFloat() * 10.0f / max;
+      }
 
       if (value.first == Field::YEAR &&
           (mediaType == MediaTypeTvShow || mediaType == MediaTypeEpisode ||
