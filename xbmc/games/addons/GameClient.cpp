@@ -730,7 +730,9 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
   {
     for (const auto& sibling : siblings)
     {
-      if (!sibling->IsFolder() && sibling->GetPath() != archivedPath)
+      // Listed paths need not be spelled as the one asked for, so compare names
+      if (!sibling->IsFolder() &&
+          URIUtils::GetFileName(sibling->GetPath()) != URIUtils::GetFileName(archivedPath))
         disks.push_back(sibling->GetPath());
     }
   }
