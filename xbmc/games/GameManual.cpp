@@ -140,10 +140,6 @@ const std::set<std::string>& CManualIndex::Names(const std::string& folder)
   // remembered as holding nothing rather than being tried again per game
   std::set<std::string>& names = m_folders[folder];
 
-  std::vector<std::string> directories{folder};
-  for (const char* subfolder : MANUAL_SUBFOLDERS)
-    directories.emplace_back(URIUtils::AddFileToFolder(folder, subfolder));
-
   // Filtered by the directory layer rather than here: a platform folder can
   // hold thousands of games, and without a mask every one of them becomes an
   // item just to be discarded
@@ -152,17 +148,32 @@ const std::set<std::string>& CManualIndex::Names(const std::string& folder)
     mask += std::string(extension) + "|";
   mask.pop_back();
 
-  for (const std::string& directory : directories)
+  // The mask leaves folders in, so the listing also says which manual
+  // subfolders exist. Asking for one that doesn't logs an error, and most game
+  // folders have neither.
+  std::vector<std::string> directories{folder};
+  for (size_t i = 0; i < directories.size(); ++i)
   {
     CFileItemList items;
-    if (!XFILE::CDirectory::GetDirectory(directory, items, mask, XFILE::DIR_FLAG_NO_FILE_DIRS))
+    if (!XFILE::CDirectory::GetDirectory(directories[i], items, mask,
+                                         XFILE::DIR_FLAG_NO_FILE_DIRS))
       continue;
 
-    for (int i = 0; i < items.Size(); ++i)
+    for (int j = 0; j < items.Size(); ++j)
     {
-      const CFileItemPtr& item = items[i];
+      const CFileItemPtr& item = items[j];
       if (!item->IsFolder())
+      {
         names.insert(CGameManual::NormaliseName(GetGameStem(item->GetPath())));
+      }
+      else if (i == 0)
+      {
+        std::string path = item->GetPath();
+        URIUtils::RemoveSlashAtEnd(path);
+        const std::string name = URIUtils::GetFileName(path);
+        if (std::ranges::find(MANUAL_SUBFOLDERS, name) != MANUAL_SUBFOLDERS.end())
+          directories.emplace_back(item->GetPath());
+      }
     }
   }
 

@@ -354,6 +354,16 @@ TEST(TestGameManual, IndexFindsAManualInTheManualsFolder)
   EXPECT_TRUE(index.HasManual(fixture.Path("Game (USA).md")));
 }
 
+TEST(TestGameManual, IndexFindsAManualInACapitalisedManualsFolder)
+{
+  const CManualFixture fixture;
+  fixture.Touch("Game (USA).md");
+  fixture.Touch("Manuals/Game (USA).pdf");
+
+  CManualIndex index;
+  EXPECT_TRUE(index.HasManual(fixture.Path("Game (USA).md")));
+}
+
 TEST(TestGameManual, IndexReportsNothingWhenNoManualIsThere)
 {
   const CManualFixture fixture;
