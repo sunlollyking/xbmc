@@ -570,6 +570,11 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
     std::string base = baseDir;
     URIUtils::AddSlashAtEnd(base);
 
+    // Skins pick the icon for a genre folder by its type, and a game facet has
+    // no info tag to say it; a home widget can't read it off the listing's
+    // content either
+    const bool isGenre = url.GetNode() == GameDbNode::GENRES;
+
     if (m_pDS->query(sql))
     {
       while (!m_pDS->eof())
@@ -584,6 +589,8 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
         item->SetLabelPreformatted(true);
         item->SetLabel2(std::to_string(count));
         item->SetProperty("gamecount", count);
+        if (isGenre)
+          item->SetProperty("DBType", "genre");
         items.Add(item);
         m_pDS->next();
       }
