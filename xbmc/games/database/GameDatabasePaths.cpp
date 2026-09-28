@@ -379,3 +379,15 @@ bool CGameDatabase::AddPlayTime(const std::string& fileNameAndPath, unsigned int
   return ExecuteQuery(PrepareSQL("UPDATE files SET playTime = playTime + %u WHERE idFile = %i",
                                  seconds, idFile));
 }
+
+bool CGameDatabase::SetCompletedForFile(const std::string& fileNameAndPath)
+{
+  const int idFile = GetFileId(fileNameAndPath);
+  if (idFile <= 0)
+    return false;
+
+  return ExecuteQuery(PrepareSQL("UPDATE game SET completed = 1 WHERE idGame = (SELECT r.idGame FROM "
+                                 "files f JOIN gamerelease r ON r.idRelease = f.idRelease WHERE "
+                                 "f.idFile = %i)",
+                                 idFile));
+}

@@ -10,9 +10,10 @@
 
 #include "controllers/ControllerTypes.h"
 
-#include <future>
 #include <chrono>
+#include <future>
 #include <memory>
+#include <mutex>
 #include <string>
 
 class CFileExtensionProvider;
@@ -86,6 +87,9 @@ public:
   //! \brief Record the time played and forget the session, if one is open
   void EndPlaySession();
 
+  //! \brief Mark the game being played completed in the library, if it is in it
+  void MarkPlayingGameCompleted();
+
   /*!
    * \brief Translate a feature on a controller into its localized name
    *
@@ -124,6 +128,7 @@ private:
   const CProfileManager& m_profileManager;
   CFileExtensionProvider& m_fileExtensionProvider;
 
+  std::mutex m_playSessionMutex;
   std::string m_playSessionPath;
   std::chrono::steady_clock::time_point m_playSessionStart;
 

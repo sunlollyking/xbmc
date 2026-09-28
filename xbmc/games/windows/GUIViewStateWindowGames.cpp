@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "games/GameUtils.h"
+#include "games/library/GameDbUrl.h"
 #include "guilib/WindowIDs.h"
 #include "playlists/PlayListFileItemClassify.h"
 #include "ServiceBroker.h"
@@ -59,6 +60,7 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
       AddSortMethod(SortBy::USER_RATING, 38018, LABEL_MASKS("%T", "%r", "%T", "%r"));
       AddSortMethod(SortBy::PLAYCOUNT, 567, LABEL_MASKS("%T", "%V", "%T", "%V"));
       AddSortMethod(SortBy::LAST_PLAYED, 568, LABEL_MASKS("%T", "%p", "%T", "%p"));
+      AddSortMethod(SortBy::TIME, 35671, LABEL_MASKS("%T", "", "%T", "")); // Time played
       AddSortMethod(SortBy::DATE_ADDED, 570, LABEL_MASKS("%T", "%a", "%T", "%a"));
       AddSortMethod(SortBy::STUDIO, 35549, LABEL_MASKS("%T", "%U", "%T", "%U")); // Platform
       SetSortMethod(SortBy::LABEL);
@@ -76,6 +78,20 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
       SetSortMethod(viewState->m_sortDescription);
       SetViewAsControl(viewState->m_viewMode);
       SetSortOrder(viewState->m_sortDescription.sortOrder);
+    }
+
+    // A node that ranks its games opens in its own order. A sort chosen for
+    // the node itself is still restored over this when the view state loads.
+    CGameDbUrl url;
+    if (url.FromString(items.GetPath()))
+    {
+      const std::string& list = url.GetList();
+      if (list == "recentlyplayed" || list == "continueplaying")
+        SetSortMethod(SortBy::LAST_PLAYED, SortOrder::DESCENDING);
+      else if (list == "mostplayed")
+        SetSortMethod(SortBy::TIME, SortOrder::DESCENDING);
+      else if (list == "recentlyadded")
+        SetSortMethod(SortBy::DATE_ADDED, SortOrder::DESCENDING);
     }
   }
   else

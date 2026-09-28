@@ -272,6 +272,8 @@ std::string DatabaseUtils::GetField(Field field, const MediaType &mediaType, Dat
       return "game_view.userRating";
     else if (field == Field::PLAYCOUNT)
       return "game_view.playCount";
+    else if (field == Field::TIME)
+      return "game_view.playTime";
     else if (field == Field::LAST_PLAYED)
       return "game_view.lastPlayed";
     else if (field == Field::DATE_ADDED)
@@ -970,6 +972,8 @@ int DatabaseUtils::GetField(Field field, const MediaType &mediaType, bool asInde
       return KODI::GAME::GAMEDB_USER_RATING;
     else if (field == Field::PLAYCOUNT)
       return KODI::GAME::GAMEDB_PLAY_COUNT;
+    else if (field == Field::TIME)
+      return KODI::GAME::GAMEDB_PLAY_TIME;
     else if (field == Field::LAST_PLAYED)
       return KODI::GAME::GAMEDB_LAST_PLAYED;
     else if (field == Field::DATE_ADDED)
