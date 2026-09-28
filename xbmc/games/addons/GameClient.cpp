@@ -22,6 +22,8 @@
 #include "addons/addoninfo/AddonType.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "filesystem/FileDirectoryFactory.h"
+#include "filesystem/IFileDirectory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/GameServices.h"
 #include "games/addons/cheats/GameClientCheats.h"
@@ -201,6 +203,12 @@ bool CGameClient::IsExtensionValid(const std::string& strExtension) const
   return m_extensions.contains(NormalizeExtension(strExtension));
 }
 
+bool CGameClient::SupportsFolders() const
+{
+  // Libretro's mark for an emulator that boots a whole folder
+  return m_extensions.contains(NormalizeExtension("/"));
+}
+
 bool CGameClient::Initialize(void)
 {
   using namespace XFILE;
@@ -320,6 +328,17 @@ bool CGameClient::OpenFile(const CFileItem& file,
   if (!m_bSupportsVFS && URIUtils::IsInArchive(file.GetDynPath()))
   {
     path = ExtractGame(file.GetDynPath());
+    if (path.empty())
+    {
+      // "Failed to play game"
+      // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+      MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
+      return false;
+    }
+  }
+  else if (!IsExtensionValid(URIUtils::GetExtension(path)) && SupportsFolders())
+  {
+    path = ExtractFolder(file.GetDynPath());
     if (path.empty())
     {
       // "Failed to play game"
@@ -752,6 +771,56 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
   CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted copy", CURL::GetRedacted(game));
 
   return CSpecialProtocol::TranslatePath(game);
+}
+
+std::string CGameClient::ExtractFolder(const std::string& archivePath)
+{
+  std::string archiveName = URIUtils::GetFileName(archivePath);
+  URIUtils::RemoveExtension(archiveName);
+  const std::string folder = URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, archiveName) + "/";
+
+  // A folder unpacked before holds whatever the game has saved since
+  CFileItemList existing;
+  if (!XFILE::CDirectory::GetDirectory(folder, existing, "", XFILE::DIR_FLAG_DEFAULTS) ||
+      existing.IsEmpty())
+  {
+    CFileItem archive(archivePath, false);
+    const std::unique_ptr<XFILE::IFileDirectory> directory{
+        XFILE::CFileDirectoryFactory::Create(CURL{archivePath}, &archive)};
+    if (!directory || !XFILE::CDirectory::Create(folder) || !CopyTree(archive.GetPath(), folder))
+    {
+      CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(archivePath));
+      XFILE::CDirectory::RemoveRecursive(folder);
+      return "";
+    }
+  }
+
+  CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted folder",
+            CURL::GetRedacted(archivePath));
+
+  return CSpecialProtocol::TranslatePath(folder);
+}
+
+bool CGameClient::CopyTree(const std::string& from, const std::string& to)
+{
+  CFileItemList items;
+  if (!XFILE::CDirectory::GetDirectory(from, items, "", XFILE::DIR_FLAG_NO_FILE_DIRS))
+    return false;
+
+  for (const auto& item : items)
+  {
+    const std::string target = URIUtils::AddFileToFolder(to, item->GetLabel());
+    if (item->IsFolder())
+    {
+      if (!XFILE::CDirectory::Create(target) ||
+          !CopyTree(item->GetPath(), URIUtils::AddFileToFolder(target, "")))
+        return false;
+    }
+    else if (!XFILE::CFile::Copy(item->GetPath(), target))
+      return false;
+  }
+
+  return true;
 }
 
 void CGameClient::CloseFile()

@@ -154,6 +154,8 @@ public:
   const std::set<std::string>& GetExtensions() const { return m_extensions; }
   bool SupportsAllExtensions() const { return m_bSupportsAllExtensions; }
   bool IsExtensionValid(const std::string& strExtension) const;
+  //! Whether the client boots a folder, which lets it take an unpacked archive
+  bool SupportsFolders() const;
   const std::string& GetEmulatorName() const { return m_emulatorName; }
   const std::string& GetPlatforms() const { return m_platforms; }
   bool SupportsDiscControl() const { return m_supportsDiscControl; }
@@ -256,6 +258,14 @@ private:
    * \return The copy's local path, or empty if it could not be made
    */
   std::string ExtractGame(const std::string& archivedPath);
+
+  /*!
+   * \brief Unpack an archive into a folder, for a client that boots one
+   *
+   * \return The folder's local path, or empty if it could not be made
+   */
+  std::string ExtractFolder(const std::string& archivePath);
+  static bool CopyTree(const std::string& from, const std::string& to);
 
   // Private gameplay functions
   bool InitializeGameplay(const std::string& gamePath,
