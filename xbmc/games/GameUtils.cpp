@@ -24,6 +24,8 @@
 #include "dialogs/GUIDialogOK.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/AddonsDirectory.h"
+#include "filesystem/FileDirectoryFactory.h"
+#include "filesystem/IFileDirectory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
@@ -66,6 +68,8 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
     }
     else
     {
+      OpenInsideArchive(item);
+
       if (!CGUIDialogSelectSavestate::ShowAndGetSavestate(item.GetDynPath(), savestatePath))
         return false;
 
@@ -154,8 +158,7 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
   return !item.GetGameInfoTag()->GetGameClient().empty();
 }
 
-std::string CGameUtils::GetDefaultGameClient(const std::string& path,
-                                             const GameClientVector& candidates)
+std::string CGameUtils::GetRememberedGameClient(const std::string& path)
 {
   if (path.empty())
     return "";
@@ -174,6 +177,14 @@ std::string CGameUtils::GetDefaultGameClient(const std::string& path,
     if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
       gameClient = platform.defaultGameClient;
   }
+
+  return gameClient;
+}
+
+std::string CGameUtils::GetDefaultGameClient(const std::string& path,
+                                             const GameClientVector& candidates)
+{
+  const std::string gameClient = GetRememberedGameClient(path);
   if (gameClient.empty())
     return "";
 
@@ -375,6 +386,59 @@ bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
               CURL::GetRedacted(path));
 
   return true;
+}
+
+void CGameUtils::OpenInsideArchive(CFileItem& item)
+{
+  const std::string archivePath = item.GetDynPath();
+  CFileItem contents(archivePath, false);
+  if (URIUtils::IsInArchive(archivePath) || !contents.IsFileFolder(FileFolderType::ALWAYS))
+    return;
+
+  // Arcade sets are archives by design, and an emulator that asks for the
+  // archive is given it whole
+  const std::string gameClient = GetRememberedGameClient(item.GetPath());
+  if (!gameClient.empty())
+  {
+    GameClientVector candidates;
+    bool bHasVfsGameClient;
+    GetInstalledGameClients(item, candidates, bHasVfsGameClient);
+    if (std::ranges::any_of(candidates, [&gameClient](const GameClientPtr& candidate)
+                            { return candidate->ID() == gameClient; }))
+      return;
+  }
+
+  // An archive holding a single game is that game, as it is when browsing
+  std::string gamePath;
+  const std::unique_ptr<XFILE::IFileDirectory> directory{
+      XFILE::CFileDirectoryFactory::Create(CURL{archivePath}, &contents)};
+  if (directory)
+  {
+    CFileItemList files;
+    if (!directory->GetDirectory(contents.GetURL(), files))
+      return;
+
+    for (const auto& file : files)
+    {
+      if (file->IsFolder() || !HasGameExtension(file->GetPath()))
+        continue;
+      if (!gamePath.empty())
+        return;
+      gamePath = file->GetPath();
+    }
+  }
+  else if (!contents.IsFolder() && contents.GetPath() != archivePath &&
+           HasGameExtension(contents.GetPath()))
+  {
+    gamePath = contents.GetPath();
+  }
+
+  if (gamePath.empty())
+    return;
+
+  CLog::Log(LOGDEBUG, "GAME: Opening {} from inside {}", CURL::GetRedacted(gamePath),
+            CURL::GetRedacted(archivePath));
+  item.SetDynPath(gamePath);
 }
 
 void CGameUtils::GetInstalledGameClients(const CFileItem& file,

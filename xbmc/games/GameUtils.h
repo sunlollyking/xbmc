@@ -110,6 +110,18 @@ public:
 
 private:
   /*!
+   * \brief The emulator remembered for a game, or for the nearest folder above
+   *        it, or failing both the default for the game's platform
+   */
+  static std::string GetRememberedGameClient(const std::string& path);
+
+  /*!
+   * \brief Point an archived game at the one game file inside it, unless its
+   *        remembered emulator opens the archive itself
+   */
+  static void OpenInsideArchive(CFileItem& item);
+
+  /*!
    * \brief The emulator remembered for a game, or for the nearest folder above it
    *
    * \param path The game
