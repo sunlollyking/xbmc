@@ -610,6 +610,9 @@ void CGameInfoTag::ToSortable(SortItem& sortable, Field field) const
     case Field::LAST_PLAYED:
       sortable[Field::LAST_PLAYED] = m_strLastPlayed;
       break;
+    case Field::TIME:
+      sortable[Field::TIME] = m_playTime;
+      break;
     case Field::DATE_ADDED:
       sortable[Field::DATE_ADDED] = m_strDateAdded;
       break;

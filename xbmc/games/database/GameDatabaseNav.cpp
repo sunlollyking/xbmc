@@ -188,6 +188,18 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendOrder("game_view.lastPlayed DESC");
     filter.limit = PrepareSQL("%i", RECENT_LIMIT);
   }
+  else if (list == "continueplaying")
+  {
+    filter.AppendWhere("game_view.playCount > 0 AND game_view.completed = 0");
+    filter.AppendOrder("game_view.lastPlayed DESC");
+    filter.limit = PrepareSQL("%i", RECENT_LIMIT);
+  }
+  else if (list == "mostplayed")
+  {
+    filter.AppendWhere("game_view.playTime > 0");
+    filter.AppendOrder("game_view.playTime DESC");
+    filter.limit = PrepareSQL("%i", RECENT_LIMIT);
+  }
   else if (list == "neverplayed")
     filter.AppendWhere("game_view.playCount = 0");
   else if (list == "favourites")

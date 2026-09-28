@@ -20768,7 +20768,23 @@ msgctxt "#35671"
 msgid "Time played"
 msgstr ""
 
-#empty strings from id 35672 to 35699
+msgctxt "#35672"
+msgid "Continue playing"
+msgstr ""
+
+msgctxt "#35673"
+msgid "Games you have started and not finished, the most recently played first."
+msgstr ""
+
+msgctxt "#35674"
+msgid "Most played"
+msgstr ""
+
+msgctxt "#35675"
+msgid "The games you have spent the longest playing."
+msgstr ""
+
+#empty strings from id 35676 to 35699
 
 #. Label of the setting that enables RetroAchievements hardcore mode
 #: system/settings/settings.xml

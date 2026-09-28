@@ -161,6 +161,13 @@ public:
    * \param seconds How long this session lasted
    */
   bool AddPlayTime(const std::string& fileNameAndPath, unsigned int seconds);
+
+  /*!
+   * \brief Mark completed the game a file belongs to
+   *
+   * \param fileNameAndPath A file of the game
+   */
+  bool SetCompletedForFile(const std::string& fileNameAndPath);
   ///@}
 
   /*!

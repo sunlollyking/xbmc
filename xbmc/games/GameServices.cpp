@@ -101,24 +101,44 @@ void CGameServices::OnAddonRepoInstalled()
 
 void CGameServices::StartPlaySession(const std::string& gamePath)
 {
+  std::lock_guard lock(m_playSessionMutex);
   m_playSessionPath = gamePath;
   m_playSessionStart = std::chrono::steady_clock::now();
 }
 
 void CGameServices::EndPlaySession()
 {
-  if (m_playSessionPath.empty())
-    return;
+  std::string gamePath;
+  std::chrono::steady_clock::time_point started;
+  {
+    std::lock_guard lock(m_playSessionMutex);
+    if (m_playSessionPath.empty())
+      return;
+    gamePath = std::move(m_playSessionPath);
+    m_playSessionPath.clear();
+    started = m_playSessionStart;
+  }
 
-  const std::string gamePath = m_playSessionPath;
-  m_playSessionPath.clear();
-
-  const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(
-                           std::chrono::steady_clock::now() - m_playSessionStart)
-                           .count();
+  const auto seconds =
+      std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - started)
+          .count();
   if (seconds <= 0)
     return;
 
   if (CGameDatabase library; library.Open())
     library.AddPlayTime(gamePath, static_cast<unsigned int>(seconds));
+}
+
+void CGameServices::MarkPlayingGameCompleted()
+{
+  std::string gamePath;
+  {
+    std::lock_guard lock(m_playSessionMutex);
+    gamePath = m_playSessionPath;
+  }
+  if (gamePath.empty())
+    return;
+
+  if (CGameDatabase library; library.Open())
+    library.SetCompletedForFile(gamePath);
 }

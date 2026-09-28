@@ -281,6 +281,8 @@ void CGameClientCheevos::OnGameCompleted(const std::string& title, bool hardcore
   // "Game mastered" / "Game completed"
   CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(hardcore ? 35282 : 35283),
                                         title, TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+
+  CServiceBroker::GetGameServices().MarkPlayingGameCompleted();
 }
 
 void CGameClientCheevos::OnAchievementProgress(const game_rc_achievement_progress* progress,

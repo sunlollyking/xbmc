@@ -57,7 +57,8 @@ const std::vector<std::string_view> facetNames{
 };
 
 const std::vector<std::string_view> listNames{
-    "recentlyadded", "recentlyplayed", "neverplayed", "favourites",     "completed",
+    "recentlyadded", "recentlyplayed", "continueplaying", "mostplayed", "neverplayed",
+    "favourites",    "completed",
     "multiplayer",   "coop",           "achievements", "inprogress",    "hacks",
     "homebrew",      "needsattention",
 };
