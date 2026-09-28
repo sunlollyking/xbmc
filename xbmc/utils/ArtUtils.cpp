@@ -90,8 +90,8 @@ void FillInDefaultIcon(CFileItem& item)
         // Live TV Channel
         item.SetArt("icon", "DefaultTVShows.png");
       }
-      else if (URIUtils::IsArchive(item.GetPath()))
-      { // archive
+      else if (URIUtils::IsArchive(item.GetPath()) && !item.HasGameInfoTag())
+      { // archive, unless it is a zipped game
         item.SetArt("icon", "DefaultFile.png");
       }
       else if (item.IsUsablePVRRecording())
