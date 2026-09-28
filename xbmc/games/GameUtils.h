@@ -122,6 +122,15 @@ private:
   static void OpenInsideArchive(CFileItem& item);
 
   /*!
+   * \brief Whether the game's remembered emulator would open it, but can't
+   *        read a file inside an archive
+   *
+   * Offering emulators for other machines instead would be wrong, and the
+   * generic extensions such games use (.rom, .bin) match plenty of them.
+   */
+  static bool NeedsExtracting(const CFileItem& item);
+
+  /*!
    * \brief The emulator remembered for a game, or for the nearest folder above it
    *
    * \param path The game
