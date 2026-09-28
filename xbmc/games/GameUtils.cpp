@@ -591,12 +591,16 @@ void CGameUtils::GetGameClients(const ADDON::VECADDONS& addons,
                             translatedUrl.GetProtocol().empty() ||
                             URIUtils::IsInArchive(translatedUrl.Get());
 
+  // An emulator that boots a folder can take an archive unpacked into one
+  const bool bIsArchive =
+      bIsLocalFile && CFileItem(translatedUrl.Get(), false).IsFileFolder(FileFolderType::ALWAYS);
+
   for (auto& addon : addons)
   {
     GameClientPtr gameClient = std::static_pointer_cast<CGameClient>(addon);
 
     // Filter by extension
-    if (!gameClient->IsExtensionValid(extension))
+    if (!gameClient->IsExtensionValid(extension) && !(bIsArchive && gameClient->SupportsFolders()))
       continue;
 
     // Filter by VFS
