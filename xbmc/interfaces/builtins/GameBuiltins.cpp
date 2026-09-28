@@ -13,6 +13,7 @@
 #include "application/Application.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "games/GameManual.h"
+#include "games/manual/GUIDialogGameManuals.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -82,8 +83,7 @@ int ShowGameManual(const std::vector<std::string>& params)
     // answer than a notification saying only that nothing was found.
     if (!gamePath.empty())
     {
-      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_DIALOG_GAME_MANUALS,
-                                                                 {gamePath, knownManual});
+      KODI::GAME::CGUIDialogGameManuals::ShowFor(gamePath, knownManual);
       return 0;
     }
 
