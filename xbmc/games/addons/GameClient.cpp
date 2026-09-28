@@ -41,6 +41,7 @@
 #include "messaging/helpers/DialogOKHelper.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "utils/Digest.h"
 #include "utils/FileUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -69,8 +70,25 @@ using namespace GAME;
 namespace
 {
 //! Where a game kept in an archive is copied for a client that reads only local
-//! files. Kept, because a disk-based game saves onto its own disks.
+//! files. Copies are kept and never overwritten, because a disk-based game
+//! saves onto its own disks.
 constexpr const char* EXTRACTED_GAMES_FOLDER = "special://profile/games/extracted/";
+
+/*!
+ * \brief The folder an archive's games are copied to
+ *
+ * Named after the archive so it can be recognised, and told apart from any
+ * other archive of the same name by a hash of where it is. The hash has to stay
+ * the same between versions, or a game would lose the saves on its copy.
+ */
+std::string ExtractedFolder(const std::string& archive)
+{
+  std::string name = URIUtils::GetFileName(archive);
+  URIUtils::RemoveExtension(name);
+  const std::string hash =
+      KODI::UTILITY::CDigest::Calculate(KODI::UTILITY::CDigest::Type::MD5, archive).substr(0, 8);
+  return URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, name + "-" + hash) + "/";
+}
 
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
@@ -714,14 +732,11 @@ void CGameClient::Reset()
 
 std::string CGameClient::ExtractGame(const std::string& archivedPath)
 {
-  std::string archiveName = URIUtils::GetFileName(CURL(archivedPath).GetHostName());
-  URIUtils::RemoveExtension(archiveName);
-  const std::string folder = URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, archiveName) + "/";
+  const std::string folder = ExtractedFolder(CURL(archivedPath).GetHostName());
 
   if (!XFILE::CDirectory::Exists(folder) && !XFILE::CDirectory::Create(folder))
     return "";
 
-  // The other disks of the same game travel with it
   std::vector<std::string> disks{archivedPath};
   const std::string extension = URIUtils::GetExtension(archivedPath);
   CFileItemList siblings;
@@ -744,7 +759,6 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
     const std::string name = URIUtils::GetFileName(disk);
     const std::string target = URIUtils::AddFileToFolder(folder, name);
 
-    // A copy made before is the one the game has been saving onto
     if (!XFILE::CFile::Exists(target) && !XFILE::CFile::Copy(disk, target))
     {
       CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(disk));
@@ -777,24 +791,17 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
 
 std::string CGameClient::ExtractFolder(const std::string& archivePath)
 {
-  std::string archiveName = URIUtils::GetFileName(archivePath);
-  URIUtils::RemoveExtension(archiveName);
-  const std::string folder = URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, archiveName) + "/";
+  const std::string folder = ExtractedFolder(archivePath);
 
-  // A folder unpacked before holds whatever the game has saved since
-  CFileItemList existing;
-  if (!XFILE::CDirectory::GetDirectory(folder, existing, "", XFILE::DIR_FLAG_DEFAULTS) ||
-      existing.IsEmpty())
+  // Every start fills in what an unpacking cut short left out
+  CFileItem archive(archivePath, false);
+  const std::unique_ptr<XFILE::IFileDirectory> directory{
+      XFILE::CFileDirectoryFactory::Create(CURL{archivePath}, &archive)};
+  if (!directory || (!XFILE::CDirectory::Exists(folder) && !XFILE::CDirectory::Create(folder)) ||
+      !CopyTree(archive.GetPath(), folder))
   {
-    CFileItem archive(archivePath, false);
-    const std::unique_ptr<XFILE::IFileDirectory> directory{
-        XFILE::CFileDirectoryFactory::Create(CURL{archivePath}, &archive)};
-    if (!directory || !XFILE::CDirectory::Create(folder) || !CopyTree(archive.GetPath(), folder))
-    {
-      CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(archivePath));
-      XFILE::CDirectory::RemoveRecursive(folder);
-      return "";
-    }
+    CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(archivePath));
+    return "";
   }
 
   CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted folder",
@@ -814,11 +821,11 @@ bool CGameClient::CopyTree(const std::string& from, const std::string& to)
     const std::string target = URIUtils::AddFileToFolder(to, item->GetLabel());
     if (item->IsFolder())
     {
-      if (!XFILE::CDirectory::Create(target) ||
+      if ((!XFILE::CDirectory::Exists(target) && !XFILE::CDirectory::Create(target)) ||
           !CopyTree(item->GetPath(), URIUtils::AddFileToFolder(target, "")))
         return false;
     }
-    else if (!XFILE::CFile::Copy(item->GetPath(), target))
+    else if (!XFILE::CFile::Exists(target) && !XFILE::CFile::Copy(item->GetPath(), target))
       return false;
   }
 
