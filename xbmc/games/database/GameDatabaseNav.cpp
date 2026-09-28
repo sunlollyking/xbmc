@@ -446,6 +446,23 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
             }
           }
         }
+
+        // The same stand-ins the thumb loader gives a game with no cover, so a
+        // widget shows it as the library window does
+        if (found->second.find("poster") == found->second.end() &&
+            found->second.find("boxfront") != found->second.end())
+          item->SetArtFallback("poster", "boxfront");
+        if (found->second.find("thumb") == found->second.end())
+        {
+          for (const char* type : {"boxfront", "clearlogo", "titlescreen", "screenshot"})
+          {
+            if (found->second.find(type) != found->second.end())
+            {
+              item->SetArtFallback("thumb", type);
+              break;
+            }
+          }
+        }
       }
     }
 
