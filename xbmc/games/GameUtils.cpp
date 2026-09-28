@@ -46,9 +46,34 @@
 #include "utils/log.h"
 
 #include <algorithm>
+#include <vector>
 
 using namespace KODI;
 using namespace GAME;
+
+namespace
+{
+/*!
+ * \brief Whether a disk is the one a game starts from, going by its name
+ *
+ * Sets name the boot disk "Disk A", "Disk 1" or "System disk", or give it no
+ * tag at all beside its "User disk" and "Data disk", which sort before it.
+ */
+bool IsStartDisk(const std::string& path)
+{
+  std::string name = URIUtils::GetFileName(path);
+  URIUtils::RemoveExtension(name);
+  StringUtils::ToLower(name);
+
+  const size_t open = name.rfind('(');
+  if (open == std::string::npos || name.back() != ')')
+    return true;
+
+  const std::string tag = name.substr(open + 1, name.size() - open - 2);
+  return tag == "disk a" || tag == "disk 1" || StringUtils::StartsWith(tag, "disk a -") ||
+         tag == "system disk" || tag == "program disk" || tag == "boot disk" || tag == "game disk";
+}
+} // namespace
 
 // Initialize static state
 ADDON::VECADDONS CGameUtils::m_installableGameAddons;
@@ -424,14 +449,33 @@ void CGameUtils::OpenInsideArchive(CFileItem& item)
     if (!directory->GetDirectory(contents.GetURL(), files))
       return;
 
+    std::vector<std::string> games;
     for (const auto& file : files)
     {
-      if (file->IsFolder() || !HasGameExtension(file->GetPath()))
-        continue;
-      if (!gamePath.empty())
-        return;
-      gamePath = file->GetPath();
+      if (!file->IsFolder() && HasGameExtension(file->GetPath()))
+        games.push_back(file->GetPath());
     }
+
+    if (games.size() > 1)
+    {
+      // Several disks of one game, for the emulator the platform remembers:
+      // start at the first, and the rest are found beside it
+      const std::string extension = URIUtils::GetExtension(games.front());
+      if (gameClient.empty() ||
+          !std::ranges::all_of(games, [&extension](const std::string& game)
+                               { return URIUtils::GetExtension(game) == extension; }))
+        return;
+      std::ranges::stable_sort(games,
+                               [](const std::string& lhs, const std::string& rhs)
+                               {
+                                 const bool lhsStarts = IsStartDisk(lhs);
+                                 const bool rhsStarts = IsStartDisk(rhs);
+                                 return lhsStarts != rhsStarts ? lhsStarts : lhs < rhs;
+                               });
+    }
+
+    if (!games.empty())
+      gamePath = games.front();
   }
   else if (!contents.IsFolder() && contents.GetPath() != archivePath &&
            HasGameExtension(contents.GetPath()))
@@ -463,7 +507,8 @@ bool CGameUtils::NeedsExtracting(const CFileItem& item)
   const bool bIsLocalFile =
       (translatedUrl.GetProtocol() == "file" || translatedUrl.GetProtocol().empty());
 
-  return !bIsLocalFile && !gameClient->SupportsVFS() &&
+  return !bIsLocalFile && !URIUtils::IsInArchive(translatedUrl.Get()) &&
+         !gameClient->SupportsVFS() &&
          gameClient->IsExtensionValid(URIUtils::GetExtension(translatedUrl.Get()));
 }
 
@@ -540,8 +585,11 @@ void CGameUtils::GetGameClients(const ADDON::VECADDONS& addons,
 
   const std::string extension = URIUtils::GetExtension(translatedUrl.Get());
 
-  const bool bIsLocalFile =
-      (translatedUrl.GetProtocol() == "file" || translatedUrl.GetProtocol().empty());
+  // A game inside an archive is copied out for a client that reads only local
+  // files, so it can be offered one
+  const bool bIsLocalFile = translatedUrl.GetProtocol() == "file" ||
+                            translatedUrl.GetProtocol().empty() ||
+                            URIUtils::IsInArchive(translatedUrl.Get());
 
   for (auto& addon : addons)
   {
