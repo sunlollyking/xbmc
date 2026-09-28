@@ -23,6 +23,7 @@
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
+#include "input/actions/ActionIDs.h"
 #include "jobs/Job.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
@@ -115,6 +116,19 @@ CGUIDialogGameManuals::CGUIDialogGameManuals()
 }
 
 CGUIDialogGameManuals::~CGUIDialogGameManuals() = default;
+
+void CGUIDialogGameManuals::ShowFor(const std::string& gamePath, const std::string& knownManual)
+{
+  auto* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogGameManuals>(
+      WINDOW_DIALOG_GAME_MANUALS);
+  if (dialog == nullptr)
+    return;
+
+  // Set here rather than passed as window parameters, because a dialog is
+  // only ever given the first of those
+  dialog->m_knownManual = knownManual;
+  dialog->Open(gamePath);
+}
 
 void CGUIDialogGameManuals::OnInitWindow()
 {
@@ -438,13 +452,17 @@ bool CGUIDialogGameManuals::OnMessage(CGUIMessage& message)
       if (!path.empty())
         m_gamePath = path;
 
-      m_knownManual = message.GetStringParam(1);
-
       break;
     }
     case GUI_MSG_CLICKED:
     {
       const int control = message.GetSenderId();
+
+      // A list reports every action it does not handle itself as a click, so
+      // Info or a screenshot on a result would otherwise start a download
+      const int action = message.GetParam1();
+      if (action != ACTION_SELECT_ITEM && action != ACTION_MOUSE_LEFT_CLICK)
+        break;
 
       if (control == CONTROL_RESULT_LIST)
       {

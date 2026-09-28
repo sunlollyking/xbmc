@@ -43,6 +43,14 @@ public:
   CGUIDialogGameManuals();
   ~CGUIDialogGameManuals() override;
 
+  /*!
+   * \brief Find a manual for a game, or fetch the one the library knows about
+   *
+   * \param gamePath The game's path
+   * \param knownManual Where a catalogue said the manual is, or empty to search
+   */
+  static void ShowFor(const std::string& gamePath, const std::string& knownManual);
+
   // Implementation of CGUIControl via CGUIDialog
   bool OnMessage(CGUIMessage& message) override;
 
