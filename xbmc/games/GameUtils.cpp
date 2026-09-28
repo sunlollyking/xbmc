@@ -106,6 +106,12 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
         {
           item.GetGameInfoTag()->SetGameClient(defaultClient);
         }
+        else if (NeedsExtracting(item))
+        {
+          // "Failed to play game"
+          // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+          MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
+        }
         else
         {
           GetInstallableGameClients(item, installable, bHasVfsGameClient);
@@ -440,6 +446,26 @@ void CGameUtils::OpenInsideArchive(CFileItem& item)
   CLog::Log(LOGDEBUG, "GAME: Opening {} from inside {}", CURL::GetRedacted(gamePath),
             CURL::GetRedacted(archivePath));
   item.SetDynPath(gamePath);
+}
+
+bool CGameUtils::NeedsExtracting(const CFileItem& item)
+{
+  const std::string gameClientId = GetRememberedGameClient(item.GetPath());
+  if (gameClientId.empty())
+    return false;
+
+  ADDON::AddonPtr addon;
+  if (!CServiceBroker::GetAddonMgr().GetAddon(gameClientId, addon, ADDON::AddonType::GAMEDLL,
+                                              ADDON::OnlyEnabled::CHOICE_NO))
+    return false;
+
+  const auto gameClient = std::static_pointer_cast<CGameClient>(addon);
+  const CURL translatedUrl(CSpecialProtocol::TranslatePath(item.GetDynPath()));
+  const bool bIsLocalFile =
+      (translatedUrl.GetProtocol() == "file" || translatedUrl.GetProtocol().empty());
+
+  return !bIsLocalFile && !gameClient->SupportsVFS() &&
+         gameClient->IsExtensionValid(URIUtils::GetExtension(translatedUrl.Get()));
 }
 
 void CGameUtils::GetInstalledGameClients(const CFileItem& file,
