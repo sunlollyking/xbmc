@@ -249,6 +249,14 @@ public:
   void LogException(const char* strFunctionName) const;
 
 private:
+  /*!
+   * \brief Copy a game, and any other disks of it, out of its archive for a
+   *        client that reads only local files
+   *
+   * \return The copy's local path, or empty if it could not be made
+   */
+  std::string ExtractGame(const std::string& archivedPath);
+
   // Private gameplay functions
   bool InitializeGameplay(const std::string& gamePath,
                           RETRO::IStreamManager& streamManager,

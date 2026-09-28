@@ -9,6 +9,7 @@
 #include "GameClient.h"
 
 #include "FileItem.h"
+#include "FileItemList.h"
 #include "GameClientCallbacks.h"
 #include "GameClientInGameSaves.h"
 #include "GameClientProperties.h"
@@ -20,6 +21,7 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
 #include "filesystem/Directory.h"
+#include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/GameServices.h"
 #include "games/addons/cheats/GameClientCheats.h"
@@ -64,6 +66,10 @@ using namespace GAME;
 
 namespace
 {
+//! Where a game kept in an archive is copied for a client that reads only local
+//! files. Kept, because a disk-based game saves onto its own disks.
+constexpr const char* EXTRACTED_GAMES_FOLDER = "special://profile/games/extracted/";
+
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 
@@ -310,6 +316,18 @@ bool CGameClient::OpenFile(const CFileItem& file,
     return false;
 
   CloseFile();
+
+  if (!m_bSupportsVFS && URIUtils::IsInArchive(file.GetDynPath()))
+  {
+    path = ExtractGame(file.GetDynPath());
+    if (path.empty())
+    {
+      // "Failed to play game"
+      // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+      MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
+      return false;
+    }
+  }
 
   GAME_ERROR error = GAME_ERROR_FAILED;
 
@@ -673,6 +691,67 @@ void CGameClient::Reset()
       LogException("Reset()");
     }
   }
+}
+
+std::string CGameClient::ExtractGame(const std::string& archivedPath)
+{
+  std::string archiveName = URIUtils::GetFileName(CURL(archivedPath).GetHostName());
+  URIUtils::RemoveExtension(archiveName);
+  const std::string folder = URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, archiveName) + "/";
+
+  if (!XFILE::CDirectory::Exists(folder) && !XFILE::CDirectory::Create(folder))
+    return "";
+
+  // The other disks of the same game travel with it
+  std::vector<std::string> disks{archivedPath};
+  const std::string extension = URIUtils::GetExtension(archivedPath);
+  CFileItemList siblings;
+  if (XFILE::CDirectory::GetDirectory(URIUtils::GetDirectory(archivedPath), siblings, extension,
+                                      XFILE::DIR_FLAG_DEFAULTS))
+  {
+    for (const auto& sibling : siblings)
+    {
+      if (!sibling->IsFolder() && sibling->GetPath() != archivedPath)
+        disks.push_back(sibling->GetPath());
+    }
+  }
+  std::sort(disks.begin() + 1, disks.end());
+
+  std::vector<std::string> names;
+  for (const std::string& disk : disks)
+  {
+    const std::string name = URIUtils::GetFileName(disk);
+    const std::string target = URIUtils::AddFileToFolder(folder, name);
+
+    // A copy made before is the one the game has been saving onto
+    if (!XFILE::CFile::Exists(target) && !XFILE::CFile::Copy(disk, target))
+    {
+      CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(disk));
+      XFILE::CFile::Delete(target);
+      return "";
+    }
+    names.push_back(name);
+  }
+
+  std::string game = URIUtils::AddFileToFolder(folder, names.front());
+
+  // A playlist lets the emulator swap to the other disks
+  if (names.size() > 1 && IsExtensionValid(".m3u"))
+  {
+    std::string playlist = game;
+    URIUtils::RemoveExtension(playlist);
+    playlist += ".m3u";
+
+    XFILE::CFile file;
+    const std::string content = StringUtils::Join(names, "\n") + "\n";
+    if (file.OpenForWrite(playlist, true) &&
+        file.Write(content.data(), content.size()) == static_cast<ssize_t>(content.size()))
+      game = playlist;
+  }
+
+  CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted copy", CURL::GetRedacted(game));
+
+  return CSpecialProtocol::TranslatePath(game);
 }
 
 void CGameClient::CloseFile()
