@@ -915,6 +915,48 @@ void CGameClient::PollInput()
     input->PollInput();
 }
 
+bool CGameClient::SupportsSpeculativeFrames() const
+{
+  return m_ifc.game->toAddon->RunFrameSpeculative != nullptr && !m_speculativeUnsupported;
+}
+
+bool CGameClient::RunFrameSpeculative()
+{
+  if (!SupportsSpeculativeFrames())
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  if (!m_bIsPlaying)
+    return false;
+
+  try
+  {
+    CClientFrameScope hwScope(Streams());
+    if (!hwScope.IsBound())
+      return false;
+
+    const GAME_ERROR error = m_ifc.game->toAddon->RunFrameSpeculative(m_ifc.game);
+    if (error == GAME_ERROR_NOT_IMPLEMENTED)
+    {
+      CLog::Log(LOGINFO, "GAME: {} can't run speculative frames", ID());
+      m_speculativeUnsupported = true;
+      return false;
+    }
+    LogError(error, "RunFrameSpeculative()");
+
+    const GAME_ERROR audioError = m_ifc.game->toAddon->AudioAvailable(m_ifc.game);
+    if (audioError != GAME_ERROR_NO_ERROR && audioError != GAME_ERROR_NOT_IMPLEMENTED)
+      LogError(audioError, "AudioAvailable()");
+  }
+  catch (...)
+  {
+    LogException("RunFrameSpeculative()");
+  }
+
+  return true;
+}
+
 void CGameClient::RunFrame(bool pollInput)
 {
   if (pollInput)

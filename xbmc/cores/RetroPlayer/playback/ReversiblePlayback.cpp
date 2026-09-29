@@ -626,9 +626,9 @@ unsigned int CReversiblePlayback::GetRunaheadFrames()
     return 0;
   }
 
-  // The client evaluates achievements on every frame it runs, so a frame that
-  // is later rolled back can still report progress or an unlock
-  if (m_gameClient->HasAchievementState())
+  // A client that can't run a frame without evaluating achievements would
+  // report progress or unlocks from frames that are rolled back
+  if (!m_gameClient->SupportsSpeculativeFrames() && m_gameClient->HasAchievementState())
   {
     if (!m_runaheadAchievements)
     {
@@ -663,7 +663,12 @@ const uint8_t* CReversiblePlayback::RunaheadFrame(unsigned int frames)
       const bool lastFrame = (frame == frames);
       m_streamManager.EnableAudio(lastFrame);
       m_streamManager.EnableVideo(lastFrame);
-      m_gameClient->RunFrame(false);
+      if (!m_gameClient->RunFrameSpeculative())
+      {
+        if (m_gameClient->HasAchievementState())
+          break;
+        m_gameClient->RunFrame(false);
+      }
     }
 
     success = m_gameClient->RestoreState(m_runaheadState.data(), memorySize);

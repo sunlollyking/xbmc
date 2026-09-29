@@ -180,6 +180,19 @@ public:
   void RunFrame(bool pollInput = true);
 
   /*!
+   * \brief Run a frame that will be rolled back, without the side effects of a
+   *        real one such as evaluating achievements
+   *
+   * \return False if the client can't, in which case nothing was run
+   */
+  bool RunFrameSpeculative();
+
+  /*!
+   * \brief Whether RunFrameSpeculative() may work, as far as is known yet
+   */
+  bool SupportsSpeculativeFrames() const;
+
+  /*!
    * \brief Tell the client what speed the player is running at
    *
    * \param speed The speed as a multiple of normal speed, with the player's own
@@ -389,6 +402,7 @@ private:
   // Properties of the current playing file
   std::atomic_bool m_bIsPlaying; // True between OpenFile() and CloseFile()
   std::atomic_bool m_hasFrameRun{false};
+  std::atomic_bool m_speculativeUnsupported{false};
   // The speed the player is running at, as a multiple of normal speed. Written
   // by the thread that changes the speed and read by the client's own, so it is
   // atomic; a client asks for it from inside a call of its own, which can be on

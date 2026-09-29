@@ -179,6 +179,7 @@ struct Core
   unsigned int loads{0};
   unsigned int readyFrame{1};
   size_t achievementStateSize{0};
+  unsigned int speculativeFrames{0};
   bool serializationNeedsReset{false};
   bool deserializeNeedsFrame{false};
   GAME_ERROR frameResult{GAME_ERROR_NO_ERROR};
@@ -1132,6 +1133,35 @@ TEST_F(TestGameClientHardwareRendering, RunaheadStandsAsideForAchievements)
     playback.FrameEvent();
     EXPECT_EQ(m_core.frames, 2U);
     EXPECT_EQ(m_core.deserializations, 0U);
+  }
+  settings->SetInt("gamesgeneral.runaheadframes", runaheadFrames);
+  settings->SetBool("gamesgeneral.enablerunahead", runaheadEnabled);
+}
+
+TEST_F(TestGameClientHardwareRendering, RunaheadUsesSpeculativeFramesWithAchievements)
+{
+  RETRO::CPlaybackTestEnvironment environment;
+  auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const bool runaheadEnabled = settings->GetBool("gamesgeneral.enablerunahead");
+  const int runaheadFrames = settings->GetInt("gamesgeneral.runaheadframes");
+  settings->SetBool("gamesgeneral.enablerunahead", true);
+  settings->SetInt("gamesgeneral.runaheadframes", 2);
+  m_core.achievementStateSize = 1;
+  m_client->GetInstanceInterface()->toAddon->RunFrameSpeculative =
+      [](const AddonInstance_Game* game)
+  {
+    ++GetCore(game).speculativeFrames;
+    return GAME_ERROR_NO_ERROR;
+  };
+  {
+    RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(),
+                                        environment.Streams(), environment.Messenger(), 60.0, 0);
+    playback.SetSpeed(1.0);
+    playback.FrameEvent();
+    playback.FrameEvent();
+    EXPECT_EQ(m_core.frames, 2U);
+    EXPECT_EQ(m_core.speculativeFrames, 2U);
+    EXPECT_EQ(m_core.deserializations, 1U);
   }
   settings->SetInt("gamesgeneral.runaheadframes", runaheadFrames);
   settings->SetBool("gamesgeneral.enablerunahead", runaheadEnabled);
