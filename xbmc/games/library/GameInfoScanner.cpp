@@ -1265,7 +1265,24 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     if (!m_database.GetGameInfo(refreshGameId, existing))
       return false;
     tag.SetDatabaseId(refreshGameId);
-    tag.SetReleases(existing.GetReleases());
+
+    // The releases are kept as they are, but what the refresh learnt about an
+    // arcade set belongs to its file
+    std::vector<GameRelease> releases = existing.GetReleases();
+    const auto scanned = std::ranges::find_if(release.files, [&playPath](const GameFile& f)
+                                              { return f.path == playPath; });
+    if (scanned != release.files.end() && !scanned->romsets.empty())
+    {
+      for (GameRelease& known : releases)
+      {
+        for (GameFile& file : known.files)
+        {
+          if (file.path == playPath)
+            file.romsets = scanned->romsets;
+        }
+      }
+    }
+    tag.SetReleases(releases);
     tag.SetDefaultReleaseId(existing.GetDefaultReleaseId());
     tag.SetUserRating(existing.GetUserRating());
     tag.SetFavourite(existing.IsFavourite());
