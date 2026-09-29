@@ -49,6 +49,8 @@ const std::string SETTING_GAMES_SHOW_OSD_HELP = "gamesgeneral.showosdhelp";
 const std::string SETTING_GAMES_ENABLEAUTOSAVE = "gamesgeneral.enableautosave";
 const std::string SETTING_GAMES_ENABLEREWIND = "gamesgeneral.enablerewind";
 const std::string SETTING_GAMES_REWINDTIME = "gamesgeneral.rewindtime";
+const std::string SETTING_GAMES_ENABLERUNAHEAD = "gamesgeneral.enablerunahead";
+const std::string SETTING_GAMES_RUNAHEADFRAMES = "gamesgeneral.runaheadframes";
 const std::string SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT = "gamesachievements.createaccount";
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
@@ -92,7 +94,8 @@ CGameSettings::CGameSettings()
        SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
        SETTING_GAMES_ACHIEVEMENTS_HARDCORE, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
        SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT,
-       SETTING_GAMES_CLEAR_MANUAL_CACHE});
+       SETTING_GAMES_CLEAR_MANUAL_CACHE, SETTING_GAMES_ENABLERUNAHEAD,
+       SETTING_GAMES_RUNAHEADFRAMES});
 
   // A person should say who they are once. The scrapers keep fields of their
   // own so they still work for anyone driving them directly, but while these
@@ -148,6 +151,16 @@ bool CGameSettings::AutosaveEnabled()
 bool CGameSettings::RewindEnabled()
 {
   return m_settings->GetBool(SETTING_GAMES_ENABLEREWIND);
+}
+
+bool CGameSettings::RunaheadEnabled()
+{
+  return m_settings->GetBool(SETTING_GAMES_ENABLERUNAHEAD);
+}
+
+unsigned int CGameSettings::RunaheadFrames()
+{
+  return static_cast<unsigned int>(std::max(m_settings->GetInt(SETTING_GAMES_RUNAHEADFRAMES), 0));
 }
 
 unsigned int CGameSettings::MaxRewindTimeSec()
@@ -241,6 +254,7 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
+      settingId == SETTING_GAMES_ENABLERUNAHEAD || settingId == SETTING_GAMES_RUNAHEADFRAMES ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_ENCORE)
   {
     // Hardcore belongs here as much as the rewind settings do: turning it on

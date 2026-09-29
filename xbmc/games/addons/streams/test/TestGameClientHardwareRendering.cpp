@@ -178,6 +178,7 @@ struct Core
   unsigned int unloads{0};
   unsigned int loads{0};
   unsigned int readyFrame{1};
+  size_t achievementStateSize{0};
   bool serializationNeedsReset{false};
   bool deserializeNeedsFrame{false};
   GAME_ERROR frameResult{GAME_ERROR_NO_ERROR};
@@ -393,6 +394,8 @@ protected:
       return !core.deserializeNeedsFrame || core.frames > 0 ? GAME_ERROR_NO_ERROR
                                                             : GAME_ERROR_FAILED;
     };
+    callbacks->AchievementStateSize = [](const AddonInstance_Game* game)
+    { return GetCore(game).achievementStateSize; };
     callbacks->DeserializeAchievements = [](const AddonInstance_Game*, const uint8_t*, size_t)
     { return GAME_ERROR_NOT_IMPLEMENTED; };
     callbacks->HwContextReset = [](const AddonInstance_Game* game)
@@ -512,7 +515,7 @@ protected:
     ASSERT_TRUE(database.AddSavestate(path, {}, savestate));
     {
       RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(),
-                                          environment.Messenger(), 60.0, 0);
+                                          environment.Streams(), environment.Messenger(), 60.0, 0);
       EXPECT_EQ(m_core.sizeQueries, 0U);
       EXPECT_TRUE(playback.LoadSavestate(path));
       EXPECT_EQ(m_core.frames, 0U);
@@ -1067,7 +1070,7 @@ TEST_F(TestGameClientHardwareRendering, RewindRetriesUntilSerializationBecomesAv
   m_core.readyFrame = 3;
   {
     RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(),
-                                        environment.Messenger(), 60.0, 0);
+                                        environment.Streams(), environment.Messenger(), 60.0, 0);
     playback.FrameEvent();
     playback.FrameEvent();
     EXPECT_EQ(m_core.serializations, 0U);
@@ -1078,6 +1081,60 @@ TEST_F(TestGameClientHardwareRendering, RewindRetriesUntilSerializationBecomesAv
     EXPECT_EQ(m_core.sizeQueries, 5U);
   }
   settings->SetBool("gamesgeneral.enablerewind", rewindEnabled);
+}
+
+TEST_F(TestGameClientHardwareRendering, RunaheadRestoresTheRealFrame)
+{
+  RETRO::CPlaybackTestEnvironment environment;
+  auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const bool rewindEnabled = settings->GetBool("gamesgeneral.enablerewind");
+  const bool runaheadEnabled = settings->GetBool("gamesgeneral.enablerunahead");
+  const int runaheadFrames = settings->GetInt("gamesgeneral.runaheadframes");
+  settings->SetBool("gamesgeneral.enablerewind", true);
+  settings->SetBool("gamesgeneral.enablerunahead", true);
+  settings->SetInt("gamesgeneral.runaheadframes", 2);
+  {
+    RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(),
+                                        environment.Streams(), environment.Messenger(), 60.0, 0);
+    playback.SetSpeed(1.0);
+
+    // The state size is unknown until the client has run a frame
+    playback.FrameEvent();
+    EXPECT_EQ(m_core.frames, 1U);
+    EXPECT_EQ(m_core.serializations, 1U);
+    EXPECT_EQ(m_core.deserializations, 0U);
+
+    // Rewind reuses the state run-ahead restores to
+    playback.FrameEvent();
+    EXPECT_EQ(m_core.frames, 4U);
+    EXPECT_EQ(m_core.serializations, 2U);
+    EXPECT_EQ(m_core.deserializations, 1U);
+  }
+  settings->SetInt("gamesgeneral.runaheadframes", runaheadFrames);
+  settings->SetBool("gamesgeneral.enablerunahead", runaheadEnabled);
+  settings->SetBool("gamesgeneral.enablerewind", rewindEnabled);
+}
+
+TEST_F(TestGameClientHardwareRendering, RunaheadStandsAsideForAchievements)
+{
+  RETRO::CPlaybackTestEnvironment environment;
+  auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const bool runaheadEnabled = settings->GetBool("gamesgeneral.enablerunahead");
+  const int runaheadFrames = settings->GetInt("gamesgeneral.runaheadframes");
+  settings->SetBool("gamesgeneral.enablerunahead", true);
+  settings->SetInt("gamesgeneral.runaheadframes", 2);
+  m_core.achievementStateSize = 1;
+  {
+    RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(),
+                                        environment.Streams(), environment.Messenger(), 60.0, 0);
+    playback.SetSpeed(1.0);
+    playback.FrameEvent();
+    playback.FrameEvent();
+    EXPECT_EQ(m_core.frames, 2U);
+    EXPECT_EQ(m_core.deserializations, 0U);
+  }
+  settings->SetInt("gamesgeneral.runaheadframes", runaheadFrames);
+  settings->SetBool("gamesgeneral.enablerunahead", runaheadEnabled);
 }
 
 TEST_F(TestGameClientHardwareRendering, DevKitInstallsHandleBeforeSingleReset)

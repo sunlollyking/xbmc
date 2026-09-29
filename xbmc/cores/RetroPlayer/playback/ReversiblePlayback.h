@@ -37,6 +37,7 @@ class CGameClient;
 namespace RETRO
 {
 class CGUIGameMessenger;
+class CRPStreamManager;
 class CSavestateDatabase;
 class CDeltaPairMemoryStream;
 
@@ -45,6 +46,7 @@ class CReversiblePlayback : public IPlayback, public IGameLoopCallback, public O
 public:
   CReversiblePlayback(GAME::CGameClient* gameClient,
                       CRPRenderManager& renderManager,
+                      CRPStreamManager& streamManager,
                       CGUIGameMessenger& guiMessenger,
                       double fps,
                       size_t serializeSize);
@@ -78,7 +80,30 @@ public:
   void Notify(const Observable& obs, const ObservableMessage msg) override;
 
 private:
-  void AddFrame();
+  /*!
+   * \brief How many frames to run ahead for the coming frame, or 0 for none
+   *
+   * Asked each frame, because a client may not know its state size until it
+   * has run.
+   */
+  unsigned int GetRunaheadFrames();
+
+  /*!
+   * \brief Run the frame that is really happening, then show one from further on
+   *
+   * The client is run past the current frame with the same input, the picture
+   * and sound of the last of those frames are presented, and the client is
+   * put back. Input then takes effect on screen that many frames sooner.
+   *
+   * \return The state the client was put back to, or nullptr if run-ahead
+   *         failed and was switched off
+   */
+  const uint8_t* RunaheadFrame(unsigned int frames);
+
+  void UpdateRunahead();
+
+  //! \param runaheadState The client's current state if run-ahead took it
+  void AddFrame(const uint8_t* runaheadState = nullptr);
   void UpdateFrameRate();
   GAME::RestoreResult RewindFrames(uint64_t frames);
   GAME::RestoreResult AdvanceFrames(uint64_t frames);
@@ -114,6 +139,7 @@ private:
   // Construction parameter
   GAME::CGameClient* const m_gameClient;
   CRPRenderManager& m_renderManager;
+  CRPStreamManager& m_streamManager;
   CGUIGameMessenger& m_guiMessenger;
 
   // Gameplay functionality
@@ -126,6 +152,15 @@ private:
 
   //! Retry after each frame until serialization becomes available, or rewind is disabled.
   bool m_memoryStreamSized{false};
+
+  // Run-ahead functionality. The settings observer only writes the atomics;
+  // the buffers belong to the game loop.
+  std::atomic<unsigned int> m_runaheadFrames{0};
+  std::atomic<bool> m_runaheadReset{false};
+  bool m_runaheadFailed{false};
+  bool m_runaheadTooLarge{false};
+  bool m_runaheadAchievements{false};
+  std::vector<uint8_t> m_runaheadState;
 
   // Savestate functionality
   CAutosaveCapture m_autosaveCapture;

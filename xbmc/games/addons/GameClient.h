@@ -205,6 +205,19 @@ public:
                             const CGameClientDiscModel* discState = nullptr);
 
   /*!
+   * \brief Put back a state this client produced moments ago
+   *
+   * Unlike Deserialize(), leaves the discs alone: the state was taken from the
+   * running client with the same media inserted.
+   */
+  bool RestoreState(const uint8_t* data, size_t size);
+
+  /*!
+   * \brief Whether the client is evaluating achievements for this game
+   */
+  bool HasAchievementState();
+
+  /*!
    * \brief Hold the client still for the duration of a savestate snapshot
    *
    * Callers combining core and achievement state hold this lock across both

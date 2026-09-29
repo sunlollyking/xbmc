@@ -42,6 +42,8 @@ public:
   bool AutosaveEnabled();
   bool RewindEnabled();
   unsigned int MaxRewindTimeSec();
+  bool RunaheadEnabled();
+  unsigned int RunaheadFrames();
   std::string GetRAUsername() const;
   std::string GetRAToken() const;
 

@@ -1099,6 +1099,48 @@ RestoreResult CGameClient::Deserialize(const uint8_t* data,
   return bSuccess ? RestoreResult::Restored : RestoreResult::StateUncertain;
 }
 
+bool CGameClient::RestoreState(const uint8_t* data, size_t size)
+{
+  if (data == nullptr || size == 0)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+  if (!m_bIsPlaying)
+    return false;
+
+  try
+  {
+    CClientFrameScope hwScope(Streams());
+    if (hwScope.IsBound())
+      return LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
+  }
+  catch (...)
+  {
+    LogException("Deserialize()");
+  }
+
+  return false;
+}
+
+bool CGameClient::HasAchievementState()
+{
+  if (!m_bIsPlaying)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  try
+  {
+    return m_ifc.game->toAddon->AchievementStateSize(m_ifc.game) > 0;
+  }
+  catch (...)
+  {
+    LogException("AchievementStateSize()");
+  }
+
+  return false;
+}
+
 bool CGameClient::SerializeAchievementState(std::vector<uint8_t>& data)
 {
   data.clear();
