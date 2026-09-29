@@ -107,15 +107,6 @@ public:
   CRetroPlayerVideo(CRPRenderManager& m_renderManager, CRPProcessInfo& m_processInfo);
   ~CRetroPlayerVideo() override;
 
-  /*!
-   * \brief Whether frames handed over are shown or thrown away
-   *
-   * A frame the player is never meant to see still has to be produced -- the
-   * client draws it either way -- so this discards it on arrival rather than
-   * trying to stop it being made.
-   */
-  void Enable(bool bEnabled) { m_bVideoEnabled = bEnabled; }
-
   // implementation of IRetroPlayerStream
   bool OpenStream(const StreamProperties& properties) override;
   bool GetStreamBuffer(unsigned int width, unsigned int height, StreamBuffer& buffer) override;
@@ -129,7 +120,6 @@ private:
 
   // Stream properties
   bool m_bOpen = false;
-  bool m_bVideoEnabled = true;
 };
 } // namespace RETRO
 } // namespace KODI
