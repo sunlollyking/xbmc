@@ -13,17 +13,19 @@
 #include "URL.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "filesystem/ZipManager.h"
 #include "utils/Digest.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
-#include <zlib.h>
 #include <algorithm>
 #include <array>
 #include <cctype>
 #include <vector>
+
+#include <zlib.h>
 
 using namespace KODI;
 using namespace GAME;
@@ -251,8 +253,32 @@ bool CGameFileIdentity::HashWhole(const std::string& path, GameFile& file)
   return true;
 }
 
+bool CGameFileIdentity::ListZip(const std::string& path, std::vector<ArchiveMember>& members)
+{
+  std::vector<SZipEntry> entries;
+  if (!g_ZipManager.GetZipList(URIUtils::CreateArchivePath("zip", CURL(path), ""), entries))
+    return false;
+
+  for (const SZipEntry& entry : entries)
+  {
+    const std::string name = entry.name;
+    if (name.empty() || name.back() == '/')
+      continue;
+    members.push_back({name, entry.usize, StringUtils::Format("{:08x}", entry.crc32)});
+  }
+  return true;
+}
+
 bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
 {
+  // A zip of several files may be an arcade set, which is known by all of them
+  if (StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip")
+  {
+    std::vector<ArchiveMember> members;
+    if (ListZip(path, members) && members.size() > 1)
+      file.members = std::move(members);
+  }
+
   // The archive is browsed as a folder; its largest member is the ROM
   const std::string archiveUrl = URIUtils::CreateArchivePath(
       StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip" ? "zip" : "archive", CURL(path),

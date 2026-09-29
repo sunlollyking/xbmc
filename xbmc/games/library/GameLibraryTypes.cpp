@@ -66,13 +66,14 @@ constexpr Words<MediaFormat, 8> mediaFormats{{
     {MediaFormat::OTHER, "other"},
 }};
 
-constexpr Words<GameCategory, 6> categories{{
+constexpr Words<GameCategory, 7> categories{{
     {GameCategory::RETAIL, "retail"},
     {GameCategory::HACK, "hack"},
     {GameCategory::HOMEBREW, "homebrew"},
     {GameCategory::DEMO, "demo"},
     {GameCategory::BIOS, "bios"},
     {GameCategory::APPLICATION, "application"},
+    {GameCategory::NONGAME, "nongame"},
 }};
 
 constexpr Words<ReleaseStatus, 9> releaseStatuses{{
@@ -243,6 +244,8 @@ int CGameLibraryTypes::CategoryLabel(GameCategory category)
       return 35597; // "BIOS"
     case GameCategory::APPLICATION:
       return 35598; // "Application"
+    case GameCategory::NONGAME:
+      return 35676; // "Not a video game"
     case GameCategory::RETAIL:
       break;
   }
@@ -288,4 +291,33 @@ std::string CGameLibraryTypes::TitleKey(std::string_view title)
     }
   }
   return key;
+}
+
+std::string KODI::GAME::RomsetsToString(const std::vector<EmulatorRomset>& romsets)
+{
+  std::vector<std::string> pairs;
+  for (const EmulatorRomset& romset : romsets)
+  {
+    std::string pair = romset.gameClient + "=" + romset.romset;
+    for (const std::string& required : romset.required)
+      pair += "+" + required;
+    pairs.emplace_back(std::move(pair));
+  }
+  return StringUtils::Join(pairs, ";");
+}
+
+std::vector<EmulatorRomset> KODI::GAME::RomsetsFromString(std::string_view text)
+{
+  std::vector<EmulatorRomset> romsets;
+  for (const std::string& pair : StringUtils::Split(std::string(text), ';'))
+  {
+    const size_t equals = pair.find('=');
+    if (equals == std::string::npos || equals + 1 == pair.size())
+      continue;
+    std::vector<std::string> names = StringUtils::Split(pair.substr(equals + 1), '+');
+    const std::string romset = names.front();
+    names.erase(names.begin());
+    romsets.push_back({pair.substr(0, equals), romset, std::move(names)});
+  }
+  return romsets;
 }

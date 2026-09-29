@@ -146,6 +146,16 @@ public:
    */
   int AddFile(const std::string& fileNameAndPath, int idRelease, const GameFile& file);
   int GetFileId(const std::string& fileNameAndPath);
+
+  /*!
+   * \brief The emulators that hold the arcade set at a path, best first
+   */
+  std::vector<EmulatorRomset> GetRomsetsForFile(const std::string& fileNameAndPath);
+
+  /*!
+   * \brief A file in the library that holds an arcade set, whatever it is called
+   */
+  std::string GetFileForRomset(const std::string& romset);
   int GetGameIdByFile(const std::string& fileNameAndPath);
   bool GetFilesForRelease(int idRelease, std::vector<GameFile>& files);
 
@@ -370,7 +380,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 6; }
+  int GetSchemaVersion() const override { return 7; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

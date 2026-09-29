@@ -67,6 +67,7 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "serial text, "
                   "raHash text, "
                   "discNumber integer, "
+                  "romsets text, "
                   "playCount integer, "
                   "lastPlayed text, "
                   "playTime integer, "
@@ -385,4 +386,8 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
     db.ExecuteQuery("DROP VIEW IF EXISTS release_view");
   }
+
+  // 7: the emulators that hold an arcade set exactly, and their names for it
+  if (version < 7)
+    db.ExecuteQuery("ALTER TABLE files ADD COLUMN romsets text");
 }
