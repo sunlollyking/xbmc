@@ -54,6 +54,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <vector>
 
 using namespace KODI;
 using namespace GAME;
@@ -786,10 +787,26 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
     URIUtils::RemoveExtension(playlist);
     playlist += ".m3u";
 
-    XFILE::CFile file;
+    // A playlist is replaced only through a complete copy written aside, so a
+    // failed write never leaves a partial one. Rename can't replace a file on
+    // every platform, so an outdated playlist is removed first.
     const std::string content = StringUtils::Join(names, "\n") + "\n";
-    if (file.OpenForWrite(playlist, true) &&
-        file.Write(content.data(), content.size()) == static_cast<ssize_t>(content.size()))
+    std::vector<uint8_t> current;
+    if (XFILE::CFile().LoadFile(playlist, current) < 0 ||
+        std::string(current.begin(), current.end()) != content)
+    {
+      const std::string partial = playlist + ".tmp";
+      XFILE::CFile file;
+      const bool written =
+          file.OpenForWrite(partial, true) &&
+          file.Write(content.data(), content.size()) == static_cast<ssize_t>(content.size());
+      file.Close();
+      if (!written || (XFILE::CFile::Exists(playlist) && !XFILE::CFile::Delete(playlist)) ||
+          !XFILE::CFile::Rename(partial, playlist))
+        XFILE::CFile::Delete(partial);
+    }
+
+    if (XFILE::CFile::Exists(playlist))
       game = playlist;
   }
 
