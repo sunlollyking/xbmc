@@ -98,6 +98,18 @@ bool IsSafeName(const std::string& name)
          name.find_first_of("/\\") == std::string::npos;
 }
 
+// Copied under a temporary name and then renamed, so a copy that was
+// interrupted is never taken for a complete one on a later start
+bool CopyWhole(const std::string& from, const std::string& to)
+{
+  const std::string partial = to + ".tmp";
+  if (XFILE::CFile::Copy(from, partial) && XFILE::CFile::Rename(partial, to))
+    return true;
+
+  XFILE::CFile::Delete(partial);
+  return false;
+}
+
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 
@@ -769,10 +781,9 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
       return "";
     const std::string target = URIUtils::AddFileToFolder(folder, name);
 
-    if (!XFILE::CFile::Exists(target) && !XFILE::CFile::Copy(disk, target))
+    if (!XFILE::CFile::Exists(target) && !CopyWhole(disk, target))
     {
       CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(disk));
-      XFILE::CFile::Delete(target);
       return "";
     }
     names.push_back(name);
@@ -857,7 +868,7 @@ bool CGameClient::CopyTree(const std::string& from, const std::string& to)
           !CopyTree(item->GetPath(), URIUtils::AddFileToFolder(target, "")))
         return false;
     }
-    else if (!XFILE::CFile::Exists(target) && !XFILE::CFile::Copy(item->GetPath(), target))
+    else if (!XFILE::CFile::Exists(target) && !CopyWhole(item->GetPath(), target))
       return false;
   }
 
