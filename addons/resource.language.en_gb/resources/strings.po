@@ -20812,7 +20812,13 @@ msgctxt "#35675"
 msgid "The games you have spent the longest playing."
 msgstr ""
 
-#empty strings from id 35676 to 35699
+#. What an arcade machine is when it is not a video game: a slot, fruit or mechanical machine
+#: xbmc/games/library/GameLibraryTypes.cpp
+msgctxt "#35676"
+msgid "Not a video game"
+msgstr ""
+
+#empty strings from id 35677 to 35699
 
 #. Label of the setting that enables RetroAchievements hardcore mode
 #: system/settings/settings.xml

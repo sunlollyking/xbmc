@@ -498,6 +498,7 @@ void CGameInfoScanner::FillRequest(const Entry& entry,
   request.regions = parsed.regions;
   request.languages = parsed.languages;
   request.year = parsed.year;
+  request.members = identity.members;
 }
 
 bool CGameInfoScanner::ScanFolder(const std::string& folder,
@@ -1135,7 +1136,13 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
 
         for (const GameRelease& known : catalogueReleases)
         {
-          const bool sameDump = std::ranges::any_of(known.files, [&identity](const GameFile& f)
+          // An arcade answer describes the zip whose files were sent, and no other
+          const auto arcadeSet =
+              std::ranges::find_if(known.files, [&identity](const GameFile& f)
+                                   { return !identity.members.empty() && !f.romsets.empty(); });
+          const bool sameDump = arcadeSet != known.files.end() ||
+                                std::ranges::any_of(known.files,
+                                                    [&identity](const GameFile& f)
                                                     {
                                                       return (!f.crc32.empty() && f.crc32 == identity.crc32) ||
                                                              (!f.md5.empty() && f.md5 == identity.md5);
@@ -1143,6 +1150,14 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
                                 (!known.serial.empty() && known.serial == identity.serial);
           if (sameDump)
           {
+            if (arcadeSet != known.files.end())
+            {
+              for (GameFile& file : release.files)
+              {
+                if (file.path == playPath)
+                  file.romsets = arcadeSet->romsets;
+              }
+            }
             if (!known.title.empty())
               release.title = known.title;
             if (!known.regions.empty())

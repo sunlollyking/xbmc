@@ -82,6 +82,14 @@ public:
 private:
   static bool HashWhole(const std::string& path, GameFile& file);
   static bool HashArchive(const std::string& path, GameFile& file);
+
+  /*!
+   * \brief Every file in a zip, from its directory, without decompressing any
+   *
+   * An arcade set is identified by the CRCs of all its chips, which the zip
+   * already records.
+   */
+  static bool ListZip(const std::string& path, std::vector<ArchiveMember>& members);
 };
 } // namespace GAME
 } // namespace KODI

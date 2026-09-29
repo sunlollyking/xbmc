@@ -87,6 +87,7 @@ enum class GameCategory
   DEMO,
   BIOS,
   APPLICATION,
+  NONGAME, // an arcade cabinet that is not a video game: casino, fruit, mechanical
 };
 
 /*!
@@ -226,6 +227,37 @@ struct GameAgeRating
  * \ingroup games
  * \brief One file on disk belonging to a release
  */
+/*!
+ * \ingroup games
+ * \brief One file inside a zip, as the zip's own directory describes it
+ */
+struct ArchiveMember
+{
+  std::string name;
+  uint64_t size{0};
+  std::string crc32;
+};
+
+/*!
+ * \ingroup games
+ * \brief An emulator that holds an arcade set exactly, and its name for the set
+ *
+ * Emulators find a set by its short name, and their romset lists do not always
+ * agree on it.
+ */
+struct EmulatorRomset
+{
+  std::string gameClient;
+  std::string romset;
+  std::vector<std::string> required; // sets the emulator needs beside it: parent, then BIOS
+};
+
+/*!
+ * \brief The emulators holding an arcade set, as stored: "client=romset+parent+bios;..."
+ */
+std::string RomsetsToString(const std::vector<EmulatorRomset>& romsets);
+std::vector<EmulatorRomset> RomsetsFromString(std::string_view text);
+
 struct GameFile
 {
   int id{-1};
@@ -237,6 +269,8 @@ struct GameFile
   std::string serial;
   std::string raHash; // the RetroAchievements hash, when the platform has one
   int disc{0}; // 1-based for multi-disc releases, 0 otherwise
+  std::vector<EmulatorRomset> romsets; // arcade sets only, best emulator first
+  std::vector<ArchiveMember> members; // read while scanning to identify the file; not stored
   int playCount{0};
   std::string lastPlayed;
   std::string dateAdded;

@@ -131,6 +131,20 @@ private:
   static bool NeedsExtracting(const CFileItem& item);
 
   /*!
+   * \brief The emulator an arcade set should play with, or empty to decide as usual
+   *
+   * An emulator finds a set by name and runs only the version its own romset
+   * list describes, so a remembered emulator that lacks this exact set gives
+   * way to one that has it. An emulator chosen for this one game still stands.
+   */
+  static std::string GetArcadeGameClient(const std::string& path,
+                                         const GameClientVector& candidates,
+                                         const std::string& remembered);
+
+  //! Tell the emulator which name its romset list gives the arcade set at this item
+  static void SetRomset(CFileItem& item);
+
+  /*!
    * \brief The emulator remembered for a game, or for the nearest folder above it
    *
    * \param path The game

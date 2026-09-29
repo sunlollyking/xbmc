@@ -71,6 +71,21 @@ bool IsJustTheTitle(const std::string& overview, const std::string& title)
   return StringUtils::EqualsNoCase(bare, title);
 }
 
+//! A zip's files as the scraper protocol sends them: [name, size, crc32]
+CVariant Members(const std::vector<ArchiveMember>& members)
+{
+  CVariant out(CVariant::VariantTypeArray);
+  for (const ArchiveMember& member : members)
+  {
+    CVariant one(CVariant::VariantTypeArray);
+    one.push_back(member.name);
+    one.push_back(member.size);
+    one.push_back(member.crc32);
+    out.push_back(std::move(one));
+  }
+  return out;
+}
+
 std::vector<std::string> Strings(const CVariant& value)
 {
   std::vector<std::string> out;
@@ -212,6 +227,12 @@ std::string CGameScraper::BuildUrl(const std::string& action, const GameScrapeRe
     url.SetOption("size", std::to_string(request.size));
   if (!request.regions.empty())
     url.SetOption("regions", StringUtils::Join(request.regions, ","));
+  if (!request.members.empty())
+  {
+    std::string json;
+    if (CJSONVariantWriter::Write(Members(request.members), json, true))
+      url.SetOption("members", json);
+  }
   if (!request.languages.empty())
     url.SetOption("languages", StringUtils::Join(request.languages, ","));
   if (request.year > 0)
@@ -318,6 +339,8 @@ bool CGameScraper::FindMany(const std::vector<GameScrapeRequest>& requests,
       one["rahash"] = request.raHash;
     if (request.size > 0)
       one["size"] = request.size;
+    if (!request.members.empty())
+      one["members"] = Members(request.members);
     if (!request.regions.empty())
       one["regions"] = StringUtils::Join(request.regions, ",");
     if (!request.languages.empty())
@@ -349,7 +372,7 @@ bool CGameScraper::FindMany(const std::vector<GameScrapeRequest>& requests,
   batchUrl.SetOption("batch", file);
   // The first request's own identity would only confuse a batch
   for (const char* key : {"title", "filename", "crc32", "md5", "sha1", "serial", "rahash", "size",
-                          "regions", "languages", "year"})
+                          "regions", "languages", "year", "members"})
     batchUrl.RemoveOption(key);
 
   CFileItemList items;
@@ -545,6 +568,19 @@ bool CGameScraper::ReadDetails(const std::string& id,
   // The scraper's own id is always kept, so the game can be refreshed
   details.SetUniqueID(m_addon->ID(), id, details.GetDefaultUniqueIDType().empty());
 
+  // The emulators holding an arcade set exactly, with each one's name for it
+  std::vector<EmulatorRomset> romsets;
+  if (payload["emulators"].isArray())
+  {
+    for (auto it = payload["emulators"].begin_array(); it != payload["emulators"].end_array(); ++it)
+    {
+      const std::string gameClient = (*it)["addon"].asString();
+      const std::string romset = (*it)["romset"].asString();
+      if (!gameClient.empty() && !romset.empty())
+        romsets.push_back({gameClient, romset, Strings((*it)["requires"])});
+    }
+  }
+
   if (payload["releases"].isArray())
   {
     std::vector<GameRelease> releases;
@@ -566,7 +602,12 @@ bool CGameScraper::ReadDetails(const std::string& id,
       file.md5 = (*it)["md5"].asString();
       file.sha1 = (*it)["sha1"].asString();
       file.size = static_cast<uint64_t>(std::max<int64_t>((*it)["size"].asInteger(), 0));
-      if (!file.crc32.empty() || !file.md5.empty() || !file.sha1.empty())
+      // An arcade set is described by its short name. With no emulator holding
+      // it exactly, the name is kept on its own.
+      const std::string romset = (*it)["romset"].asString();
+      if (!romset.empty())
+        file.romsets = romsets.empty() ? std::vector<EmulatorRomset>{{"", romset, {}}} : romsets;
+      if (!file.crc32.empty() || !file.md5.empty() || !file.sha1.empty() || !file.romsets.empty())
         release.files.emplace_back(std::move(file));
       releases.emplace_back(std::move(release));
     }

@@ -291,6 +291,19 @@ private:
    * \return The folder's local path, or empty if it could not be made
    */
   std::string ExtractFolder(const std::string& archivePath);
+
+  /*!
+   * \brief A copy of an arcade set under the name the client knows it by
+   *
+   * A client finds a set by its short name, so a set kept under another name
+   * would not load, and looks for its parent and BIOS beside it. The copy and
+   * those companions, given as "set=path", are kept for next time.
+   *
+   * \return The copy's local path, or empty if it could not be made
+   */
+  std::string PresentAsRomset(const std::string& path,
+                              const std::string& romset,
+                              const std::vector<std::string>& companions);
   static bool CopyTree(const std::string& from, const std::string& to);
 
   // Private gameplay functions

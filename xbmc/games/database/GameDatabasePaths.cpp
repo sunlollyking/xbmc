@@ -248,22 +248,23 @@ int CGameDatabase::AddFile(const std::string& fileNameAndPath, int idRelease, co
     if (idFile > 0)
     {
       m_pDS->exec(PrepareSQL("UPDATE files SET idRelease = %i, size = %llu, crc32 = '%s', md5 = "
-                             "'%s', sha1 = '%s', serial = '%s', raHash = '%s', discNumber = %i "
-                             "WHERE idFile = %i",
+                             "'%s', sha1 = '%s', serial = '%s', raHash = '%s', discNumber = %i, "
+                             "romsets = '%s' WHERE idFile = %i",
                              idRelease, static_cast<unsigned long long>(file.size),
                              file.crc32.c_str(), file.md5.c_str(), file.sha1.c_str(),
-                             file.serial.c_str(), file.raHash.c_str(), file.disc, idFile));
+                             file.serial.c_str(), file.raHash.c_str(), file.disc,
+                             RomsetsToString(file.romsets).c_str(), idFile));
       return idFile;
     }
 
     m_pDS->exec(PrepareSQL(
         "INSERT INTO files (idPath, idRelease, strFilename, size, crc32, md5, sha1, serial, "
-        "raHash, discNumber, playCount, lastPlayed, playTime, dateAdded) VALUES (%i, %i, '%s', "
-        "%llu, '%s', '%s', '%s', '%s', '%s', %i, %i, '%s', 0, '%s')",
+        "raHash, discNumber, romsets, playCount, lastPlayed, playTime, dateAdded) VALUES (%i, "
+        "%i, '%s', %llu, '%s', '%s', '%s', '%s', '%s', %i, '%s', %i, '%s', 0, '%s')",
         idPath, idRelease, fileName.c_str(), static_cast<unsigned long long>(file.size),
         file.crc32.c_str(), file.md5.c_str(), file.sha1.c_str(), file.serial.c_str(),
-        file.raHash.c_str(), file.disc, file.playCount, file.lastPlayed.c_str(),
-        (file.dateAdded.empty() ? Now() : file.dateAdded).c_str()));
+        file.raHash.c_str(), file.disc, RomsetsToString(file.romsets).c_str(), file.playCount,
+        file.lastPlayed.c_str(), (file.dateAdded.empty() ? Now() : file.dateAdded).c_str()));
     return static_cast<int>(m_pDS->lastinsertid());
   }
   catch (...)
@@ -316,6 +317,61 @@ int CGameDatabase::GetGameIdByFile(const std::string& fileNameAndPath)
   return -1;
 }
 
+std::vector<EmulatorRomset> CGameDatabase::GetRomsetsForFile(const std::string& fileNameAndPath)
+{
+  const int idFile = GetFileId(fileNameAndPath);
+  if (idFile <= 0 || m_pDB == nullptr || m_pDS == nullptr)
+    return {};
+
+  try
+  {
+    const std::string romsets =
+        GetSingleValue(PrepareSQL("SELECT romsets FROM files WHERE idFile = %i", idFile));
+    return RomsetsFromString(romsets);
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: Failed to read the romsets of {}", fileNameAndPath);
+  }
+  return {};
+}
+
+std::string CGameDatabase::GetFileForRomset(const std::string& romset)
+{
+  if (romset.empty() || m_pDB == nullptr || m_pDS == nullptr)
+    return "";
+
+  try
+  {
+    const std::string sql = PrepareSQL("SELECT files.romsets, files.strFilename, path.strPath FROM "
+                                       "files JOIN path ON path.idPath = files.idPath WHERE "
+                                       "files.romsets LIKE '%%=%s%%'",
+                                       romset.c_str());
+    if (m_pDS->query(sql))
+    {
+      while (!m_pDS->eof())
+      {
+        for (const EmulatorRomset& held : RomsetsFromString(m_pDS->fv(0).get_asString()))
+        {
+          if (held.romset == romset)
+          {
+            const std::string path = m_pDS->fv(2).get_asString() + m_pDS->fv(1).get_asString();
+            m_pDS->close();
+            return path;
+          }
+        }
+        m_pDS->next();
+      }
+      m_pDS->close();
+    }
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: Failed to look for arcade set {}", romset);
+  }
+  return "";
+}
+
 bool CGameDatabase::GetFilesForRelease(int idRelease, std::vector<GameFile>& files)
 {
   try
@@ -339,6 +395,7 @@ bool CGameDatabase::GetFilesForRelease(int idRelease, std::vector<GameFile>& fil
         file.serial = m_pDS->fv("serial").get_asString();
         file.raHash = m_pDS->fv("raHash").get_asString();
         file.disc = m_pDS->fv("discNumber").get_asInt();
+        file.romsets = RomsetsFromString(m_pDS->fv("romsets").get_asString());
         file.playCount = m_pDS->fv("playCount").get_asInt();
         file.lastPlayed = m_pDS->fv("lastPlayed").get_asString();
         file.dateAdded = m_pDS->fv("dateAdded").get_asString();
