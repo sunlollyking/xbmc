@@ -90,6 +90,13 @@ std::string ExtractedFolder(const std::string& archive)
   return URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, name + "-" + hash) + "/";
 }
 
+//! Whether a name read from an archive stays inside the folder it is copied to
+bool IsSafeName(const std::string& name)
+{
+  return !name.empty() && name != "." && name != ".." &&
+         name.find_first_of("/\\") == std::string::npos;
+}
+
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 
@@ -757,6 +764,8 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
   for (const std::string& disk : disks)
   {
     const std::string name = URIUtils::GetFileName(disk);
+    if (!IsSafeName(name))
+      return "";
     const std::string target = URIUtils::AddFileToFolder(folder, name);
 
     if (!XFILE::CFile::Exists(target) && !XFILE::CFile::Copy(disk, target))
@@ -818,6 +827,12 @@ bool CGameClient::CopyTree(const std::string& from, const std::string& to)
 
   for (const auto& item : items)
   {
+    if (!IsSafeName(item->GetLabel()))
+    {
+      CLog::Log(LOGERROR, "GameClient: Refusing archive entry {}",
+                CURL::GetRedacted(item->GetPath()));
+      return false;
+    }
     const std::string target = URIUtils::AddFileToFolder(to, item->GetLabel());
     if (item->IsFolder())
     {
