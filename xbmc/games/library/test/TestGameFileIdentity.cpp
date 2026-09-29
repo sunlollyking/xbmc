@@ -69,3 +69,49 @@ TEST(TestGameFileIdentity, ReadsAnArchivedGameWithoutExtractingIt)
 
   EXPECT_EQ(TempFileNames(), before);
 }
+
+TEST(TestGameFileIdentity, ListsEveryFileOfAnArcadeSet)
+{
+  // arcade.zip holds three small files, one of them in a folder
+  GameFile file;
+  CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/arcade.zip"), file,
+                              MediaFormat::CARTRIDGE);
+
+  ASSERT_EQ(file.members.size(), 3U);
+  EXPECT_EQ(file.members[0].name, "074-p1.p1");
+  EXPECT_EQ(file.members[0].size, 120U);
+  EXPECT_EQ(file.members[0].crc32, "2480cadb");
+  EXPECT_EQ(file.members[2].name, "sub/074-s1.s1");
+  EXPECT_EQ(file.members[2].crc32, "01281d6c");
+}
+
+TEST(TestGameFileIdentity, ListsNothingForAZipOfOneGame)
+{
+  GameFile file;
+  CGameFileIdentity::Identify(XBMC_REF_FILE_PATH(ARCHIVE), file, MediaFormat::CARTRIDGE);
+
+  EXPECT_TRUE(file.members.empty());
+}
+
+TEST(TestGameFileIdentity, StoresEachEmulatorsNameForAnArcadeSet)
+{
+  const std::vector<EmulatorRomset> romsets{
+      {"game.libretro.fbneo", "aodk", {}},
+      {"game.libretro.mame2003_plus", "kof95h", {"kof95", "neogeo"}}};
+  const std::string stored = RomsetsToString(romsets);
+  EXPECT_EQ(stored, "game.libretro.fbneo=aodk;game.libretro.mame2003_plus=kof95h+kof95+neogeo");
+
+  const std::vector<EmulatorRomset> read = RomsetsFromString(stored);
+  ASSERT_EQ(read.size(), 2U);
+  EXPECT_EQ(read[1].gameClient, "game.libretro.mame2003_plus");
+  EXPECT_EQ(read[1].romset, "kof95h");
+  EXPECT_EQ(read[1].required, (std::vector<std::string>{"kof95", "neogeo"}));
+  EXPECT_TRUE(read[0].required.empty());
+
+  // A set no emulator holds exactly keeps its name alone
+  const std::vector<EmulatorRomset> nameOnly = RomsetsFromString("=aodk");
+  ASSERT_EQ(nameOnly.size(), 1U);
+  EXPECT_TRUE(nameOnly[0].gameClient.empty());
+  EXPECT_EQ(nameOnly[0].romset, "aodk");
+  EXPECT_TRUE(RomsetsFromString("").empty());
+}

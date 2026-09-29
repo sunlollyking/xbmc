@@ -25,16 +25,16 @@
 #include "dialogs/GUIDialogOK.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/AddonsDirectory.h"
+#include "filesystem/File.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/IFileDirectory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
 #include "games/database/GameDatabase.h"
-#include "games/library/GameLibraryTypes.h"
-#include "utils/Variant.h"
 #include "games/dialogs/GUIDialogSelectGameClient.h"
 #include "games/dialogs/GUIDialogSelectSavestate.h"
+#include "games/library/GameLibraryTypes.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -44,6 +44,7 @@
 #include "resources/ResourcesComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
+#include "utils/Variant.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -126,7 +127,11 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
 
         // An emulator remembered for this game, or for a folder above it,
         // answers the question without asking
-        const std::string defaultClient = GetDefaultGameClient(item.GetPath(), candidates);
+        std::string defaultClient = GetDefaultGameClient(item.GetPath(), candidates);
+        if (const std::string arcade =
+                GetArcadeGameClient(item.GetPath(), candidates, defaultClient);
+            !arcade.empty())
+          defaultClient = arcade;
         if (!defaultClient.empty())
         {
           item.GetGameInfoTag()->SetGameClient(defaultClient);
@@ -187,7 +192,82 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
     item.GetGameInfoTag()->SetGameClient("");
   }
 
+  SetRomset(item);
+
   return !item.GetGameInfoTag()->GetGameClient().empty();
+}
+
+std::string CGameUtils::GetArcadeGameClient(const std::string& path,
+                                            const GameClientVector& candidates,
+                                            const std::string& remembered)
+{
+  CGameDatabase db;
+  if (path.empty() || !db.Open())
+    return "";
+
+  const std::vector<EmulatorRomset> romsets = db.GetRomsetsForFile(path);
+  if (!db.GameClients().GetGameClient(path).empty())
+    return "";
+
+  if (std::ranges::any_of(romsets, [&remembered](const EmulatorRomset& r)
+                          { return r.gameClient == remembered; }))
+    return remembered;
+
+  for (const EmulatorRomset& romset : romsets)
+  {
+    const bool installed = std::ranges::any_of(candidates, [&romset](const GameClientPtr& c)
+                                               { return c->ID() == romset.gameClient; });
+    if (installed)
+    {
+      CLog::Log(LOGINFO, "GAME: Opening {} with {}, which holds it exactly as {}",
+                CURL::GetRedacted(path), romset.gameClient, romset.romset);
+      return romset.gameClient;
+    }
+  }
+  return "";
+}
+
+void CGameUtils::SetRomset(CFileItem& item)
+{
+  CGameDatabase db;
+  if (item.GetPath().empty() || !db.Open())
+    return;
+
+  const std::string gameClient = item.GetGameInfoTag()->GetGameClient();
+  for (const EmulatorRomset& romset : db.GetRomsetsForFile(item.GetPath()))
+  {
+    if (romset.gameClient != gameClient)
+      continue;
+
+    item.SetProperty("game.romset", romset.romset);
+
+    // An emulator looks for a set's parent and BIOS beside it. Any that are
+    // not already there are found and handed over with it.
+    const std::string folder = URIUtils::GetDirectory(item.GetPath());
+    std::vector<std::string> companions;
+    for (const std::string& required : romset.required)
+    {
+      const std::string beside = URIUtils::AddFileToFolder(folder, required + ".zip");
+      if (XFILE::CFile::Exists(beside))
+        continue;
+
+      std::string found = db.GetFileForRomset(required);
+      if (found.empty())
+      {
+        const std::string bios =
+            URIUtils::AddFileToFolder("special://profile/games/bios/system", required + ".zip");
+        if (XFILE::CFile::Exists(bios))
+          found = bios;
+      }
+      if (!found.empty())
+        companions.emplace_back(required + "=" + found);
+      else
+        CLog::Log(LOGWARNING, "GAME: {} needs the set {}, which was not found",
+                  CURL::GetRedacted(item.GetPath()), required);
+    }
+    item.SetProperty("game.romset.companions", StringUtils::Join(companions, ";"));
+    return;
+  }
 }
 
 std::string CGameUtils::GetRememberedGameClient(const std::string& path)

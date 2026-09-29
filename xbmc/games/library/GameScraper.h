@@ -48,6 +48,7 @@ struct GameScrapeRequest
   std::vector<std::string> regions;
   std::vector<std::string> languages;
   int year{0};
+  std::vector<ArchiveMember> members; // every file in a zip, for arcade sets
 
   //! True while a folder is being scanned, false when a person asked about
   //! this one game. A source with a small allowance is left out of a scan.
