@@ -31,8 +31,8 @@ enum class TitleStyle
   ORIGINAL = 1,
   ON_DISK = 2,
 };
-constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY = "gamelibrary.regionpriority";
-constexpr const char* SETTING_GAMELIBRARY_REGIONPRIORITY_DEFAULT = "Europe,World,USA,Japan";
+constexpr const char* SETTING_GAMELIBRARY_REGION = "gamelibrary.region";
+constexpr const char* SETTING_GAMELIBRARY_REGION_DEFAULT = "Europe";
 constexpr const char* SETTING_GAMELIBRARY_AGERATINGBOARD = "gamelibrary.ageratingboard";
 //! The boards after the preferred one, in the order their classifications are shown
 constexpr const char* AGERATINGBOARDS_ORDER = "PEGI,BBFC,ESRB,USK,CERO,ACB,GRAC,CLASS_IND";

@@ -20212,12 +20212,12 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35552"
-msgid "Preferred regions"
+msgid "Preferred region"
 msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35553"
-msgid "Regions in order of preference, separated by commas, such as Europe, World, USA, Japan. When a game has several releases, the one from the first region listed here plays."
+msgid "Where you play. When a game has several releases, the one from here plays and its box art is shown. Failing that, a release for the wider region or the whole world is chosen, then Europe, USA and Japan in turn."
 msgstr ""
 
 #: xbmc/games/library
@@ -20947,7 +20947,79 @@ msgctxt "#35737"
 msgid "ClassInd - Brazil"
 msgstr ""
 
-#empty strings from id 35738 to 35999
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35738"
+msgid "Europe"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35739"
+msgid "United Kingdom"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35740"
+msgid "Germany"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35741"
+msgid "France"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35742"
+msgid "Spain"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35743"
+msgid "Italy"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35744"
+msgid "Australia"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35745"
+msgid "USA"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35746"
+msgid "Canada"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35747"
+msgid "Brazil"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35748"
+msgid "Japan"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35749"
+msgid "South Korea"
+msgstr ""
+
+#empty strings from id 35750 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
