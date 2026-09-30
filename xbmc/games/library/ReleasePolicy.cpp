@@ -8,52 +8,66 @@
 
 #include "ReleasePolicy.h"
 
-#include "GameNameParser.h"
 #include "ServiceBroker.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
-#include "utils/StringUtils.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
+#include <string_view>
 
 using namespace KODI;
 using namespace GAME;
 
 namespace
 {
-std::vector<std::string> SplitRegions(const std::string& list)
+//! The regions tried after the player's own, in order
+constexpr std::array<std::string_view, 3> FALLBACK_REGIONS{"Europe", "USA", "Japan"};
+
+//! The wider region whose releases a country gets
+std::string_view WiderRegion(std::string_view region)
+{
+  if (region == "United Kingdom" || region == "Germany" || region == "France" ||
+      region == "Spain" || region == "Italy" || region == "Australia")
+    return "Europe";
+  if (region == "Canada" || region == "Brazil")
+    return "USA";
+  if (region == "Korea")
+    return "Asia";
+  return "";
+}
+
+std::vector<std::string> RegionPriority(const std::string& region)
 {
   std::vector<std::string> regions;
-  for (std::string name : StringUtils::Split(list, ','))
+  const auto add = [&regions](std::string_view name)
   {
-    StringUtils::Trim(name);
-    // What the user typed is matched against the names a file name gave, so a
-    // shorthand or a different spelling still finds its region
-    std::string lower = name;
-    StringUtils::ToLower(lower);
-    std::string canonical = CGameNameParser::RegionName(lower);
-    if (canonical.empty())
-      canonical = std::move(name);
-    if (!canonical.empty() && std::ranges::find(regions, canonical) == regions.end())
-      regions.emplace_back(std::move(canonical));
-  }
+    if (!name.empty() && std::ranges::find(regions, name) == regions.end())
+      regions.emplace_back(name);
+  };
+  add(region);
+  add(WiderRegion(region));
+  add("World");
+  for (std::string_view fallback : FALLBACK_REGIONS)
+    add(fallback);
   return regions;
 }
 } // namespace
 
 CReleasePolicy::CReleasePolicy()
 {
+  std::string region = SETTING_GAMELIBRARY_REGION_DEFAULT;
   const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
   if (settings)
   {
-    m_regionPriority = SplitRegions(settings->GetString(SETTING_GAMELIBRARY_REGIONPRIORITY));
+    if (const std::string chosen = settings->GetString(SETTING_GAMELIBRARY_REGION); !chosen.empty())
+      region = chosen;
     m_preferRetail = settings->GetBool(SETTING_GAMELIBRARY_PREFERRETAIL);
     m_preferNewestRevision = settings->GetBool(SETTING_GAMELIBRARY_PREFERNEWESTREVISION);
     m_preferVerified = settings->GetBool(SETTING_GAMELIBRARY_PREFERVERIFIED);
   }
-  if (m_regionPriority.empty())
-    m_regionPriority = SplitRegions(SETTING_GAMELIBRARY_REGIONPRIORITY_DEFAULT);
+  m_regionPriority = RegionPriority(region);
 }
 
 CReleasePolicy::CReleasePolicy(std::vector<std::string> regionPriority,
