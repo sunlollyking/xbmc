@@ -16,6 +16,7 @@
 #include "addons/RepositoryUpdater.h"
 #include "favourites/FavouritesService.h"
 #include "filesystem/Directory.h"
+#include "games/GameUtils.h"
 #include "interfaces/AnnouncementManager.h"
 #include "interfaces/IAnnouncer.h"
 #include "jobs/JobManager.h"
@@ -666,6 +667,11 @@ bool CDirectoryProvider::OnClick(const std::shared_ptr<CGUIListItem>& item)
     if (proc.ProcessDefaultAction())
       return true;
   }
+
+  // A game follows the games library's select action, as it does in the Games window
+  if (targetItem->HasGameInfoTag() && !targetItem->IsFolder() &&
+      KODI::GAME::CGameUtils::OnSelect(targetItem))
+    return true;
 
   // exec the execute string for the original (!) item
   CFileItem fileItem{*std::static_pointer_cast<CFileItem>(item)};
