@@ -1174,18 +1174,26 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
           }
         }
 
+        // Art from the player's preferred regions first, in their order. Then
+        // the dump's own region, then art that names no region, then the rest.
+        const std::vector<std::string> regionPriority = CReleasePolicy().GetRegionPriority();
+        const auto rank = [&regionPriority, &release](const GameScrapeArt& piece)
+        {
+          if (piece.region.empty())
+            return regionPriority.size() + 1;
+          const auto preferred =
+              std::ranges::find_if(regionPriority, [&piece](const std::string& region)
+                                   { return StringUtils::EqualsNoCase(region, piece.region); });
+          if (preferred != regionPriority.end())
+            return static_cast<size_t>(preferred - regionPriority.begin());
+          if (std::ranges::find(release.regions, piece.region) != release.regions.end())
+            return regionPriority.size();
+          return regionPriority.size() + 2;
+        };
+
         for (const auto& [type, pieces] : offered)
         {
-          // The first piece whose region agrees with the dump, else the first
-          const GameScrapeArt* pick = &pieces.front();
-          for (const GameScrapeArt& piece : pieces)
-          {
-            if (!piece.region.empty() && std::ranges::find(release.regions, piece.region) != release.regions.end())
-            {
-              pick = &piece;
-              break;
-            }
-          }
+          const GameScrapeArt* pick = &*std::ranges::min_element(pieces, {}, rank);
           art[type] = pick->url;
 
           // A source that offers several of a kind, as IGDB does with
