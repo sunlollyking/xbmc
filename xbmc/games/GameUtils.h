@@ -118,6 +118,16 @@ public:
    */
   static void UpdateInstallableAddons();
 
+  /*!
+   * \brief Act on a game being selected, as the games library settings ask
+   *
+   * Shows the game's information or asks what to do. Only a game in the library
+   * has information to show, so anything else is left to be played.
+   *
+   * \return True if it was dealt with here, false if the caller should play it
+   */
+  static bool OnSelect(const std::shared_ptr<CFileItem>& item);
+
 private:
   /*!
    * \brief The emulator remembered for a game, or for the nearest folder above

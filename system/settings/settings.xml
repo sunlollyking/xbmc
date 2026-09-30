@@ -1126,7 +1126,7 @@
       <group id="4" label="35590">
         <setting id="gamelibrary.selectaction" type="integer" label="22079" help="35638">
           <level>0</level>
-          <default>8</default> <!-- ACTION_PLAY -->
+          <default>3</default> <!-- ACTION_INFO -->
           <constraints>
             <options>
               <option label="22080">0</option> <!-- ACTION_CHOOSE -->

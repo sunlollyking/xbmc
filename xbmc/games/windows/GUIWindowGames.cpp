@@ -52,9 +52,6 @@ namespace
 {
 // The values the games library select-action setting stores, which are Kodi's
 // own action ids so the setting reads the same as the video one
-constexpr int SELECT_ACTION_CHOOSE = 0;
-constexpr int SELECT_ACTION_INFO = 3;
-constexpr int SELECT_ACTION_PLAY = 8;
 } // namespace
 using namespace GAME;
 
@@ -198,50 +195,13 @@ bool CGUIWindowGames::OnClick(int iItem, const std::string& player /* = "" */)
     // A playlist is opened, not played
     if (!item->IsFolder() && !PLAYLIST::IsSmartPlayList(*item) && !PLAYLIST::IsPlayList(*item))
     {
-      switch (SelectAction())
-      {
-        case SELECT_ACTION_INFO:
-          CGUIDialogGameInfo::ShowFor(item);
-          return true;
-        case SELECT_ACTION_CHOOSE:
-          if (ChooseAction(item))
-            return true;
-          break;
-        default:
-          break;
-      }
-      PlayGame(*item);
+      if (!CGameUtils::OnSelect(item))
+        PlayGame(*item);
       return true;
     }
   }
 
   return CGUIMediaWindow::OnClick(iItem, player);
-}
-
-int CGUIWindowGames::SelectAction()
-{
-  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-  if (!settings)
-    return SELECT_ACTION_PLAY;
-  return settings->GetInt(CSettings::SETTING_GAMELIBRARY_SELECTACTION);
-}
-
-bool CGUIWindowGames::ChooseAction(const std::shared_ptr<CFileItem>& item)
-{
-  CContextButtons choices;
-  choices.Add(SELECT_ACTION_PLAY, 208); // "Play"
-  choices.Add(SELECT_ACTION_INFO, 22081); // "Show information"
-
-  switch (CGUIDialogContextMenu::ShowAndGetChoice(choices))
-  {
-    case SELECT_ACTION_INFO:
-      CGUIDialogGameInfo::ShowFor(item);
-      return true;
-    case SELECT_ACTION_PLAY:
-      return false; // the caller plays it
-    default:
-      return true; // dismissed, so do nothing
-  }
 }
 
 void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons)
