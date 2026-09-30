@@ -21,6 +21,7 @@
 #include "cores/RetroPlayer/guibridge/GUIGameSettingsHandle.h"
 #include "cores/RetroPlayer/savestates/ISavestate.h"
 #include "cores/RetroPlayer/savestates/SavestateDatabase.h"
+#include "dialogs/GUIDialogContextMenu.h"
 #include "dialogs/GUIDialogOK.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/AddonsDirectory.h"
@@ -31,6 +32,7 @@
 #include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
 #include "games/database/GameDatabase.h"
+#include "games/dialogs/GUIDialogGameInfo.h"
 #include "games/dialogs/GUIDialogSelectGameClient.h"
 #include "games/dialogs/GUIDialogSelectSavestate.h"
 #include "games/library/GameLibraryTypes.h"
@@ -41,6 +43,8 @@
 #include "messaging/helpers/DialogOKHelper.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -51,6 +55,14 @@
 
 using namespace KODI;
 using namespace GAME;
+
+namespace
+{
+// Values of the games library's "Default select action" setting
+constexpr int SELECT_ACTION_CHOOSE = 0;
+constexpr int SELECT_ACTION_INFO = 3;
+constexpr int SELECT_ACTION_PLAY = 8;
+} // namespace
 
 namespace
 {
@@ -863,4 +875,31 @@ GameClientPtr CGameUtils::GetPlayingGameClient()
     return {};
 
   return std::static_pointer_cast<CGameClient>(addon);
+}
+
+bool CGameUtils::OnSelect(const std::shared_ptr<CFileItem>& item)
+{
+  if (!item || !item->HasProperty("gameid"))
+    return false;
+
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  int action =
+      settings ? settings->GetInt(CSettings::SETTING_GAMELIBRARY_SELECTACTION) : SELECT_ACTION_INFO;
+
+  if (action == SELECT_ACTION_CHOOSE)
+  {
+    CContextButtons choices;
+    choices.Add(SELECT_ACTION_PLAY, 208); // "Play"
+    choices.Add(SELECT_ACTION_INFO, 22081); // "Show information"
+    action = CGUIDialogContextMenu::ShowAndGetChoice(choices);
+    if (action < 0)
+      return true; // Dismissed, so nothing happens
+  }
+
+  // The information dialog has a Play button of its own, and leaves the
+  // playing to whoever opened it
+  if (action == SELECT_ACTION_INFO)
+    return !CGUIDialogGameInfo::ShowFor(item);
+
+  return false;
 }

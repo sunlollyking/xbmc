@@ -20637,7 +20637,7 @@ msgstr ""
 
 #: system/settings/settings.xml
 msgctxt "#35638"
-msgid "Toggle between [Choose], [Play] (default) and [Show information].[CR][Choose] will ask which of them you want.[CR][Play] will start the game.[CR][Show information] will open the game's information dialog."
+msgid "Toggle between [Choose], [Play] and [Show information] (default).[CR][Choose] will ask which of them you want.[CR][Play] will start the game.[CR][Show information] will open the game's information dialog."
 msgstr ""
 
 #empty string with id 35639
