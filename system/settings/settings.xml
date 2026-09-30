@@ -1819,10 +1819,22 @@
           <default>Europe,World,USA,Japan</default>
           <control type="edit" format="string" />
         </setting>
-        <setting id="gamelibrary.ageratingboards" type="string" label="35586" help="35587">
+        <setting id="gamelibrary.ageratingboard" type="string" label="35586" help="35587">
           <level>1</level>
-          <default>PEGI,BBFC,ESRB,USK,CERO,ACB,GRAC</default>
-          <control type="edit" format="string" />
+          <default>PEGI</default>
+          <constraints>
+            <options>
+              <option label="35730">PEGI</option>
+              <option label="35731">BBFC</option>
+              <option label="35732">ESRB</option>
+              <option label="35733">USK</option>
+              <option label="35734">CERO</option>
+              <option label="35735">ACB</option>
+              <option label="35736">GRAC</option>
+              <option label="35737">CLASS_IND</option>
+            </options>
+          </constraints>
+          <control type="list" format="string" />
         </setting>
         <setting id="gamelibrary.preferretail" type="boolean" label="35554" help="35557">
           <level>1</level>

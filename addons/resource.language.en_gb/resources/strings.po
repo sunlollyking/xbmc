@@ -20378,12 +20378,12 @@ msgstr ""
 #. Label of the setting choosing which classification board's rating is shown
 #: system/settings/settings.xml
 msgctxt "#35586"
-msgid "Ratings boards in order of preference"
+msgid "Preferred age rating board"
 msgstr ""
 
 #: system/settings/settings.xml
 msgctxt "#35587"
-msgid "Which board's classification a game shows, when it carries several. Separate them with commas, such as PEGI, BBFC, ESRB. A board that is not listed here is shown only when a game has no other."
+msgid "Which board's classification a game shows first, when it carries several. The others follow."
 msgstr ""
 
 #: xbmc/games/dialogs/GUIDialogGameInfo.cpp
@@ -20897,7 +20897,57 @@ msgctxt "#35728"
 msgid "Developer"
 msgstr ""
 
-#empty strings from id 35729 to 35999
+#empty string with id 35729
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35730"
+msgid "PEGI - Europe"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35731"
+msgid "BBFC - United Kingdom"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35732"
+msgid "ESRB - North America"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35733"
+msgid "USK - Germany"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35734"
+msgid "CERO - Japan"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35735"
+msgid "ACB - Australia"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35736"
+msgid "GRAC - South Korea"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35737"
+msgid "ClassInd - Brazil"
+msgstr ""
+
+#empty strings from id 35738 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

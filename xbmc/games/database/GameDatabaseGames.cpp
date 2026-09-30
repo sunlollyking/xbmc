@@ -412,18 +412,18 @@ void CGameDatabase::LoadAgeRatings(int idGame, CGameInfoTag& details)
 
 std::vector<std::string> CGameDatabase::PreferredAgeRatingBoards()
 {
-  std::string setting;
+  std::vector<std::string> boards;
   const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
   if (settings)
-    setting = settings->GetString(SETTING_GAMELIBRARY_AGERATINGBOARDS);
-  if (setting.empty())
-    setting = SETTING_GAMELIBRARY_AGERATINGBOARDS_DEFAULT;
-
-  std::vector<std::string> boards;
-  for (std::string board : StringUtils::Split(setting, ','))
   {
-    StringUtils::Trim(board);
-    if (!board.empty())
+    const std::string preferred = settings->GetString(SETTING_GAMELIBRARY_AGERATINGBOARD);
+    if (!preferred.empty())
+      boards.emplace_back(preferred);
+  }
+
+  for (std::string board : StringUtils::Split(AGERATINGBOARDS_ORDER, ','))
+  {
+    if (std::ranges::find(boards, board) == boards.end())
       boards.emplace_back(std::move(board));
   }
   return boards;
