@@ -13,10 +13,12 @@
 #include "jobs/JobQueue.h"
 #include "threads/CriticalSection.h"
 
+#include <atomic>
 #include <memory>
 #include <string>
 
 class CFileItem;
+class CGUIDialogProgressBarHandle;
 
 namespace KODI
 {
@@ -64,6 +66,10 @@ protected:
 
   // Implementation of CJobQueue
   void OnJobComplete(unsigned int jobID, bool success, CJob* job) override;
+  void OnJobProgress(unsigned int jobID,
+                     unsigned int progress,
+                     unsigned int total,
+                     const CJob* job) override;
 
 private:
   enum class Status
@@ -100,6 +106,11 @@ private:
 
   void SetStatus(Status status, const std::string& detail = "");
 
+  //! Brings up, updates and closes our slot in Kodi's background progress
+  //! bar. Driven from Process() so that everything touching the GUI happens
+  //! on the GUI thread, while the percentage arrives from the job thread.
+  void UpdateDownloadProgress();
+
   //! Publish the lists and status for the skin
   void UpdateProviderList();
 
@@ -124,6 +135,21 @@ private:
   //! Results arrive on a job thread, but a control can only be bound on the
   //! GUI thread, so the binding waits for the next frame
   bool m_updateResults{false};
+
+  //! Set once there are results to focus, and cleared only once the focus has
+  //! actually landed. The list is hidden while a status is showing, and
+  //! whether it is visible is worked out during rendering - so on the frame
+  //! the results are bound it can still be invisible, and a control that
+  //! cannot be seen cannot be focused.
+  bool m_focusResults{false};
+
+  //! A manual is fetched in the background, so without this a large one over
+  //! a slow link is indistinguishable from Kodi having hung
+  std::atomic<bool> m_downloadActive{false};
+  std::atomic<int> m_downloadPercent{0};
+
+  //! Our slot in Kodi's background progress bar while a download runs
+  CGUIDialogProgressBarHandle* m_progressHandle{nullptr};
 };
 
 } // namespace GAME
