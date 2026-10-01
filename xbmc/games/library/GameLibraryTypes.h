@@ -195,6 +195,12 @@ public:
   //! \brief The string id naming a category, for a listing to show
   static int CategoryLabel(GameCategory category);
 
+  //! \brief The string id naming a release status, or 0 for a retail release
+  static int ReleaseStatusLabel(ReleaseStatus status);
+
+  //! \brief The string id naming a licence, or 0 for a licensed release
+  static int LicenceLabel(Licence licence);
+
   /*!
    * \brief The string a machine's kind and its medium go by on screen
    */

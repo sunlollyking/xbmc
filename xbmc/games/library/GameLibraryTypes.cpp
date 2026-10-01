@@ -230,6 +230,50 @@ int CGameLibraryTypes::MediaFormatLabel(MediaFormat format)
   return 0;
 }
 
+int CGameLibraryTypes::ReleaseStatusLabel(ReleaseStatus status)
+{
+  switch (status)
+  {
+    case ReleaseStatus::BETA:
+      return 35752; // "Beta"
+    case ReleaseStatus::PROTOTYPE:
+      return 35753; // "Prototype"
+    case ReleaseStatus::SAMPLE:
+      return 35754; // "Sample"
+    case ReleaseStatus::DEMO:
+      return 35596; // "Demo"
+    case ReleaseStatus::ALPHA:
+      return 35755; // "Alpha"
+    case ReleaseStatus::KIOSK:
+      return 35756; // "Kiosk"
+    case ReleaseStatus::DEBUG:
+      return 35757; // "Debug"
+    case ReleaseStatus::PROGRAM:
+      return 35597; // "BIOS"
+    case ReleaseStatus::RETAIL:
+      break;
+  }
+  return 0;
+}
+
+int CGameLibraryTypes::LicenceLabel(Licence licence)
+{
+  switch (licence)
+  {
+    case Licence::UNLICENSED:
+      return 35758; // "Unlicensed"
+    case Licence::AFTERMARKET:
+      return 35759; // "Aftermarket"
+    case Licence::HOMEBREW:
+      return 35537; // "Homebrew"
+    case Licence::PIRATE:
+      return 35760; // "Pirate"
+    case Licence::LICENSED:
+      break;
+  }
+  return 0;
+}
+
 int CGameLibraryTypes::CategoryLabel(GameCategory category)
 {
   switch (category)
