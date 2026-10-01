@@ -18,6 +18,7 @@
 #include "dialogs/GUIDialogContextMenu.h"
 #include "dialogs/GUIDialogMediaSource.h"
 #include "dialogs/GUIDialogProgress.h"
+#include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
 #include "filesystem/Directory.h"
 #include "filesystem/FileDirectoryFactory.h"
@@ -43,6 +44,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
+#include "utils/Variant.h"
 
 #include <algorithm>
 
@@ -244,11 +246,13 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
       {
         buttons.Add(CONTEXT_BUTTON_INFO, 19033); // "Information"
         buttons.Add(CONTEXT_BUTTON_REFRESH_THUMBS, 184); // "Refresh"
+        if (item->HasGameInfoTag() && item->GetGameInfoTag()->GetReleaseCount() > 1)
+          buttons.Add(CONTEXT_BUTTON_CHOOSE_GAME_VERSION, 35714); // "Choose version"
       }
 
-      // A release of a library game can be made the one that plays
+      // A version of a library game can be made the one that plays
       if (item->HasProperty("releaseid") && !item->GetProperty("isdefaultrelease").asBoolean())
-        buttons.Add(CONTEXT_BUTTON_SET_DEFAULT, 35551); // "Set as default release"
+        buttons.Add(CONTEXT_BUTTON_SET_DEFAULT, 35551); // "Set as default version"
 
       // A folder of games is given its platform, scraper, emulator and filter in one place
       if (item->IsFolder() && !m_vecItems->IsPlugin() && !URIUtils::IsProtocol(item->GetPath(), "gamedb"))
@@ -331,6 +335,9 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         }
         return true;
       }
+      case CONTEXT_BUTTON_CHOOSE_GAME_VERSION:
+        ChooseVersionAndPlay(static_cast<int>(item->GetProperty("gameid").asInteger()));
+        return true;
       case CONTEXT_BUTTON_SET_DEFAULT:
       {
         CGameDatabase db;
@@ -548,6 +555,33 @@ void CGUIWindowGames::OnItemInfo(int itemNumber)
     if (item->IsPlugin() || item->IsScript())
       CGUIDialogAddonInfo::ShowForItem(item);
   }
+}
+
+void CGUIWindowGames::ChooseVersionAndPlay(int idGame)
+{
+  CFileItemList versions;
+  if (!XFILE::CDirectory::GetDirectory("gamedb://titles/" + std::to_string(idGame) + "/", versions,
+                                       "", XFILE::DIR_FLAG_DEFAULTS) ||
+      versions.IsEmpty())
+    return;
+
+  auto* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
+  if (dialog == nullptr)
+    return;
+
+  dialog->Reset();
+  dialog->SetHeading(CVariant{35714}); // "Choose version"
+  dialog->SetItems(versions);
+  for (int i = 0; i < versions.Size(); ++i)
+  {
+    if (versions[i]->GetProperty("isdefaultrelease").asBoolean())
+      dialog->SetSelected(i);
+  }
+  dialog->Open();
+
+  if (dialog->IsConfirmed() && dialog->GetSelectedFileItem())
+    PlayGame(*dialog->GetSelectedFileItem());
 }
 
 bool CGUIWindowGames::PlayGame(const CFileItem& item)

@@ -20165,7 +20165,7 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35543"
-msgid "Releases"
+msgid "Versions"
 msgstr ""
 
 #: xbmc/games/library
@@ -20205,7 +20205,7 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35551"
-msgid "Set as default release"
+msgid "Set as default version"
 msgstr ""
 
 #: xbmc/games/library
@@ -20215,12 +20215,12 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35553"
-msgid "Where you play. When a game has several releases, the one from here plays and its box art is shown. Failing that, a release for the wider region or the whole world is chosen, then Europe, USA and Japan in turn."
+msgid "Where you play. When a game has several versions, the one from here plays and its box art is shown. Failing that, a version for the wider region or the whole world is chosen, then Europe, USA and Japan in turn."
 msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35554"
-msgid "Prefer retail releases"
+msgid "Prefer retail versions"
 msgstr ""
 
 #: xbmc/games/library
@@ -20235,7 +20235,7 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35557"
-msgid "Decides which of a game's releases plays by default. Choosing a release in the game's releases list always wins."
+msgid "Decides which of a game's versions plays by default. Choosing a version in the game's versions list always wins."
 msgstr ""
 
 #empty strings from id 35558 to 35559
@@ -20282,17 +20282,17 @@ msgstr ""
 
 #: xbmc/media/MediaType.cpp
 msgctxt "#35568"
-msgid "release"
+msgid "version"
 msgstr ""
 
 #: xbmc/media/MediaType.cpp
 msgctxt "#35569"
-msgid "releases"
+msgid "versions"
 msgstr ""
 
 #: xbmc/media/MediaType.cpp
 msgctxt "#35570"
-msgid "Release"
+msgid "Version"
 msgstr ""
 
 #. Label of the company that made a games platform, shown in the games library
@@ -20838,7 +20838,79 @@ msgctxt "#35702"
 msgid "Starting a hardcore session restarts the game. Any unsaved progress will be lost.[CR][CR]Continue?"
 msgstr ""
 
-#empty strings from id 35703 to 35719
+#. What a version of a game is made from it as
+#: xbmc/games
+msgctxt "#35703"
+msgid "Hack"
+msgstr ""
+
+#. What a version of a game is made from it as
+#: xbmc/games
+msgctxt "#35704"
+msgid "Fan translation"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35705"
+msgid "Beta"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35706"
+msgid "Prototype"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35707"
+msgid "Sample"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35708"
+msgid "Alpha"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35709"
+msgid "Kiosk"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35710"
+msgid "Debug"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35711"
+msgid "Unlicensed"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35712"
+msgid "Aftermarket"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35713"
+msgid "Pirate"
+msgstr ""
+
+#. Context menu entry and heading: pick which version of a game to play
+#: xbmc/games
+msgctxt "#35714"
+msgid "Choose version"
+msgstr ""
+
+#empty strings from id 35715 to 35719
 
 #. Shown when no add-on is installed that can look for manuals
 #: xbmc/games/manual/GUIDialogGameManuals.cpp
