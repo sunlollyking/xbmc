@@ -54,6 +54,12 @@ private:
    */
   void SetVideoFilterForGame(const std::string& gamePath);
 
+  /*!
+   * \brief Get the bezel to frame a game with: its own art, or else the art the
+   *        game library has for it
+   */
+  static std::string GetBezelForGame(const CFileItem& item);
+
 public:
   bool CloseFile(bool reopen = false) override;
   bool IsPlaying() const override;
@@ -79,6 +85,7 @@ public:
   bool IsDiscEjected() const override;
   std::string DiscLabel() const override;
   bool IsTrayEmpty() const override;
+  bool HasBezel() const override;
 
   // Implementation of IGameCallback
   std::string GameClientID() const override;
