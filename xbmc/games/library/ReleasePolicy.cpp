@@ -102,7 +102,7 @@ int CReleasePolicy::RegionRank(const GameRelease& release) const
 int CReleasePolicy::StatusRank(const GameRelease& release)
 {
   int rank = 0;
-  if (release.status != ReleaseStatus::RETAIL)
+  if (release.status != ReleaseStatus::RETAIL || !release.edition.empty())
     rank += 2;
   if (release.licence == Licence::PIRATE)
     rank += 4;

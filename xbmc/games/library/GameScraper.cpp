@@ -593,6 +593,7 @@ bool CGameScraper::ReadDetails(const std::string& id,
       release.regions = Strings((*it)["regions"]);
       release.languages = Strings((*it)["languages"]);
       release.revision = (*it)["revision"].asString();
+      release.edition = (*it)["edition"].asString();
       release.status = CGameLibraryTypes::ReleaseStatusFromString((*it)["status"].asString());
       release.licence = CGameLibraryTypes::LicenceFromString((*it)["licence"].asString());
       release.serial = (*it)["serial"].asString();

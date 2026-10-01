@@ -123,6 +123,9 @@ bool SameRelease(const GameRelease& a, const GameRelease& b)
     std::ranges::sort(v);
     return v;
   };
+  // Two hacks of one game are two versions however alike their tags are
+  if (a.edition != b.edition || (!a.edition.empty() && a.title != b.title))
+    return false;
   return sorted(a.regions) == sorted(b.regions) && sorted(a.languages) == sorted(b.languages) &&
          a.revision == b.revision && a.status == b.status && a.licence == b.licence;
 }
@@ -1020,6 +1023,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   release.status = parsed.status;
   release.licence = parsed.licence;
   release.alternate = parsed.alternate;
+  release.edition = tag.GetEdition();
   release.dump = parsed.bad ? DumpStatus::BAD : (parsed.verified ? DumpStatus::VERIFIED : DumpStatus::UNKNOWN);
   release.serial = identity.serial;
   release.isDefault = true;
@@ -1128,10 +1132,11 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
           scraped.SetYear(tag.GetYear());
         if (scraped.GetPublishers().empty() && !tag.GetPublishers().empty())
           scraped.SetPublishers(tag.GetPublishers());
-        if (scraped.GetCategory() == GameCategory::RETAIL && tag.GetCategory() != GameCategory::RETAIL)
+        // A hack or a fan translation of the game the catalogue named is one of
+        // its versions, and says so on the version rather than on the game
+        if (scraped.GetCategory() == GameCategory::RETAIL &&
+            tag.GetCategory() != GameCategory::RETAIL && release.edition.empty())
           scraped.SetCategory(tag.GetCategory());
-        if (!tag.GetEdition().empty())
-          scraped.SetEdition(tag.GetEdition());
         tag = scraped;
 
         for (const GameRelease& known : catalogueReleases)
@@ -1166,6 +1171,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
               release.languages = known.languages;
             if (!known.revision.empty())
               release.revision = known.revision;
+            if (!known.edition.empty())
+              release.edition = known.edition;
             release.status = known.status;
             release.licence = known.licence;
             if (!known.releaseDate.empty())
