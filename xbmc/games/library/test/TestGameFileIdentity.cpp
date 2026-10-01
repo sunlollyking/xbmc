@@ -85,6 +85,19 @@ TEST(TestGameFileIdentity, ListsEveryFileOfAnArcadeSet)
   EXPECT_EQ(file.members[2].crc32, "01281d6c");
 }
 
+TEST(TestGameFileIdentity, KnowsAZipOfOneFileInAFolderByItsDirectory)
+{
+  // nested.zip holds one file, under a folder as a merged arcade set files a
+  // clone's chips. Only the zip's directory says what it is.
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/nested.zip"),
+                                          file, MediaFormat::CARTRIDGE));
+
+  EXPECT_EQ(file.crc32, "f5765659");
+  EXPECT_EQ(file.size, 45U);
+  EXPECT_TRUE(file.members.empty());
+}
+
 TEST(TestGameFileIdentity, ListsNothingForAZipOfOneGame)
 {
   GameFile file;
