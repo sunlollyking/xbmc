@@ -13,7 +13,9 @@
 #include "GameScraper.h"
 #include "InfoScanner.h"
 #include "games/database/GameDatabase.h"
+#include "utils/Artwork.h"
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -121,6 +123,20 @@ public:
   static PlatformInfo MergeScrapedPlatform(const PlatformInfo& curated,
                                            const PlatformInfo& scraped);
 
+  /*!
+   * \brief Where the art folder keeps one kind of picture of a game, less
+   *        the extension
+   *
+   * <folder>/<platform>/<type>/<the game's folder within its source>/<name>,
+   * the layout other front ends download into. Following the source's own
+   * folders keeps apart two games that share a file name.
+   */
+  static std::string ArtPath(const std::string& folder,
+                             const std::string& platformSlug,
+                             const std::string& type,
+                             const std::string& sourcePath,
+                             const std::string& playPath);
+
 protected:
   // Implementation of CInfoScanner
   std::pair<ScanComplete, ContentFound> DoScan(const std::string& strDirectory) override;
@@ -145,6 +161,19 @@ private:
 
   //! \brief Whether the library may ask the internet, or reads what is on this disk
   static bool DownloadsAllowed();
+
+  //! \brief Where scraped pictures are kept, or empty to keep links to them
+  static std::string ArtFolder();
+
+  /*!
+   * \brief Swap the links among a set of pictures for files in the art folder
+   *
+   * Only each kind's own picture is fetched; the numbered extras stay links,
+   * as does any picture that could not be fetched.
+   */
+  static void KeepArt(CGameScraper& scraper,
+                      KODI::ART::Artwork& art,
+                      const std::function<std::string(const std::string& type)>& pathFor);
 
   //! \brief A game as it was sold, rather than a hack, a prototype or a BIOS
   static bool IsRetail(const ParsedGameName& parsed);

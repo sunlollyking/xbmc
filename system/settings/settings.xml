@@ -1787,6 +1787,19 @@
           <default>true</default>
           <control type="toggle" />
         </setting>
+        <setting id="gamelibrary.artfolder" type="path" label="35762" help="35763">
+          <level>1</level>
+          <default></default>
+          <constraints>
+            <allowempty>true</allowempty>
+          </constraints>
+          <dependencies>
+            <dependency type="enable" setting="gamelibrary.downloadinfo">true</dependency>
+          </dependencies>
+          <control type="button" format="path">
+            <heading>35762</heading>
+          </control>
+        </setting>
         <setting id="gamelibrary.titlestyle" type="integer" label="35664" help="35665">
           <level>1</level>
           <default>0</default> <!-- the catalogue title -->

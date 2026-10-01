@@ -39,6 +39,7 @@ constexpr const char* PROPERTY_DETAILS = "gamelibrary.details";
 constexpr const char* PROPERTY_PLATFORM = "gamelibrary.platform";
 constexpr const char* PROPERTY_PROGRESS = "gamelibrary.progress";
 constexpr const char* PROPERTY_BATCH = "gamelibrary.batch";
+constexpr const char* PROPERTY_SAVED = "gamelibrary.saved";
 
 /*!
  * \brief Whether an overview says nothing the title has not already said
@@ -672,6 +673,64 @@ bool CGameScraper::GetProgress(std::map<std::string, GameProgress>& progress)
     one.hardcore = static_cast<int>(counts["hardcore"].asInteger());
     if (one.total > 0)
       progress[it->first] = one;
+  }
+  return true;
+}
+
+bool CGameScraper::SaveArt(const std::vector<std::string>& urls,
+                           std::map<std::string, std::string>& files)
+{
+  files.clear();
+  if (urls.empty())
+    return true;
+  if (!m_savesArt)
+    return false;
+
+  CVariant batch(CVariant::VariantTypeObject);
+  batch["version"] = PROTOCOL_VERSION;
+  CVariant art(CVariant::VariantTypeArray);
+  for (const std::string& url : urls)
+    art.push_back(url);
+  batch["art"] = std::move(art);
+
+  // The links carry no sign-in, but a list of them is still too long for a URL
+  std::string json;
+  if (!CJSONVariantWriter::Write(batch, json, true))
+    return false;
+  const std::string file = CSpecialProtocol::TranslatePath(
+      "special://temp/gameart-" + StringUtils::CreateUUID() + ".json");
+  {
+    XFILE::CFile out;
+    if (!out.OpenForWrite(file, true) ||
+        out.Write(json.c_str(), json.size()) != static_cast<ssize_t>(json.size()))
+    {
+      CLog::Log(LOGWARNING, "GAME: Cannot write the art list for {}", m_addon->ID());
+      return false;
+    }
+  }
+
+  CURL url(BuildUrl("saveart", GameScrapeRequest{}));
+  url.SetOption("batch", file);
+  CFileItem result;
+  const bool answered = XFILE::CPluginDirectory::GetPluginResult(url.Get(), result, false);
+  XFILE::CFile::Delete(file);
+
+  CVariant payload;
+  if (!answered || !ParsePayload(result, PROPERTY_SAVED, payload))
+  {
+    CLog::Log(LOGDEBUG, "GAME: {} does not fetch pictures; keeping links", m_addon->ID());
+    m_savesArt = false;
+    return false;
+  }
+
+  const CVariant& saved = payload["files"];
+  if (saved.isObject())
+  {
+    for (auto it = saved.begin_map(); it != saved.end_map(); ++it)
+    {
+      if (it->second.isString() && !it->second.asString().empty())
+        files[it->first] = it->second.asString();
+    }
   }
   return true;
 }

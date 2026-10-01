@@ -91,6 +91,7 @@ public:
   static constexpr auto SETTING_GAMELIBRARY_EXPORT = "gamelibrary.export";
   static constexpr auto SETTING_GAMELIBRARY_IMPORT = "gamelibrary.import";
   static constexpr auto SETTING_GAMELIBRARY_DOWNLOADINFO = "gamelibrary.downloadinfo";
+  static constexpr auto SETTING_GAMELIBRARY_ARTFOLDER = "gamelibrary.artfolder";
   static constexpr auto SETTING_GAMELIBRARY_IGNORENONRETAIL = "gamelibrary.ignorenonretail";
   static constexpr auto SETTING_VIDEOLIBRARY_EXPORT = "videolibrary.export";
   static constexpr auto SETTING_VIDEOLIBRARY_IMPORT = "videolibrary.import";

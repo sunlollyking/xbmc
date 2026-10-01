@@ -165,6 +165,27 @@ Query: `platform`, `platformids`. One resolved item with property
  "art": {"clearlogo": [{"url": ""}], "fanart": [{"url": ""}], "photo": [{"url": ""}]}}
 ```
 
+## `action=saveart`
+
+Asked only when the user has set an artwork folder. Kodi wants to keep the
+pictures it chose and asks the scraper to fetch them, because a source may
+serve a picture only to someone signed in and the links a scraper hands out
+leave sign-ins out. Query: `batch`, the path of a JSON file:
+
+```json
+{"version": 1, "art": ["https://...", "https://..."]}
+```
+
+Fetch each link, signed in where the source needs it, into a file of the
+add-on's own with the picture's extension. One resolved item with property
+`gamelibrary.saved`, naming the file each fetched link was written to:
+
+```json
+{"version": 1, "files": {"https://...": "/.../addon_data/<id>/saved/1f3c.png"}}
+```
+
+Kodi moves each file into its artwork folder. A link left out stays a link.
+
 ## Behaviour
 
 - Never write outside the add-on's profile directory
