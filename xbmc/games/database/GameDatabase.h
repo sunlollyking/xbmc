@@ -380,7 +380,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 7; }
+  int GetSchemaVersion() const override { return 8; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:
