@@ -43,6 +43,7 @@ protected:
   bool OnClickMsg(int controlId, int actionId);
   void OnItemInfo(int itemNumber);
   bool PlayGame(const CFileItem& item);
+  void ChooseVersionAndPlay(int idGame);
   bool CanPlay(const CFileItem& item) const;
 
   CGUIDialogProgress* m_dlgProgress = nullptr;

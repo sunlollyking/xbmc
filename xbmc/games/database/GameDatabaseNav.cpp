@@ -15,6 +15,7 @@
 #include "dbwrappers/dataset.h"
 #include "games/GameManual.h"
 #include "games/library/GameDbUrl.h"
+#include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIListItem.h"
 #include "playlists/SmartPlayList.h"
@@ -78,22 +79,37 @@ std::string DisplayTitle(const CGameInfoTag& game, const dbiplus::sql_record* re
 
 std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& release)
 {
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
   std::vector<std::string> parts;
-  if (!release.regions.empty())
-    parts.emplace_back(StringUtils::ToUpper(StringUtils::Join(release.regions, ", ")));
-  if (!release.languages.empty())
-    parts.emplace_back(StringUtils::Join(release.languages, ","));
+
+  // A hack or a translation that has a name of its own goes by it. A catalogue
+  // name carries its tags, which the rest of the label says in words.
+  if (!release.edition.empty() && !release.title.empty())
+  {
+    const std::string own = CGameNameParser::Parse(release.title).displayTitle;
+    if (!own.empty() && CGameLibraryTypes::TitleKey(own) != CGameLibraryTypes::TitleKey(gameTitle))
+      parts.emplace_back(own);
+  }
+
+  if (release.edition == "Mod")
+    parts.emplace_back(strings.Get(35750)); // "Hack"
+  else if (release.edition == "Fan Translation")
+    parts.emplace_back(strings.Get(35751)); // "Fan translation"
+  else if (!release.edition.empty())
+    parts.emplace_back(release.edition);
+
+  if (const int status = CGameLibraryTypes::ReleaseStatusLabel(release.status); status > 0)
+    parts.emplace_back(strings.Get(status));
+  if (const int licence = CGameLibraryTypes::LicenceLabel(release.licence); licence > 0)
+    parts.emplace_back(strings.Get(licence));
   if (!release.revision.empty())
     parts.emplace_back(release.revision);
-  if (release.status != ReleaseStatus::RETAIL)
-    parts.emplace_back(std::string(CGameLibraryTypes::ToString(release.status)));
-  if (release.licence != Licence::LICENSED)
-    parts.emplace_back(std::string(CGameLibraryTypes::ToString(release.licence)));
+  if (!release.regions.empty())
+    parts.emplace_back(StringUtils::Join(release.regions, ", "));
+  if (!release.languages.empty())
+    parts.emplace_back(StringUtils::ToUpper(StringUtils::Join(release.languages, ", ")));
 
-  std::string label = gameTitle;
-  if (!parts.empty())
-    label += " (" + StringUtils::Join(parts, ") (") + ")";
-  return label;
+  return parts.empty() ? gameTitle : StringUtils::Join(parts, " \u00b7 ");
 }
 } // namespace
 
