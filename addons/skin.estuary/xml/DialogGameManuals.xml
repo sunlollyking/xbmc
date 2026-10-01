@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window type="dialog">
-	<!-- Not "always": the results list is hidden while a status is showing,
-       and forcing focus onto a hidden control fails and logs an error -->
-	<defaultcontrol>110</defaultcontrol>
+	<!-- No default control: the results list is empty when the dialog opens,
+	     and the dialog focuses it once there are results -->
 	<include>Animation_DialogPopupOpenClose</include>
 	<controls>
 		<control type="group">
