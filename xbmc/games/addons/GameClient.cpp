@@ -709,6 +709,22 @@ void CGameClient::NotifyError(GAME_ERROR error)
             CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35211),
             missingResource)});
   }
+  else if (error == GAME_ERROR_FAILED)
+  {
+    // The emulator turned the game down rather than broke, which is what a
+    // missing BIOS looks like. game.libretro reads them from a "system"
+    // folder in the shared BIOS directory.
+    const std::string biosFolder = CSpecialProtocol::TranslatePath(
+        URIUtils::AddFileToFolder(GAME_BIOS_DIRECTORY, "system"));
+
+    // Failed to play game
+    // The emulator "%s" couldn't load this game. If the system needs BIOS files, put them in: %s
+    MESSAGING::HELPERS::ShowOKDialogText(
+        CVariant{35210},
+        CVariant{StringUtils::Format(
+            CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35240), Name(),
+            biosFolder)});
+  }
   else
   {
     // Failed to play game

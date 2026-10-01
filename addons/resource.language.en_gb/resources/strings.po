@@ -19243,7 +19243,13 @@ msgctxt "#35239"
 msgid "Integer (square pixels)"
 msgstr ""
 
-#empty strings from id 35240 to 35248
+#. Shown when an emulator refuses to load a game; {0} is the emulator, {1} the BIOS folder
+#: xbmc/games/addons/GameClient.cpp
+msgctxt "#35240"
+msgid "The emulator \"{0:s}\" couldn't load this game. If the system needs BIOS files, put them in:[CR]{1:s}"
+msgstr ""
+
+#empty strings from id 35241 to 35248
 
 #. Button to open the savestate manager from the game OSD
 #: addons/skin.estuary/xml/GameOSD.xml
