@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-	<defaultcontrol always="true">9000</defaultcontrol>
 	<controls>
 		<!-- The page is read against a plain dark background rather than the game,
 		     which would show through and make the scanned paper hard to read -->
