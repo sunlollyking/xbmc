@@ -190,22 +190,23 @@ int CGameDatabase::SetReleaseForGame(int idGame, GameRelease& release)
   {
     m_pDS->exec(PrepareSQL(
         "UPDATE gamerelease SET idGame = %i, title = '%s', regions = '%s', languages = '%s', "
-        "revision = '%s', status = '%s', licence = '%s', isAlternate = %i, dumpStatus = '%s', "
-        "releaseDate = '%s', serial = '%s', notes = '%s' WHERE idRelease = %i",
+        "revision = '%s', status = '%s', licence = '%s', isAlternate = %i, edition = '%s', "
+        "dumpStatus = '%s', releaseDate = '%s', serial = '%s', notes = '%s' WHERE idRelease = %i",
         idGame, release.title.c_str(), regions.c_str(), languages.c_str(),
         release.revision.c_str(), status.c_str(), licence.c_str(), release.alternate ? 1 : 0,
-        dump.c_str(), release.releaseDate.c_str(), release.serial.c_str(), release.notes.c_str(),
-        release.id));
+        release.edition.c_str(), dump.c_str(), release.releaseDate.c_str(), release.serial.c_str(),
+        release.notes.c_str(), release.id));
   }
   else
   {
     m_pDS->exec(PrepareSQL(
         "INSERT INTO gamerelease (idGame, title, regions, languages, revision, status, licence, "
-        "isAlternate, dumpStatus, releaseDate, serial, notes) VALUES (%i, '%s', '%s', '%s', '%s', "
-        "'%s', '%s', %i, '%s', '%s', '%s', '%s')",
+        "isAlternate, edition, dumpStatus, releaseDate, serial, notes) VALUES (%i, '%s', '%s', "
+        "'%s', '%s', '%s', '%s', %i, '%s', '%s', '%s', '%s', '%s')",
         idGame, release.title.c_str(), regions.c_str(), languages.c_str(),
         release.revision.c_str(), status.c_str(), licence.c_str(), release.alternate ? 1 : 0,
-        dump.c_str(), release.releaseDate.c_str(), release.serial.c_str(), release.notes.c_str()));
+        release.edition.c_str(), dump.c_str(), release.releaseDate.c_str(), release.serial.c_str(),
+        release.notes.c_str()));
     release.id = static_cast<int>(m_pDS->lastinsertid());
   }
 
@@ -449,6 +450,7 @@ void CGameDatabase::GetReleasesForGame(int idGame, std::vector<GameRelease>& rel
           CGameLibraryTypes::ReleaseStatusFromString(m_pDS->fv("status").get_asString());
       release.licence = CGameLibraryTypes::LicenceFromString(m_pDS->fv("licence").get_asString());
       release.alternate = m_pDS->fv("isAlternate").get_asBool();
+      release.edition = m_pDS->fv("edition").get_asString();
       release.dump = CGameLibraryTypes::DumpStatusFromString(m_pDS->fv("dumpStatus").get_asString());
       release.releaseDate = m_pDS->fv("releaseDate").get_asString();
       release.serial = m_pDS->fv("serial").get_asString();

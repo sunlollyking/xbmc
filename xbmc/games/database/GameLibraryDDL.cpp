@@ -122,6 +122,7 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "status text, "
                   "licence text, "
                   "isAlternate bool, "
+                  "edition text, "
                   "dumpStatus text, "
                   "releaseDate text, "
                   "serial text, "
@@ -390,4 +391,13 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   // 7: the emulators that hold an arcade set exactly, and their names for it
   if (version < 7)
     db.ExecuteQuery("ALTER TABLE files ADD COLUMN romsets text");
+
+  // 8: a version of a game says what it is made from the game as, a hack or a
+  // fan translation. The release view lists the release's columns, so it is
+  // rebuilt by the CreateAnalytics that follows an update.
+  if (version < 8)
+  {
+    db.ExecuteQuery("ALTER TABLE gamerelease ADD COLUMN edition text");
+    db.ExecuteQuery("DROP VIEW IF EXISTS release_view");
+  }
 }

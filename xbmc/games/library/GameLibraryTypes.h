@@ -295,6 +295,7 @@ struct GameRelease
   ReleaseStatus status{ReleaseStatus::RETAIL};
   Licence licence{Licence::LICENSED};
   bool alternate{false};
+  std::string edition; // "Mod" for a hack, "Fan Translation", or empty
   DumpStatus dump{DumpStatus::UNKNOWN};
   std::string releaseDate;
   std::string serial;
