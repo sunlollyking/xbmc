@@ -59,6 +59,7 @@ constexpr const char* GAME_DATABASE_NAME = "Games";
  */
 struct GamePathContent
 {
+  std::string path; //!< The folder the platform was set on
   int idPlatform{-1};
   std::string scraper;
   std::string settings;

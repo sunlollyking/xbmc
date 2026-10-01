@@ -20,6 +20,7 @@
 #include "ReleasePolicy.h"
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "Util.h"
 #include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
@@ -781,11 +782,22 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
 
   m_database.SetPlatformDetails(MergeScrapedPlatform(platform, scraped));
 
+  KODI::ART::Artwork picks;
   for (const auto& [type, pieces] : art)
   {
-    if (pieces.empty() || pieces.front().url.empty())
+    if (!pieces.empty() && !pieces.front().url.empty())
+      picks[type] = pieces.front().url;
+  }
+  if (const std::string folder = ArtFolder(); !folder.empty())
+    KeepArt(*scraper, picks, [&](const std::string& type)
+            { return URIUtils::AddFileToFolder(folder, "platforms", platform.slug + "-" + type); });
+
+  for (const auto& [type, pieces] : art)
+  {
+    const auto pick = picks.find(type);
+    if (pick == picks.end())
       continue;
-    m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type, pieces.front().url);
+    m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type, pick->second);
 
     int extra = 0;
     for (const GameScrapeArt& piece : pieces)
@@ -805,11 +817,10 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
   {
     for (const char* type : {"clearlogo", "logo", "photo", "illustration", "fanart"})
     {
-      const auto found = art.find(type);
-      if (found != art.end() && !found->second.empty() && !found->second.front().url.empty())
+      const auto found = picks.find(type);
+      if (found != picks.end())
       {
-        m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, "thumb",
-                                 found->second.front().url);
+        m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, "thumb", found->second);
         break;
       }
     }
@@ -840,6 +851,82 @@ bool CGameInfoScanner::DownloadsAllowed()
 {
   const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
   return settings == nullptr || settings->GetBool(CSettings::SETTING_GAMELIBRARY_DOWNLOADINFO);
+}
+
+std::string CGameInfoScanner::ArtFolder()
+{
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  return settings != nullptr ? settings->GetString(CSettings::SETTING_GAMELIBRARY_ARTFOLDER) : "";
+}
+
+std::string CGameInfoScanner::ArtPath(const std::string& folder,
+                                      const std::string& platformSlug,
+                                      const std::string& type,
+                                      const std::string& sourcePath,
+                                      const std::string& playPath)
+{
+  std::string within = URIUtils::GetDirectory(playPath);
+  if (!sourcePath.empty() && StringUtils::StartsWith(within, sourcePath))
+    within.erase(0, sourcePath.size());
+  else
+    within.clear();
+
+  const std::string name = URIUtils::ReplaceExtension(URIUtils::GetFileName(playPath), "");
+  return URIUtils::AddFileToFolder(folder, platformSlug, type, within + name);
+}
+
+void CGameInfoScanner::KeepArt(CGameScraper& scraper,
+                               KODI::ART::Artwork& art,
+                               const std::function<std::string(const std::string& type)>& pathFor)
+{
+  // Each picture is fetched once, named by the first kind that shows it: a
+  // thumb and a poster are the box front again
+  std::map<std::string, std::string> wanted;
+  std::vector<std::string> urls;
+  for (const auto& [type, url] : art)
+  {
+    if (type.empty() || StringUtils::isasciidigit(type.back()))
+      continue;
+    if (!StringUtils::StartsWithNoCase(url, "http://") &&
+        !StringUtils::StartsWithNoCase(url, "https://"))
+      continue;
+    if (wanted.emplace(url, pathFor(type)).second)
+      urls.emplace_back(url);
+  }
+
+  std::map<std::string, std::string> fetched;
+  if (urls.empty() || !scraper.SaveArt(urls, fetched))
+    return;
+
+  std::map<std::string, std::string> kept;
+  for (const auto& [url, file] : fetched)
+  {
+    const auto target = wanted.find(url);
+    if (target == wanted.end())
+    {
+      XFILE::CFile::Delete(file);
+      continue;
+    }
+
+    const std::string path = target->second + URIUtils::GetExtension(file);
+    CUtil::CreateDirectoryEx(URIUtils::GetDirectory(path));
+    bool moved = XFILE::CFile::Rename(file, path);
+    if (!moved)
+    {
+      moved = XFILE::CFile::Copy(file, path);
+      XFILE::CFile::Delete(file);
+    }
+    if (moved)
+      kept[url] = path;
+    else
+      CLog::Log(LOGWARNING, "GAME: Cannot keep a picture as {}", path);
+  }
+
+  for (auto& [type, url] : art)
+  {
+    if (const auto it = kept.find(url); it != kept.end())
+      url = it->second;
+  }
 }
 
 bool CGameInfoScanner::IsRetail(const ParsedGameName& parsed)
@@ -1268,6 +1355,13 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       matchedBy = MatchMethod::GAMELIST;
       ++m_identified;
     }
+  }
+
+  if (scraper != nullptr)
+  {
+    if (const std::string folder = ArtFolder(); !folder.empty())
+      KeepArt(*scraper, art, [&](const std::string& type)
+              { return ArtPath(folder, platform.slug, type, content.path, playPath); });
   }
 
   tag.SetMatchMethod(matchedBy);

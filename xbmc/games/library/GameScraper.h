@@ -196,8 +196,24 @@ public:
    */
   bool GetProgress(std::map<std::string, GameProgress>& progress);
 
+  /*!
+   * \brief Have the scraper fetch pictures for the library to keep
+   *
+   * A source may only serve a picture to someone signed in, and the links a
+   * scraper hands out leave the sign-in out, so the scraper does the
+   * fetching. Each picture lands in the scraper's own folder for the caller
+   * to move.
+   *
+   * \param urls Links as the scraper gave them
+   * \param[out] files Each link that was fetched, and the file holding it
+   *
+   * \return false when the scraper does not fetch pictures
+   */
+  bool SaveArt(const std::vector<std::string>& urls, std::map<std::string, std::string>& files);
+
 private:
   bool m_answersBatches{true};
+  bool m_savesArt{true};
 
   std::string BuildUrl(const std::string& action, const GameScrapeRequest& request) const;
   static bool ReadCandidate(const CFileItem& item, GameScrapeCandidate& candidate, int& queryIndex);

@@ -152,6 +152,7 @@ bool CGameDatabase::GetPathContent(const std::string& path,
 
         if (idPlatform > 0)
         {
+          content.path = folder;
           content.idPlatform = idPlatform;
           content.scraper = m_pDS->fv("strScraper").get_asString();
           content.settings = m_pDS->fv("strSettings").get_asString();

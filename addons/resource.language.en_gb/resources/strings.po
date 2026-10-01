@@ -21095,7 +21095,17 @@ msgctxt "#35761"
 msgid "Choose version"
 msgstr ""
 
-#empty strings from id 35762 to 35999
+#: system/settings/settings.xml
+msgctxt "#35762"
+msgid "Artwork folder"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35763"
+msgid "Where to save the pictures games are scraped with. Saved pictures show without asking the internet again, which some sources only allow so many times a day. Leave empty to keep links instead."
+msgstr ""
+
+#empty strings from id 35764 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
