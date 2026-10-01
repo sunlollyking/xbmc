@@ -5263,6 +5263,9 @@
       "licence": {
         "type": "string"
       },
+      "edition": {
+        "type": "string"
+      },
       "default": {
         "type": "boolean"
       },
