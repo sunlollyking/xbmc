@@ -110,6 +110,23 @@ void CRetroPlayer::SetVideoFilterForGame(const std::string& gamePath)
   gameSettings.NotifyObservers(ObservableMessageSettingsChanged);
 }
 
+std::string CRetroPlayer::GetBezelForGame(const CFileItem& item)
+{
+  std::string bezel = item.GetArt("bezel");
+  if (!bezel.empty())
+    return bezel;
+
+  GAME::CGameDatabase db;
+  if (!db.Open())
+    return "";
+
+  const int idGame = db.GetGameIdByFile(item.GetDynPath());
+  if (idGame <= 0)
+    return "";
+
+  return db.GetArtForItem(idGame, MediaTypeGame, "bezel");
+}
+
 bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options)
 {
   // A dialog shown while a game opens, such as the one reporting that it
@@ -200,6 +217,9 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
 
   m_guiMessenger = std::make_unique<CGUIGameMessenger>(*m_processInfo);
   m_renderManager = std::make_unique<CRPRenderManager>(*m_processInfo);
+
+  if (!bStandalone)
+    m_renderManager->SetBezel(GetBezelForGame(fileCopy));
 
   std::unique_lock lock(m_mutex);
 
@@ -585,6 +605,11 @@ bool CRetroPlayer::SupportsDiscControl() const
     return m_gameClient->Discs().SupportsDiscControl();
 
   return false;
+}
+
+bool CRetroPlayer::HasBezel() const
+{
+  return m_renderManager && m_renderManager->HasBezel();
 }
 
 bool CRetroPlayer::IsDiscEjected() const

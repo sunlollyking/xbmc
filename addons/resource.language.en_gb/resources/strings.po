@@ -19244,7 +19244,15 @@ msgctxt "#35239"
 msgid "Integer (square pixels)"
 msgstr ""
 
-#empty strings from id 35240 to 35248
+#empty string with id 35240
+
+#. Label of the in-game setting that frames the game with its bezel artwork
+#: addons/skin.estuary/xml/Includes_SettingsDialog.xml
+msgctxt "#35241"
+msgid "Bezel"
+msgstr ""
+
+#empty strings from id 35242 to 35248
 
 #. Button to open the savestate manager from the game OSD
 #: addons/skin.estuary/xml/GameOSD.xml
