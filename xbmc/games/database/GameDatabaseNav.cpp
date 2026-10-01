@@ -82,9 +82,9 @@ std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& releas
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
   std::vector<std::string> parts;
 
-  // A hack or a translation that has a name of its own goes by it. A catalogue
-  // name carries its tags, which the rest of the label says in words.
-  if (!release.edition.empty() && !release.title.empty())
+  // A hack, a translation or a bootleg that has a name of its own goes by it. A
+  // catalogue name carries its tags, which the rest of the label says in words.
+  if ((!release.edition.empty() || release.licence == Licence::PIRATE) && !release.title.empty())
   {
     const std::string own = CGameNameParser::Parse(release.title).displayTitle;
     if (!own.empty() && CGameLibraryTypes::TitleKey(own) != CGameLibraryTypes::TitleKey(gameTitle))
