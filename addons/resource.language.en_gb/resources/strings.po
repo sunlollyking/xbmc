@@ -19663,11 +19663,7 @@ msgctxt "#35317"
 msgid "Find a manual"
 msgstr ""
 
-#. Footer hint in the find-a-manual dialog
-#: addons/skin.estuary/xml/DialogGameManuals.xml
-msgctxt "#35318"
-msgid "Choose a manual to download it"
-msgstr ""
+#empty string with id 35318
 
 #. Label for which add-on is being asked for manuals
 #: addons/skin.estuary/xml/DialogGameManuals.xml
