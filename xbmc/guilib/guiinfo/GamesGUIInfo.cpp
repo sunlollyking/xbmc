@@ -31,6 +31,7 @@
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
 #include "media/MediaType.h"
+#include "settings/AdvancedSettings.h"
 #include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -253,6 +254,13 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           }
           break;
         case LISTITEM_STUDIO:
+          // Listed as a video's studios are, so a skin can tell one from several
+          value = tag->GetPublishers().empty()
+                      ? tag->GetPublisher()
+                      : StringUtils::Join(tag->GetPublishers(), CServiceBroker::GetSettingsComponent()
+                                                                    ->GetAdvancedSettings()
+                                                                    ->m_videoItemSeparator);
+          return !value.empty();
         case LISTITEM_PUBLISHER:
           value = tag->GetPublishers().empty() ? tag->GetPublisher()
                                                : StringUtils::Join(tag->GetPublishers(), ", ");
