@@ -235,19 +235,19 @@ int CGameLibraryTypes::ReleaseStatusLabel(ReleaseStatus status)
   switch (status)
   {
     case ReleaseStatus::BETA:
-      return 35705; // "Beta"
+      return 35752; // "Beta"
     case ReleaseStatus::PROTOTYPE:
-      return 35706; // "Prototype"
+      return 35753; // "Prototype"
     case ReleaseStatus::SAMPLE:
-      return 35707; // "Sample"
+      return 35754; // "Sample"
     case ReleaseStatus::DEMO:
       return 35596; // "Demo"
     case ReleaseStatus::ALPHA:
-      return 35708; // "Alpha"
+      return 35755; // "Alpha"
     case ReleaseStatus::KIOSK:
-      return 35709; // "Kiosk"
+      return 35756; // "Kiosk"
     case ReleaseStatus::DEBUG:
-      return 35710; // "Debug"
+      return 35757; // "Debug"
     case ReleaseStatus::PROGRAM:
       return 35597; // "BIOS"
     case ReleaseStatus::RETAIL:
@@ -261,13 +261,13 @@ int CGameLibraryTypes::LicenceLabel(Licence licence)
   switch (licence)
   {
     case Licence::UNLICENSED:
-      return 35711; // "Unlicensed"
+      return 35758; // "Unlicensed"
     case Licence::AFTERMARKET:
-      return 35712; // "Aftermarket"
+      return 35759; // "Aftermarket"
     case Licence::HOMEBREW:
       return 35537; // "Homebrew"
     case Licence::PIRATE:
-      return 35713; // "Pirate"
+      return 35760; // "Pirate"
     case Licence::LICENSED:
       break;
   }

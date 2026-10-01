@@ -247,7 +247,7 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
         buttons.Add(CONTEXT_BUTTON_INFO, 19033); // "Information"
         buttons.Add(CONTEXT_BUTTON_REFRESH_THUMBS, 184); // "Refresh"
         if (item->HasGameInfoTag() && item->GetGameInfoTag()->GetReleaseCount() > 1)
-          buttons.Add(CONTEXT_BUTTON_CHOOSE_GAME_VERSION, 35714); // "Choose version"
+          buttons.Add(CONTEXT_BUTTON_CHOOSE_GAME_VERSION, 35761); // "Choose version"
       }
 
       // A version of a library game can be made the one that plays
@@ -571,7 +571,7 @@ void CGUIWindowGames::ChooseVersionAndPlay(int idGame)
     return;
 
   dialog->Reset();
-  dialog->SetHeading(CVariant{35714}); // "Choose version"
+  dialog->SetHeading(CVariant{35761}); // "Choose version"
   dialog->SetItems(versions);
   for (int i = 0; i < versions.Size(); ++i)
   {

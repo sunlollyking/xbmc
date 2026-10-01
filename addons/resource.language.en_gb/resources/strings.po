@@ -20838,79 +20838,7 @@ msgctxt "#35702"
 msgid "Starting a hardcore session restarts the game. Any unsaved progress will be lost.[CR][CR]Continue?"
 msgstr ""
 
-#. What a version of a game is made from it as
-#: xbmc/games
-msgctxt "#35703"
-msgid "Hack"
-msgstr ""
-
-#. What a version of a game is made from it as
-#: xbmc/games
-msgctxt "#35704"
-msgid "Fan translation"
-msgstr ""
-
-#. How far a version of a game got towards being sold
-#: xbmc/games
-msgctxt "#35705"
-msgid "Beta"
-msgstr ""
-
-#. How far a version of a game got towards being sold
-#: xbmc/games
-msgctxt "#35706"
-msgid "Prototype"
-msgstr ""
-
-#. How far a version of a game got towards being sold
-#: xbmc/games
-msgctxt "#35707"
-msgid "Sample"
-msgstr ""
-
-#. How far a version of a game got towards being sold
-#: xbmc/games
-msgctxt "#35708"
-msgid "Alpha"
-msgstr ""
-
-#. How far a version of a game got towards being sold
-#: xbmc/games
-msgctxt "#35709"
-msgid "Kiosk"
-msgstr ""
-
-#. How far a version of a game got towards being sold
-#: xbmc/games
-msgctxt "#35710"
-msgid "Debug"
-msgstr ""
-
-#. Who made a version of a game, where it was not its publisher
-#: xbmc/games
-msgctxt "#35711"
-msgid "Unlicensed"
-msgstr ""
-
-#. Who made a version of a game, where it was not its publisher
-#: xbmc/games
-msgctxt "#35712"
-msgid "Aftermarket"
-msgstr ""
-
-#. Who made a version of a game, where it was not its publisher
-#: xbmc/games
-msgctxt "#35713"
-msgid "Pirate"
-msgstr ""
-
-#. Context menu entry and heading: pick which version of a game to play
-#: xbmc/games
-msgctxt "#35714"
-msgid "Choose version"
-msgstr ""
-
-#empty strings from id 35715 to 35719
+#empty strings from id 35703 to 35719
 
 #. Shown when no add-on is installed that can look for manuals
 #: xbmc/games/manual/GUIDialogGameManuals.cpp
@@ -21082,7 +21010,79 @@ msgctxt "#35749"
 msgid "South Korea"
 msgstr ""
 
-#empty strings from id 35750 to 35999
+#. What a version of a game is made from it as
+#: xbmc/games
+msgctxt "#35750"
+msgid "Hack"
+msgstr ""
+
+#. What a version of a game is made from it as
+#: xbmc/games
+msgctxt "#35751"
+msgid "Fan translation"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35752"
+msgid "Beta"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35753"
+msgid "Prototype"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35754"
+msgid "Sample"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35755"
+msgid "Alpha"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35756"
+msgid "Kiosk"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35757"
+msgid "Debug"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35758"
+msgid "Unlicensed"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35759"
+msgid "Aftermarket"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35760"
+msgid "Pirate"
+msgstr ""
+
+#. Context menu entry and heading: pick which version of a game to play
+#: xbmc/games
+msgctxt "#35761"
+msgid "Choose version"
+msgstr ""
+
+#empty strings from id 35762 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

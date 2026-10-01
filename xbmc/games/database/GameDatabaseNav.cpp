@@ -92,9 +92,9 @@ std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& releas
   }
 
   if (release.edition == "Mod")
-    parts.emplace_back(strings.Get(35703)); // "Hack"
+    parts.emplace_back(strings.Get(35750)); // "Hack"
   else if (release.edition == "Fan Translation")
-    parts.emplace_back(strings.Get(35704)); // "Fan translation"
+    parts.emplace_back(strings.Get(35751)); // "Fan translation"
   else if (!release.edition.empty())
     parts.emplace_back(release.edition);
 
