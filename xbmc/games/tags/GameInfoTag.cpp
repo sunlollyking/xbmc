@@ -546,6 +546,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
     entry["revision"] = release.revision;
     entry["status"] = std::string(CGameLibraryTypes::ToString(release.status));
     entry["licence"] = std::string(CGameLibraryTypes::ToString(release.licence));
+    entry["edition"] = release.edition;
     entry["default"] = release.isDefault;
     entry["files"] = CVariant(CVariant::VariantTypeArray);
     for (const GameFile& file : release.files)
