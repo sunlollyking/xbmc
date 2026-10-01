@@ -33,7 +33,6 @@ public:
   bool GetDirectory(const CURL& url, CFileItemList& items) override;
   bool AllowAll() const override { return true; }
   bool Exists(const CURL& url) override;
-  CacheType GetCacheType(const CURL& url) const override { return CacheType::ALWAYS; }
 
   /*!
    * \brief The label a gamedb:// path should be shown with, or empty
