@@ -82,6 +82,7 @@ public:
 private:
   static bool HashWhole(const std::string& path, GameFile& file);
   static bool HashArchive(const std::string& path, GameFile& file);
+  static bool HashLargestMember(const std::string& path, GameFile& file);
 
   /*!
    * \brief Every file in a zip, from its directory, without decompressing any

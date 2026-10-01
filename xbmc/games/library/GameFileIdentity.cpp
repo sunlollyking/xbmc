@@ -271,14 +271,28 @@ bool CGameFileIdentity::ListZip(const std::string& path, std::vector<ArchiveMemb
 
 bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
 {
-  // A zip of several files may be an arcade set, which is known by all of them
+  // A zip of several files may be an arcade set, which is known by all of them.
+  // A zip of one keeps that file's CRC in its directory, which still names it
+  // when it is too large to hash or is filed in a folder.
+  std::vector<ArchiveMember> members;
   if (StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip")
-  {
-    std::vector<ArchiveMember> members;
-    if (ListZip(path, members) && members.size() > 1)
-      file.members = std::move(members);
-  }
+    ListZip(path, members);
+  if (members.size() > 1)
+    file.members = members;
 
+  if (HashLargestMember(path, file))
+    return true;
+
+  if (members.size() != 1)
+    return false;
+
+  file.crc32 = members.front().crc32;
+  file.size = members.front().size;
+  return true;
+}
+
+bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& file)
+{
   // The archive is browsed as a folder; its largest member is the ROM
   const std::string archiveUrl = URIUtils::CreateArchivePath(
       StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip" ? "zip" : "archive", CURL(path),
