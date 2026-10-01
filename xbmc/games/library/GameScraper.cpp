@@ -227,6 +227,8 @@ std::string CGameScraper::BuildUrl(const std::string& action, const GameScrapeRe
     url.SetOption("size", std::to_string(request.size));
   if (!request.regions.empty())
     url.SetOption("regions", StringUtils::Join(request.regions, ","));
+  if (!request.preferredRegions.empty())
+    url.SetOption("preferredregions", StringUtils::Join(request.preferredRegions, ","));
   if (!request.members.empty())
   {
     std::string json;

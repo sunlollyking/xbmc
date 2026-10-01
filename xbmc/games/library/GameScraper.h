@@ -46,6 +46,7 @@ struct GameScrapeRequest
   std::string raHash;
   uint64_t size{0};
   std::vector<std::string> regions;
+  std::vector<std::string> preferredRegions; // the player's, in their order
   std::vector<std::string> languages;
   int year{0};
   std::vector<ArchiveMember> members; // every file in a zip, for arcade sets

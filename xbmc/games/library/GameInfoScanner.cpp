@@ -499,6 +499,7 @@ void CGameInfoScanner::FillRequest(const Entry& entry,
   request.raHash = identity.raHash;
   request.size = identity.size;
   request.regions = parsed.regions;
+  request.preferredRegions = CReleasePolicy().GetRegionPriority();
   request.languages = parsed.languages;
   request.year = parsed.year;
   request.members = identity.members;
