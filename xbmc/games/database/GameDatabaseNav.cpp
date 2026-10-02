@@ -248,8 +248,12 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     derivedShown = true;
   }
 
-  if (!derivedShown)
-    filter.AppendWhere("game_view.category IN ('retail', 'demo')");
+  // Showing hacks and homebrew adds those two; a BIOS set, an application or a
+  // machine that is not a video game is not listed among games either way
+  if (option("category") == nullptr)
+    filter.AppendWhere(derivedShown
+                           ? "game_view.category IN ('retail', 'demo', 'hack', 'homebrew')"
+                           : "game_view.category IN ('retail', 'demo')");
 
   filter.AppendWhere("game_view.hidden = 0");
 
