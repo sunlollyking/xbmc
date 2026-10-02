@@ -21,7 +21,6 @@
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
 #include "games/library/GameLibraryQueue.h"
-#include "games/manual/ManualCache.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
@@ -66,7 +65,6 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS =
 //! What the scraper add-ons call the same two credentials
 constexpr const char* SCRAPER_SETTING_USERNAME = "ra_username";
 constexpr const char* SCRAPER_SETTING_API_KEY = "ra_api_key";
-const std::string SETTING_GAMES_CLEAR_MANUAL_CACHE = "gamesgeneral.clearmanualcache";
 
 constexpr auto LOGIN_TO_RETRO_ACHIEVEMENTS_URL =
     "https://retroachievements.org/dorequest.php?r=login2";
@@ -94,8 +92,7 @@ CGameSettings::CGameSettings()
        SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
        SETTING_GAMES_ACHIEVEMENTS_HARDCORE, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
        SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT,
-       SETTING_GAMES_CLEAR_MANUAL_CACHE, SETTING_GAMES_ENABLERUNAHEAD,
-       SETTING_GAMES_RUNAHEADFRAMES});
+       SETTING_GAMES_ENABLERUNAHEAD, SETTING_GAMES_RUNAHEADFRAMES});
 
   // A person should say who they are once. The scrapers keep fields of their
   // own so they still work for anyone driving them directly, but while these
@@ -213,9 +210,7 @@ void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setti
   if (setting == nullptr)
     return;
 
-  if (setting->GetId() == SETTING_GAMES_CLEAR_MANUAL_CACHE)
-    CManualCache::GetInstance().Clear();
-  else if (setting->GetId() == SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS)
+  if (setting->GetId() == SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS)
   {
     // The count belongs to an account, so there is nothing to ask for until
     // there is one signed in

@@ -11,9 +11,6 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
-
-class CFileItem;
 
 namespace KODI::GAME
 {
@@ -21,84 +18,22 @@ namespace KODI::GAME
 /*!
  * \ingroup games
  *
- * \brief Finds the manual that belongs to a game
+ * \brief How a game's manual is recognised
  *
- * A manual is a PDF or a comic archive (.cbz, .cbr) that belongs to a game
- * file. It is looked for beside the game, and in a "manuals" folder next to it:
- *
- *     Sonic The Hedgehog (USA).md
- *     Sonic The Hedgehog (USA).pdf
- *     manuals/Sonic The Hedgehog (USA).cbz
- *
- * An exact name match is preferred and costs nothing but a few existence
- * checks. Only when that fails is the folder listed and a looser match tried,
- * ignoring the parenthesised region and revision tags that ROM naming
- * conventions add:
+ * A manual is a PDF or a comic archive (.cbz, .cbr) that sits beside its game,
+ * or in a "manuals" folder next to it. The two are matched by name, ignoring
+ * the parenthesised region and revision tags that ROM naming conventions add:
  *
  *     Sonic The Hedgehog 2 (World) (Rev A).md
- *     Sonic The Hedgehog 2.pdf
+ *     manuals/Sonic The Hedgehog 2.pdf
  *
- * The looser match stops there. Titles are not compared and nothing is
- * fuzzily scored, because a manual that is merely close is worse than no
- * manual - the player would read the wrong game's instructions without being
- * told.
+ * Titles are not compared and nothing is fuzzily scored, because a manual
+ * that is merely close is worse than no manual - the player would read the
+ * wrong game's instructions without being told.
  */
 class CGameManual
 {
 public:
-  /*!
-   * \brief Get the manual belonging to a game
-   *
-   * Touches the filesystem, and may list a directory, so this does not belong
-   * on the GUI thread when the game is on a network share.
-   *
-   * \param gamePath The game's path, in any form Kodi can resolve
-   *
-   * \return The manual's path, or an empty string if the game has none
-   */
-  static std::string GetManualPath(const std::string& gamePath);
-
-  /*!
-   * \brief Get the manual belonging to a game
-   *
-   * \param item The game
-   *
-   * \return The manual's path, or an empty string if the game has none
-   */
-  static std::string GetManualPath(const CFileItem& item);
-
-  /*!
-   * \brief Derive where a game's manual could be, without checking for any
-   *
-   * Separated from the lookup so that the candidates can be reasoned about -
-   * and tested - without touching the filesystem, which matters when the game
-   * lives on a network share.
-   *
-   * \param gamePath The game's path
-   *
-   * \return The paths a manual could have, best first, or empty if none can
-   *         be derived
-   */
-  static std::vector<std::string> BuildManualPaths(const std::string& gamePath);
-
-  /*!
-   * \brief Where a manual fetched for a game should be written
-   *
-   * The "manuals" folder beside the game, which is one of the places the
-   * lookup already searches, so a fetched manual is found the same way one
-   * put there by hand would be.
-   *
-   * A games folder is often read only - a share mounted for playing, or a
-   * disc - so the caller is told whether it can be written to and can fall
-   * back to somewhere in the profile.
-   *
-   * \param gamePath The game's path
-   * \param[out] writable Whether the folder can be created and written to
-   *
-   * \return The path to write to, or empty if none can be derived
-   */
-  static std::string GetDownloadPath(const std::string& gamePath, bool& writable);
-
   /*!
    * \brief Reduce a name so that two spellings of the same title compare equal
    *
@@ -118,11 +53,10 @@ public:
  *
  * \brief Which games in a listing have a manual sitting beside them
  *
- * Asking CGameManual per game would read a directory per game: the manuals in
- * a real collection carry different region and revision tags from the games
- * they belong to, so the exact-name check almost never settles it and the
- * listing fallback almost always runs. Each folder is read once here instead
- * and remembered, which makes a listing cost one read per folder.
+ * The manuals in a real collection carry different region and revision tags
+ * from the games they belong to, so settling it needs the folder's listing.
+ * Each folder is read once here and remembered, which makes a listing cost one
+ * read per folder rather than one per game.
  *
  * Held for as long as the listing being built and then discarded, so a manual
  * added while Kodi is running is picked up the next time the folder is opened.
