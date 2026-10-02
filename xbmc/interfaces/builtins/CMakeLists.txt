@@ -2,7 +2,6 @@ set(SOURCES AddonBuiltins.cpp
             ApplicationBuiltins.cpp
             Builtins.cpp
             CECBuiltins.cpp
-            GameBuiltins.cpp
             GUIBuiltins.cpp
             GUIControlBuiltins.cpp
             GUIContainerBuiltins.cpp
@@ -21,7 +20,6 @@ set(HEADERS AddonBuiltins.h
             ApplicationBuiltins.h
             Builtins.h
             CECBuiltins.h
-            GameBuiltins.h
             GUIBuiltins.h
             GUIContainerBuiltins.h
             GUIControlBuiltins.h

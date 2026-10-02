@@ -164,8 +164,6 @@
 #include "games/dialogs/osd/DialogGameVideoRotation.h"
 #include "games/dialogs/osd/DialogGameVolume.h"
 #include "games/dialogs/osd/DialogInGameSaves.h"
-#include "games/manual/GUIDialogGameManuals.h"
-#include "games/manual/GUIWindowGameManual.h"
 #include "games/ports/windows/GUIPortWindow.h"
 #include "games/windows/GUIWindowGames.h"
 
@@ -370,8 +368,6 @@ void CGUIWindowManager::CreateWindows()
   Add(new GAME::CDialogGameLeaderboardEntries);
   Add(new GAME::CDialogGameIndicators);
   Add(new GAME::CDialogGameCheats);
-  Add(new GAME::CGUIWindowGameManual);
-  Add(new GAME::CGUIDialogGameManuals);
   Add(new RETRO::CGameWindowFullScreen);
 }
 

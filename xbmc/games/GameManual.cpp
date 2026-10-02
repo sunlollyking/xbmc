@@ -10,16 +10,14 @@
 
 #include "FileItem.h"
 #include "FileItemList.h"
-#include "URL.h"
 #include "filesystem/Directory.h"
-#include "filesystem/File.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 
 #include <algorithm>
 #include <array>
-#include <vector>
 #include <cctype>
+#include <vector>
 
 using namespace KODI::GAME;
 
@@ -35,9 +33,6 @@ constexpr std::array<const char*, 3> MANUAL_EXTENSIONS = {".pdf", ".cbz", ".cbr"
 //! capitalised one, and a case-sensitive filesystem makes that a different
 //! folder that would otherwise never be read.
 constexpr std::array<const char*, 2> MANUAL_SUBFOLDERS = {"manuals", "Manuals"};
-
-//! The one to create when none exists yet
-constexpr const char* MANUAL_SUBFOLDER = MANUAL_SUBFOLDERS[0];
 
 /*!
  * \brief Whether a path could have a manual sitting beside it
@@ -76,45 +71,6 @@ std::string GetGameStem(const std::string& gamePath)
     stem.erase(extension);
 
   return stem;
-}
-
-/*!
- * \brief Look through a folder for a manual whose name reduces to the game's
- *
- * \return The manual's path, or empty if the folder holds no match
- */
-std::string FindByNormalisedName(const std::string& folder, const std::string& normalisedGame)
-{
-  if (normalisedGame.empty())
-    return {};
-
-  CFileItemList items;
-  if (!XFILE::CDirectory::GetDirectory(folder, items, "", XFILE::DIR_FLAG_NO_FILE_DIRS))
-    return {};
-
-  // The extensions are tried in order of preference, so that a folder holding
-  // both a PDF and a comic archive resolves the same way an exact match would
-  for (const char* extension : MANUAL_EXTENSIONS)
-  {
-    for (int i = 0; i < items.Size(); ++i)
-    {
-      const CFileItemPtr& item = items[i];
-      if (item->IsFolder())
-        continue;
-
-      const std::string candidate = item->GetPath();
-
-      std::string candidateExtension = URIUtils::GetExtension(candidate);
-      StringUtils::ToLower(candidateExtension);
-      if (candidateExtension != extension)
-        continue;
-
-      if (CGameManual::NormaliseName(GetGameStem(candidate)) == normalisedGame)
-        return candidate;
-    }
-  }
-
-  return {};
 }
 } // namespace
 
@@ -219,105 +175,4 @@ std::string CGameManual::NormaliseName(const std::string& name)
   StringUtils::Trim(result);
 
   return result;
-}
-
-std::vector<std::string> CGameManual::BuildManualPaths(const std::string& gamePath)
-{
-  if (!CanHaveManual(gamePath))
-    return {};
-
-  std::vector<std::string> paths;
-
-  const std::string folder = URIUtils::GetDirectory(gamePath);
-  const std::string stem = GetGameStem(gamePath);
-
-  if (stem.empty())
-    return {};
-
-  std::vector<std::string> directories{folder};
-  for (const char* subfolder : MANUAL_SUBFOLDERS)
-    directories.emplace_back(URIUtils::AddFileToFolder(folder, subfolder));
-
-  // Beside the game first, since that is where a manual kept with one game
-  // lives, then the shared folders
-  for (const std::string& directory : directories)
-  {
-    for (const char* extension : MANUAL_EXTENSIONS)
-      paths.emplace_back(URIUtils::AddFileToFolder(directory, stem + extension));
-  }
-
-  return paths;
-}
-
-std::string CGameManual::GetManualPath(const std::string& gamePath)
-{
-  // An exact name match costs only a handful of existence checks, so it is
-  // tried in full before any directory is listed
-  for (const std::string& candidate : BuildManualPaths(gamePath))
-  {
-    if (XFILE::CFile::Exists(candidate))
-      return candidate;
-  }
-
-  if (!CanHaveManual(gamePath))
-    return {};
-
-  // Nothing matched exactly, so the folders are listed and a manual whose name
-  // differs only by its region and revision tags is accepted
-  const std::string normalised = NormaliseName(GetGameStem(gamePath));
-  const std::string folder = URIUtils::GetDirectory(gamePath);
-
-  std::vector<std::string> directories{folder};
-  for (const char* subfolder : MANUAL_SUBFOLDERS)
-    directories.emplace_back(URIUtils::AddFileToFolder(folder, subfolder));
-
-  for (const std::string& directory : directories)
-  {
-    const std::string found = FindByNormalisedName(directory, normalised);
-    if (!found.empty())
-      return found;
-  }
-
-  return {};
-}
-
-std::string CGameManual::GetDownloadPath(const std::string& gamePath, bool& writable)
-{
-  writable = false;
-
-  if (!CanHaveManual(gamePath))
-    return {};
-
-  const std::string stem = GetGameStem(gamePath);
-  if (stem.empty())
-    return {};
-
-  // Downloads join the folder a source already keeps its manuals in, whichever
-  // spelling that is, rather than making a second one beside it
-  const std::string parent = URIUtils::GetDirectory(gamePath);
-  std::string folder;
-  for (const char* subfolder : MANUAL_SUBFOLDERS)
-  {
-    const std::string candidate = URIUtils::AddFileToFolder(parent, subfolder);
-    if (XFILE::CDirectory::Exists(candidate))
-    {
-      folder = candidate;
-      break;
-    }
-  }
-
-  if (folder.empty())
-    folder = URIUtils::AddFileToFolder(parent, MANUAL_SUBFOLDER);
-
-  // Whether the folder can be made is the question, not whether it is there:
-  // the first manual fetched for a source has to create it
-  if (XFILE::CDirectory::Exists(folder) || XFILE::CDirectory::Create(folder))
-    writable = true;
-
-  return URIUtils::AddFileToFolder(folder, stem + ".pdf");
-}
-
-std::string CGameManual::GetManualPath(const CFileItem& item)
-{
-  return GetManualPath(item.GetDynPath());
 }
