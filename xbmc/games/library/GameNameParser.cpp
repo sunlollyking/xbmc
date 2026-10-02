@@ -150,6 +150,7 @@ struct Patterns
   CRegExp alt{true};
   CRegExp extension{true};
   CRegExp leadingNumber{true};
+  CRegExp sceneNumber;
 
   Patterns()
   {
@@ -166,6 +167,12 @@ struct Patterns
     alt.RegComp("^alt( ?[0-9]+)?$");
     extension.RegComp("\\.[a-z0-9]{1,4}$");
     leadingNumber.RegComp("^0[0-9]{2,4} +-? *");
+    // A scene set numbers every release, "2797 Kimi no Yusha (JP)", past the
+    // zero-padded range above. Its two-letter region and its lack of a date
+    // tell it from a title that starts with a number, "1943 Kai (Japan)" or
+    // TOSEC's "1942 (1986)(Elite)(GB)".
+    sceneNumber.RegComp("^[0-9]{4} +(?=.*\\((?:JP|EU|US|FR|KS|DE|IT|ES|NL|AU)\\))"
+                        "(?!.*\\([0-9]{4}\\))");
   }
 };
 
@@ -279,6 +286,8 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName)
     name.erase(name.size() - re.extension.GetFindLen());
   if (Matches(re.leadingNumber, name))
     name.erase(0, re.leadingNumber.GetFindLen());
+  else if (Matches(re.sceneNumber, name))
+    name.erase(0, re.sceneNumber.GetFindLen());
 
   // Bracket tags: GoodTools and TOSEC dump flags
   std::string rest;

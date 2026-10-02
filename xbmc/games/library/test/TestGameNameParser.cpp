@@ -69,3 +69,22 @@ TEST(TestGameNameParser, StillReadsATosecName)
   const ParsedGameName parsed = CGameNameParser::Parse("Savage (1988)(Probe Software).tap");
   EXPECT_EQ(parsed.displayTitle, "Savage");
 }
+
+TEST(TestGameNameParser, DropsAScenesReleaseNumber)
+{
+  EXPECT_EQ(CGameNameParser::Parse("2797 Kimi no Yusha (JP).zip").title, "Kimi no Yusha");
+  EXPECT_EQ(CGameNameParser::Parse("4737 Super Robot Taisen OG Saga (JP).zip").title,
+            "Super Robot Taisen OG Saga");
+  EXPECT_EQ(CGameNameParser::Parse("0414 My Pet Hotel (EU)(M2).zip").title, "My Pet Hotel");
+}
+
+TEST(TestGameNameParser, KeepsATitleThatStartsWithANumber)
+{
+  EXPECT_EQ(CGameNameParser::Parse("1943 Kai (Japan).zip").title, "1943 Kai");
+  EXPECT_EQ(CGameNameParser::Parse("2002 FIFA World Cup (USA) (En,Es).cue").title,
+            "2002 FIFA World Cup");
+  EXPECT_EQ(CGameNameParser::Parse("1942 (1986)(Elite)(GB).tap").title, "1942");
+  EXPECT_EQ(CGameNameParser::Parse("1943 Kai (1991)(Namco)(JP).pce").title, "1943 Kai");
+  EXPECT_EQ(CGameNameParser::Parse("2010 - The Graphic Action Game.col").title,
+            "2010 - The Graphic Action Game");
+}
