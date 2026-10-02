@@ -41,7 +41,7 @@ struct OverviewChild
   int description;
 };
 
-constexpr std::array<OverviewChild, 25> overviewChildren{{
+constexpr std::array<OverviewChild, 24> overviewChildren{{
     {"titles", 35544, 35640},
     {"genres", 135, 35641},
     {"years", 652, 35642},
@@ -52,7 +52,6 @@ constexpr std::array<OverviewChild, 25> overviewChildren{{
     {"regions", 35524, 35647},
     {"players", 35525, 35648},
     {"ageratings", 35526, 35649},
-    {"categories", 35527, 35650},
     {"recentlyadded", 35528, 35651},
     {"recentlyplayed", 35529, 35652},
     {"continueplaying", 35672, 35673},
