@@ -1631,11 +1631,6 @@
 					<param name="colour" value="FFFFB300" />
 				</include>
 				<include content="GamePill">
-					<param name="info" value="ListItem.Property(gamecategory)" />
-					<param name="label" value="" />
-					<param name="colour" value="FFE0A94A" />
-				</include>
-				<include content="GamePill">
 					<param name="info" value="ListItem.Property(completed)" />
 					<param name="label" value="$LOCALIZE[35574]" />
 					<param name="colour" value="FF66BB6A" />
