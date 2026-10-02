@@ -24,6 +24,7 @@
 #include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "filesystem/SpecialProtocol.h"
 #include "games/tags/GameInfoTag.h"
 #include "games/tags/GameInfoTagLoader.h"
 #include "dialogs/GUIDialogSelect.h"
@@ -909,11 +910,13 @@ void CGameInfoScanner::KeepArt(CGameScraper& scraper,
     }
 
     const std::string path = target->second + URIUtils::GetExtension(file);
-    CUtil::CreateDirectoryEx(URIUtils::GetDirectory(path));
-    bool moved = XFILE::CFile::Rename(file, path);
+    // A rename only follows real paths; the library keeps the folder as set
+    const std::string destination = CSpecialProtocol::TranslatePath(path);
+    CUtil::CreateDirectoryEx(URIUtils::GetDirectory(destination));
+    bool moved = XFILE::CFile::Rename(file, destination);
     if (!moved)
     {
-      moved = XFILE::CFile::Copy(file, path);
+      moved = XFILE::CFile::Copy(file, destination);
       XFILE::CFile::Delete(file);
     }
     if (moved)
