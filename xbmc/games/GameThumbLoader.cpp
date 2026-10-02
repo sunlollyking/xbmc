@@ -228,11 +228,22 @@ bool CGameThumbLoader::LoadLibraryArt(CFileItem& item)
     }
   }
 
-  if (item.HasArt("boxfront") && !item.HasArt("poster"))
-    item.SetArt("poster", item.GetArt("boxfront"));
+  // An arcade game has no box, and its flyer is the picture that stands in
+  // for one
+  if (!item.HasArt("poster"))
+  {
+    for (const char* fallback : {"boxfront", "flyer"})
+    {
+      if (item.HasArt(fallback))
+      {
+        item.SetArt("poster", item.GetArt(fallback));
+        break;
+      }
+    }
+  }
   if (!item.HasArt("thumb"))
   {
-    for (const char* fallback : {"boxfront", "clearlogo", "titlescreen", "screenshot"})
+    for (const char* fallback : {"boxfront", "flyer", "clearlogo", "titlescreen", "screenshot"})
     {
       if (item.HasArt(fallback))
       {
