@@ -37,31 +37,58 @@ void CRPStreamManager::EnableAudio(bool bEnable)
     m_audioStream->Enable(bEnable);
 }
 
+void CRPStreamManager::SuppressAudio(bool bSuppress)
+{
+  m_audioSuppressed = bSuppress;
+
+  if (m_audioStream != nullptr)
+    m_audioStream->Suppress(bSuppress);
+}
+
+void CRPStreamManager::EnableVideo(bool bEnable)
+{
+  m_videoEnabled = bEnable;
+
+  if (m_videoStream != nullptr)
+    m_videoStream->Enable(bEnable);
+
+  if (m_renderingStream != nullptr)
+    m_renderingStream->Enable(bEnable);
+}
+
 StreamPtr CRPStreamManager::CreateStream(StreamType streamType)
 {
   switch (streamType)
   {
     case StreamType::AUDIO:
     {
-      // Save pointer to audio stream
-      m_audioStream = new CRetroPlayerAudio(m_processInfo);
+      auto audioStream = std::make_unique<CRetroPlayerAudio>(m_processInfo);
+      audioStream->Suppress(m_audioSuppressed);
 
-      return StreamPtr(m_audioStream);
+      // Save pointer to audio stream
+      m_audioStream = audioStream.get();
+
+      return StreamPtr{audioStream.release()};
     }
     case StreamType::VIDEO:
     case StreamType::SW_BUFFER:
     {
-      // Save pointer to video stream
-      m_videoStream = new CRetroPlayerVideo(m_renderManager, m_processInfo);
+      auto videoStream = std::make_unique<CRetroPlayerVideo>(m_renderManager, m_processInfo);
+      videoStream->Enable(m_videoEnabled);
 
-      return StreamPtr(m_videoStream);
+      m_videoStream = videoStream.get();
+
+      return StreamPtr{videoStream.release()};
     }
     case StreamType::HW_BUFFER:
     {
-      // Save pointer to rendering stream
-      m_renderingStream = new CRetroPlayerRendering(m_renderManager, m_processInfo);
+      auto renderingStream =
+          std::make_unique<CRetroPlayerRendering>(m_renderManager, m_processInfo);
+      renderingStream->Enable(m_videoEnabled);
 
-      return StreamPtr(m_renderingStream);
+      m_renderingStream = renderingStream.get();
+
+      return StreamPtr{renderingStream.release()};
     }
     default:
       break;
