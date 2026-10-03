@@ -362,6 +362,10 @@
 		<value condition="!String.IsEmpty(ListItem.Art(screenshot))">$INFO[ListItem.Art(screenshot)]</value>
 		<value>$INFO[ListItem.Art(titlescreen)]</value>
 	</variable>
+	<variable name="GameSpinesBoxVar">
+		<value condition="!String.IsEmpty(ListItem.Art(box3d))">$INFO[ListItem.Art(box3d)]</value>
+		<value>$VAR[GameInfoBoxVar]</value>
+	</variable>
 	<variable name="GameInfoBoxVar">
 		<value condition="!String.IsEmpty(ListItem.Art(boxfront))">$INFO[ListItem.Art(boxfront)]</value>
 		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
