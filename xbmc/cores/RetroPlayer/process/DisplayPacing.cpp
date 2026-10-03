@@ -111,8 +111,8 @@ CDisplayPacing::Clock::time_point CDisplayPacing::NextTake(Clock::time_point now
   if (intervalNs > 0 && nextNs <= nowNs)
     nextNs += ((nowNs - nextNs) / intervalNs + 1) * intervalNs;
 
-  return Clock::time_point(std::chrono::duration_cast<Clock::duration>(
-      std::chrono::nanoseconds(nextNs)));
+  return Clock::time_point(
+      std::chrono::duration_cast<Clock::duration>(std::chrono::nanoseconds(nextNs)));
 }
 
 void CDisplayPacing::Restart(int64_t takeNs)

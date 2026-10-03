@@ -533,7 +533,8 @@ protected:
     ASSERT_TRUE(database.AddSavestate(path, {}, savestate));
     {
       RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(),
-                                          environment.Streams(), environment.Messenger(), 60.0, 0);
+                                          environment.Streams(), environment.Messenger(),
+                                          environment.ProcessInfo().GetDisplayPacing(), 60.0, 0);
       EXPECT_EQ(m_core.sizeQueries, 0U);
       EXPECT_TRUE(playback.LoadSavestate(path));
       EXPECT_EQ(m_core.frames, 0U);
@@ -1167,7 +1168,8 @@ TEST_F(TestGameClientHardwareRendering, RewindRetriesUntilSerializationBecomesAv
   m_core.readyFrame = 3;
   {
     RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(),
-                                        environment.Streams(), environment.Messenger(), 60.0, 0);
+                                        environment.Streams(), environment.Messenger(),
+                                        environment.ProcessInfo().GetDisplayPacing(), 60.0, 0);
     playback.FrameEvent();
     playback.FrameEvent();
     EXPECT_EQ(m_core.serializations, 0U);
@@ -1217,7 +1219,8 @@ TEST_F(TestGameClientHardwareRendering, RunaheadRestoresTheRealFrame)
   RETRO::CPlaybackTestEnvironment environment;
   CRunaheadSettings runahead(true);
   RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(), environment.Streams(),
-                                      environment.Messenger(), 60.0, 0);
+                                      environment.Messenger(),
+                                      environment.ProcessInfo().GetDisplayPacing(), 60.0, 0);
   playback.SetSpeed(1.0);
 
   // The state size is unknown until the client has run a frame
@@ -1240,7 +1243,8 @@ TEST_F(TestGameClientHardwareRendering, RunaheadNeedsSpeculativeFrames)
   CRunaheadSettings runahead(false);
   m_client->GetInstanceInterface()->toAddon->RunFrameSpeculative = nullptr;
   RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(), environment.Streams(),
-                                      environment.Messenger(), 60.0, 0);
+                                      environment.Messenger(),
+                                      environment.ProcessInfo().GetDisplayPacing(), 60.0, 0);
   playback.SetSpeed(1.0);
   playback.FrameEvent();
   playback.FrameEvent();
@@ -1254,7 +1258,8 @@ TEST_F(TestGameClientHardwareRendering, RunaheadStopsWhenASpeculativeFrameFails)
   CRunaheadSettings runahead(false);
   m_core.speculativeResult = GAME_ERROR_FAILED;
   RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(), environment.Streams(),
-                                      environment.Messenger(), 60.0, 0);
+                                      environment.Messenger(),
+                                      environment.ProcessInfo().GetDisplayPacing(), 60.0, 0);
   playback.SetSpeed(1.0);
   playback.FrameEvent();
   playback.FrameEvent();
@@ -1273,7 +1278,8 @@ TEST_F(TestGameClientHardwareRendering, RunaheadStopsPlaybackWhenTheRealFrameIsL
   CRunaheadSettings runahead(false);
   m_core.deserializeFails = true;
   RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(), environment.Streams(),
-                                      environment.Messenger(), 60.0, 0);
+                                      environment.Messenger(),
+                                      environment.ProcessInfo().GetDisplayPacing(), 60.0, 0);
   playback.SetSpeed(1.0);
   playback.FrameEvent();
   playback.FrameEvent();
