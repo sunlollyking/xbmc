@@ -197,14 +197,6 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
     }
   }
 
-  // A game is drawn with whatever filter was chosen for it, or failing that
-  // the nearest folder above it that has one - a handheld wants something very
-  // different to a home console, and a collection is already a folder per
-  // system. A preset that has since been uninstalled fails to load and the
-  // game draws unfiltered, which is the right answer for a filter that is gone.
-  if (!bStandalone)
-    SetVideoFilterForGame(fileCopy.GetDynPath());
-
   m_processInfo = CRPProcessInfo::CreateInstance();
   if (!m_processInfo)
   {
@@ -217,6 +209,17 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
 
   m_guiMessenger = std::make_unique<CGUIGameMessenger>(*m_processInfo);
   m_renderManager = std::make_unique<CRPRenderManager>(*m_processInfo);
+
+  // A game is drawn with whatever filter was chosen for it, or failing that
+  // the nearest folder above it that has one - a handheld wants something very
+  // different to a home console, and a collection is already a folder per
+  // system. A preset that has since been uninstalled fails to load and the
+  // game draws unfiltered, which is the right answer for a filter that is gone.
+  // The render manager resets the game settings to the defaults, so this has
+  // to come after it. The library knows a zipped game by its archive, not the
+  // file inside it that it is opened as.
+  if (!bStandalone)
+    SetVideoFilterForGame(fileCopy.GetPath());
 
   if (!bStandalone)
     m_renderManager->SetBezel(GetBezelForGame(fileCopy));
