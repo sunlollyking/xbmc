@@ -384,6 +384,36 @@ TEST_F(TestGamesGUIInfo, AListItemAnswersForItsOwnGame)
   EXPECT_EQ(value, "1998");
 }
 
+TEST_F(TestGamesGUIInfo, ARatingCanBeAskedForBySource)
+{
+  //
+  // Spec: a game keeps every source's rating. ListItem.Rating gives the one
+  // to show, and ListItem.Rating(source) gives that source's, both out of 10
+  //
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+
+  CFileItem item{"/roms/zelda.n64", false};
+  item.GetGameInfoTag()->SetRatings(
+      {{"igdb", GameRating{72.0f, 100.0f, 400}}, {"igdbcritic", GameRating{91.0f, 100.0f, 12}}},
+      "igdb");
+
+  std::string value;
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_RATING), nullptr));
+  EXPECT_EQ(value, "7.2");
+
+  EXPECT_TRUE(
+      gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_RATING, "igdbcritic"), nullptr));
+  EXPECT_EQ(value, "9.1");
+
+  EXPECT_TRUE(
+      gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_VOTES, "igdbcritic"), nullptr));
+  EXPECT_EQ(value, "12");
+
+  EXPECT_FALSE(
+      gamesGUIInfo.GetLabel(value, &item, 0, CGUIInfo(LISTITEM_RATING, "screenscraper"), nullptr));
+}
+
 TEST_F(TestGamesGUIInfo, AnItemWithNoGameTagIsPassedOn)
 {
   //

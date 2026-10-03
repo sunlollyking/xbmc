@@ -199,9 +199,11 @@ public:
   void SetRatings(const std::map<std::string, GameRating>& ratings, const std::string& defaultType);
 
   /*!
-   * \brief The rating to show, scaled to 0-10
+   * \brief A rating, scaled to 0-10
+   *
+   * \param type The source, such as "igdbcritic", or empty for the rating to show
    */
-  GameRating GetRating() const;
+  GameRating GetRating(const std::string& type = "") const;
   const std::string& GetDefaultRatingType() const { return m_strDefaultRating; }
 
   const std::vector<GameAgeRating>& GetAgeRatings() const { return m_ageRatings; }

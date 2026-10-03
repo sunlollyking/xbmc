@@ -273,19 +273,25 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           value = tag->GetOriginalTitle();
           return !value.empty();
         case LISTITEM_RATING:
-          if (tag->GetRating().rating > 0.0f)
+        {
+          const GameRating rating = tag->GetRating(info.GetData3());
+          if (rating.rating > 0.0f)
           {
-            value = StringUtils::FormatNumber(tag->GetRating().rating);
+            value = StringUtils::FormatNumber(rating.rating);
             return true;
           }
           break;
+        }
         case LISTITEM_VOTES:
-          if (tag->GetRating().votes > 0)
+        {
+          const GameRating rating = tag->GetRating(info.GetData3());
+          if (rating.votes > 0)
           {
-            value = std::to_string(tag->GetRating().votes);
+            value = std::to_string(rating.votes);
             return true;
           }
           break;
+        }
         case LISTITEM_USER_RATING:
           if (tag->GetUserRating() > 0)
           {
