@@ -53,6 +53,7 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT = "gamesachievements
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
+const std::string SETTING_GAMES_ACHIEVEMENTS_HARDCORE = "gamesachievements.hardcore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_INDICATOR = "gamesachievements.challengeindicator";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
@@ -83,14 +84,16 @@ constexpr auto TOKEN = "Token";
 CGameSettings::CGameSettings()
 {
   m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  m_achievementsHardcore = m_settings->GetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE);
 
   m_settings->RegisterCallback(
       this,
       {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME, SETTING_GAMES_ACHIEVEMENTS_USERNAME,
        SETTING_GAMES_ACHIEVEMENTS_PASSWORD, SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN,
        SETTING_GAMES_ACHIEVEMENTS_API_KEY, SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS,
-       SETTING_GAMES_ACHIEVEMENTS_ENCORE, SETTING_GAMES_ACHIEVEMENTS_INDICATOR,
-       SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT, SETTING_GAMES_CLEAR_MANUAL_CACHE});
+       SETTING_GAMES_ACHIEVEMENTS_HARDCORE, SETTING_GAMES_ACHIEVEMENTS_ENCORE,
+       SETTING_GAMES_ACHIEVEMENTS_INDICATOR, SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT,
+       SETTING_GAMES_CLEAR_MANUAL_CACHE});
 
   // A person should say who they are once. The scrapers keep fields of their
   // own so they still work for anyone driving them directly, but while these
@@ -227,6 +230,8 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
   if (settingId == SETTING_GAMES_ACHIEVEMENTS_USERNAME ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_API_KEY)
     ShareAchievementCredentials();
+  if (settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE)
+    m_achievementsHardcore = std::dynamic_pointer_cast<const CSettingBool>(setting)->GetValue();
 
   // Signing in or out changes who the kept standings describe, and the runtime
   // holds them per game rather than per account. Settings outlive the services
@@ -238,8 +243,12 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
   }
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
+      settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_ENCORE)
   {
+    // Hardcore belongs with the rewind settings: turning it on has to drop the
+    // rewind buffer, or the frames already in it stay rewindable for the rest
+    // of the session
     SetChanged();
     NotifyObservers(ObservableMessageSettingsChanged);
   }
@@ -398,6 +407,22 @@ std::string CGameSettings::GetRAUserPicUrl() const
     return {};
 
   return StringUtils::Format(RA_USER_PIC_URL_TEMPLATE, CURL::Encode(username));
+}
+
+bool CGameSettings::GetAchievementsHardcore() const
+{
+  return m_achievementsHardcore;
+}
+
+void CGameSettings::SetAchievementsHardcore(bool hardcore)
+{
+  m_settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE, hardcore);
+}
+
+bool CGameSettings::AchievementsHardcoreOffered() const
+{
+  const auto setting = m_settings->GetSetting(SETTING_GAMES_ACHIEVEMENTS_HARDCORE);
+  return setting && setting->IsVisible();
 }
 
 bool CGameSettings::GetAchievementsEncore() const
