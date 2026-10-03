@@ -8,7 +8,9 @@
 
 #include "GameDatabase.h"
 #include "dbwrappers/dataset.h"
+#include "imagefiles/ImageFileURL.h"
 #include "utils/StringUtils.h"
+#include "utils/URIUtils.h"
 #include "utils/log.h"
 
 using namespace KODI;
@@ -85,6 +87,7 @@ bool CGameDatabase::GetArtForItem(int mediaId, const MediaType& mediaType, KODI:
       m_pDS->close();
     }
     AddDefaultArt(art);
+    StandSpinesUpright(art);
     return !art.empty();
   }
   catch (...)
@@ -105,6 +108,21 @@ void CGameDatabase::AddDefaultArt(KODI::ART::Artwork& art)
   {
     if (art.find(alias) == art.end())
       art[alias] = front->second;
+  }
+}
+
+void CGameDatabase::StandSpinesUpright(KODI::ART::Artwork& art)
+{
+  for (auto& [type, url] : art)
+  {
+    // Already a picture with options, such as one chosen from this same list
+    if (!StringUtils::StartsWith(type, "boxspine") || url.empty() ||
+        URIUtils::IsProtocol(url, "image"))
+      continue;
+
+    IMAGE_FILES::CImageFileURL imageURL = IMAGE_FILES::CImageFileURL::FromFile(url);
+    imageURL.AddOption("orientation", "portrait");
+    url = imageURL.ToString();
   }
 }
 
@@ -143,7 +161,10 @@ bool CGameDatabase::GetArtForItems(const std::vector<int>& mediaIds,
     }
 
     for (auto& [id, one] : art)
+    {
       AddDefaultArt(one);
+      StandSpinesUpright(one);
+    }
 
     return true;
   }

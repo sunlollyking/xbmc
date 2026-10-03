@@ -227,7 +227,24 @@ std::unique_ptr<CTexture> CTextureCacheJob::LoadImage(const IMAGE_FILES::CImageF
   if (imageURL.flipped)
     texture->SetOrientation(texture->GetOrientation() ^ 1);
 
+  texture->SetOrientation(UprightOrientation(imageURL, texture->GetOriginalWidth(),
+                                             texture->GetOriginalHeight(),
+                                             texture->GetOrientation()));
+
   return texture;
+}
+
+int CTextureCacheJob::UprightOrientation(const IMAGE_FILES::CImageFileURL& imageURL,
+                                         unsigned int width,
+                                         unsigned int height,
+                                         int orientation)
+{
+  // Only a picture with no orientation of its own, so that one EXIF has
+  // already turned is not turned again
+  constexpr int ROTATE_90_CW = 5;
+  if (imageURL.GetOption("orientation") == "portrait" && orientation == 0 && width > height)
+    return ROTATE_90_CW;
+  return orientation;
 }
 
 std::string CTextureCacheJob::FormatImageHash(int64_t modificationTime, int64_t size)
