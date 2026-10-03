@@ -222,9 +222,9 @@ void CGameInfoTag::SetRatings(const std::map<std::string, GameRating>& ratings,
     m_strDefaultRating = ratings.empty() ? "" : ratings.begin()->first;
 }
 
-GameRating CGameInfoTag::GetRating() const
+GameRating CGameInfoTag::GetRating(const std::string& type /* = "" */) const
 {
-  const auto it = m_ratings.find(m_strDefaultRating);
+  const auto it = m_ratings.find(type.empty() ? m_strDefaultRating : type);
   if (it == m_ratings.end())
     return {};
 
