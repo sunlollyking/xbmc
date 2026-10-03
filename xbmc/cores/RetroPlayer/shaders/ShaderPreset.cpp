@@ -17,30 +17,7 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
-#include <cctype>
-#include <string_view>
-
 using namespace KODI::SHADER;
-
-namespace
-{
-bool ContainsIdentifier(std::string_view source, std::string_view identifier)
-{
-  const auto isIdentifierChar = [](char c)
-  { return std::isalnum(static_cast<unsigned char>(c)) != 0 || c == '_'; };
-
-  for (size_t pos = source.find(identifier); pos != std::string_view::npos;
-       pos = source.find(identifier, pos + 1))
-  {
-    const size_t end = pos + identifier.size();
-    if ((pos == 0 || !isIdentifierChar(source[pos - 1])) &&
-        (end == source.size() || !isIdentifierChar(source[end])))
-      return true;
-  }
-
-  return false;
-}
-} // namespace
 
 CShaderPreset::CShaderPreset(RETRO::CRenderContext& context,
                              unsigned videoWidth,
@@ -277,23 +254,19 @@ bool CShaderPreset::HasPathFailed(const std::string& path) const
 }
 
 ShaderParameterMap CShaderPreset::GetShaderParameters(
-    const std::vector<ShaderParameter>& parameters, const std::string& sourceStr) const
+    const std::vector<ShaderParameter>& parameters) const
 {
-  ShaderParameterMap matchParams;
+  // Parameters belong to the whole preset, not just the pass that declares
+  // them with "#pragma parameter"
+  ShaderParameterMap shaderParams;
 
-  // Parameters are shared by the whole preset. A pass can use one that only
-  // another pass declares with "#pragma parameter", so match the names the
-  // source uses instead.
   for (const ShaderParameter& parameter : parameters)
   {
-    if (ContainsIdentifier(sourceStr, parameter.strId))
-    {
-      // The add-on has already handled parsing and overwriting default
-      // parameter values from the preset file. The final value we
-      // should use is in the 'current' field.
-      matchParams[parameter.strId] = parameter.current;
-    }
+    // The add-on has already handled parsing and overwriting default
+    // parameter values from the preset file. The final value we
+    // should use is in the 'current' field.
+    shaderParams[parameter.strId] = parameter.current;
   }
 
-  return matchParams;
+  return shaderParams;
 }
