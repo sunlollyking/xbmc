@@ -164,6 +164,8 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       if (delaySecs > MAX_DELAY)
       {
         m_pAudioStream->Flush();
+        skipFrames = 0;
+        m_framesToSkip = 0;
         CLog::Log(LOGDEBUG, "RetroPlayer[AUDIO]: Audio delay ({:0.2f} ms) is too high - flushing",
                   delaySecs * 1000);
       }
