@@ -155,7 +155,7 @@
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>grey</textcolor>
-							<label>$INFO[ListItem.UserRating,$LOCALIZE[38023] ,]</label>
+							<label>$INFO[ListItem.Rating(igdbcritic),$LOCALIZE[35764] ,]</label>
 						</control>
 						<control type="label">
 							<top>90</top>
@@ -164,7 +164,7 @@
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>grey</textcolor>
-							<label>$INFO[ListItem.PlayCount,$LOCALIZE[567] ,]</label>
+							<label>$INFO[ListItem.UserRating,$LOCALIZE[38023] ,]</label>
 						</control>
 						<control type="label">
 							<top>130</top>
@@ -173,7 +173,7 @@
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>grey</textcolor>
-							<label>$INFO[ListItem.LastPlayed,$LOCALIZE[568] ,]</label>
+							<label>$INFO[ListItem.PlayCount,$LOCALIZE[567] ,]</label>
 						</control>
 						<control type="label">
 							<top>170</top>
@@ -182,10 +182,19 @@
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>grey</textcolor>
-							<label>$INFO[ListItem.Property(playtime),$LOCALIZE[35671] ,]</label>
+							<label>$INFO[ListItem.LastPlayed,$LOCALIZE[568] ,]</label>
 						</control>
 						<control type="label">
 							<top>210</top>
+							<width>340</width>
+							<height>40</height>
+							<font>font12</font>
+							<align>right</align>
+							<textcolor>grey</textcolor>
+							<label>$INFO[ListItem.Property(playtime),$LOCALIZE[35671] ,]</label>
+						</control>
+						<control type="label">
+							<top>250</top>
 							<width>340</width>
 							<height>40</height>
 							<font>font12</font>

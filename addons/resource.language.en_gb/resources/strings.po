@@ -21022,7 +21022,13 @@ msgctxt "#35763"
 msgid "Where to save the pictures games are scraped with. Saved pictures show without asking the internet again, which some sources only allow so many times a day. Leave empty to keep links instead."
 msgstr ""
 
-#empty strings from id 35764 to 35999
+#. Label for the score critics gave a game, followed by the score
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35764"
+msgid "Critics"
+msgstr ""
+
+#empty strings from id 35765 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
