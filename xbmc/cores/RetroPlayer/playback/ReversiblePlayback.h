@@ -48,6 +48,7 @@ public:
                       CRPRenderManager& renderManager,
                       CRPStreamManager& streamManager,
                       CGUIGameMessenger& guiMessenger,
+                      CDisplayPacing& displayPacing,
                       double fps,
                       size_t serializeSize);
 

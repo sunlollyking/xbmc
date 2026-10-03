@@ -75,6 +75,7 @@ private:
   IAE::StreamPtr m_pAudioStream;
   bool m_bAudioEnabled = true;
   bool m_bAudioSuppressed = false;
+  double m_playbackRate = 1.0;
 
   uint64_t m_droppedFrames = 0;
   uint64_t m_dropEvents = 0;
