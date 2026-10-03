@@ -371,6 +371,9 @@ public:
 
   //! \brief Let a skin that asks for a thumb or a poster find the box front
   static void AddDefaultArt(KODI::ART::Artwork& art);
+
+  //! \brief Ask for a box's spines upright, since some are scanned on their side
+  static void StandSpinesUpright(KODI::ART::Artwork& art);
   std::string GetArtForItem(int mediaId, const MediaType& mediaType, const std::string& artType);
   bool RemoveArtForItem(int mediaId, const MediaType& mediaType, const std::string& artType);
   bool GetArtTypes(const MediaType& mediaType, std::vector<std::string>& artTypes);
