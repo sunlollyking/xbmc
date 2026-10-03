@@ -36,6 +36,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/JSONVariantParser.h"
 #include "utils/StringUtils.h"
+#include "utils/SystemInfo.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 #include "view/GUIViewControl.h"
@@ -44,15 +45,22 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <set>
 
 using namespace KODI;
 using namespace GAME;
 
 namespace
 {
-//! The set and the player's standing in it, in one answer
-constexpr const char* GAME_PROGRESS_URL =
-    "https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?g={}&u={}&y={}";
+//! Takes the signed-in player's token, posted so that it stays out of the URL
+constexpr const char* RA_REQUEST_URL = "https://retroachievements.org/dorequest.php";
+
+//! The achievement the service adds to every set for a client it doesn't
+//! recognise, warning about the emulator rather than belonging to the game
+constexpr unsigned int UNKNOWN_EMULATOR_WARNING_ID = 101000001;
+
+//! Flags of an achievement in the official set, as opposed to an unofficial one
+constexpr unsigned int CORE_ACHIEVEMENT_FLAGS = 3;
 
 //! Where RetroAchievements serves achievement badges from
 constexpr const char* BADGE_URL = "https://media.retroachievements.org/Badge/{}.png";
@@ -66,8 +74,10 @@ constexpr unsigned int REQUEST_TIMEOUT_SECS = 10;
 class CLibraryAchievementsJob : public CJob
 {
 public:
-  CLibraryAchievementsJob(std::string gameId, std::string username, std::string apiKey)
-    : m_gameId(std::move(gameId)), m_username(std::move(username)), m_apiKey(std::move(apiKey))
+  CLibraryAchievementsJob(std::string gameId, std::string username, std::string token)
+    : m_gameId(std::move(gameId)),
+      m_username(std::move(username)),
+      m_token(std::move(token))
   {
   }
 
@@ -75,37 +85,35 @@ public:
 
   bool DoWork() override
   {
-    const std::string url = StringUtils::Format(GAME_PROGRESS_URL, CURL::Encode(m_gameId),
-                                                CURL::Encode(m_username), CURL::Encode(m_apiKey));
-
-    XFILE::CCurlFile curl;
-    curl.SetTimeout(REQUEST_TIMEOUT_SECS);
-
-    std::string response;
-    if (!curl.Get(url, response))
-    {
-      CLog::Log(LOGERROR, "CDialogGameAchievements: no answer for game {}", m_gameId);
+    CVariant set;
+    if (!Request("patch", "", set))
       return false;
-    }
 
-    CVariant data;
-    if (!CJSONVariantParser::Parse(response, data) || !data.isObject())
-    {
-      CLog::Log(LOGERROR, "CDialogGameAchievements: game {} answered {} bytes that are not an object",
-                m_gameId, response.size());
+    // Hardcore unlocks are listed with the softcore ones, so one list covers both
+    CVariant unlocks;
+    if (!Request("unlocks", "&h=0", unlocks))
       return false;
-    }
 
+    std::set<unsigned int> earned;
+    const CVariant& unlockIds = unlocks["UserUnlocks"];
+    for (auto it = unlockIds.begin_array(); it != unlockIds.end_array(); ++it)
+      earned.insert(static_cast<unsigned int>(it->asUnsignedInteger()));
+
+    const CVariant& data = set["PatchData"];
     m_state.gameTitle = data["Title"].asString();
     m_state.gameId = static_cast<unsigned int>(data["ID"].asUnsignedInteger());
 
     const CVariant& achievements = data["Achievements"];
-    for (auto it = achievements.begin_map(); it != achievements.end_map(); ++it)
+    for (auto it = achievements.begin_array(); it != achievements.end_array(); ++it)
     {
-      const CVariant& row = it->second;
+      const CVariant& row = *it;
 
       AchievementInfo info;
       info.id = static_cast<unsigned int>(row["ID"].asUnsignedInteger());
+      if (info.id == UNKNOWN_EMULATOR_WARNING_ID ||
+          row["Flags"].asUnsignedInteger() != CORE_ACHIEVEMENT_FLAGS)
+        continue;
+
       info.title = row["Title"].asString();
       info.description = row["Description"].asString();
       info.points = static_cast<unsigned int>(row["Points"].asUnsignedInteger());
@@ -117,21 +125,10 @@ public:
         info.lockedBadgeUrl = StringUtils::Format(LOCKED_BADGE_URL, badge);
       }
 
-      // Earned at all, in either mode; the date is the softcore one where both
-      // exist, which is when the achievement was first met.
-      const std::string earnedDate = row["DateEarned"].asString();
-      const std::string hardcoreDate = row["DateEarnedHardcore"].asString();
-      info.earned = !earnedDate.empty() || !hardcoreDate.empty();
-      if (info.earned)
-        info.unlockedDate.SetFromDBDateTime(earnedDate.empty() ? hardcoreDate : earnedDate);
+      // The share of players who have it, as a percentage
+      info.rarity = static_cast<float>(row["Rarity"].asDouble());
 
-      // Rarity is published as the count of players who have it against the
-      // count who have played the game at all.
-      const auto awarded = static_cast<double>(row["NumAwarded"].asUnsignedInteger());
-      const auto players = static_cast<double>(data["NumDistinctPlayers"].asUnsignedInteger());
-      if (awarded > 0.0 && players > 0.0)
-        info.rarity = static_cast<float>(100.0 * awarded / players);
-
+      info.earned = earned.contains(info.id);
       if (info.earned)
         ++m_state.unlockedAchievements;
       ++m_state.totalAchievements;
@@ -148,9 +145,42 @@ public:
   const AchievementState& GetState() const { return m_state; }
 
 private:
+  bool Request(const std::string& request, const std::string& extra, CVariant& answer) const
+  {
+    const std::string postData =
+        StringUtils::Format("r={}&u={}&t={}&g={}{}", request, CURL::Encode(m_username),
+                            CURL::Encode(m_token), CURL::Encode(m_gameId), extra);
+
+    XFILE::CCurlFile curl;
+    curl.SetTimeout(REQUEST_TIMEOUT_SECS);
+    curl.SetRequestHeader("User-Agent", CSysInfo::GetUserAgent());
+
+    std::string response;
+    if (!curl.Post(RA_REQUEST_URL, postData, response))
+    {
+      CLog::Log(LOGERROR, "CDialogGameAchievements: no answer to {} for game {}", request,
+                m_gameId);
+      return false;
+    }
+
+    if (!CJSONVariantParser::Parse(response, answer) || !answer.isObject())
+    {
+      CLog::Log(LOGERROR, "CDialogGameAchievements: {} for game {} answered {} bytes of non-JSON",
+                request, m_gameId, response.size());
+      return false;
+    }
+    if (!answer["Success"].asBoolean())
+    {
+      CLog::Log(LOGERROR, "CDialogGameAchievements: {} for game {} was refused: {}", request,
+                m_gameId, answer["Error"].asString());
+      return false;
+    }
+    return true;
+  }
+
   const std::string m_gameId;
   const std::string m_username;
-  const std::string m_apiKey;
+  const std::string m_token;
   AchievementState m_state;
 };
 
@@ -534,15 +564,15 @@ bool CDialogGameAchievements::FetchForLibraryGame()
   const std::string gameId = item->GetGameInfoTag()->GetUniqueID("retroachievements");
   if (gameId.empty())
     return false;
-  CLog::Log(LOGINFO, "CDialogGameAchievements: asking about game {}", gameId);
 
   const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
   const std::string username = gameSettings.GetRAUsername();
-  const std::string apiKey = gameSettings.GetRAApiKey();
-  if (username.empty() || apiKey.empty())
+  const std::string token = gameSettings.GetRAToken();
+  if (username.empty() || token.empty())
     return false;
 
-  AddJob(new CLibraryAchievementsJob(gameId, username, apiKey));
+  CLog::Log(LOGINFO, "CDialogGameAchievements: asking about game {}", gameId);
+  AddJob(new CLibraryAchievementsJob(gameId, username, token));
   return true;
 }
 

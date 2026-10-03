@@ -178,11 +178,6 @@ std::string CGameSettings::GetRAToken() const
   return m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_TOKEN);
 }
 
-std::string CGameSettings::GetRAApiKey() const
-{
-  return m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_API_KEY);
-}
-
 void CGameSettings::ShareAchievementCredentials() const
 {
   const std::string username = m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_USERNAME);

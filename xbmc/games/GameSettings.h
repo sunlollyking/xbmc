@@ -49,14 +49,6 @@ public:
   std::string GetRAToken() const;
 
   /*!
-   * \brief The key that identifies the player to the web API
-   *
-   * The token above signs requests an emulator makes while playing; this
-   * one is for asking the service about a game nobody is playing.
-   */
-  std::string GetRAApiKey() const;
-
-  /*!
    * \brief The player's RetroAchievements avatar, or empty if not signed in
    *
    * The icon for notifications that speak for RetroAchievements, as the
