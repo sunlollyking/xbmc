@@ -374,6 +374,12 @@
 						<param name="visible" value="true" />
 					</include>
 					<include content="InfoDialogButton">
+						<param name="id" value="10" />
+						<param name="icon" value="icons/infodialogs/choose_image.png" />
+						<param name="label" value="$LOCALIZE[13511]" />
+						<param name="visible" value="Integer.IsGreater(ListItem.DBID,0)" />
+					</include>
+					<include content="InfoDialogButton">
 						<param name="id" value="12" />
 						<param name="icon" value="icons/infodialogs/rating.png" />
 						<param name="label" value="$LOCALIZE[14076]" />

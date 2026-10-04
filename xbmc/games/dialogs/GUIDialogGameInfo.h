@@ -78,6 +78,14 @@ private:
 
   //! \brief Every picture the library holds for this game, one to look at
   void OnArtwork();
+
+  /*!
+   * \brief Choose which of a kind of picture the game shows
+   *
+   * The scraped alternatives are offered first, then any image on disk. The
+   * picture that is replaced stays as an alternative.
+   */
+  void OnChooseArt();
   void OnUserRating();
   void OnGameClient();
   void OnVideoFilter();

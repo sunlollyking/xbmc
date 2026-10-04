@@ -9,8 +9,11 @@
 #include "GUIDialogGameInfo.h"
 
 #include "FileItem.h"
+#include "FileItemList.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
+#include "application/ApplicationComponents.h"
+#include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "games/GameUtils.h"
 #include "games/database/GameDatabase.h"
@@ -20,10 +23,12 @@
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
+#include "messaging/ApplicationMessenger.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
-#include "application/ApplicationComponents.h"
-#include "messaging/ApplicationMessenger.h"
+#include "settings/MediaSourceSettings.h"
+#include "storage/MediaManager.h"
+#include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 
@@ -38,6 +43,7 @@ using namespace GAME;
 namespace
 {
 constexpr int CONTROL_BTN_RELEASES = 5;
+constexpr int CONTROL_BTN_CHOOSE_ART = 10; // The id the video info dialog uses for it
 constexpr int CONTROL_BTN_REFRESH = 6;
 constexpr int CONTROL_BTN_USERRATING = 7;
 constexpr int CONTROL_BTN_PLAY = 8;
@@ -204,6 +210,9 @@ bool CGUIDialogGameInfo::OnMessage(CGUIMessage& message)
         case CONTROL_BTN_ARTWORK:
           OnArtwork();
           return true;
+        case CONTROL_BTN_CHOOSE_ART:
+          OnChooseArt();
+          return true;
         default:
           break;
       }
@@ -287,6 +296,146 @@ void CGUIDialogGameInfo::OnArtwork()
   // The picture viewer shows it whole, and zooming and panning come with it
   CServiceBroker::GetAppMessenger()->PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr,
                                             "ShowPicture(" + pictures[chosen].second + ")");
+}
+
+void CGUIDialogGameInfo::OnChooseArt()
+{
+  if (!m_item || !m_item->HasProperty("gameid"))
+    return;
+
+  const int idGame = static_cast<int>(m_item->GetProperty("gameid").asInteger());
+  CGameDatabase db;
+  KODI::ART::Artwork stored;
+  if (!db.Open() || !db.GetArtForItem(idGame, MediaTypeGame, stored))
+    return;
+
+  // The alternatives a scraper offered are stored as "boxfront1", "boxfront2"
+  // and so on, beside the one shown
+  const auto alternatives = [&stored](const std::string& type)
+  {
+    std::vector<std::string> slots;
+    for (const auto& [slot, url] : stored)
+    {
+      if (!url.empty() && slot.size() > type.size() && StringUtils::StartsWith(slot, type) &&
+          StringUtils::IsNaturalNumber(slot.substr(type.size())))
+        slots.emplace_back(slot);
+    }
+    return slots;
+  };
+
+  auto* select = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
+  if (select == nullptr)
+    return;
+
+  // Kinds the game has, and the box front always, so one can be added
+  std::vector<std::pair<std::string, int>> kinds;
+  for (const auto& [type, label] : ART_TYPES)
+  {
+    if (std::string_view(type) == "boxfront" || stored.contains(type) ||
+        !alternatives(type).empty())
+      kinds.emplace_back(type, label);
+  }
+
+  select->Reset();
+  select->SetHeading(CVariant{13511}); // "Choose art"
+  select->SetUseDetails(true);
+  for (const auto& [type, label] : kinds)
+  {
+    CFileItem kind(Localize(label));
+    kind.SetArt("thumb", stored.contains(type) ? stored.at(type) : "");
+    select->Add(kind);
+  }
+  select->Open();
+  const int chosenKind = select->GetSelectedItem();
+  if (chosenKind < 0 || chosenKind >= static_cast<int>(kinds.size()))
+    return;
+  const std::string type = kinds[chosenKind].first;
+  const std::string current = stored.contains(type) ? stored.at(type) : "";
+
+  CFileItemList items;
+  if (!current.empty())
+  {
+    auto item = std::make_shared<CFileItem>("thumb://Current", false);
+    item->SetArt("thumb", current);
+    item->SetLabel(Localize(13512)); // "Current art"
+    items.Add(item);
+  }
+  const std::vector<std::string> slots = alternatives(type);
+  for (size_t i = 0; i < slots.size(); ++i)
+  {
+    auto item = std::make_shared<CFileItem>(StringUtils::Format("thumb://Alternative{}", i), false);
+    item->SetArt("thumb", stored.at(slots[i]));
+    item->SetLabel(URIUtils::GetFileName(stored.at(slots[i])));
+    items.Add(item);
+  }
+  if (!current.empty())
+  {
+    auto item = std::make_shared<CFileItem>("thumb://None", false);
+    item->SetArt("thumb", "DefaultAddonGame.png");
+    item->SetLabel(Localize(13515)); // "No art"
+    items.Add(item);
+  }
+
+  std::vector<CMediaSource> sources(*CMediaSourceSettings::GetInstance().GetSources("games"));
+  CServiceBroker::GetMediaManager().GetLocalDrives(sources);
+  std::string result;
+  if (!CGUIDialogFileBrowser::ShowAndGetImage(items, sources, Localize(13511), result) ||
+      result == "thumb://Current")
+    return;
+
+  std::string chosen;
+  std::string freedSlot;
+  if (StringUtils::StartsWith(result, "thumb://Alternative"))
+  {
+    const size_t index = std::stoul(result.substr(std::string("thumb://Alternative").size()));
+    if (index >= slots.size())
+      return;
+    freedSlot = slots[index];
+    chosen = stored.at(freedSlot);
+  }
+  else if (result != "thumb://None")
+    chosen = result;
+
+  // The replaced picture is kept as an alternative: in the slot the chosen one
+  // came from, or in a new one when it came from disk or was taken away
+  if (!current.empty())
+  {
+    if (freedSlot.empty())
+    {
+      unsigned int next = 1;
+      while (stored.contains(type + std::to_string(next)))
+        ++next;
+      freedSlot = type + std::to_string(next);
+    }
+    db.SetArtForItem(idGame, MediaTypeGame, freedSlot, current);
+  }
+  else if (!freedSlot.empty())
+    db.RemoveArtForItem(idGame, MediaTypeGame, freedSlot);
+
+  // A thumb and a poster that only showed the box front follow it
+  std::vector<std::string> shown{type};
+  if (type == "boxfront")
+  {
+    for (const char* follower : {"thumb", "poster"})
+    {
+      if (stored.contains(follower) && stored.at(follower) == current)
+        shown.emplace_back(follower);
+    }
+  }
+  for (const std::string& slot : shown)
+  {
+    if (chosen.empty())
+      db.RemoveArtForItem(idGame, MediaTypeGame, slot);
+    else
+      db.SetArtForItem(idGame, MediaTypeGame, slot, chosen);
+    m_item->SetArt(slot, chosen);
+  }
+
+  CGUIMessage update(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_ITEM, 0, m_item);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(update);
+  CGUIMessage refresh(GUI_MSG_REFRESH_LIST, GetID(), 0);
+  OnMessage(refresh);
 }
 
 void CGUIDialogGameInfo::OnReleases()
