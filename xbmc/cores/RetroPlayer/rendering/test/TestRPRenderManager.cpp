@@ -696,6 +696,14 @@ TEST_F(TestRPRenderManager, HardwareFrameLargerThanReportedGrowsFramebuffer)
   ASSERT_TRUE(rendering.GetStreamBuffer(640, 448, buffer));
   ASSERT_TRUE(manager.BeginClientFrame());
 
+  for (const auto& invalid :
+       {HwFramebufferPacket{0, 512, 512, 0.0f, VideoRotation::ROTATION_0},
+        HwFramebufferPacket{buffer.framebuffer + 1, 512, 512, 0.0f, VideoRotation::ROTATION_0},
+        HwFramebufferPacket{buffer.framebuffer, 800, 0, 0.0f, VideoRotation::ROTATION_0}})
+    rendering.AddStreamData(invalid);
+  EXPECT_EQ(m_pool->clientBuffer->GetWidth(), 640);
+  EXPECT_EQ(m_pool->clientBuffer->GetHeight(), 448);
+
   const HwFramebufferPacket packet{buffer.framebuffer, 512, 512, 0.0f, VideoRotation::ROTATION_0};
   rendering.AddStreamData(packet);
   EXPECT_EQ(m_pool->captures, 0);
