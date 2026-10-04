@@ -160,6 +160,7 @@ enum class Field
   FAVOURITE,
   COMPLETED,
   HAS_ACHIEVEMENTS,
+  COOP,
   MAX
 };
 

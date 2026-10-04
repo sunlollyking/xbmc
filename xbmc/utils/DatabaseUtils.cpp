@@ -302,6 +302,8 @@ std::string DatabaseUtils::GetField(Field field, const MediaType &mediaType, Dat
       return "game_view.completed";
     else if (field == Field::HAS_ACHIEVEMENTS)
       return "game_view.achievementsTotal";
+    else if (field == Field::COOP)
+      return "game_view.coop";
     else if (field == Field::SET)
       return "game_view.collections";
     else if (field == Field::TAG)
@@ -996,6 +998,8 @@ int DatabaseUtils::GetField(Field field, const MediaType &mediaType, bool asInde
       return KODI::GAME::GAMEDB_PLAYERS_MAX;
     else if (field == Field::REGION)
       return KODI::GAME::GAMEDB_RELEASE_REGIONS;
+    else if (field == Field::COOP)
+      return KODI::GAME::GAMEDB_COOP;
   }
   else if (mediaType == MediaTypeMovie)
   {
