@@ -683,6 +683,32 @@ TEST_F(TestRPRenderManager, HardwareProcessDimensionsFollowFramesWithoutResizing
   processInfo.SetDataCache(nullptr);
 }
 
+TEST_F(TestRPRenderManager, HardwareFrameLargerThanReportedGrowsFramebuffer)
+{
+  auto& manager = m_environment.Renderer();
+  m_pool->hardware = true;
+  manager.Initialize();
+  CRetroPlayerRendering rendering(manager, m_environment.ProcessInfo());
+  const HwFramebufferProperties properties{
+      GAME_HW_CONTEXT_OPENGL_CORE, false, false, true, 3, 3, false, false, 640, 448, 0.0f};
+  ASSERT_TRUE(rendering.OpenStream(properties));
+  HwFramebufferBuffer buffer;
+  ASSERT_TRUE(rendering.GetStreamBuffer(640, 448, buffer));
+  ASSERT_TRUE(manager.BeginClientFrame());
+
+  const HwFramebufferPacket packet{buffer.framebuffer, 512, 512, 0.0f, VideoRotation::ROTATION_0};
+  rendering.AddStreamData(packet);
+  EXPECT_EQ(m_pool->captures, 0);
+  EXPECT_EQ(m_pool->clientBuffer->GetWidth(), 640);
+  EXPECT_EQ(m_pool->clientBuffer->GetHeight(), 512);
+
+  rendering.AddStreamData(packet);
+  ASSERT_EQ(m_pool->captures, 1);
+  EXPECT_EQ(m_pool->captured->GetHeight(), 512);
+  manager.EndClientFrame();
+  rendering.CloseStream();
+}
+
 TEST_F(TestRPRenderManager, HardwareStreamPropagatesDebugContextRequest)
 {
   m_pool->hardware = true;

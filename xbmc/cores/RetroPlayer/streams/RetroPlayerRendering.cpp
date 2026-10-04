@@ -228,6 +228,15 @@ void CRetroPlayerRendering::AddStreamData(const StreamPacket& packet)
   if (!m_bVideoEnabled)
     return;
 
+  // A core can present a frame larger than the maximum it reported, as LRPS2
+  // does with PAL games. Grow the framebuffer for the frames that follow. This
+  // one was clipped to the old size, and growing replaced its contents.
+  if (m_bOpen && (hwPacket.width > m_width || hwPacket.height > m_height))
+  {
+    Configure(std::max(hwPacket.width, m_width), std::max(hwPacket.height, m_height));
+    return;
+  }
+
   if (m_bOpen && hwPacket.framebuffer != 0 && hwPacket.width != 0 && hwPacket.height != 0 &&
       hwPacket.width <= m_width && hwPacket.height <= m_height &&
       hwPacket.framebuffer ==
