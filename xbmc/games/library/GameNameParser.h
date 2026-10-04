@@ -38,6 +38,7 @@ struct ParsedGameName
   std::string translation; // language code of a fan translation, or empty
   int disc{0};
   int discs{0};
+  bool dataDisk{false}; // one the game asks for once it runs: user, data, scenario...
   int year{0};
   std::string publisher; // TOSEC names the publisher in the file name
   std::vector<std::string> unknownTags;

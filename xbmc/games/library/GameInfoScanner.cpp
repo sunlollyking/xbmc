@@ -1035,6 +1035,11 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     std::vector<Entry> parts = GroupEntries(inside, false);
     if (parts.empty())
       return false;
+    // A user or data disk is one the game asks for once it runs. Booting it
+    // leaves the machine at its BASIC prompt, so the game's own disks lead.
+    std::ranges::stable_partition(
+        parts, [](const Entry& e)
+        { return !CGameNameParser::Parse(URIUtils::GetFileName(e.path)).dataDisk; });
     // A sheet plays the folder; failing that, its first file
     auto sheet = std::ranges::find_if(parts, [](const Entry& e) { return HasExtension(e.path, sheetExtensions); });
     const Entry& first = sheet != parts.end() ? *sheet : parts.front();

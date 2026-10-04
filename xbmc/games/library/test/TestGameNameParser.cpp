@@ -15,6 +15,17 @@
 using namespace KODI;
 using namespace GAME;
 
+TEST(TestGameNameParser, TellsADataDiskFromTheGamesOwn)
+{
+  EXPECT_TRUE(CGameNameParser::Parse("Ashe (Data disk).d88").dataDisk);
+  EXPECT_TRUE(CGameNameParser::Parse("Abyss (User disk) {V1 mode}.d88").dataDisk);
+  EXPECT_TRUE(CGameNameParser::Parse("Arcush (Scenario disk).d88").dataDisk);
+  EXPECT_TRUE(CGameNameParser::Parse("Fushigi no Umi no Nadia (Music Disk) [FD].zip").dataDisk);
+  EXPECT_FALSE(CGameNameParser::Parse("Ashe (Game disk).d88").dataDisk);
+  EXPECT_FALSE(CGameNameParser::Parse("Ys (Disk A).d88").dataDisk);
+  EXPECT_EQ(CGameNameParser::Parse("Ashe (Data disk).d88").title, "Ashe");
+}
+
 TEST(TestGameNameParser, SeparatesTheWordsOfAWhdLoadName)
 {
   EXPECT_EQ(CGameNameParser::ParseWhdLoadName("SecretOfMonkeyIsland_v3.4_1625"),
