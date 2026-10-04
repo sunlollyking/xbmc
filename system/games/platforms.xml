@@ -1347,7 +1347,7 @@
     <alias>NEC PC-8800 Series</alias>
     <alias>NEC - PC-8001 - PC-8801</alias>
     <alias>PC-8000/8800</alias>
-    <ids screenscraper="221" libretro="NEC - PC-8001 - PC-8801" retroachievements="47" esde="pc88"/>
+    <ids screenscraper="221" libretro="NEC - PC-8001 - PC-8801" retroachievements="47" esde="pc88" launchbox="NEC PC-8801"/>
   </platform>
   <platform id="pc98">
     <name>NEC PC-9801</name>
