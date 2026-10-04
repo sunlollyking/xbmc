@@ -69,13 +69,14 @@ protected:
   virtual void RefreshList();
   void OnDescriptionChange(const std::string& description);
 
+  // Keeps the settings for the games that follow
+  virtual void SaveSettings();
+
   std::shared_ptr<RETRO::CGUIGameVideoHandle> m_gameVideoHandle;
 
 private:
   void Update();
   void Clear();
-
-  void SaveSettings();
 
   void RegisterDialog();
   void UnregisterDialog();
