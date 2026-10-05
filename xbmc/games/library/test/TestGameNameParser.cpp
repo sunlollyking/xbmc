@@ -38,6 +38,13 @@ TEST(TestGameNameParser, TellsAnotherDumpFromTheCleanOne)
   EXPECT_EQ(CGameNameParser::Parse("Thexder (invincibility hack) [Set 1].d88").title, "Thexder");
 }
 
+TEST(TestGameNameParser, LeavesTheLoadingInstructionsOutOfTheTitle)
+{
+  EXPECT_EQ(CGameNameParser::Parse("Apploon {V1 mode, MON R G8F00}.t88").title, "Apploon");
+  EXPECT_EQ(CGameNameParser::Parse("Melt Down  {4MHz}.d88").title, "Melt Down");
+  EXPECT_EQ(CGameNameParser::Parse("Abyss (User disk) {V1 mode}.d88").title, "Abyss");
+}
+
 TEST(TestGameNameParser, SeparatesTheWordsOfAWhdLoadName)
 {
   EXPECT_EQ(CGameNameParser::ParseWhdLoadName("SecretOfMonkeyIsland_v3.4_1625"),

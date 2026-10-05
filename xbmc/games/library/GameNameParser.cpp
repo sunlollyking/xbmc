@@ -294,6 +294,13 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName)
   else if (Matches(re.sceneNumber, name))
     name.erase(0, re.sceneNumber.GetFindLen());
 
+  // Neo Kobe gives how to load a game in braces: "Apploon {V1 mode, MON R G8F00}"
+  for (size_t open = name.find('{'); open != std::string::npos; open = name.find('{', open))
+  {
+    const size_t close = name.find('}', open);
+    name.erase(open, close == std::string::npos ? std::string::npos : close - open + 1);
+  }
+
   // Bracket tags: GoodTools and TOSEC dump flags
   std::string rest;
   size_t pos = 0;
