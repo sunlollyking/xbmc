@@ -1279,11 +1279,19 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
 
         // Art from the player's preferred regions first, in their order. Then
         // the dump's own region, then art that names no region, then the rest.
+        // A logo is lettering: one from a region that writes in another script
+        // comes after a logo that names no region, which is nearly always in
+        // English.
         const std::vector<std::string> regionPriority = CReleasePolicy().GetRegionPriority();
-        const auto rank = [&regionPriority, &release](const GameScrapeArt& piece)
+        static constexpr std::array otherScripts = {"Japan",  "Korea",     "China",
+                                                    "Taiwan", "Hong Kong", "Russia"};
+        const auto rank = [&regionPriority, &release](const GameScrapeArt& piece, bool lettering)
         {
           if (piece.region.empty())
             return regionPriority.size() + 1;
+          if (lettering && std::ranges::any_of(otherScripts, [&piece](const char* region)
+                                               { return StringUtils::EqualsNoCase(region, piece.region); }))
+            return regionPriority.size() + 2;
           const auto preferred =
               std::ranges::find_if(regionPriority, [&piece](const std::string& region)
                                    { return StringUtils::EqualsNoCase(region, piece.region); });
@@ -1291,12 +1299,15 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
             return static_cast<size_t>(preferred - regionPriority.begin());
           if (std::ranges::find(release.regions, piece.region) != release.regions.end())
             return regionPriority.size();
-          return regionPriority.size() + 2;
+          return regionPriority.size() + 3;
         };
 
         for (const auto& [type, pieces] : offered)
         {
-          const GameScrapeArt* pick = &*std::ranges::min_element(pieces, {}, rank);
+          const bool lettering = type == "clearlogo" || type == "wheel";
+          const GameScrapeArt* pick = &*std::ranges::min_element(
+              pieces, {}, [&rank, lettering](const GameScrapeArt& piece)
+              { return rank(piece, lettering); });
           art[type] = pick->url;
 
           // A source that offers several of a kind, as IGDB does with
