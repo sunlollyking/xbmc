@@ -149,6 +149,7 @@ struct Patterns
   CRegExp debug{true};
   CRegExp program{true};
   CRegExp alt{true};
+  CRegExp alternateSet{true};
   CRegExp extension{true};
   CRegExp leadingNumber{true};
   CRegExp sceneNumber;
@@ -168,6 +169,7 @@ struct Patterns
     debug.RegComp("^debug( version)?$");
     program.RegComp("^(check |sample |test )?program$");
     alt.RegComp("^alt( ?[0-9]+)?$");
+    alternateSet.RegComp("^(alt|set) ?[0-9]+$");
     extension.RegComp("\\.[a-z0-9]{1,4}$");
     leadingNumber.RegComp("^0[0-9]{2,4} +-? *");
     // A scene set numbers every release, "2797 Kimi no Yusha (JP)", past the
@@ -323,9 +325,12 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName)
       out.verified = true;
     else if (tl.starts_with("t+") || tl.starts_with("t-"))
       out.translation = tl.substr(2, 2);
-    else if (!tl.empty() && tl[0] == 'b' && tl.find_first_not_of("0123456789", 1) == std::string::npos)
+    else if ((!tl.empty() && tl[0] == 'b' && tl.find_first_not_of("0123456789", 1) == std::string::npos) ||
+             tl == "bad" || tl.starts_with("bad "))
       out.bad = true;
-    else if (!tl.empty() && tl[0] == 'a' && tl.find_first_not_of("0123456789", 1) == std::string::npos)
+    // Neo Kobe names another dump of the same disks "[Set 2]" or "[Alt 1]"
+    else if ((!tl.empty() && tl[0] == 'a' && tl.find_first_not_of("0123456789", 1) == std::string::npos) ||
+             Matches(re.alternateSet, tl))
       out.alternate = true;
     else if (!tl.empty() && tl[0] == 'h' && tl.find_first_not_of("0123456789", 1) == std::string::npos)
       out.hack = true;
@@ -459,7 +464,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName)
       out.alternate = true;
       continue;
     }
-    if (tl == "hack" || tl == "hacked")
+    if (tl == "hack" || tl == "hacked" || tl.ends_with(" hack"))
     {
       out.hack = true;
       continue;

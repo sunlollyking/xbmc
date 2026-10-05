@@ -49,6 +49,7 @@
 #include <algorithm>
 #include <array>
 #include <map>
+#include <tuple>
 
 using namespace KODI;
 using namespace GAME;
@@ -1036,10 +1037,17 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     if (parts.empty())
       return false;
     // A user or data disk is one the game asks for once it runs. Booting it
-    // leaves the machine at its BASIC prompt, so the game's own disks lead.
-    std::ranges::stable_partition(
-        parts, [](const Entry& e)
-        { return !CGameNameParser::Parse(URIUtils::GetFileName(e.path)).dataDisk; });
+    // leaves the machine at its BASIC prompt, so the game's own disks lead,
+    // the first of them before the rest. A clean dump of a disk comes before a
+    // hacked, bad or alternate one, which may not even be the game.
+    std::ranges::stable_sort(parts, {},
+                             [](const Entry& e)
+                             {
+                               const ParsedGameName name =
+                                   CGameNameParser::Parse(URIUtils::GetFileName(e.path));
+                               return std::make_tuple(name.dataDisk, name.disc > 1, name.hack,
+                                                      name.bad, name.alternate);
+                             });
     // A sheet plays the folder; failing that, its first file
     auto sheet = std::ranges::find_if(parts, [](const Entry& e) { return HasExtension(e.path, sheetExtensions); });
     const Entry& first = sheet != parts.end() ? *sheet : parts.front();

@@ -26,6 +26,18 @@ TEST(TestGameNameParser, TellsADataDiskFromTheGamesOwn)
   EXPECT_EQ(CGameNameParser::Parse("Ashe (Data disk).d88").title, "Ashe");
 }
 
+TEST(TestGameNameParser, TellsAnotherDumpFromTheCleanOne)
+{
+  EXPECT_TRUE(CGameNameParser::Parse("Super Mario Bros. Special [Set 1].d88").alternate);
+  EXPECT_TRUE(CGameNameParser::Parse("Super Mario Bros. Special [Alt 2].d88").alternate);
+  EXPECT_TRUE(CGameNameParser::Parse("Thunder Force (SR) [Set 2] [bad sectors].d88").bad);
+  EXPECT_TRUE(CGameNameParser::Parse("Gradius (Kai hack).d88").hack);
+  EXPECT_TRUE(CGameNameParser::Parse("Thexder (invincibility hack) [Set 1].d88").hack);
+  const ParsedGameName clean = CGameNameParser::Parse("Thexder.d88");
+  EXPECT_FALSE(clean.alternate || clean.bad || clean.hack);
+  EXPECT_EQ(CGameNameParser::Parse("Thexder (invincibility hack) [Set 1].d88").title, "Thexder");
+}
+
 TEST(TestGameNameParser, SeparatesTheWordsOfAWhdLoadName)
 {
   EXPECT_EQ(CGameNameParser::ParseWhdLoadName("SecretOfMonkeyIsland_v3.4_1625"),
