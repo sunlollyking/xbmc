@@ -230,8 +230,12 @@ std::string CSmartPlaylistRule::TranslateGroup(Field group)
   return it == groups.end() ? "" : std::string(it->name);
 }
 
-std::string CSmartPlaylistRule::GetLocalizedField(int field)
+std::string CSmartPlaylistRule::GetLocalizedField(int field, const std::string& type /* = "" */)
 {
+  // A game's time is the time it has been played, not a running time
+  if (type == "games" && field == static_cast<int>(Field::TIME))
+    return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35671);
+
   const auto it = std::ranges::find_if(fields, [field](const auto& f)
                                        { return field == static_cast<int>(f.field); });
   const int str = it == fields.end() ? 16018 : it->localizedString;
@@ -705,9 +709,17 @@ bool CSmartPlaylistRule::CanGroupMix(Field group)
   return it == groups.end() ? false : it->canMix;
 }
 
-std::string CSmartPlaylistRule::GetLocalizedRule() const
+std::string CSmartPlaylistRule::GetLocalizedOrder(SortBy order, const std::string& type)
 {
-  return StringUtils::Format("{} {} {}", GetLocalizedField(m_field),
+  if (type == "games" && order == SortBy::TIME)
+    return GetLocalizedField(static_cast<int>(Field::TIME), type);
+  return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
+      SortUtils::GetSortLabel(order));
+}
+
+std::string CSmartPlaylistRule::GetLocalizedRule(const std::string& type /* = "" */) const
+{
+  return StringUtils::Format("{} {} {}", GetLocalizedField(m_field, type),
                              GetLocalizedOperator(m_operator), GetParameter());
 }
 

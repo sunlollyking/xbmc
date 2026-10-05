@@ -469,7 +469,7 @@ void CGUIDialogSmartPlaylistRule::OnField()
   int selected = -1;
   for (auto field = fields.begin(); field != fields.end(); field++)
   {
-    dialog->Add(PLAYLIST::CSmartPlaylistRule::GetLocalizedField(static_cast<int>(*field)));
+    dialog->Add(PLAYLIST::CSmartPlaylistRule::GetLocalizedField(static_cast<int>(*field), m_type));
     if (static_cast<int>(*field) == m_rule.m_field)
       selected = std::distance(fields.begin(), field);
   }
@@ -519,7 +519,8 @@ void CGUIDialogSmartPlaylistRule::UpdateButtons()
 {
   if (m_rule.m_field == 0)
     m_rule.m_field = static_cast<int>(PLAYLIST::CSmartPlaylistRule::GetFields(m_type)[0]);
-  SET_CONTROL_LABEL(CONTROL_FIELD, PLAYLIST::CSmartPlaylistRule::GetLocalizedField(m_rule.m_field));
+  SET_CONTROL_LABEL(CONTROL_FIELD,
+                    PLAYLIST::CSmartPlaylistRule::GetLocalizedField(m_rule.m_field, m_type));
 
   const CDatabaseQueryRule::FieldType fieldType = m_rule.GetFieldType(m_rule.m_field);
 

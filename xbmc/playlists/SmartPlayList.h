@@ -32,14 +32,15 @@ public:
   CSmartPlaylistRule();
   ~CSmartPlaylistRule() override = default;
 
-  std::string GetLocalizedRule() const;
+  std::string GetLocalizedRule(const std::string& type = "") const;
 
   static SortBy TranslateOrder(const char *order);
   static std::string TranslateOrder(SortBy order);
   static Field TranslateGroup(const char *group);
   static std::string TranslateGroup(Field group);
 
-  static std::string GetLocalizedField(int field);
+  static std::string GetLocalizedField(int field, const std::string& type = "");
+  static std::string GetLocalizedOrder(SortBy order, const std::string& type);
   static std::string GetLocalizedGroup(Field group);
   static bool CanGroupMix(Field group);
 
