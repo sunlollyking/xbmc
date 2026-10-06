@@ -37,9 +37,9 @@ public:
   /*!
    * \brief Reduce a name so that two spellings of the same title compare equal
    *
-   * Lowercases, and drops parenthesised and bracketed tags along with the
-   * punctuation and spacing around them, so that "Sonic The Hedgehog 2 (World)
-   * (Rev A)" and "Sonic The Hedgehog 2" both reduce to the same thing.
+   * Lowercases, and drops parenthesised, bracketed and braced tags along with
+   * the punctuation and spacing around them, so that "Sonic The Hedgehog 2
+   * (World) (Rev A)" and "Sonic The Hedgehog 2" both reduce to the same thing.
    *
    * Exposed for the benefit of tests.
    *

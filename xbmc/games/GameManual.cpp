@@ -147,13 +147,13 @@ std::string CGameManual::NormaliseName(const std::string& name)
 
   for (const char c : name)
   {
-    if (c == '(' || c == '[')
+    if (c == '(' || c == '[' || c == '{')
     {
       ++depth;
       continue;
     }
 
-    if (c == ')' || c == ']')
+    if (c == ')' || c == ']' || c == '}')
     {
       if (depth > 0)
         --depth;

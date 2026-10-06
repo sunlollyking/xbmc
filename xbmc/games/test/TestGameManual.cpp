@@ -29,6 +29,13 @@ TEST(TestGameManual, NormalisingDropsBracketedTags)
   EXPECT_EQ(CGameManual::NormaliseName("Zelda (Europe) [!]"), CGameManual::NormaliseName("Zelda"));
 }
 
+TEST(TestGameManual, NormalisingDropsBracedTags)
+{
+  // PC-8801 sets put a game's start-up settings in braces
+  EXPECT_EQ(CGameManual::NormaliseName("Demon's Ring (Disk A) {V1 mode}"),
+            CGameManual::NormaliseName("Demon's Ring (manual)"));
+}
+
 TEST(TestGameManual, NormalisingIgnoresCaseAndPunctuation)
 {
   EXPECT_EQ(CGameManual::NormaliseName("Mega Man X2 - The Sequel!"),
