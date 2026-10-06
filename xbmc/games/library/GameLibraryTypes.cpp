@@ -330,7 +330,9 @@ std::string CGameLibraryTypes::TitleKey(std::string_view title)
   {
     for (const char c : word)
     {
-      if (std::isalnum(static_cast<unsigned char>(c)))
+      // A letter outside ASCII is part of the title too: "ランス3" is not "3"
+      const auto byte = static_cast<unsigned char>(c);
+      if (std::isalnum(byte) || byte >= 0x80)
         key += c;
     }
   }

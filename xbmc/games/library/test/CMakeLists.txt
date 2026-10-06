@@ -1,6 +1,7 @@
 set(SOURCES TestGameAgeRatings.cpp
             TestGameArtPath.cpp
             TestGameFileIdentity.cpp
+            TestGameLibraryTypes.cpp
             TestGameNameParser.cpp
 )
 
