@@ -187,21 +187,27 @@ bool CGameLoop::PaceToDisplay()
   if (interval == Clock::duration::zero())
     return false;
 
-  const double rate = (1s / std::chrono::duration<double>(interval)) / m_fps.load();
-  if (std::abs(rate - 1.0) > m_displayPacing->MaxRateDifference())
+  const int refreshes = CDisplayPacing::RefreshesPerFrame(interval, m_fps.load(),
+                                                          m_displayPacing->MaxRateDifference());
+  if (refreshes == 0)
     return false;
+
+  // Each frame is shown for this long, so the game runs at this rate
+  const Clock::duration period = interval * refreshes;
+  const double rate = (1s / std::chrono::duration<double>(period)) / m_fps.load();
 
   // Started this long before the screen takes it, a frame is ready in time.
   // One that can't be gains nothing from waiting for the screen.
   const Clock::duration lead = m_frameCost + m_displayPacing->Margin();
-  if (lead >= interval)
+  if (lead >= period)
     return false;
 
-  // One frame for each one the screen takes. The renderer hasn't taken the
-  // last one yet if the next take is still the one it was run for.
+  // One frame for every so many the screen takes. The renderer hasn't taken
+  // the last one yet if the next take is still the one it was run for, and a
+  // frame shown for several refreshes keeps to the same ones.
   Clock::time_point take = m_displayPacing->NextTake(now);
-  if (m_lastPacedTake != Clock::time_point{} && take - m_lastPacedTake < interval / 2)
-    take = m_lastPacedTake + interval;
+  if (m_lastPacedTake != Clock::time_point{} && take - m_lastPacedTake < period - interval / 2)
+    take = m_lastPacedTake + period;
 
   const Clock::time_point start = take - lead;
   if (start > now && m_sleepEvent.Wait(start - now))
