@@ -331,6 +331,17 @@ public:
 
   //! \brief The classification boards a person wants to see, in their order
   static std::vector<std::string> PreferredAgeRatingBoards();
+
+  /*!
+   * \brief Gives an item the age it is grouped under, for a skin to show
+   *
+   * Sets "age" (e.g. 16) and, where the preferred board has a classification
+   * for it, "ageratingboard" and "agerating" (e.g. "BBFC" and "15"), so a
+   * skin can show that board's mark whichever board rated the game.
+   *
+   * \param age An age from CGameAgeRatings::AGES, or 0 to clear them
+   */
+  static void SetAgeProperties(CFileItem& item, int age);
   bool SetUserRating(int idGame, int rating);
 
   /*!
@@ -425,6 +436,14 @@ private:
   void LoadRatings(int idGame, CGameInfoTag& details);
   void LoadUniqueIds(int idGame, CGameInfoTag& details);
   void LoadAgeRatings(int idGame, CGameInfoTag& details);
+
+  /*!
+   * \brief SQL for the age a game_view row is grouped under, 0 for none
+   *
+   * The age of its classification from the board first in
+   * PreferredAgeRatingBoards() that has one; see CGameAgeRatings.
+   */
+  std::string GameAgeSQL();
   bool GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& sorting);
 
   // Platforms

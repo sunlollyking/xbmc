@@ -17,6 +17,7 @@
 #include "dialogs/GUIDialogSelect.h"
 #include "games/GameUtils.h"
 #include "games/database/GameDatabase.h"
+#include "games/library/GameAgeRatings.h"
 #include "games/library/GameLibraryQueue.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
@@ -130,6 +131,7 @@ void CGUIDialogGameInfo::Reload()
   if (db.Open() && db.GetGameInfo(idGame, tag))
   {
     *m_item->GetGameInfoTag() = tag;
+    CGameDatabase::SetAgeProperties(*m_item, CGameAgeRatings::AgeOf(tag.GetAgeRatings()));
     KODI::ART::Artwork art;
     if (db.GetArtForItem(idGame, MediaTypeGame, art))
     {

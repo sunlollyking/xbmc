@@ -1,4 +1,5 @@
-set(SOURCES GameDbUrl.cpp
+set(SOURCES GameAgeRatings.cpp
+            GameDbUrl.cpp
             GameFileIdentity.cpp
             GameInfoScanner.cpp
             GameLibraryQueue.cpp
@@ -9,7 +10,8 @@ set(SOURCES GameDbUrl.cpp
             PlatformCatalogue.cpp
             ReleasePolicy.cpp)
 
-set(HEADERS GameDbUrl.h
+set(HEADERS GameAgeRatings.h
+            GameDbUrl.h
             GameFileIdentity.h
             GameInfoScanner.h
             GameLibraryQueue.h

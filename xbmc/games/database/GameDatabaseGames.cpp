@@ -14,6 +14,7 @@
 #include "dbwrappers/dataset.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "games/library/GameAgeRatings.h"
 #include "games/tags/GameInfoTag.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -409,6 +410,44 @@ void CGameDatabase::LoadAgeRatings(int idGame, CGameInfoTag& details)
                            });
 
   details.SetAgeRatings(ratings);
+}
+
+std::string CGameDatabase::GameAgeSQL()
+{
+  // Made from the classifications the library holds, so one stored by any
+  // scraper is grouped where it fits best
+  std::string age;
+  if (m_pDS2->query(PrepareSQL(
+          "SELECT DISTINCT board, value FROM agerating WHERE media_type = '%s'", MediaTypeGame)))
+  {
+    while (!m_pDS2->eof())
+    {
+      const std::string board = m_pDS2->fv(0).get_asString();
+      const std::string value = m_pDS2->fv(1).get_asString();
+      const int fit = CGameAgeRatings::AgeFor(board, value);
+      if (fit > 0)
+        age += PrepareSQL(" WHEN agerating.board = '%s' AND agerating.value = '%s' THEN %i",
+                          board.c_str(), value.c_str(), fit);
+      m_pDS2->next();
+    }
+    m_pDS2->close();
+  }
+  if (age.empty())
+    return "0";
+  age = "CASE" + age + " ELSE 0 END";
+
+  const std::vector<std::string> boards = PreferredAgeRatingBoards();
+  std::string rank = "CASE";
+  for (size_t i = 0; i < boards.size(); ++i)
+    rank +=
+        PrepareSQL(" WHEN agerating.board = '%s' THEN %i", boards[i].c_str(), static_cast<int>(i));
+  rank += PrepareSQL(" ELSE %i END", static_cast<int>(boards.size()));
+
+  return "COALESCE((SELECT " + age +
+         " FROM agerating WHERE agerating.media_id = game_view.idGame AND agerating.media_type = "
+         "'" +
+         MediaTypeGame + "' AND " + age + " > 0 ORDER BY " + rank +
+         ", agerating.agerating_id LIMIT 1), 0)";
 }
 
 std::vector<std::string> CGameDatabase::PreferredAgeRatingBoards()

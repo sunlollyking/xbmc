@@ -14,6 +14,7 @@
 #include "URL.h"
 #include "dbwrappers/dataset.h"
 #include "games/GameManual.h"
+#include "games/library/GameAgeRatings.h"
 #include "games/library/GameDbUrl.h"
 #include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
@@ -176,12 +177,7 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
         v->asString().c_str()));
   }
   if (const CVariant* v = option("agerating"))
-  {
-    filter.AppendWhere(
-        PrepareSQL("EXISTS (SELECT 1 FROM agerating WHERE agerating.media_id = game_view.idGame "
-                   "AND agerating.media_type = '%s' AND agerating.value = '%s')",
-                   MediaTypeGame, v->asString().c_str()));
-  }
+    filter.AppendWhere(GameAgeSQL() + PrepareSQL(" = %i", static_cast<int>(v->asInteger())));
 
   bool derivedShown = ShowDerivedGames();
   if (const CVariant* v = option("category"))
@@ -496,6 +492,24 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
   return false;
 }
 
+void CGameDatabase::SetAgeProperties(CFileItem& item, int age)
+{
+  item.ClearProperty("age");
+  item.ClearProperty("ageratingboard");
+  item.ClearProperty("agerating");
+  if (age <= 0)
+    return;
+
+  item.SetProperty("age", age);
+  const std::string board = PreferredAgeRatingBoards().front();
+  const std::string classification = CGameAgeRatings::ClassificationFor(board, age);
+  if (!classification.empty())
+  {
+    item.SetProperty("ageratingboard", board);
+    item.SetProperty("agerating", classification);
+  }
+}
+
 bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items)
 {
   try
@@ -571,11 +585,10 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
               join + where + " GROUP BY region.code ORDER BY region.code";
         break;
       case GameDbNode::AGERATINGS:
-        numericValue = false;
-        sql = "SELECT agerating.value AS id, agerating.value AS label, COUNT(DISTINCT "
-              "game_view.idGame) AS n FROM agerating JOIN game_view ON game_view.idGame = "
-              "agerating.media_id AND agerating.media_type = '" MediaTypeGame "' " +
-              join + where + " GROUP BY agerating.value ORDER BY agerating.value";
+        sql = "SELECT age AS id, age AS label, COUNT(*) AS n FROM (SELECT DISTINCT "
+              "game_view.idGame, " +
+              GameAgeSQL() + " AS age FROM game_view " + join + where +
+              ") AS ages WHERE age > 0 GROUP BY age ORDER BY age";
         break;
       case GameDbNode::CATEGORIES:
         numericValue = false;
@@ -595,12 +608,14 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
     // content either
     const bool isGenre = url.GetNode() == GameDbNode::GENRES;
 
+    const bool isAge = url.GetNode() == GameDbNode::AGERATINGS;
+
     if (m_pDS->query(sql))
     {
       while (!m_pDS->eof())
       {
         const std::string id = m_pDS->fv("id").get_asString();
-        const std::string label = m_pDS->fv("label").get_asString();
+        const std::string label = isAge ? id + "+" : m_pDS->fv("label").get_asString();
         const int count = m_pDS->fv("n").get_asInt();
 
         const auto item = std::make_shared<CFileItem>(label);
@@ -611,6 +626,8 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
         item->SetProperty("gamecount", count);
         if (isGenre)
           item->SetProperty("DBType", "genre");
+        if (isAge)
+          SetAgeProperties(*item, m_pDS->fv("id").get_asInt());
         items.Add(item);
         m_pDS->next();
       }
