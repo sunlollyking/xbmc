@@ -1356,7 +1356,7 @@
     <type>computer</type>
     <media>disk</media>
     <released>1982</released>
-    <extensions>2hd 7z 88d 98d cmd d88 d98 dup fdd fdi hdd hdi hdm hdn m3u nhd tfd thd xdf zip</extensions>
+    <extensions>2hd 7z 88d 98d cmd d88 d98 dup fdd fdi hdd hdi hdm hdn m3u nfd nhd tfd thd xdf zip</extensions>
     <alias>PC98</alias>
     <alias>PC9801</alias>
     <alias>NEC PC-9800 Series</alias>
