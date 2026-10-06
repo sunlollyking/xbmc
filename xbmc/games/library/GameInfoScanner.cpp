@@ -1074,10 +1074,10 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     }
   }
 
-  const std::string nameSource = (entry.isFolder || entry.nameFromFolder)
-                                     ? FolderName(entry.folder)
-                                     : URIUtils::GetFileName(playPath);
-  const ParsedGameName parsed = CGameNameParser::Parse(nameSource);
+  const bool fromFolder = entry.isFolder || entry.nameFromFolder;
+  const std::string nameSource =
+      fromFolder ? FolderName(entry.folder) : URIUtils::GetFileName(playPath);
+  const ParsedGameName parsed = CGameNameParser::Parse(nameSource, !fromFolder);
   if (parsed.displayTitle.empty())
     return false;
 

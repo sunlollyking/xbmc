@@ -274,7 +274,7 @@ std::string CGameNameParser::ParseWhdLoadName(std::string_view fileName)
   return title;
 }
 
-ParsedGameName CGameNameParser::Parse(std::string_view fileName)
+ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtension)
 {
   Patterns& re = GetPatterns();
   ParsedGameName out;
@@ -287,7 +287,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName)
   }
 
   std::string name(fileName);
-  if (Matches(re.extension, Lower(name)))
+  if (hasExtension && Matches(re.extension, Lower(name)))
     name.erase(name.size() - re.extension.GetFindLen());
   if (Matches(re.leadingNumber, name))
     name.erase(0, re.leadingNumber.GetFindLen());

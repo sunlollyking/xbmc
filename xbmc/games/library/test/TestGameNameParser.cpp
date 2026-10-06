@@ -118,3 +118,11 @@ TEST(TestGameNameParser, KeepsATitleThatStartsWithANumber)
   EXPECT_EQ(CGameNameParser::Parse("2010 - The Graphic Action Game.col").title,
             "2010 - The Graphic Action Game");
 }
+
+TEST(TestGameNameParser, KeepsTheDotsInAFoldersName)
+{
+  EXPECT_EQ(CGameNameParser::Parse("G.R", false).title, "G.R");
+  EXPECT_EQ(CGameNameParser::Parse("Flight Simulator Ver.5.0", false).title,
+            "Flight Simulator Ver.5.0");
+  EXPECT_EQ(CGameNameParser::Parse("G.R").title, "G");
+}

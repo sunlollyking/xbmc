@@ -62,8 +62,10 @@ public:
    * \brief Parse a file or folder name
    *
    * \param fileName The base name, with or without an extension
+   * \param hasExtension False for a folder's name, whose last dot is part of
+   *        the title: "G.R" is a game, not "G" with an extension
    */
-  static ParsedGameName Parse(std::string_view fileName);
+  static ParsedGameName Parse(std::string_view fileName, bool hasExtension = true);
 
   /*!
    * \brief Turn a WHDLoad install name into something a catalogue can match
