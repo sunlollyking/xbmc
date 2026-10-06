@@ -588,7 +588,7 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
         sql = "SELECT age AS id, age AS label, COUNT(*) AS n FROM (SELECT DISTINCT "
               "game_view.idGame, " +
               GameAgeSQL() + " AS age FROM game_view " + join + where +
-              ") AS ages WHERE age > 0 GROUP BY age ORDER BY age";
+              ") AS ages GROUP BY age ORDER BY age = 0, age";
         break;
       case GameDbNode::CATEGORIES:
         numericValue = false;
@@ -615,7 +615,11 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
       while (!m_pDS->eof())
       {
         const std::string id = m_pDS->fv("id").get_asString();
-        const std::string label = isAge ? id + "+" : m_pDS->fv("label").get_asString();
+        std::string label = m_pDS->fv("label").get_asString();
+        if (isAge)
+          label = id == "0" ? CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
+                                  35765) // "Unrated"
+                            : id + "+";
         const int count = m_pDS->fv("n").get_asInt();
 
         const auto item = std::make_shared<CFileItem>(label);

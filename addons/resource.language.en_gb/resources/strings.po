@@ -21037,7 +21037,13 @@ msgctxt "#35764"
 msgid "Critics"
 msgstr ""
 
-#empty strings from id 35765 to 35999
+#. The age rating list's entry for games no board gave an age
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35765"
+msgid "Unrated"
+msgstr ""
+
+#empty strings from id 35766 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
