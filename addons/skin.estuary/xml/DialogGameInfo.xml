@@ -410,6 +410,13 @@
 						<textureradioondisabled colordiffuse="disabled">icons/infodialogs/enabled.png</textureradioondisabled>
 					</control>
 					<include content="InfoDialogButton">
+						<param name="id" value="17" />
+						<param name="icon" value="icons/infodialogs/extras.png" />
+						<param name="label" value="$LOCALIZE[35588]" />
+						<param name="onclick_1" value="ActivateWindow(gameachievements)" />
+						<param name="visible" value="!String.IsEmpty(ListItem.AchievementsGameId) + System.GetBool(gamesachievements.loggedin)" />
+					</include>
+					<include content="InfoDialogButton">
 						<param name="id" value="7" />
 						<param name="icon" value="icons/infodialogs/rating.png" />
 						<param name="label" value="$LOCALIZE[38023]" />
