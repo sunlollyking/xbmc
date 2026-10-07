@@ -83,14 +83,16 @@ std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& releas
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
   std::vector<std::string> parts;
 
-  // A hack, a translation or a bootleg that has a name of its own goes by it. A
-  // catalogue name carries its tags, which the rest of the label says in words.
-  if ((!release.edition.empty() || release.licence == Licence::PIRATE) && !release.title.empty())
-  {
-    const std::string own = CGameNameParser::Parse(release.title).displayTitle;
-    if (!own.empty() && CGameLibraryTypes::TitleKey(own) != CGameLibraryTypes::TitleKey(gameTitle))
-      parts.emplace_back(own);
-  }
+  // A catalogue name carries its tags, which the rest of the label says in words
+  std::string own;
+  if (!release.title.empty())
+    own = CGameNameParser::Parse(release.title).displayTitle;
+  if (CGameLibraryTypes::TitleKey(own) == CGameLibraryTypes::TitleKey(gameTitle))
+    own.clear();
+
+  // A hack, a translation or a bootleg that has a name of its own goes by it
+  if ((!release.edition.empty() || release.licence == Licence::PIRATE) && !own.empty())
+    parts.emplace_back(own);
 
   if (release.edition == "Mod")
     parts.emplace_back(strings.Get(35750)); // "Hack"
@@ -110,7 +112,10 @@ std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& releas
   if (!release.languages.empty())
     parts.emplace_back(StringUtils::ToUpper(StringUtils::Join(release.languages, ", ")));
 
-  return parts.empty() ? gameTitle : StringUtils::Join(parts, " \u00b7 ");
+  // An arcade set has nothing else to tell it apart, so it goes by its set name
+  if (parts.empty())
+    return own.empty() ? gameTitle : own;
+  return StringUtils::Join(parts, " \u00b7 ");
 }
 } // namespace
 
