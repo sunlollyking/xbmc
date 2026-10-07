@@ -66,6 +66,7 @@ private:
   std::string PlatformLabel(const std::string& slug) const;
   std::string ScraperLabel(const std::string& addonId) const;
   std::string GameClientLabel(const std::string& addonId) const;
+  std::string VideoFilterLabel(const std::string& videoFilter) const;
   bool ChoosePlatform();
   bool ChooseScraper();
   bool ChooseGameClient();

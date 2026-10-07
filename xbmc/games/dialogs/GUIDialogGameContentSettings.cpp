@@ -194,6 +194,23 @@ std::string CGUIDialogGameContentSettings::GameClientLabel(const std::string& ad
   return addonId;
 }
 
+std::string CGUIDialogGameContentSettings::VideoFilterLabel(const std::string& videoFilter) const
+{
+  if (videoFilter.empty())
+    return Localize(231);
+
+  CFileItemList filters;
+  GetVideoFilters(filters);
+  for (const auto& filter : filters)
+  {
+    if (filter->GetProperty("game.videofilter").asString() == videoFilter)
+      return filter->GetLabel();
+  }
+
+  // A preset that is no longer installed is still named by its file
+  return URIUtils::ReplaceExtension(URIUtils::GetFileName(videoFilter), "");
+}
+
 void CGUIDialogGameContentSettings::SetLabel2(const std::string& settingId, const std::string& label)
 {
   BaseSettingControlPtr control = GetSettingControl(settingId);
@@ -213,7 +230,7 @@ void CGUIDialogGameContentSettings::SetupView()
   SetLabel2(SETTING_PLATFORM, PlatformLabel(m_platformSlug));
   SetLabel2(SETTING_SCRAPER, ScraperLabel(m_scraperId));
   SetLabel2(SETTING_GAME_CLIENT, GameClientLabel(m_gameClient));
-  SetLabel2(SETTING_VIDEO_FILTER, m_videoFilter.empty() ? Localize(231) : m_videoFilter);
+  SetLabel2(SETTING_VIDEO_FILTER, VideoFilterLabel(m_videoFilter));
 }
 
 void CGUIDialogGameContentSettings::InitializeSettings()
@@ -293,7 +310,7 @@ void CGUIDialogGameContentSettings::OnSettingAction(const std::shared_ptr<const 
   else if (id == SETTING_VIDEO_FILTER)
   {
     if (ChooseVideoFilter())
-      SetLabel2(SETTING_VIDEO_FILTER, m_videoFilter.empty() ? Localize(231) : m_videoFilter);
+      SetLabel2(SETTING_VIDEO_FILTER, VideoFilterLabel(m_videoFilter));
   }
 }
 
@@ -438,7 +455,7 @@ bool CGUIDialogGameContentSettings::ChooseVideoFilter()
 
   CFileItemList items;
   const auto none = std::make_shared<CFileItem>(Localize(231));
-  none->SetPath("");
+  none->SetProperty("game.videofilter", CVariant{""});
   items.Add(none);
 
   CFileItemList filters;
@@ -447,7 +464,7 @@ bool CGUIDialogGameContentSettings::ChooseVideoFilter()
   for (const auto& filter : filters)
   {
     const auto item = std::make_shared<CFileItem>(*filter);
-    if (filter->GetPath() == m_videoFilter)
+    if (filter->GetProperty("game.videofilter").asString() == m_videoFilter)
       selected = items.Size();
     items.Add(item);
   }
@@ -459,7 +476,7 @@ bool CGUIDialogGameContentSettings::ChooseVideoFilter()
   if (!select->IsConfirmed() || select->GetSelectedItem() < 0)
     return false;
 
-  m_videoFilter = select->GetSelectedFileItem()->GetPath();
+  m_videoFilter = select->GetSelectedFileItem()->GetProperty("game.videofilter").asString();
   return true;
 }
 
