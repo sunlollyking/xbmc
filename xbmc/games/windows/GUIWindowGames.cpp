@@ -194,8 +194,9 @@ bool CGUIWindowGames::OnClick(int iItem, const std::string& player /* = "" */)
   CFileItemPtr item = m_vecItems->Get(iItem);
   if (item)
   {
-    // A playlist is opened, not played
-    if (!item->IsFolder() && !PLAYLIST::IsSmartPlayList(*item) && !PLAYLIST::IsPlayList(*item))
+    // A playlist is opened, not played, and a new one is made in the editor
+    if (!item->IsFolder() && !PLAYLIST::IsSmartPlayList(*item) && !PLAYLIST::IsPlayList(*item) &&
+        !URIUtils::IsProtocol(item->GetPath(), "newsmartplaylist"))
     {
       if (!CGameUtils::OnSelect(item))
         PlayGame(*item);
