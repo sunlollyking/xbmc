@@ -3,7 +3,6 @@ set(SOURCES TestBaseRenderBufferPool.cpp
             TestRenderBufferOpenGLES.cpp
             TestRenderBezel.cpp
             TestRenderBufferPoolFBO.cpp
-            TestRenderGeometryFBO.cpp
             TestRPProcessInfoEGL.cpp
             TestRPRenderManager.cpp
 )

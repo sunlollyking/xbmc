@@ -24,6 +24,7 @@
 #include "games/GameSettings.h"
 #include "games/addons/GameClient.h"
 #include "games/addons/GameClientInGameSaves.h"
+#include "games/addons/GameClientProperties.h"
 #include "games/addons/cheevos/GameClientCheevos.h"
 #include "games/addons/disc/GameClientDiscs.h"
 #include "games/addons/streams/GameClientStreams.h"
@@ -299,9 +300,11 @@ class DevKitInstance
 {
 public:
   explicit DevKitInstance(CGameClientStreams& streams,
-                          const char* kodiVersion = ADDON_INSTANCE_VERSION_GAME)
+                          const char* kodiVersion = ADDON_INSTANCE_VERSION_GAME,
+                          const char* libretroCore = nullptr)
     : m_previous(kodi::addon::CPrivateBase::m_interface)
   {
+    m_props.libretro_core = libretroCore;
     m_callbacks.kodiInstance = &streams;
     m_callbacks.OpenStream = [](KODI_HANDLE instance,
                                 const game_stream_properties* properties) -> KODI_GAME_STREAM_HANDLE
@@ -338,12 +341,14 @@ public:
   {
     return m_addonCallbacks.RunFrameSpeculative != nullptr;
   }
+  std::string LibretroCore() const { return m_addon->LibretroCore(); }
 
 private:
   AddonGlobalInterface* m_previous;
   AddonToKodiFuncTable_Game m_callbacks{};
   KodiToAddonFuncTable_Game m_addonCallbacks{};
-  AddonInstance_Game m_game{nullptr, &m_callbacks, &m_addonCallbacks};
+  AddonProps_Game m_props{};
+  AddonInstance_Game m_game{&m_props, &m_callbacks, &m_addonCallbacks};
   KODI_ADDON_INSTANCE_INFO m_info{};
   KODI_ADDON_INSTANCE_FUNC m_functions{};
   KODI_ADDON_INSTANCE_STRUCT m_instance{};
@@ -1304,6 +1309,35 @@ TEST_F(TestGameClientHardwareRendering, DevKitLeavesSpeculativeFramesToNewerKodi
   }
   DevKitInstance addon(m_client->Streams(), "8.3.0");
   EXPECT_TRUE(addon.InstalledSpeculativeFrames());
+}
+
+TEST_F(TestGameClientHardwareRendering, PropertiesPassTheLibretroCore)
+{
+  CXBMCTinyXML2 xml;
+  const std::string addonXml =
+      R"(<addon id="game.test.core" name="Core test" version="1.0.0">
+      <extension point="kodi.gameclient" library="test.so">
+        <libretro_core>test_libretro</libretro_core>
+      </extension>
+      <extension point="kodi.addon.metadata"><platform>all</platform></extension>
+    </addon>)";
+  ASSERT_TRUE(xml.Parse(addonXml));
+  CGameClient client(
+      ADDON::CAddonInfoBuilder::Generate(xml.RootElement(), ADDON::RepositoryDirInfo{}));
+  ASSERT_TRUE(client.AddonProperties().InitializeProperties());
+  ASSERT_NE(client.GetInstanceInterface()->props->libretro_core, nullptr);
+  EXPECT_STREQ(client.GetInstanceInterface()->props->libretro_core, "test_libretro");
+}
+
+TEST_F(TestGameClientHardwareRendering, DevKitReadsTheLibretroCoreFromNewerKodi)
+{
+  // An 8.2.0 Kodi's properties end before the field
+  {
+    DevKitInstance addon(m_client->Streams(), "8.2.0", "test_libretro");
+    EXPECT_EQ(addon.LibretroCore(), "");
+  }
+  DevKitInstance addon(m_client->Streams(), "8.2.1", "test_libretro");
+  EXPECT_EQ(addon.LibretroCore(), "test_libretro");
 }
 
 TEST_F(TestGameClientHardwareRendering, DevKitInstallsHandleBeforeSingleReset)

@@ -21,6 +21,7 @@
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "view/ViewState.h"
+#include "view/ViewStateNames.h"
 #include "view/ViewStateSettings.h"
 
 #include <assert.h>
@@ -72,7 +73,7 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     }
     SetSortOrder(SortOrder::ASCENDING);
 
-    const CViewState* viewState = CViewStateSettings::GetInstance().Get("gameslibrary");
+    const CViewState* viewState = CViewStateSettings::GetInstance().Get(VIEW_STATE::GAMES_LIBRARY);
     if (viewState)
     {
       SetSortMethod(viewState->m_sortDescription);
@@ -101,7 +102,7 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     AddSortMethod(SortBy::SIZE, 553,
                   LABEL_MASKS("%L", "%I", "%L", "%I")); // Filename, Size | Label, Size
 
-    const CViewState* viewState = CViewStateSettings::GetInstance().Get("games");
+    const CViewState* viewState = CViewStateSettings::GetInstance().Get(VIEW_STATE::GAMES);
     if (viewState)
     {
       SetSortMethod(viewState->m_sortDescription);
@@ -147,6 +148,8 @@ std::vector<CMediaSource>& CGUIViewStateWindowGames::GetSources()
 
 void CGUIViewStateWindowGames::SaveViewState()
 {
-  const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb") ? "gameslibrary" : "games";
+  const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb")
+                              ? VIEW_STATE::GAMES_LIBRARY
+                              : VIEW_STATE::GAMES;
   SaveViewToDb(m_items.GetPath(), WINDOW_GAMES, CViewStateSettings::GetInstance().Get(viewState));
 }

@@ -102,6 +102,7 @@ set(HEADERS AddonsDirectory.h
             ImageFile.h
             GameDatabaseDirectory.h
             LibraryDirectory.h
+            LibraryPaths.h
             MultiPathDirectory.h
             MultiPathFile.h
             MusicDatabaseDirectory.h
