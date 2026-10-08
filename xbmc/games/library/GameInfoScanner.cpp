@@ -149,6 +149,44 @@ std::string FolderName(const std::string& folder)
   return URIUtils::GetFileName(path);
 }
 
+/*!
+ * \brief Whether a game's files credit only other companies than these
+ *
+ * Two games can share a title and nothing else: a homebrew Tetris and the one
+ * it copies, or two publishers' Tsume Shogi. Where both credit a company and
+ * none agree, they are kept as two games.
+ */
+bool CreditsOtherCompanies(CGameDatabase& db, int idGame, const std::vector<std::string>& credits)
+{
+  if (credits.empty())
+    return false;
+
+  CGameInfoTag existing;
+  if (!db.GetGameInfo(idGame, existing))
+    return false;
+
+  bool credited = false;
+  for (const GameRelease& release : existing.GetReleases())
+  {
+    for (const GameFile& file : release.files)
+    {
+      for (const ParsedGameName& name :
+           {CGameNameParser::Parse(FolderName(URIUtils::GetDirectory(file.path)), false),
+            CGameNameParser::Parse(URIUtils::GetFileName(file.path))})
+      {
+        for (const std::string& theirs : CGameNameParser::Credits(name))
+        {
+          credited = true;
+          if (std::ranges::any_of(credits, [&theirs](const std::string& ours)
+                                  { return CGameNameParser::SameCompany(ours, theirs); }))
+            return false;
+        }
+      }
+    }
+  }
+  return credited;
+}
+
 std::vector<std::string> ReadSheet(const std::string& path)
 {
   std::vector<std::string> tracks;
@@ -1488,6 +1526,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       other = m_database.FindGameByTitleKey(platform.id,
                                             CGameLibraryTypes::TitleKey(tag.GetTitle()),
                                             refreshGameId);
+    if (other > 0 && CreditsOtherCompanies(m_database, other, CGameNameParser::Credits(parsed)))
+      other = -1;
     if (other > 0)
     {
       int keep = other;
@@ -1507,6 +1547,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     idGame = m_database.FindGameByUniqueId(platform.id, scraper->ID(), candidateId);
   if (idGame <= 0)
     idGame = m_database.FindGameByTitleKey(platform.id, CGameLibraryTypes::TitleKey(tag.GetTitle()));
+  if (idGame > 0 && CreditsOtherCompanies(m_database, idGame, CGameNameParser::Credits(parsed)))
+    idGame = -1;
 
   if (idGame > 0)
   {

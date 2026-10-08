@@ -11,6 +11,7 @@
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <utility>
@@ -185,6 +186,31 @@ Patterns& GetPatterns()
 {
   static Patterns patterns;
   return patterns;
+}
+
+// Words that say what kind of company a name is rather than which one
+constexpr std::array<std::string_view, 12> COMPANY_NOISE = {
+    "soft",        "software", "co",    "ltd",  "inc", "corp",
+    "corporation", "kk",       "games", "game", "the", "doujin"};
+
+std::vector<std::string> CompanyWords(std::string_view company)
+{
+  std::vector<std::string> words;
+  std::string word;
+  for (const char c : company)
+  {
+    if (std::isalnum(static_cast<unsigned char>(c)))
+    {
+      word += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+      continue;
+    }
+    if (!word.empty() && std::ranges::find(COMPANY_NOISE, word) == COMPANY_NOISE.end())
+      words.emplace_back(word);
+    word.clear();
+  }
+  if (!word.empty() && std::ranges::find(COMPANY_NOISE, word) == COMPANY_NOISE.end())
+    words.emplace_back(word);
+  return words;
 }
 } // namespace
 
@@ -510,4 +536,45 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
   out.title = title;
   out.displayTitle = DisplayTitle(title);
   return out;
+}
+
+std::vector<std::string> CGameNameParser::Credits(const ParsedGameName& name)
+{
+  if (name.unknownTags.size() != 1)
+    return {};
+
+  std::string tag = name.unknownTags.front();
+  if (StringUtils::StartsWithNoCase(tag, "doujin"))
+  {
+    tag.erase(0, 6);
+    StringUtils::TrimLeft(tag, " -");
+  }
+
+  std::vector<std::string> credits;
+  for (std::string part : StringUtils::Split(tag, " - "))
+  {
+    StringUtils::Trim(part);
+    if (!part.empty())
+      credits.emplace_back(std::move(part));
+  }
+  return credits;
+}
+
+bool CGameNameParser::SameCompany(std::string_view a, std::string_view b)
+{
+  const std::vector<std::string> wordsA = CompanyWords(a);
+  const std::vector<std::string> wordsB = CompanyWords(b);
+  if (wordsA.empty() || wordsB.empty())
+    return true;
+
+  for (const std::string& word : wordsA)
+  {
+    if (std::ranges::find(wordsB, word) != wordsB.end())
+      return true;
+  }
+
+  const std::string joinedA = StringUtils::Join(wordsA, "");
+  const std::string joinedB = StringUtils::Join(wordsB, "");
+  return std::min(joinedA.size(), joinedB.size()) >= 4 &&
+         (joinedA.find(joinedB) != std::string::npos || joinedB.find(joinedA) != std::string::npos);
 }

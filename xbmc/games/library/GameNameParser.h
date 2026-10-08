@@ -80,6 +80,25 @@ public:
   static std::string ParseWhdLoadName(std::string_view fileName);
 
   /*!
+   * \brief The companies a name credits in a tag of its own
+   *
+   * Collections of Japanese computer games give one tag the parser doesn't
+   * otherwise know, sometimes marked as doujin: "Tetris (Doujin - Noripy)",
+   * "Teki wa Kaizoku (D-Photon - Victor)". A TOSEC publisher is left out, as a
+   * budget label reissuing a game is credited there too.
+   */
+  static std::vector<std::string> Credits(const ParsedGameName& name);
+
+  /*!
+   * \brief Whether two credited names could be one company
+   *
+   * They share a word, or one's words run together inside the other's
+   * ("Micro Cabin", "Microcabin"). Words like "Soft" say what kind of company
+   * it is rather than which.
+   */
+  static bool SameCompany(std::string_view a, std::string_view b);
+
+  /*!
    * \brief "Legend of Zelda, The" -> "The Legend of Zelda"
    */
   static std::string DisplayTitle(std::string_view title);

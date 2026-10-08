@@ -126,3 +126,24 @@ TEST(TestGameNameParser, KeepsTheDotsInAFoldersName)
             "Flight Simulator Ver.5.0");
   EXPECT_EQ(CGameNameParser::Parse("G.R").title, "G");
 }
+
+TEST(TestGameNameParser, CreditsTheCompanyInATagOfItsOwn)
+{
+  EXPECT_EQ(CGameNameParser::Credits(CGameNameParser::Parse("Tetris (Doujin - Noripy)", false)),
+            std::vector<std::string>{"Noripy"});
+  EXPECT_EQ(CGameNameParser::Credits(
+                CGameNameParser::Parse("Teki wa Kaizoku - Kaizokuban (D-Photon - Victor)", false)),
+            (std::vector<std::string>{"D-Photon", "Victor"}));
+  EXPECT_TRUE(CGameNameParser::Credits(CGameNameParser::Parse("Sonic (USA, Europe).md")).empty());
+  EXPECT_TRUE(
+      CGameNameParser::Credits(CGameNameParser::Parse("Elite (1985)(Firebird)[a].d64")).empty());
+}
+
+TEST(TestGameNameParser, TellsCompaniesApart)
+{
+  EXPECT_TRUE(CGameNameParser::SameCompany("Micro Cabin", "Microcabin"));
+  EXPECT_TRUE(CGameNameParser::SameCompany("Riverhill Soft", "Riverhillsoft"));
+  EXPECT_TRUE(CGameNameParser::SameCompany("Onion Soft", "Doujin - Onion Soft"));
+  EXPECT_FALSE(CGameNameParser::SameCompany("Noripy", "BPS"));
+  EXPECT_FALSE(CGameNameParser::SameCompany("Apollo Technica", "Tsukumo"));
+}
