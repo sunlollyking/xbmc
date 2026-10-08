@@ -8,6 +8,8 @@
 
 #include "GameLoop.h"
 
+#include "utils/log.h"
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -27,6 +29,11 @@ constexpr auto PAUSE_SLEEP = 5s;
 // How many frames the loop may fall behind before it gives up the deficit
 // rather than trying to run them back to back
 constexpr unsigned int MAX_FRAME_DEFICIT = 2;
+
+double ToMs(std::chrono::duration<double> duration)
+{
+  return duration.count() * 1000.0;
+}
 } // namespace
 
 CGameLoop::CGameLoop(IGameLoopCallback* callback, double fps, CDisplayPacing* displayPacing)
@@ -185,12 +192,25 @@ bool CGameLoop::PaceToDisplay()
 
   const Clock::duration interval = m_displayPacing->Interval(now);
   if (interval == Clock::duration::zero())
+  {
+    if (PacingChanged(PacingState::NO_INTERVAL))
+      CLog::Log(LOGINFO, "RetroPlayer[PACING]: Not pacing, the screen isn't taking frames "
+                         "regularly");
     return false;
+  }
 
+  const double refreshRate = 1s / std::chrono::duration<double>(interval);
   const int refreshes = CDisplayPacing::RefreshesPerFrame(interval, m_fps.load(),
                                                           m_displayPacing->MaxRateDifference());
   if (refreshes == 0)
+  {
+    if (PacingChanged(PacingState::RATE_TOO_FAR))
+      CLog::Log(LOGINFO,
+                "RetroPlayer[PACING]: Not pacing, the screen's {:.3f} Hz is too far from the "
+                "game's {:.3f} fps",
+                refreshRate, m_fps.load());
     return false;
+  }
 
   // Each frame is shown for this long, so the game runs at this rate
   const Clock::duration period = interval * refreshes;
@@ -200,7 +220,19 @@ bool CGameLoop::PaceToDisplay()
   // One that can't be gains nothing from waiting for the screen.
   const Clock::duration lead = m_frameCost + m_displayPacing->Margin();
   if (lead >= period)
+  {
+    if (PacingChanged(PacingState::FRAME_TOO_SLOW))
+      CLog::Log(LOGINFO,
+                "RetroPlayer[PACING]: Not pacing, a {:.1f} ms frame and the {:.1f} ms margin "
+                "don't fit in the {:.1f} ms each frame is shown",
+                ToMs(m_frameCost), ToMs(m_displayPacing->Margin()), ToMs(period));
     return false;
+  }
+
+  if (PacingChanged(PacingState::PACED))
+    CLog::Log(LOGINFO,
+              "RetroPlayer[PACING]: Pacing the game to the screen's {:.3f} Hz at {:.2f}% speed",
+              refreshRate, rate * 100.0);
 
   // One frame for every so many the screen takes. The renderer hasn't taken
   // the last one yet if the next take is still the one it was run for, and a
@@ -217,6 +249,9 @@ bool CGameLoop::PaceToDisplay()
 
   m_lastPacedTake = take;
   m_displayPacing->SetPlaybackRate(rate);
+  // A frame shown for several refreshes repeats by design, so only a game
+  // with a frame for every refresh is counted for those that had none
+  m_displayPacing->SetPaced(refreshes == 1);
 
   // The timer carries on from here if pacing stops
   m_lastFrameUs = NowUs();
@@ -245,6 +280,16 @@ void CGameLoop::StopPacing()
 
   m_lastPacedTake = {};
   m_displayPacing->SetPlaybackRate(1.0);
+  m_displayPacing->SetPaced(false);
+}
+
+bool CGameLoop::PacingChanged(PacingState state)
+{
+  if (state == m_pacingState)
+    return false;
+
+  m_pacingState = state;
+  return true;
 }
 
 std::chrono::microseconds CGameLoop::FrameTimeUs() const
