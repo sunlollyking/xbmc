@@ -1,5 +1,6 @@
 set(SOURCES TestGameArt.cpp
             TestGameManual.cpp
-            TestGameThumbLoader.cpp)
+            TestGameThumbLoader.cpp
+            TestGameVideoSettings.cpp)
 
 core_add_test_library(games_test)

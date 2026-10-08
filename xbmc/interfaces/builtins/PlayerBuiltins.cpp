@@ -417,9 +417,10 @@ static int PlayerControl(const std::vector<std::string>& params)
     CGameSettings& gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
     gameSettings.SetBezelEnabled(!gameSettings.BezelEnabled());
 
-    // Kept for the games that follow, as the other game video settings are
+    // Kept for the games that follow, as the other game video settings are. A
+    // game played from a file has it remembered for that game instead.
     CGameSettings& defaultSettings = CMediaSettings::GetInstance().GetDefaultGameSettings();
-    if (defaultSettings != gameSettings)
+    if (g_application.CurrentFileItem().GetDynPath().empty() && defaultSettings != gameSettings)
     {
       defaultSettings = gameSettings;
       CServiceBroker::GetSettingsComponent()->GetSettings()->Save();

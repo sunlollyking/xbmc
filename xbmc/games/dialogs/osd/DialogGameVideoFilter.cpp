@@ -9,11 +9,9 @@
 #include "DialogGameVideoFilter.h"
 
 #include "ServiceBroker.h"
-#include "URL.h"
 #include "addons/AddonInstaller.h"
 #include "addons/AddonManager.h"
 #include "addons/addoninfo/AddonType.h"
-#include "application/Application.h"
 #include "cores/RetroPlayer/guibridge/GUIGameVideoHandle.h"
 #include "cores/RetroPlayer/rendering/RenderVideoSettings.h"
 #include "cores/RetroPlayer/shaders/ShaderPresetFactory.h"
@@ -21,7 +19,6 @@
 #include "filesystem/SpecialProtocol.h"
 #include "games/GameServices.h"
 #include "games/VideoFilters.h"
-#include "games/database/GameDatabase.h"
 #include "games/dialogs/DialogGameDefines.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
@@ -62,13 +59,6 @@ void GetProperties(const CFileItem& item, std::string& videoFilter)
 CDialogGameVideoFilter::CDialogGameVideoFilter()
   : CDialogGameVideoSelect(WINDOW_DIALOG_GAME_VIDEO_FILTER)
 {
-}
-
-void CDialogGameVideoFilter::OnInitWindow()
-{
-  m_initialVideoFilter = CMediaSettings::GetInstance().GetCurrentGameSettings().VideoFilter();
-
-  CDialogGameVideoSelect::OnInitWindow();
 }
 
 std::string CDialogGameVideoFilter::GetHeading()
@@ -203,29 +193,6 @@ void CDialogGameVideoFilter::RefreshList()
 
   // Call ancestor
   CDialogGameVideoSelect::RefreshList();
-}
-
-void CDialogGameVideoFilter::SaveSettings()
-{
-  const std::string videoFilter =
-      CMediaSettings::GetInstance().GetCurrentGameSettings().VideoFilter();
-  if (videoFilter == m_initialVideoFilter)
-    return;
-
-  // A filter chosen while playing is kept for that game, and the default is
-  // left for the games that nothing was chosen for. The library knows a game
-  // by the path it was played from.
-  const std::string gamePath = g_application.CurrentFileItem().GetPath();
-  if (gamePath.empty())
-  {
-    CDialogGameVideoSelect::SaveSettings();
-    return;
-  }
-
-  CGameDatabase db;
-  if (db.Open() && db.VideoFilters().SetVideoFilter(gamePath, videoFilter))
-    CLog::Log(LOGDEBUG, "GAME: Remembered video filter {} for {}", videoFilter,
-              CURL::GetRedacted(gamePath));
 }
 
 std::string CDialogGameVideoFilter::GetLocalizedString(uint32_t code)

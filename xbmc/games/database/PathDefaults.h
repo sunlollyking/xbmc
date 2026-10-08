@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 namespace KODI
 {
@@ -38,6 +39,13 @@ namespace GAME
  */
 std::string FindPathDefault(const std::string& path,
                             const std::function<std::string(const std::string&)>& lookup);
+
+/*!
+ * \ingroup games
+ *
+ * \brief The folders above a path, nearest first
+ */
+std::vector<std::string> GetParentPaths(const std::string& path);
 
 } // namespace GAME
 } // namespace KODI

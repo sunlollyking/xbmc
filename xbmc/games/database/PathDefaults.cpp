@@ -38,6 +38,20 @@ std::string GAME::FindPathDefault(const std::string& path,
     return value;
 
   // Otherwise the nearest folder above it that has one
+  for (const std::string& parentPath : GetParentPaths(path))
+  {
+    value = lookup(parentPath);
+    if (!value.empty())
+      return value;
+  }
+
+  return "";
+}
+
+std::vector<std::string> GAME::GetParentPaths(const std::string& path)
+{
+  std::vector<std::string> parentPaths;
+
   std::string currentPath = path;
   for (unsigned int i = 0; i < MAX_FOLDER_DEPTH; ++i)
   {
@@ -46,12 +60,9 @@ std::string GAME::FindPathDefault(const std::string& path,
         parentPath == currentPath)
       break;
 
-    value = lookup(parentPath);
-    if (!value.empty())
-      return value;
-
+    parentPaths.push_back(parentPath);
     currentPath = std::move(parentPath);
   }
 
-  return "";
+  return parentPaths;
 }

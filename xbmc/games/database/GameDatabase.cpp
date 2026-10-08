@@ -32,21 +32,21 @@ bool CGameDatabase::Open()
 void CGameDatabase::CreateTables()
 {
   m_gameClients.Create();
-  m_videoFilters.Create();
+  m_videoSettings.Create();
   CGameLibraryDDL::CreateTables(*this);
 }
 
 void CGameDatabase::CreateAnalytics()
 {
   m_gameClients.CreateAnalytics();
-  m_videoFilters.CreateAnalytics();
+  m_videoSettings.CreateAnalytics();
   CGameLibraryDDL::CreateAnalytics(*this);
 }
 
 void CGameDatabase::UpdateTables(int version)
 {
   m_gameClients.UpdateTables(version);
-  m_videoFilters.UpdateTables(version);
+  m_videoSettings.UpdateTables(version);
   CGameLibraryDDL::UpdateTables(*this, version);
 }
 

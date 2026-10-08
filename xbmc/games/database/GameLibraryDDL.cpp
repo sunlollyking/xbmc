@@ -35,6 +35,9 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "extensions text, "
                   "defaultGameClient text, "
                   "defaultVideoFilter text, "
+                  "defaultStretchMode text, "
+                  "defaultRotation integer, "
+                  "defaultBezel integer, "
                   "dateAdded text, "
                   "lastScraped text)");
 
@@ -399,5 +402,16 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   {
     db.ExecuteQuery("ALTER TABLE gamerelease ADD COLUMN edition text");
     db.ExecuteQuery("DROP VIEW IF EXISTS release_view");
+  }
+
+  // 9: a platform remembers the stretch mode, rotation and bezel its games are
+  // drawn with, as it already remembered the filter. The platform view lists
+  // the platform's columns, so it is rebuilt too.
+  if (version < 9)
+  {
+    db.ExecuteQuery("ALTER TABLE platform ADD COLUMN defaultStretchMode text");
+    db.ExecuteQuery("ALTER TABLE platform ADD COLUMN defaultRotation integer");
+    db.ExecuteQuery("ALTER TABLE platform ADD COLUMN defaultBezel integer");
+    db.ExecuteQuery("DROP VIEW IF EXISTS platform_view");
   }
 }

@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -335,6 +336,9 @@ struct PlatformInfo
   std::map<std::string, std::string> providerIds; // provider name -> that provider's id
   std::string defaultGameClient;
   std::string defaultVideoFilter;
+  std::string defaultStretchMode; // RetroPlayer's identifier, or empty for none
+  std::optional<unsigned int> defaultRotationDegCCW;
+  std::optional<bool> defaultBezelEnabled;
   std::string dateAdded;
   std::string lastScraped;
   int gameCount{0};

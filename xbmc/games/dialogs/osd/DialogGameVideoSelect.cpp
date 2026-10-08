@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "ServiceBroker.h"
+#include "application/Application.h"
 #include "cores/RetroPlayer/guibridge/GUIGameRenderManager.h"
 #include "cores/RetroPlayer/guibridge/GUIGameVideoHandle.h"
 #include "games/dialogs/DialogGameDefines.h"
@@ -221,6 +222,11 @@ void CDialogGameVideoSelect::RefreshList()
 
 void CDialogGameVideoSelect::SaveSettings()
 {
+  // A game played from a file has what it was changed to remembered for it
+  // when it closes, so only a game client started on its own sets the defaults
+  if (!g_application.CurrentFileItem().GetDynPath().empty())
+    return;
+
   CGameSettings& defaultSettings = CMediaSettings::GetInstance().GetDefaultGameSettings();
   CGameSettings& currentSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
 
