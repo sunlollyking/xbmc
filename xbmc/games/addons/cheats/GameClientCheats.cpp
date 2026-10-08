@@ -23,6 +23,7 @@
 #include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/game.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "games/GameUtils.h"
 #include "games/addons/GameClient.h"
 #include "games/cheats/CheatUtils.h"
 #include "guilib/GUIComponent.h"
@@ -565,8 +566,7 @@ CCheatPack CGameClientCheats::ReadPack(const std::string& path)
 
 std::string CGameClientCheats::GetSelectionPath(const std::string& gamePath) const
 {
-  return URIUtils::AddFileToFolder("special://masterprofile/games/cheats",
-                                   CCheatUtils::GetSelectionFileName(gamePath));
+  return URIUtils::AddFileToFolder(CGameUtils::GetGameFolder(gamePath), "cheats.xml");
 }
 
 std::string CGameClientCheats::ReadChoice(const std::string& gamePath) const
