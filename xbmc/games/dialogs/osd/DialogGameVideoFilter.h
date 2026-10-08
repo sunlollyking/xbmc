@@ -26,9 +26,6 @@ public:
   ~CDialogGameVideoFilter() override = default;
 
 protected:
-  // implementation of CGUIWindow via CDialogGameVideoSelect
-  void OnInitWindow() override;
-
   // implementation of CDialogGameVideoSelect
   std::string GetHeading() override;
   void PreInit() override;
@@ -38,7 +35,6 @@ protected:
   void PostExit() override;
   bool OnClickAction() override;
   void RefreshList() override;
-  void SaveSettings() override;
 
 private:
   void InitGetMoreButton();
@@ -57,7 +53,6 @@ private:
   };
 
   // GUI state
-  std::string m_initialVideoFilter;
   unsigned int m_focusedItemIndex{0};
   bool m_regenerateList{false};
 };

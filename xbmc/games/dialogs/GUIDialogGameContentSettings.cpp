@@ -13,11 +13,14 @@
 #include "ServiceBroker.h"
 #include "addons/AddonManager.h"
 #include "addons/addoninfo/AddonType.h"
+#include "cores/RetroPlayer/RetroPlayerUtils.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
 #include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
+#include "games/dialogs/osd/DialogGameStretchMode.h"
+#include "games/dialogs/osd/DialogGameVideoRotation.h"
 #include "games/library/PlatformCatalogue.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -44,6 +47,12 @@ constexpr const char* SETTING_NO_UPDATE = "gamecontent.noupdate";
 constexpr const char* SETTING_EXCLUDE = "gamecontent.exclude";
 constexpr const char* SETTING_GAME_CLIENT = "gamecontent.gameclient";
 constexpr const char* SETTING_VIDEO_FILTER = "gamecontent.videofilter";
+constexpr const char* SETTING_STRETCH_MODE = "gamecontent.stretchmode";
+constexpr const char* SETTING_ROTATION = "gamecontent.rotation";
+constexpr const char* SETTING_BEZEL = "gamecontent.bezel";
+
+// The order the in-game rotation dialog offers them in, which is clockwise
+constexpr unsigned int ROTATIONS_DEG_CCW[] = {0, 270, 180, 90};
 
 std::vector<std::string> FolderExtensions(const std::string& folder)
 {
@@ -132,10 +141,11 @@ void CGUIDialogGameContentSettings::SetFolder(const std::string& folder)
       m_exclude = true;
     }
     m_gameClient = db.GameClients().GetGameClient(m_folder);
-    m_videoFilter = db.VideoFilters().GetVideoFilter(m_folder);
+    m_videoFilter = db.VideoSettings().GetVideoFilter(m_folder);
+    m_videoSettings = db.VideoSettings().GetVideoSettings(m_folder);
 
     // What the machine already plays with, where this folder says nothing
-    if (content.idPlatform > 0 && (m_gameClient.empty() || m_videoFilter.empty()))
+    if (content.idPlatform > 0)
     {
       PlatformInfo known;
       if (db.GetPlatform(content.idPlatform, known))
@@ -144,6 +154,7 @@ void CGUIDialogGameContentSettings::SetFolder(const std::string& folder)
           m_gameClient = known.defaultGameClient;
         if (m_videoFilter.empty())
           m_videoFilter = known.defaultVideoFilter;
+        m_videoSettings.Inherit(GameVideoSettings::FromPlatform(known));
       }
     }
   }
@@ -231,6 +242,9 @@ void CGUIDialogGameContentSettings::SetupView()
   SetLabel2(SETTING_SCRAPER, ScraperLabel(m_scraperId));
   SetLabel2(SETTING_GAME_CLIENT, GameClientLabel(m_gameClient));
   SetLabel2(SETTING_VIDEO_FILTER, VideoFilterLabel(m_videoFilter));
+  SetLabel2(SETTING_STRETCH_MODE, StretchModeLabel());
+  SetLabel2(SETTING_ROTATION, RotationLabel());
+  SetLabel2(SETTING_BEZEL, BezelLabel());
 }
 
 void CGUIDialogGameContentSettings::InitializeSettings()
@@ -262,6 +276,9 @@ void CGUIDialogGameContentSettings::InitializeSettings()
   {
     AddButton(playGroup, SETTING_GAME_CLIENT, 35510, SettingLevel::Basic);
     AddButton(playGroup, SETTING_VIDEO_FILTER, 35726, SettingLevel::Basic);
+    AddButton(playGroup, SETTING_STRETCH_MODE, 35233, SettingLevel::Basic);
+    AddButton(playGroup, SETTING_ROTATION, 35227, SettingLevel::Basic);
+    AddButton(playGroup, SETTING_BEZEL, 35241, SettingLevel::Basic);
   }
 }
 
@@ -311,6 +328,21 @@ void CGUIDialogGameContentSettings::OnSettingAction(const std::shared_ptr<const 
   {
     if (ChooseVideoFilter())
       SetLabel2(SETTING_VIDEO_FILTER, VideoFilterLabel(m_videoFilter));
+  }
+  else if (id == SETTING_STRETCH_MODE)
+  {
+    if (ChooseStretchMode())
+      SetLabel2(SETTING_STRETCH_MODE, StretchModeLabel());
+  }
+  else if (id == SETTING_ROTATION)
+  {
+    if (ChooseRotation())
+      SetLabel2(SETTING_ROTATION, RotationLabel());
+  }
+  else if (id == SETTING_BEZEL)
+  {
+    if (ChooseBezel())
+      SetLabel2(SETTING_BEZEL, BezelLabel());
   }
 }
 
@@ -480,6 +512,118 @@ bool CGUIDialogGameContentSettings::ChooseVideoFilter()
   return true;
 }
 
+std::string CGUIDialogGameContentSettings::StretchModeLabel() const
+{
+  if (m_videoSettings.stretchMode)
+  {
+    for (const auto& properties : CDialogGameStretchMode::m_allStretchModes)
+    {
+      if (RETRO::CRetroPlayerUtils::StretchModeToIdentifier(properties.stretchMode) ==
+          *m_videoSettings.stretchMode)
+        return Localize(properties.stringIndex);
+    }
+  }
+  return Localize(571); // Default
+}
+
+std::string CGUIDialogGameContentSettings::RotationLabel() const
+{
+  if (m_videoSettings.rotationDegCCW)
+    return CDialogGameVideoRotation::GetRotationLabel(*m_videoSettings.rotationDegCCW);
+  return Localize(571); // Default
+}
+
+std::string CGUIDialogGameContentSettings::BezelLabel() const
+{
+  if (m_videoSettings.bezelEnabled)
+    return Localize(*m_videoSettings.bezelEnabled ? 305 : 1223); // Enabled, Disabled
+  return Localize(571); // Default
+}
+
+bool CGUIDialogGameContentSettings::ChooseStretchMode()
+{
+  std::vector<std::string> labels{Localize(571)}; // Default
+  int selected = 0;
+  for (const auto& properties : CDialogGameStretchMode::m_allStretchModes)
+  {
+    if (m_videoSettings.stretchMode && RETRO::CRetroPlayerUtils::StretchModeToIdentifier(
+                                           properties.stretchMode) == *m_videoSettings.stretchMode)
+      selected = static_cast<int>(labels.size());
+    labels.emplace_back(Localize(properties.stringIndex));
+  }
+
+  const int chosen = Choose(35233, labels, selected); // Stretch mode
+  if (chosen < 0)
+    return false;
+
+  if (chosen == 0)
+    m_videoSettings.stretchMode.reset();
+  else
+    m_videoSettings.stretchMode = RETRO::CRetroPlayerUtils::StretchModeToIdentifier(
+        CDialogGameStretchMode::m_allStretchModes[chosen - 1].stretchMode);
+  return true;
+}
+
+bool CGUIDialogGameContentSettings::ChooseRotation()
+{
+  std::vector<std::string> labels{Localize(571)}; // Default
+  int selected = 0;
+  for (const unsigned int rotation : ROTATIONS_DEG_CCW)
+  {
+    if (m_videoSettings.rotationDegCCW == rotation)
+      selected = static_cast<int>(labels.size());
+    labels.emplace_back(CDialogGameVideoRotation::GetRotationLabel(rotation));
+  }
+
+  const int chosen = Choose(35227, labels, selected); // Rotation
+  if (chosen < 0)
+    return false;
+
+  if (chosen == 0)
+    m_videoSettings.rotationDegCCW.reset();
+  else
+    m_videoSettings.rotationDegCCW = ROTATIONS_DEG_CCW[chosen - 1];
+  return true;
+}
+
+bool CGUIDialogGameContentSettings::ChooseBezel()
+{
+  // Default, Enabled, Disabled
+  const std::vector<std::string> labels{Localize(571), Localize(305), Localize(1223)};
+  const int selected = !m_videoSettings.bezelEnabled ? 0 : *m_videoSettings.bezelEnabled ? 1 : 2;
+
+  const int chosen = Choose(35241, labels, selected); // Bezel
+  if (chosen < 0)
+    return false;
+
+  if (chosen == 0)
+    m_videoSettings.bezelEnabled.reset();
+  else
+    m_videoSettings.bezelEnabled = (chosen == 1);
+  return true;
+}
+
+int CGUIDialogGameContentSettings::Choose(int heading,
+                                          const std::vector<std::string>& labels,
+                                          int selected)
+{
+  auto* select = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
+  if (select == nullptr)
+    return -1;
+
+  select->Reset();
+  select->SetHeading(CVariant{heading});
+  for (const std::string& label : labels)
+    select->Add(label);
+  select->SetSelected(selected);
+  select->Open();
+
+  if (!select->IsConfirmed())
+    return -1;
+  return select->GetSelectedItem();
+}
+
 bool CGUIDialogGameContentSettings::Save()
 {
   CGameDatabase db;
@@ -505,11 +649,20 @@ bool CGUIDialogGameContentSettings::Save()
   // The emulator and the picture belong to the machine, so a second folder of
   // the same platform inherits what was chosen here. The folder keeps them too,
   // for a collection browsed as files rather than as a library.
+  GameVideoSettings videoSettings = m_videoSettings;
+  if (!m_videoFilter.empty())
+    videoSettings.videoFilter = m_videoFilter;
+  else
+    videoSettings.videoFilter.reset();
+
   if (content.idPlatform > 0)
+  {
     db.SetPlatformDefaults(content.idPlatform, m_gameClient, m_videoFilter);
+    db.SetPlatformVideoDefaults(content.idPlatform, videoSettings);
+  }
 
   db.GameClients().SetGameClient(m_folder, m_gameClient);
-  db.VideoFilters().SetVideoFilter(m_folder, m_videoFilter);
+  db.VideoSettings().SetVideoSettings(m_folder, videoSettings);
 
   m_saved = true;
   return true;

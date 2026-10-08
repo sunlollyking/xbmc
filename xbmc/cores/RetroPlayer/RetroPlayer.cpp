@@ -80,8 +80,9 @@ CRetroPlayer::~CRetroPlayer()
   CloseFile();
 }
 
-void CRetroPlayer::SetVideoFilterForGame(const std::string& gamePath)
+void CRetroPlayer::ApplyVideoSettingsForGame(const std::string& gamePath)
 {
+  m_videoSettingsPath.clear();
   if (gamePath.empty())
     return;
 
@@ -89,27 +90,56 @@ void CRetroPlayer::SetVideoFilterForGame(const std::string& gamePath)
   if (!db.Open())
     return;
 
-  std::string videoFilter = db.VideoFilters().GetVideoFilterForGame(gamePath);
-  if (videoFilter.empty())
-  {
-    // What the machine plays with, where neither the game nor its folder said
-    const int idPlatform = db.GetPlatformIdForGame(gamePath);
-    GAME::PlatformInfo platform;
-    if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
-      videoFilter = platform.defaultVideoFilter;
-  }
-  if (videoFilter.empty())
-    return;
+  // Each setting the game doesn't have comes from the nearest folder above it
+  // that does, then its platform, then Kodi's defaults
+  GAME::GameVideoSettings inherited = db.VideoSettings().GetFolderVideoSettings(gamePath);
+  const int idPlatform = db.GetPlatformIdForGame(gamePath);
+  GAME::PlatformInfo platform;
+  if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+    inherited.Inherit(GAME::GameVideoSettings::FromPlatform(platform));
+  inherited.Inherit(GAME::GameVideoSettings::FromGameSettings(
+      CMediaSettings::GetInstance().GetDefaultGameSettings()));
+
+  GAME::GameVideoSettings settings = db.VideoSettings().GetVideoSettings(gamePath);
+  settings.Inherit(inherited);
+
+  m_videoSettingsPath = gamePath;
+  m_inheritedVideoSettings = std::move(inherited);
 
   ::CGameSettings& gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
-  if (gameSettings.VideoFilter() == videoFilter)
+  if (GAME::GameVideoSettings::FromGameSettings(gameSettings) == settings)
     return;
 
-  CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Using video filter {} for {}", videoFilter,
-            CURL::GetRedacted(gamePath));
+  CLog::Log(
+      LOGDEBUG,
+      "RetroPlayer[PLAYER]: Using video filter \"{}\", stretch mode {}, rotation {}, bezel {} "
+      "for {}",
+      settings.videoFilter.value_or(""), settings.stretchMode.value_or(""),
+      settings.rotationDegCCW.value_or(0), settings.bezelEnabled.value_or(false),
+      CURL::GetRedacted(gamePath));
 
-  gameSettings.SetVideoFilter(videoFilter);
+  settings.ApplyTo(gameSettings);
   gameSettings.NotifyObservers(ObservableMessageSettingsChanged);
+}
+
+void CRetroPlayer::SaveVideoSettingsForGame()
+{
+  if (m_videoSettingsPath.empty())
+    return;
+
+  // Only what differs from what the game gets anyway is kept, so a game that
+  // was never changed goes on following its folder and platform
+  const GAME::GameVideoSettings changed =
+      GAME::GameVideoSettings::FromGameSettings(
+          CMediaSettings::GetInstance().GetCurrentGameSettings())
+          .Difference(m_inheritedVideoSettings);
+
+  GAME::CGameDatabase db;
+  if (db.Open() && db.VideoSettings().SetVideoSettings(m_videoSettingsPath, changed))
+    CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Remembered {} video settings for {}",
+              changed.IsEmpty() ? "no" : "changed", CURL::GetRedacted(m_videoSettingsPath));
+
+  m_videoSettingsPath.clear();
 }
 
 std::string CRetroPlayer::GetBezelForGame(const CFileItem& item)
@@ -221,16 +251,13 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
   m_guiMessenger = std::make_unique<CGUIGameMessenger>(*m_processInfo);
   m_renderManager = std::make_unique<CRPRenderManager>(*m_processInfo);
 
-  // A game is drawn with whatever filter was chosen for it, or failing that
-  // the nearest folder above it that has one - a handheld wants something very
-  // different to a home console, and a collection is already a folder per
-  // system. A preset that has since been uninstalled fails to load and the
-  // game draws unfiltered, which is the right answer for a filter that is gone.
-  // The render manager resets the game settings to the defaults, so this has
-  // to come after it. The library knows a zipped game by its archive, not the
+  // A preset that has since been uninstalled fails to load and the game draws
+  // unfiltered, which is the right answer for a filter that is gone. The
+  // render manager resets the game settings to the defaults, so this has to
+  // come after it. The library knows a zipped game by its archive, not the
   // file inside it that it is opened as.
   if (!bStandalone)
-    SetVideoFilterForGame(fileCopy.GetPath());
+    ApplyVideoSettingsForGame(fileCopy.GetPath());
 
   if (!bStandalone)
     m_renderManager->SetBezel(GetBezelForGame(fileCopy));
@@ -325,6 +352,8 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
 bool CRetroPlayer::CloseFile(bool reopen /* = false */)
 {
   CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Closing file");
+
+  SaveVideoSettingsForGame();
 
   m_gameServices.EndPlaySession();
 

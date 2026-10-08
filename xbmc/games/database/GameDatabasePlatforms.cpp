@@ -117,6 +117,12 @@ void CGameDatabase::GetPlatformFromRecord(PlatformInfo& platform)
   std::erase_if(platform.extensions, [](const std::string& s) { return s.empty(); });
   platform.defaultGameClient = m_pDS->fv("defaultGameClient").get_asString();
   platform.defaultVideoFilter = m_pDS->fv("defaultVideoFilter").get_asString();
+  platform.defaultStretchMode = m_pDS->fv("defaultStretchMode").get_asString();
+  if (!m_pDS->fv("defaultRotation").get_isNull())
+    platform.defaultRotationDegCCW =
+        static_cast<unsigned int>(m_pDS->fv("defaultRotation").get_asInt());
+  if (!m_pDS->fv("defaultBezel").get_isNull())
+    platform.defaultBezelEnabled = m_pDS->fv("defaultBezel").get_asInt() != 0;
   platform.dateAdded = m_pDS->fv("dateAdded").get_asString();
   platform.lastScraped = m_pDS->fv("lastScraped").get_asString();
   platform.gameCount = m_pDS->fv("gameCount").get_asInt();
@@ -142,6 +148,22 @@ bool CGameDatabase::SetPlatformDefaults(int idPlatform,
   return ExecuteQuery(PrepareSQL("UPDATE platform SET defaultGameClient = '%s', "
                                  "defaultVideoFilter = '%s' WHERE idPlatform = %i",
                                  gameClient.c_str(), videoFilter.c_str(), idPlatform));
+}
+
+bool CGameDatabase::SetPlatformVideoDefaults(int idPlatform, const GameVideoSettings& settings)
+{
+  const std::string stretchMode =
+      settings.stretchMode ? PrepareSQL("'%s'", settings.stretchMode->c_str()) : "NULL";
+  const std::string rotation =
+      settings.rotationDegCCW ? std::to_string(*settings.rotationDegCCW) : "NULL";
+  const std::string bezel =
+      settings.bezelEnabled ? std::to_string(*settings.bezelEnabled ? 1 : 0) : "NULL";
+
+  return ExecuteQuery(PrepareSQL("UPDATE platform SET defaultVideoFilter = '%s', ",
+                                 settings.videoFilter.value_or("").c_str()) +
+                      "defaultStretchMode = " + stretchMode + ", defaultRotation = " + rotation +
+                      ", defaultBezel = " + bezel +
+                      PrepareSQL(" WHERE idPlatform = %i", idPlatform));
 }
 
 int CGameDatabase::GetPlatformIdForGame(const std::string& path)

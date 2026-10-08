@@ -9,7 +9,7 @@
 #pragma once
 
 #include "GameClientTable.h"
-#include "VideoFilterTable.h"
+#include "VideoSettingsTable.h"
 #include "dbwrappers/Database.h"
 #include "games/library/GameLibraryTypes.h"
 #include "games/library/GameScraper.h"
@@ -100,7 +100,7 @@ public:
   /*!
    * \brief The table remembering how a game should be drawn
    */
-  CVideoFilterTable& VideoFilters() { return m_videoFilters; }
+  CVideoSettingsTable& VideoSettings() { return m_videoSettings; }
 
   /*!
    * \name Paths and files
@@ -204,6 +204,15 @@ public:
   bool SetPlatformDefaults(int idPlatform,
                            const std::string& gameClient,
                            const std::string& videoFilter);
+
+  /*!
+   * \brief How a platform's games are drawn unless a game or its folder says
+   * otherwise
+   *
+   * \param settings The filter, stretch mode, rotation and bezel, each unset
+   *        for none
+   */
+  bool SetPlatformVideoDefaults(int idPlatform, const GameVideoSettings& settings);
 
   //! \brief When a scraper last described a game, or empty if none has
   std::string GetLastScraped(int idGame);
@@ -395,7 +404,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 8; }
+  int GetSchemaVersion() const override { return 9; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:
@@ -452,7 +461,7 @@ private:
 
   // Tables
   CGameClientTable m_gameClients{*this};
-  CVideoFilterTable m_videoFilters{*this};
+  CVideoSettingsTable m_videoSettings{*this};
 };
 } // namespace GAME
 } // namespace KODI

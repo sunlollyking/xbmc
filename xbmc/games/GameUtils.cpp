@@ -454,7 +454,7 @@ bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
                              : -1;
   const bool forPlatform = idPlatform > 0 && db.GetPlatform(idPlatform, platform);
   const std::string currentVideoFilter =
-      forPlatform ? platform.defaultVideoFilter : db.VideoFilters().GetVideoFilter(path);
+      forPlatform ? platform.defaultVideoFilter : db.VideoSettings().GetVideoFilter(path);
 
   dialog->Reset();
   dialog->SetHeading(CVariant{35726}); // "Default video filter"
@@ -499,7 +499,7 @@ bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
 
   const bool stored =
       forPlatform ? db.SetPlatformDefaults(idPlatform, platform.defaultGameClient, videoFilter)
-                  : db.VideoFilters().SetVideoFilter(path, videoFilter);
+                  : db.VideoSettings().SetVideoFilter(path, videoFilter);
   if (!stored)
     return false;
 

@@ -13,6 +13,7 @@
 #include "cores/RetroPlayer/guibridge/IGameCallback.h"
 #include "cores/RetroPlayer/playback/IPlaybackControl.h"
 #include "games/GameTypes.h"
+#include "games/GameVideoSettings.h"
 #include "guilib/DispResource.h"
 #include "threads/CriticalSection.h"
 
@@ -49,10 +50,15 @@ public:
 
 private:
   /*!
-   * \brief Apply the video filter remembered for a game, or for the nearest
-   *        folder above it that has one
+   * \brief Draw a game the way it was last played, or else the way its folder
+   *        or platform says
    */
-  void SetVideoFilterForGame(const std::string& gamePath);
+  void ApplyVideoSettingsForGame(const std::string& gamePath);
+
+  /*!
+   * \brief Remember for the game what it was changed to while playing
+   */
+  void SaveVideoSettingsForGame();
 
   /*!
    * \brief Get the bezel to frame a game with: its own art, or else the art the
@@ -176,6 +182,8 @@ private:
 
   // Game parameters
   GAME::GameClientPtr m_gameClient;
+  std::string m_videoSettingsPath; // The game its video settings are kept for
+  GAME::GameVideoSettings m_inheritedVideoSettings; // What it gets without its own
 
   // Synchronization parameters
   CCriticalSection m_mutex;

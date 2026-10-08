@@ -67,10 +67,17 @@ private:
   std::string ScraperLabel(const std::string& addonId) const;
   std::string GameClientLabel(const std::string& addonId) const;
   std::string VideoFilterLabel(const std::string& videoFilter) const;
+  std::string StretchModeLabel() const;
+  std::string RotationLabel() const;
+  std::string BezelLabel() const;
   bool ChoosePlatform();
   bool ChooseScraper();
   bool ChooseGameClient();
   bool ChooseVideoFilter();
+  bool ChooseStretchMode();
+  bool ChooseRotation();
+  bool ChooseBezel();
+  int Choose(int heading, const std::vector<std::string>& labels, int selected);
 
   std::string m_folder;
   std::unique_ptr<CPlatformCatalogue> m_catalogue;
@@ -78,6 +85,7 @@ private:
   std::string m_scraperId;
   std::string m_gameClient;
   std::string m_videoFilter;
+  GameVideoSettings m_videoSettings; // The stretch mode, rotation and bezel
   bool m_scanRecursive{true};
   bool m_useFolderNames{false};
   bool m_exclude{false};

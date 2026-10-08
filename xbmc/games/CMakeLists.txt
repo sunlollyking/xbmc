@@ -5,6 +5,7 @@ set(SOURCES AchievementRuntime.cpp
             GameServices.cpp
             GameSettings.cpp
             GameUtils.cpp
+            GameVideoSettings.cpp
             VideoFilters.cpp)
 
 set(HEADERS AchievementRuntime.h
@@ -15,6 +16,7 @@ set(HEADERS AchievementRuntime.h
             GameSettings.h
             GameTypes.h
             GameUtils.h
+            GameVideoSettings.h
             VideoFilters.h)
 
 core_add_library(games)
