@@ -11376,6 +11376,8 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
         return LIBRARY_IS_SCANNING_VIDEO; //! @todo change to IsScanning(Video)
       else if (prop.Name() == "isscanningmusic")
         return LIBRARY_IS_SCANNING_MUSIC;
+      else if (prop.Name() == "isscanninggames")
+        return LIBRARY_IS_SCANNING_GAMES;
       else if (prop.Name() == "hascontent" && prop.num_params())
       {
         std::string content{prop.param(0)};
@@ -11390,6 +11392,8 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
           return LIBRARY_HAS_TVSHOWS;
         else if (content == "musicvideos")
           return LIBRARY_HAS_MUSICVIDEOS;
+        else if (content == "games")
+          return LIBRARY_HAS_GAMES;
         else if (content == "moviesets")
           return LIBRARY_HAS_MOVIE_SETS;
         else if (content == "singles")
