@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "games/GameUtils.h"
+#include "games/library/GameDbUrl.h"
 #include "guilib/WindowIDs.h"
 #include "playlists/PlayListFileItemClassify.h"
 #include "ServiceBroker.h"
@@ -31,18 +32,72 @@ using namespace GAME;
 CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   : CGUIViewState(items)
 {
+  // "The Legend of Zelda" sorts under L where a person asked for that, as it
+  // does everywhere else in Kodi
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const SortAttribute byTitle =
+      settings && settings->GetBool(CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING)
+          ? SortAttributeIgnoreArticle
+          : SortAttributeNone;
+
   if (items.IsVirtualDirectoryRoot())
   {
-    AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS());
+    AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS(), byTitle);
     AddSortMethod(SortBy::DRIVE_TYPE, 564, LABEL_MASKS());
     SetSortMethod(SortBy::LABEL);
     SetSortOrder(SortOrder::ASCENDING);
     SetViewAsControl(DEFAULT_VIEW_LIST);
   }
+  // The library, and a playlist whose results come from it. A folder of files
+  // is not either of those, even though its items are games too.
+  else if (URIUtils::IsProtocol(items.GetPath(), "gamedb") || PLAYLIST::IsSmartPlayList(items))
+  {
+    if (items.GetContent() == "games" || items.GetContent() == "releases")
+    {
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y"), byTitle); // Title, Year
+      AddSortMethod(SortBy::YEAR, 562, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+      AddSortMethod(SortBy::RATING, 563, LABEL_MASKS("%T", "%R", "%T", "%R"));
+      AddSortMethod(SortBy::USER_RATING, 38018, LABEL_MASKS("%T", "%r", "%T", "%r"));
+      AddSortMethod(SortBy::PLAYCOUNT, 567, LABEL_MASKS("%T", "%V", "%T", "%V"));
+      AddSortMethod(SortBy::LAST_PLAYED, 568, LABEL_MASKS("%T", "%p", "%T", "%p"));
+      AddSortMethod(SortBy::TIME, 35671, LABEL_MASKS("%T", "", "%T", "")); // Time played
+      AddSortMethod(SortBy::DATE_ADDED, 570, LABEL_MASKS("%T", "%a", "%T", "%a"));
+      AddSortMethod(SortBy::STUDIO, 35549, LABEL_MASKS("%T", "%U", "%T", "%U")); // Platform
+      SetSortMethod(SortBy::LABEL);
+    }
+    else
+    {
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%L", "%V", "%L", "%V"), byTitle); // Label, count
+      SetSortMethod(SortBy::LABEL);
+    }
+    SetSortOrder(SortOrder::ASCENDING);
+
+    const CViewState* viewState = CViewStateSettings::GetInstance().Get("gameslibrary");
+    if (viewState)
+    {
+      SetSortMethod(viewState->m_sortDescription);
+      SetViewAsControl(viewState->m_viewMode);
+      SetSortOrder(viewState->m_sortDescription.sortOrder);
+    }
+
+    // A node that ranks its games opens in its own order. A sort chosen for
+    // the node itself is still restored over this when the view state loads.
+    CGameDbUrl url;
+    if (url.FromString(items.GetPath()))
+    {
+      const std::string& list = url.GetList();
+      if (list == "recentlyplayed" || list == "continueplaying")
+        SetSortMethod(SortBy::LAST_PLAYED, SortOrder::DESCENDING);
+      else if (list == "mostplayed")
+        SetSortMethod(SortBy::TIME, SortOrder::DESCENDING);
+      else if (list == "recentlyadded")
+        SetSortMethod(SortBy::DATE_ADDED, SortOrder::DESCENDING);
+    }
+  }
   else
   {
-    AddSortMethod(SortBy::FILE, 561,
-                  LABEL_MASKS("%F", "%I", "%L", "")); // Filename, Size | Label, empty
+    AddSortMethod(SortBy::FILE, 561, LABEL_MASKS("%F", "%I", "%L", ""),
+                  byTitle); // Filename, Size | Label, empty
     AddSortMethod(SortBy::SIZE, 553,
                   LABEL_MASKS("%L", "%I", "%L", "%I")); // Filename, Size | Label, Size
 
@@ -70,6 +125,9 @@ std::string CGUIViewStateWindowGames::GetExtensions()
   // Ensure .zip appears
   exts.insert(".zip");
 
+  // A smart playlist is listed alongside games, as it is for video and music
+  exts.insert(".xsp");
+
   return StringUtils::Join(exts, "|");
 }
 
@@ -89,5 +147,6 @@ std::vector<CMediaSource>& CGUIViewStateWindowGames::GetSources()
 
 void CGUIViewStateWindowGames::SaveViewState()
 {
-  SaveViewToDb(m_items.GetPath(), WINDOW_GAMES, CViewStateSettings::GetInstance().Get("games"));
+  const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb") ? "gameslibrary" : "games";
+  SaveViewToDb(m_items.GetPath(), WINDOW_GAMES, CViewStateSettings::GetInstance().Get(viewState));
 }

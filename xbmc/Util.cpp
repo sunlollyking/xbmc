@@ -1383,6 +1383,14 @@ std::string CUtil::VideoPlaylistsLocation()
   return XFILE::CMultiPathDirectory::ConstructMultiPath(vec);
 }
 
+std::string CUtil::GamePlaylistsLocation()
+{
+  const std::string path =
+      CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(
+          CSettings::SETTING_SYSTEM_PLAYLISTSPATH);
+  return URIUtils::AddFileToFolder(path, "games");
+}
+
 void CUtil::DeleteMusicDatabaseDirectoryCache()
 {
   CUtil::DeleteDirectoryCache("mdb-");
