@@ -92,8 +92,11 @@ public:
 
   // Input handlers
   bool SetRumble(const std::string& feature, float magnitude);
+  void StopRumble();
 
 private:
+  void StopMotors();
+
   // Construction parameters
   CGameClient& m_gameClient;
   const std::string m_portAddress;

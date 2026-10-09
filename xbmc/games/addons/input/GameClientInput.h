@@ -100,6 +100,9 @@ public:
   // Hardware input functions
   void HardwareReset();
 
+  // Output functions
+  void StopRumble();
+
   // Input callbacks
   bool ReceiveInputEvent(const game_input_event& eventStruct);
 
