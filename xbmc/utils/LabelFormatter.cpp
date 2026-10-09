@@ -9,6 +9,7 @@
 #include "LabelFormatter.h"
 
 #include "FileItem.h"
+#include "XBDateTime.h"
 #include "RegExp.h"
 #include "ServiceBroker.h"
 #include "StringUtils.h"
@@ -16,6 +17,7 @@
 #include "Util.h"
 #include "Variant.h"
 #include "addons/IAddon.h"
+#include "games/tags/GameInfoTag.h"
 #include "music/tags/MusicInfoTag.h"
 #include "pictures/PictureInfoTag.h"
 #include "resources/LocalizeStrings.h"

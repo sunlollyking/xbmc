@@ -391,6 +391,20 @@ public:
   //----------------------------------------------------------------------------
 
   //============================================================================
+  /// @brief Run a frame that the frontend will roll back afterwards
+  ///
+  /// Used for run-ahead. The emulator advances exactly as in RunFrame(), but
+  /// anything that must only happen once per real frame, such as evaluating
+  /// achievements, is skipped, because the frontend restores the emulator's
+  /// state afterwards.
+  ///
+  /// @return The error, or @ref GAME_ERROR_NOT_IMPLEMENTED if the add-on can't
+  ///         run a frame without side effects
+  ///
+  virtual GAME_ERROR RunFrameSpeculative() { return GAME_ERROR_NOT_IMPLEMENTED; }
+  //----------------------------------------------------------------------------
+
+  //============================================================================
   /// @brief Reset the current game
   ///
   /// @return The error, or @ref GAME_ERROR_NO_ERROR if the game was reset
@@ -449,6 +463,26 @@ public:
   void SetGameTiming(const game_system_timing& timingInfo)
   {
     m_instanceData->toKodi->SetGameTiming(m_instanceData->toKodi->kodiInstance, &timingInfo);
+  }
+  //----------------------------------------------------------------------------
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// Ask Kodi to fast-forward the game, or to stop a fast-forward it asked for
+  ///
+  /// @param[in] fastForward True to fast-forward, false to return to normal speed
+  /// @param[in] ratio The speed asked for if above 1, otherwise Kodi chooses
+  ///
+  /// For a game that wants to pass over a wait of its own, such as loading from
+  /// tape. Kodi leaves a speed the user chose alone: it only fast-forwards from
+  /// normal speed, and only returns to normal speed from the one it set.
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  void SetFastForwarding(bool fastForward, double ratio)
+  {
+    m_instanceData->toKodi->SetFastForwarding(m_instanceData->toKodi->kodiInstance, fastForward,
+                                              ratio);
   }
   //----------------------------------------------------------------------------
 
@@ -1673,6 +1707,10 @@ private:
 
     instance->game->toAddon->FreeString = ADDON_FreeString;
 
+    // Added in 8.3.0. An older Kodi's table ends before this entry.
+    if (IsInstanceAPIVersionAtLeast(8, 3, 0))
+      instance->game->toAddon->RunFrameSpeculative = ADDON_RunFrameSpeculative;
+
     m_instanceData = instance->game;
     m_instanceData->toAddon->addonInstance = this;
   }
@@ -1730,6 +1768,11 @@ private:
   inline static GAME_ERROR ADDON_RunFrame(const AddonInstance_Game* instance)
   {
     return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)->RunFrame();
+  }
+
+  inline static GAME_ERROR ADDON_RunFrameSpeculative(const AddonInstance_Game* instance)
+  {
+    return static_cast<CInstanceGame*>(instance->toAddon->addonInstance)->RunFrameSpeculative();
   }
 
   inline static GAME_ERROR ADDON_Reset(const AddonInstance_Game* instance)

@@ -154,6 +154,8 @@ public:
   const std::set<std::string>& GetExtensions() const { return m_extensions; }
   bool SupportsAllExtensions() const { return m_bSupportsAllExtensions; }
   bool IsExtensionValid(const std::string& strExtension) const;
+  //! Whether the client boots a folder, which lets it take an unpacked archive
+  bool SupportsFolders() const;
   const std::string& GetEmulatorName() const { return m_emulatorName; }
   const std::string& GetPlatforms() const { return m_platforms; }
   bool SupportsDiscControl() const { return m_supportsDiscControl; }
@@ -176,6 +178,19 @@ public:
   double GetSampleRate() const { return m_samplerate.load(); }
   void PollInput();
   void RunFrame(bool pollInput = true);
+
+  /*!
+   * \brief Run a frame that will be rolled back, without the side effects of a
+   *        real one such as evaluating achievements
+   *
+   * \return False if the client can't, or the frame failed
+   */
+  bool RunFrameSpeculative();
+
+  /*!
+   * \brief Whether RunFrameSpeculative() may work, as far as is known yet
+   */
+  bool SupportsSpeculativeFrames() const;
 
   /*!
    * \brief Tell the client what speed the player is running at
@@ -201,6 +216,14 @@ public:
   RestoreResult Deserialize(const uint8_t* data,
                             size_t size,
                             const CGameClientDiscModel* discState = nullptr);
+
+  /*!
+   * \brief Put back a state this client produced moments ago
+   *
+   * Unlike Deserialize(), leaves the discs alone: the state was taken from the
+   * running client with the same media inserted.
+   */
+  bool RestoreState(const uint8_t* data, size_t size);
 
   /*!
    * \brief Hold the client still for the duration of a savestate snapshot
@@ -249,6 +272,22 @@ public:
   void LogException(const char* strFunctionName) const;
 
 private:
+  /*!
+   * \brief Copy a game, and any other disks of it, out of its archive for a
+   *        client that reads only local files
+   *
+   * \return The copy's local path, or empty if it could not be made
+   */
+  std::string ExtractGame(const std::string& archivedPath);
+
+  /*!
+   * \brief Unpack an archive into a folder, for a client that boots one
+   *
+   * \return The folder's local path, or empty if it could not be made
+   */
+  std::string ExtractFolder(const std::string& archivePath);
+  static bool CopyTree(const std::string& from, const std::string& to);
+
   // Private gameplay functions
   bool InitializeGameplay(const std::string& gamePath,
                           RETRO::IStreamManager& streamManager,
@@ -269,6 +308,7 @@ private:
                                            const game_hw_rendering_properties* properties);
   static void cb_close_game(KODI_HANDLE kodiInstance);
   static double cb_get_playback_speed(KODI_HANDLE kodiInstance);
+  static void cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForward, double ratio);
   static void cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo);
   static bool cb_start_stream(KODI_HANDLE kodiInstance, KODI_GAME_STREAM_HANDLE stream);
   static KODI_GAME_STREAM_HANDLE cb_open_stream(KODI_HANDLE kodiInstance,
@@ -358,6 +398,7 @@ private:
   // Properties of the current playing file
   std::atomic_bool m_bIsPlaying; // True between OpenFile() and CloseFile()
   std::atomic_bool m_hasFrameRun{false};
+  std::atomic_bool m_speculativeSupported{true};
   // The speed the player is running at, as a multiple of normal speed. Written
   // by the thread that changes the speed and read by the client's own, so it is
   // atomic; a client asks for it from inside a call of its own, which can be on
@@ -369,6 +410,7 @@ private:
   // would read as paused and have a client behave as though the user had
   // stopped the game before it started.
   std::atomic<double> m_playbackSpeed{1.0};
+  std::atomic<double> m_fastForwardSpeed{0.0}; // The speed set for the client, or 0
   std::string m_gamePath;
   bool m_bRequiresGameLoop = false;
   mutable size_t m_serializeSize = 0;

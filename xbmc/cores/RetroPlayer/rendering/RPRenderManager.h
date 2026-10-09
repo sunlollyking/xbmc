@@ -35,6 +35,7 @@ namespace KODI
 namespace RETRO
 {
 class CGUIRenderTargetFactory;
+class CRenderBezel;
 class CRenderContext;
 class CRenderSettings;
 class CRPBaseRenderer;
@@ -123,6 +124,21 @@ public:
 
   // Functions called from the player
   void SetSpeed(double speed);
+
+  /*!
+   * \brief Frame the game with a bezel
+   *
+   * The picture loads in the background. Until it has, or if it has no window
+   * for the game, the game is drawn as it would be without one.
+   *
+   * \param url The bezel's picture
+   */
+  void SetBezel(const std::string& url);
+
+  /*!
+   * \brief True once a bezel has loaded that has a window for the game
+   */
+  bool HasBezel() const { return m_hasBezel; }
 
   // Functions called from render thread
   void FrameMove();
@@ -234,6 +250,11 @@ private:
 
   CRenderVideoSettings GetEffectiveSettings(const IGUIRenderSettings* settings) const;
 
+  /*!
+   * \brief Get the bezel, once it has loaded
+   */
+  std::shared_ptr<CRenderBezel> GetBezel();
+
   void CheckFlush();
   void DestroyContextInternal();
 
@@ -315,6 +336,8 @@ private:
   uintptr_t m_loggedFramebuffer{0};
   bool m_loggedHardwareCapture{false};
   std::vector<IRenderBuffer*> m_renderBuffers;
+  std::atomic<uint64_t> m_framesGiven{0};
+  uint64_t m_lastFrameTaken{0}; // Rendering thread only
   std::map<AVPixelFormat, std::map<AVPixelFormat, SwsContext*>> m_scalers; // From -> to -> context
   std::vector<uint8_t> m_cachedFrame;
   unsigned int m_cachedWidth = 0;
@@ -324,6 +347,16 @@ private:
   std::map<std::string, std::vector<IRenderBuffer*>>
       m_savestateBuffers; // Render buffers for savestates
   std::vector<std::future<void>> m_savestateThreads;
+  struct BezelLoad
+  {
+    std::mutex mutex;
+    bool done{false};
+    std::shared_ptr<CRenderBezel> bezel;
+  };
+  std::shared_ptr<BezelLoad> m_bezelLoad;
+  std::shared_ptr<CRenderBezel> m_bezel;
+  std::atomic<bool> m_hasBezel{false};
+  std::mutex m_bezelMutex;
 
   // State parameters
   enum class RENDER_STATE

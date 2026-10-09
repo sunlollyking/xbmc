@@ -10,6 +10,10 @@
 
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "addons/AddonManager.h"
+#include "addons/IAddon.h"
+#include "addons/addoninfo/AddonType.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "events/EventLog.h"
 #include "events/NotificationEvent.h"
 #include "filesystem/CurlFile.h"
@@ -43,10 +47,15 @@ const std::string SETTING_GAMES_SHOW_OSD_HELP = "gamesgeneral.showosdhelp";
 const std::string SETTING_GAMES_ENABLEAUTOSAVE = "gamesgeneral.enableautosave";
 const std::string SETTING_GAMES_ENABLEREWIND = "gamesgeneral.enablerewind";
 const std::string SETTING_GAMES_REWINDTIME = "gamesgeneral.rewindtime";
+const std::string SETTING_GAMES_ENABLERUNAHEAD = "gamesgeneral.enablerunahead";
+const std::string SETTING_GAMES_RUNAHEADFRAMES = "gamesgeneral.runaheadframes";
+const std::string SETTING_GAMES_SYNC_TO_DISPLAY = "gamesgeneral.synctodisplay";
+const std::string SETTING_GAMES_SYNC_TO_DISPLAY_LIMIT = "gamesgeneral.synctodisplaylimit";
 const std::string SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT = "gamesachievements.createaccount";
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
 const std::string SETTING_GAMES_ACHIEVEMENTS_TOKEN = "gamesachievements.token";
+const std::string SETTING_GAMES_ACHIEVEMENTS_HARDCORE = "gamesachievements.hardcore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_ENCORE = "gamesachievements.encore";
 const std::string SETTING_GAMES_ACHIEVEMENTS_INDICATOR = "gamesachievements.challengeindicator";
 const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.loggedin";
@@ -69,6 +78,7 @@ constexpr auto TOKEN = "Token";
 CGameSettings::CGameSettings()
 {
   m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  m_achievementsHardcore = m_settings->GetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE);
 
   m_settings->RegisterCallback(
       this, {SETTING_GAMES_ENABLEREWIND, SETTING_GAMES_REWINDTIME,
@@ -127,11 +137,31 @@ bool CGameSettings::RewindEnabled()
   return m_settings->GetBool(SETTING_GAMES_ENABLEREWIND);
 }
 
+bool CGameSettings::RunaheadEnabled() const
+{
+  return m_settings->GetBool(SETTING_GAMES_ENABLERUNAHEAD);
+}
+
+unsigned int CGameSettings::RunaheadFrames() const
+{
+  return static_cast<unsigned int>(std::max(m_settings->GetInt(SETTING_GAMES_RUNAHEADFRAMES), 0));
+}
+
 unsigned int CGameSettings::MaxRewindTimeSec()
 {
   int rewindTimeSec = m_settings->GetInt(SETTING_GAMES_REWINDTIME);
 
   return static_cast<unsigned int>(std::max(rewindTimeSec, 0));
+}
+
+bool CGameSettings::SyncPlaybackToDisplay()
+{
+  return m_settings->GetBool(SETTING_GAMES_SYNC_TO_DISPLAY);
+}
+
+double CGameSettings::SyncToDisplayLimit()
+{
+  return std::max(m_settings->GetInt(SETTING_GAMES_SYNC_TO_DISPLAY_LIMIT), 0) / 100.0;
 }
 
 std::string CGameSettings::GetRAUsername() const
@@ -157,6 +187,8 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
 
   const std::string& settingId = setting->GetId();
 
+  if (settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE)
+    m_achievementsHardcore = std::dynamic_pointer_cast<const CSettingBool>(setting)->GetValue();
   // Signing in or out changes who the kept standings describe, and the runtime
   // holds them per game rather than per account. Settings outlive the services
   // that read them, so the runtime is only reached while it is there.
@@ -167,8 +199,13 @@ void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& sett
   }
 
   if (settingId == SETTING_GAMES_ENABLEREWIND || settingId == SETTING_GAMES_REWINDTIME ||
+      settingId == SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
+      settingId == SETTING_GAMES_ENABLERUNAHEAD || settingId == SETTING_GAMES_RUNAHEADFRAMES ||
       settingId == SETTING_GAMES_ACHIEVEMENTS_ENCORE)
   {
+    // Hardcore belongs with the rewind settings: turning it on has to drop the
+    // rewind buffer, or the frames already in it stay rewindable for the rest
+    // of the session
     SetChanged();
     NotifyObservers(ObservableMessageSettingsChanged);
   }
@@ -318,6 +355,22 @@ bool CGameSettings::IsAccountVerified(const std::string& username, const std::st
 
   CLog::Log(LOGERROR, "CGameSettings::IsAccountVerified -- verification request failed");
   return false;
+}
+
+bool CGameSettings::GetAchievementsHardcore() const
+{
+  return m_achievementsHardcore;
+}
+
+void CGameSettings::SetAchievementsHardcore(bool hardcore)
+{
+  m_settings->SetBool(SETTING_GAMES_ACHIEVEMENTS_HARDCORE, hardcore);
+}
+
+bool CGameSettings::AchievementsHardcoreOffered() const
+{
+  const auto setting = m_settings->GetSetting(SETTING_GAMES_ACHIEVEMENTS_HARDCORE);
+  return setting && setting->IsVisible();
 }
 
 bool CGameSettings::GetAchievementsEncore() const

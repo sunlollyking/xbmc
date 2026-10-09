@@ -15,6 +15,7 @@
 #include "games/GameSettings.h"
 #include "games/GameUtils.h"
 #include "games/agents/input/AgentInput.h"
+#include "games/database/GameDatabase.h"
 #include "profiles/ProfileManager.h"
 #include "utils/FileExtensionProvider.h"
 

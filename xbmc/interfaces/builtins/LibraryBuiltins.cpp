@@ -30,6 +30,7 @@
 #include "utils/StringUtils.h"
 #include "utils/log.h"
 #include "video/VideoDatabase.h"
+#include "games/database/GameDatabase.h"
 #include "video/VideoLibraryQueue.h"
 
 using namespace KODI::MESSAGING;

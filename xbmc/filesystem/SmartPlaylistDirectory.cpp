@@ -14,6 +14,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/FileDirectoryFactory.h"
+#include "games/database/GameDatabase.h"
 #include "music/MusicDatabase.h"
 #include "music/MusicDbUrl.h"
 #include "playlists/PlayListTypes.h"

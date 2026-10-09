@@ -18,6 +18,7 @@
 #include "application/ApplicationStackHelper.h"
 #ifdef HAVE_LIBBLURAY
 #include "filesystem/BlurayDirectory.h"
+#include "games/GameServices.h"
 #endif
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"

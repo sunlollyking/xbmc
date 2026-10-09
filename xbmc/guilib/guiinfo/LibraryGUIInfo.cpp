@@ -13,6 +13,7 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "filesystem/Directory.h"
+#include "games/database/GameDatabase.h"
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
 #include "music/MusicDatabase.h"

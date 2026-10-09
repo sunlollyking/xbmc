@@ -70,6 +70,7 @@ public:
   bool IsDiscEjected() const override;
   std::string DiscLabel() const override;
   bool IsTrayEmpty() const override;
+  bool HasBezel() const override;
 
   // Implementation of IGameCallback
   std::string GameClientID() const override;
@@ -92,6 +93,26 @@ private:
   bool Open(const CFileItem& file, const CPlayerOptions& options);
 
   void SetSpeedInternal(double speed);
+
+  /*!
+   * \brief Refuse a speed that hardcore mode withholds
+   *
+   * Rewind and slow motion are withheld, fast forward and pausing are not.
+   * Answered before anything is told the speed changed, so the game, its
+   * sound and what is shown on screen stay in step.
+   *
+   * \return True if the speed was refused
+   */
+  bool RefuseSpeedInHardcore(double speed) const;
+
+  /*!
+   * \brief Return to normal speed if hardcore started during rewind or slow
+   *        motion
+   *
+   * Hardcore can be switched on by a route that doesn't pause the game first,
+   * such as JSON-RPC once the setting is shown.
+   */
+  void LeaveSpeedRefusedInHardcore();
 
   /*!
    * \brief Called when the speed changes

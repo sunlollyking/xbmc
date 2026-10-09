@@ -17,6 +17,7 @@
 #include "cores/RetroPlayer/guibridge/GUIRenderHandle.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
+#include "games/dialogs/osd/DialogGameIndicators.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIControl.h"
 #include "guilib/GUIDialog.h"
@@ -180,7 +181,11 @@ void CGameWindowFullScreen::OnInitWindow()
   // Switch resolution
   CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(true); //! @todo
 
+  CServiceBroker::GetWinSystem()->SetLowLatencyPresentation(true);
+
   CGUIWindow::OnInitWindow();
+
+  GAME::CDialogGameIndicators::SetOverGame(true);
 
   // Show OSD help
   GAME::CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
@@ -206,7 +211,11 @@ void CGameWindowFullScreen::OnDeinitWindow(int nextWindowID)
   // Close all active modal dialogs
   CServiceBroker::GetGUI()->GetWindowManager().CloseInternalModalDialogs(true);
 
+  GAME::CDialogGameIndicators::SetOverGame(false);
+
   CGUIWindow::OnDeinitWindow(nextWindowID);
+
+  CServiceBroker::GetWinSystem()->SetLowLatencyPresentation(false);
 
   CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(false); //! @todo
 }

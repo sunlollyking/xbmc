@@ -9,6 +9,7 @@
 #include "GameClient.h"
 
 #include "FileItem.h"
+#include "FileItemList.h"
 #include "GameClientCallbacks.h"
 #include "GameClientInGameSaves.h"
 #include "GameClientProperties.h"
@@ -19,7 +20,12 @@
 #include "addons/BinaryAddonCache.h"
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
+#include "application/ApplicationComponents.h"
+#include "application/ApplicationPlayer.h"
 #include "filesystem/Directory.h"
+#include "filesystem/File.h"
+#include "filesystem/FileDirectoryFactory.h"
+#include "filesystem/IFileDirectory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/GameServices.h"
 #include "games/addons/cheats/GameClientCheats.h"
@@ -33,10 +39,12 @@
 #include "guilib/WindowIDs.h"
 #include "input/actions/Action.h"
 #include "input/actions/ActionIDs.h"
+#include "jobs/JobManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "utils/Digest.h"
 #include "utils/FileUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -49,6 +57,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <vector>
 
 using namespace KODI;
 using namespace GAME;
@@ -64,6 +73,50 @@ using namespace GAME;
 
 namespace
 {
+//! Where a game kept in an archive is copied for a client that reads only local
+//! files. Copies are kept and never overwritten, because a disk-based game
+//! saves onto its own disks.
+constexpr const char* EXTRACTED_GAMES_FOLDER = "special://profile/games/extracted/";
+
+/*!
+ * \brief The folder an archive's games are copied to
+ *
+ * Named after the archive so it can be recognised, and told apart from any
+ * other archive of the same name by a hash of where it is. The hash has to stay
+ * the same between versions, or a game would lose the saves on its copy.
+ */
+std::string ExtractedFolder(const std::string& archive)
+{
+  std::string name = URIUtils::GetFileName(archive);
+  URIUtils::RemoveExtension(name);
+  const std::string hash =
+      KODI::UTILITY::CDigest::Calculate(KODI::UTILITY::CDigest::Type::MD5, archive).substr(0, 8);
+  return URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, name + "-" + hash) + "/";
+}
+
+//! Whether a name read from an archive stays inside the folder it is copied to
+bool IsSafeName(const std::string& name)
+{
+  return !name.empty() && name != "." && name != ".." &&
+         name.find_first_of("/\\") == std::string::npos;
+}
+
+// Copied under a temporary name and then renamed, so a copy that was
+// interrupted is never taken for a complete one on a later start
+bool CopyWhole(const std::string& from, const std::string& to)
+{
+  const std::string partial = to + ".tmp";
+  if (XFILE::CFile::Copy(from, partial) && XFILE::CFile::Rename(partial, to))
+    return true;
+
+  XFILE::CFile::Delete(partial);
+  return false;
+}
+
+//! The speed a client gets when it asks to fast-forward and leaves the speed to
+//! Kodi. The game loop goes no faster than the client can run frames.
+constexpr double CLIENT_FAST_FORWARD_SPEED = 16.0;
+
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 
@@ -195,6 +248,12 @@ bool CGameClient::IsExtensionValid(const std::string& strExtension) const
   return m_extensions.contains(NormalizeExtension(strExtension));
 }
 
+bool CGameClient::SupportsFolders() const
+{
+  // Libretro's mark for an emulator that boots a whole folder
+  return m_extensions.contains(NormalizeExtension("/"));
+}
+
 bool CGameClient::Initialize(void)
 {
   using namespace XFILE;
@@ -216,6 +275,7 @@ bool CGameClient::Initialize(void)
   m_ifc.game->toKodi->EnableHardwareRendering = cb_enable_hardware_rendering;
   m_ifc.game->toKodi->CloseGame = cb_close_game;
   m_ifc.game->toKodi->GetPlaybackSpeed = cb_get_playback_speed;
+  m_ifc.game->toKodi->SetFastForwarding = cb_set_fast_forwarding;
   m_ifc.game->toKodi->SetGameTiming = cb_set_game_timing;
   m_ifc.game->toKodi->OpenStream = cb_open_stream;
   m_ifc.game->toKodi->StartStream = cb_start_stream;
@@ -252,6 +312,7 @@ bool CGameClient::Initialize(void)
   if (CreateInstance(&m_ifc) == ADDON_STATUS_OK)
   {
     Input().Initialize();
+    Cheevos().ObserveSettings();
     LogAddonProperties();
     return true;
   }
@@ -263,6 +324,7 @@ bool CGameClient::Initialize(void)
 
 void CGameClient::Unload()
 {
+  Cheevos().StopObservingSettings();
   CloseFile();
   Streams().Deinitialize();
   Input().Deinitialize();
@@ -308,6 +370,29 @@ bool CGameClient::OpenFile(const CFileItem& file,
     return false;
 
   CloseFile();
+
+  if (!m_bSupportsVFS && URIUtils::IsInArchive(file.GetDynPath()))
+  {
+    path = ExtractGame(file.GetDynPath());
+    if (path.empty())
+    {
+      // "Failed to play game"
+      // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+      MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
+      return false;
+    }
+  }
+  else if (!IsExtensionValid(URIUtils::GetExtension(path)) && SupportsFolders())
+  {
+    path = ExtractFolder(file.GetDynPath());
+    if (path.empty())
+    {
+      // "Failed to play game"
+      // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+      MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
+      return false;
+    }
+  }
 
   GAME_ERROR error = GAME_ERROR_FAILED;
 
@@ -434,6 +519,10 @@ bool CGameClient::InitializeGameplay(const std::string& gamePath,
                                      RETRO::IStreamManager& streamManager,
                                      IGameInputCallback* input)
 {
+  // Whether frames can be run ahead is a property of the game as well as the
+  // client: a core may refuse for one game and not the next
+  m_speculativeSupported = true;
+
   bool gameInfoLoaded = LoadGameInfo();
   if (SupportsDiscControl() && Discs().HasPersistedState() &&
       (!gameInfoLoaded || !Discs().RestoreDiscList()))
@@ -673,6 +762,131 @@ void CGameClient::Reset()
   }
 }
 
+std::string CGameClient::ExtractGame(const std::string& archivedPath)
+{
+  const std::string folder = ExtractedFolder(CURL(archivedPath).GetHostName());
+
+  if (!XFILE::CDirectory::Exists(folder) && !XFILE::CDirectory::Create(folder))
+    return "";
+
+  std::vector<std::string> disks{archivedPath};
+  const std::string extension = URIUtils::GetExtension(archivedPath);
+  CFileItemList siblings;
+  if (XFILE::CDirectory::GetDirectory(URIUtils::GetDirectory(archivedPath), siblings, extension,
+                                      XFILE::DIR_FLAG_DEFAULTS))
+  {
+    for (const auto& sibling : siblings)
+    {
+      // Listed paths need not be spelled as the one asked for, so compare names
+      if (!sibling->IsFolder() &&
+          URIUtils::GetFileName(sibling->GetPath()) != URIUtils::GetFileName(archivedPath))
+        disks.push_back(sibling->GetPath());
+    }
+  }
+  std::sort(disks.begin() + 1, disks.end());
+
+  std::vector<std::string> names;
+  for (const std::string& disk : disks)
+  {
+    const std::string name = URIUtils::GetFileName(disk);
+    if (!IsSafeName(name))
+      return "";
+    const std::string target = URIUtils::AddFileToFolder(folder, name);
+
+    if (!XFILE::CFile::Exists(target) && !CopyWhole(disk, target))
+    {
+      CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(disk));
+      return "";
+    }
+    names.push_back(name);
+  }
+
+  std::string game = URIUtils::AddFileToFolder(folder, names.front());
+
+  // A playlist lets the emulator swap to the other disks
+  if (names.size() > 1 && IsExtensionValid(".m3u"))
+  {
+    std::string playlist = game;
+    URIUtils::RemoveExtension(playlist);
+    playlist += ".m3u";
+
+    // A playlist is replaced only through a complete copy written aside, so a
+    // failed write never leaves a partial one. Rename can't replace a file on
+    // every platform, so an outdated playlist is removed first.
+    const std::string content = StringUtils::Join(names, "\n") + "\n";
+    std::vector<uint8_t> current;
+    if (XFILE::CFile().LoadFile(playlist, current) < 0 ||
+        std::string(current.begin(), current.end()) != content)
+    {
+      const std::string partial = playlist + ".tmp";
+      XFILE::CFile file;
+      const bool written =
+          file.OpenForWrite(partial, true) &&
+          file.Write(content.data(), content.size()) == static_cast<ssize_t>(content.size());
+      file.Close();
+      if (!written || (XFILE::CFile::Exists(playlist) && !XFILE::CFile::Delete(playlist)) ||
+          !XFILE::CFile::Rename(partial, playlist))
+        XFILE::CFile::Delete(partial);
+    }
+
+    if (XFILE::CFile::Exists(playlist))
+      game = playlist;
+  }
+
+  CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted copy", CURL::GetRedacted(game));
+
+  return CSpecialProtocol::TranslatePath(game);
+}
+
+std::string CGameClient::ExtractFolder(const std::string& archivePath)
+{
+  const std::string folder = ExtractedFolder(archivePath);
+
+  // Every start fills in what an unpacking cut short left out
+  CFileItem archive(archivePath, false);
+  const std::unique_ptr<XFILE::IFileDirectory> directory{
+      XFILE::CFileDirectoryFactory::Create(CURL{archivePath}, &archive)};
+  if (!directory || (!XFILE::CDirectory::Exists(folder) && !XFILE::CDirectory::Create(folder)) ||
+      !CopyTree(archive.GetPath(), folder))
+  {
+    CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(archivePath));
+    return "";
+  }
+
+  CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted folder",
+            CURL::GetRedacted(archivePath));
+
+  return CSpecialProtocol::TranslatePath(folder);
+}
+
+bool CGameClient::CopyTree(const std::string& from, const std::string& to)
+{
+  CFileItemList items;
+  if (!XFILE::CDirectory::GetDirectory(from, items, "", XFILE::DIR_FLAG_NO_FILE_DIRS))
+    return false;
+
+  for (const auto& item : items)
+  {
+    if (!IsSafeName(item->GetLabel()))
+    {
+      CLog::Log(LOGERROR, "GameClient: Refusing archive entry {}",
+                CURL::GetRedacted(item->GetPath()));
+      return false;
+    }
+    const std::string target = URIUtils::AddFileToFolder(to, item->GetLabel());
+    if (item->IsFolder())
+    {
+      if ((!XFILE::CDirectory::Exists(target) && !XFILE::CDirectory::Create(target)) ||
+          !CopyTree(item->GetPath(), URIUtils::AddFileToFolder(target, "")))
+        return false;
+    }
+    else if (!XFILE::CFile::Exists(target) && !CopyWhole(item->GetPath(), target))
+      return false;
+  }
+
+  return true;
+}
+
 void CGameClient::CloseFile()
 {
   std::unique_lock lock(m_critSection);
@@ -739,6 +953,51 @@ void CGameClient::PollInput()
   // The event scanner calls back into the client on another thread while this waits.
   if (input)
     input->PollInput();
+}
+
+bool CGameClient::SupportsSpeculativeFrames() const
+{
+  return m_ifc.game->toAddon->RunFrameSpeculative != nullptr && m_speculativeSupported;
+}
+
+bool CGameClient::RunFrameSpeculative()
+{
+  if (!SupportsSpeculativeFrames())
+    return false;
+
+  std::unique_lock lock(m_critSection);
+
+  if (!m_bIsPlaying)
+    return false;
+
+  try
+  {
+    CClientFrameScope hwScope(Streams());
+    if (!hwScope.IsBound())
+      return false;
+
+    const GAME_ERROR error = m_ifc.game->toAddon->RunFrameSpeculative(m_ifc.game);
+    if (error == GAME_ERROR_NOT_IMPLEMENTED)
+    {
+      CLog::Log(LOGINFO, "GAME: {} can't run speculative frames", ID());
+      m_speculativeSupported = false;
+      return false;
+    }
+    if (!LogError(error, "RunFrameSpeculative()"))
+      return false;
+
+    const GAME_ERROR audioError = m_ifc.game->toAddon->AudioAvailable(m_ifc.game);
+    if (audioError != GAME_ERROR_NO_ERROR && audioError != GAME_ERROR_NOT_IMPLEMENTED)
+      LogError(audioError, "AudioAvailable()");
+
+    return true;
+  }
+  catch (...)
+  {
+    LogException("RunFrameSpeculative()");
+  }
+
+  return false;
 }
 
 void CGameClient::RunFrame(bool pollInput)
@@ -925,6 +1184,29 @@ RestoreResult CGameClient::Deserialize(const uint8_t* data,
   return bSuccess ? RestoreResult::Restored : RestoreResult::StateUncertain;
 }
 
+bool CGameClient::RestoreState(const uint8_t* data, size_t size)
+{
+  if (data == nullptr || size == 0)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+  if (!m_bIsPlaying)
+    return false;
+
+  try
+  {
+    CClientFrameScope hwScope(Streams());
+    if (hwScope.IsBound())
+      return LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
+  }
+  catch (...)
+  {
+    LogException("Deserialize()");
+  }
+
+  return false;
+}
+
 bool CGameClient::SerializeAchievementState(std::vector<uint8_t>& data)
 {
   data.clear();
@@ -1088,6 +1370,40 @@ double CGameClient::cb_get_playback_speed(KODI_HANDLE kodiInstance)
     return 0.0;
 
   return gameClient->m_playbackSpeed;
+}
+
+void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForward, double ratio)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr)
+    return;
+
+  double from;
+  double to;
+  if (fastForward)
+  {
+    from = 1.0;
+    to = ratio > 1.0 ? ratio : CLIENT_FAST_FORWARD_SPEED;
+    gameClient->m_fastForwardSpeed = to;
+  }
+  else
+  {
+    from = gameClient->m_fastForwardSpeed.exchange(0.0);
+    to = 1.0;
+    if (from == 0.0)
+      return;
+  }
+
+  // The call comes from inside a frame, and changing speed waits on the game loop
+  CServiceBroker::GetJobManager()->Submit(
+      [from, to]()
+      {
+        const auto appPlayer =
+            CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
+        if (appPlayer && appPlayer->IsPlayingGame() &&
+            static_cast<double>(appPlayer->GetPlaySpeed()) == from)
+          appPlayer->SetPlaySpeed(static_cast<float>(to));
+      });
 }
 
 void CGameClient::cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo)

@@ -12,8 +12,13 @@
 #include "FileItemList.h"
 #include "games/GameUtils.h"
 #include "guilib/WindowIDs.h"
+#include "playlists/PlayListFileItemClassify.h"
+#include "ServiceBroker.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "settings/MediaSourceSettings.h"
 #include "utils/StringUtils.h"
+#include "utils/URIUtils.h"
 #include "view/ViewState.h"
 #include "view/ViewStateSettings.h"
 

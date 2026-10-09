@@ -21,9 +21,14 @@
 #include "cores/RetroPlayer/guibridge/GUIGameSettingsHandle.h"
 #include "cores/RetroPlayer/savestates/ISavestate.h"
 #include "cores/RetroPlayer/savestates/SavestateDatabase.h"
+#include "dialogs/GUIDialogContextMenu.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogOK.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/AddonsDirectory.h"
+#include "filesystem/File.h"
+#include "filesystem/FileDirectoryFactory.h"
+#include "filesystem/IFileDirectory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/addons/GameClient.h"
 #include "games/database/GameDatabase.h"
@@ -36,14 +41,42 @@
 #include "messaging/helpers/DialogOKHelper.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
+#include "utils/Variant.h"
 #include "utils/log.h"
 
 #include <algorithm>
+#include <vector>
 
 using namespace KODI;
 using namespace GAME;
+
+namespace
+{
+/*!
+ * \brief Whether a disk is the one a game starts from, going by its name
+ *
+ * Sets name the boot disk "Disk A", "Disk 1" or "System disk", or give it no
+ * tag at all beside its "User disk" and "Data disk", which sort before it.
+ */
+bool IsStartDisk(const std::string& path)
+{
+  std::string name = URIUtils::GetFileName(path);
+  URIUtils::RemoveExtension(name);
+  StringUtils::ToLower(name);
+
+  const size_t open = name.rfind('(');
+  if (open == std::string::npos || name.back() != ')')
+    return true;
+
+  const std::string tag = name.substr(open + 1, name.size() - open - 2);
+  return tag == "disk a" || tag == "disk 1" || StringUtils::StartsWith(tag, "disk a -") ||
+         tag == "system disk" || tag == "program disk" || tag == "boot disk" || tag == "game disk";
+}
+} // namespace
 
 // Initialize static state
 ADDON::VECADDONS CGameUtils::m_installableGameAddons;
@@ -346,15 +379,22 @@ void CGameUtils::GetGameClients(const ADDON::VECADDONS& addons,
 
   const std::string extension = URIUtils::GetExtension(translatedUrl.Get());
 
-  const bool bIsLocalFile =
-      (translatedUrl.GetProtocol() == "file" || translatedUrl.GetProtocol().empty());
+  // A game inside an archive is copied out for a client that reads only local
+  // files, so it can be offered one
+  const bool bIsLocalFile = translatedUrl.GetProtocol() == "file" ||
+                            translatedUrl.GetProtocol().empty() ||
+                            URIUtils::IsInArchive(translatedUrl.Get());
+
+  // An emulator that boots a folder can take an archive unpacked into one
+  const bool bIsArchive =
+      bIsLocalFile && CFileItem(translatedUrl.Get(), false).IsFileFolder(FileFolderType::ALWAYS);
 
   for (auto& addon : addons)
   {
     GameClientPtr gameClient = std::static_pointer_cast<CGameClient>(addon);
 
     // Filter by extension
-    if (!gameClient->IsExtensionValid(extension))
+    if (!gameClient->IsExtensionValid(extension) && !(bIsArchive && gameClient->SupportsFolders()))
       continue;
 
     // Filter by VFS
@@ -537,4 +577,17 @@ GameClientPtr CGameUtils::GetPlayingGameClient()
     return {};
 
   return std::static_pointer_cast<CGameClient>(addon);
+}
+
+void CGameUtils::NotifyBlockedByHardcore(uint32_t featureStringId)
+{
+  constexpr unsigned int TOAST_DISPLAY_TIME_MS = 5000;
+
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+
+  // "Hardcore mode", "{0:s} is not available". The mode heads the toast so the
+  // longest feature name still fits the notification's fixed width.
+  CGUIDialogKaiToast::QueueNotification(
+      CGUIDialogKaiToast::Info, strings.Get(35700),
+      StringUtils::Format(strings.Get(35305), strings.Get(featureStringId)), TOAST_DISPLAY_TIME_MS);
 }

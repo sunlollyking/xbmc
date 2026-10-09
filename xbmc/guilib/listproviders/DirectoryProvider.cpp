@@ -16,6 +16,7 @@
 #include "addons/RepositoryUpdater.h"
 #include "favourites/FavouritesService.h"
 #include "filesystem/Directory.h"
+#include "games/GameUtils.h"
 #include "interfaces/AnnouncementManager.h"
 #include "interfaces/IAnnouncer.h"
 #include "jobs/JobManager.h"

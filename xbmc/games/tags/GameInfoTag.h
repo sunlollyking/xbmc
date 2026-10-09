@@ -12,7 +12,10 @@
 #include "utils/ISerializable.h"
 #include "utils/ISortable.h"
 
+#include <map>
 #include <string>
+#include <vector>
+#include <tinyxml2.h>
 
 namespace KODI
 {

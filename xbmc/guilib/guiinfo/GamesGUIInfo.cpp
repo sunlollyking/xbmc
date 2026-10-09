@@ -9,6 +9,7 @@
 #include "guilib/guiinfo/GamesGUIInfo.h"
 
 #include "FileItem.h"
+#include "XBDateTime.h"
 #include "GUIInfoManager.h"
 #include "ServiceBroker.h"
 #include "Util.h"
@@ -28,7 +29,11 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/guiinfo/GUIInfo.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
+#include "media/MediaType.h"
+#include "settings/AdvancedSettings.h"
 #include "settings/MediaSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -359,6 +364,20 @@ bool CGamesGUIInfo::GetBool(bool& value,
 
       return true;
     }
+    case RETROPLAYER_HAS_BEZEL:
+    {
+      const auto& components = CServiceBroker::GetAppComponents();
+      const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+
+      value = appPlayer && appPlayer->HasBezel();
+
+      return true;
+    }
+    case RETROPLAYER_BEZEL_ENABLED:
+    {
+      value = CMediaSettings::GetInstance().GetCurrentGameSettings().BezelEnabled();
+      return true;
+    }
     case RETROPLAYER_ACHIEVEMENTS_LOGGED_IN:
     {
       value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsLoggedIn();
@@ -374,6 +393,11 @@ bool CGamesGUIInfo::GetBool(bool& value,
     {
       const GameClientPtr gameClient = CGameUtils::GetPlayingGameClient();
       value = gameClient && gameClient->Cheats().HasCheats();
+      return true;
+    }
+    case RETROPLAYER_ACHIEVEMENTS_HARDCORE:
+    {
+      value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
       return true;
     }
     default:
