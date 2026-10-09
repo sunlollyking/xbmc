@@ -20764,6 +20764,34 @@ msgctxt "#35668"
 msgid "As named on disk"
 msgstr ""
 
+msgctxt "#35669"
+msgid "Mark as completed"
+msgstr ""
+
+msgctxt "#35670"
+msgid "Mark as not completed"
+msgstr ""
+
+msgctxt "#35671"
+msgid "Time played"
+msgstr ""
+
+msgctxt "#35672"
+msgid "Continue playing"
+msgstr ""
+
+msgctxt "#35673"
+msgid "Games you have started and not finished, the most recently played first."
+msgstr ""
+
+msgctxt "#35674"
+msgid "Most played"
+msgstr ""
+
+msgctxt "#35675"
+msgid "The games you have spent the longest playing."
+msgstr ""
+
 
 #. Label of the setting that enables RetroAchievements hardcore mode
 #: system/settings/settings.xml

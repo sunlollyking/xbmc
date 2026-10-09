@@ -179,6 +179,7 @@ private:
   std::unique_ptr<IPlaybackControl> m_playbackControl;
   std::unique_ptr<CRetroPlayerAutoSave> m_autoSave;
 
+
   // Game parameters
   GAME::GameClientPtr m_gameClient;
   std::string m_videoSettingsPath; // The game its video settings are kept for

@@ -1,4 +1,5 @@
 set(SOURCES AchievementRuntime.cpp
+            ContextMenus.cpp
             GameThumbLoader.cpp
             GameManual.cpp
             GameServices.cpp
@@ -8,6 +9,7 @@ set(SOURCES AchievementRuntime.cpp
             VideoFilters.cpp)
 
 set(HEADERS AchievementRuntime.h
+            ContextMenus.h
             GameThumbLoader.h
             GameManual.h
             GameServices.h
