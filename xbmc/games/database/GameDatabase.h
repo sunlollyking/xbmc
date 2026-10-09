@@ -292,9 +292,20 @@ public:
    * goes.
    */
   bool MergeGameInto(int idFrom, int idInto);
-  int FindGameByUniqueId(int idPlatform, const std::string& type, const std::string& value,
-                         int exceptGame = -1);
-  int FindGameByTitleKey(int idPlatform, const std::string& titleKey, int exceptGame = -1);
+  /*!
+   * \brief Every game of a platform with this id from a provider, oldest first
+   */
+  std::vector<int> FindGamesByUniqueId(int idPlatform,
+                                       const std::string& type,
+                                       const std::string& value,
+                                       int exceptGame = -1);
+
+  /*!
+   * \brief Every game of a platform whose title has this key, oldest first
+   */
+  std::vector<int> FindGamesByTitleKey(int idPlatform,
+                                       const std::string& titleKey,
+                                       int exceptGame = -1);
   bool SetDefaultRelease(int idGame, int idRelease);
   bool SetFavourite(int idGame, bool favourite);
   bool SetCompleted(int idGame, bool completed);
@@ -416,6 +427,7 @@ private:
   int FindGameForImport(const tinyxml2::XMLElement* element, const CGameInfoTag& tag);
 
   int RunQuery(const std::string& sql);
+  std::vector<int> FindGames(const std::string& sql);
 
   // Lookup tables (genre, tag, company, collection, region)
   int AddLookup(const std::string& table,

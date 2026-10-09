@@ -148,6 +148,21 @@ private:
                  const GamePathContent& content,
                  const PlatformInfo& platform,
                  int refreshGameId = -1);
+
+  /*!
+   * \brief The game a dump of this identity or title is another release of
+   *
+   * Games can share both when their files credit different companies, so the
+   * first one whose files don't is the match.
+   *
+   * \return The game, or -1 if there is none
+   */
+  int FindSameGame(const PlatformInfo& platform,
+                   const CGameScraper* scraper,
+                   const std::string& candidateId,
+                   const std::string& title,
+                   const std::vector<std::string>& credits,
+                   int exceptGame);
   const struct GameScrapeCandidate* ChooseCandidate(CGameScraper& scraper,
                                                     struct GameScrapeRequest& request,
                                                     std::vector<struct GameScrapeCandidate>& candidates);

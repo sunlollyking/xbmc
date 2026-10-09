@@ -667,46 +667,57 @@ bool CGameDatabase::DeleteGame(int idGame)
   return ExecuteQuery(PrepareSQL("DELETE FROM game WHERE idGame = %i", idGame));
 }
 
-int CGameDatabase::FindGameByUniqueId(int idPlatform,
-                                      const std::string& type,
-                                      const std::string& value,
-                                      int exceptGame)
+std::vector<int> CGameDatabase::FindGamesByUniqueId(int idPlatform,
+                                                    const std::string& type,
+                                                    const std::string& value,
+                                                    int exceptGame)
 {
   if (type.empty() || value.empty())
-    return -1;
+    return {};
 
-  try
-  {
-    return GetSingleValueInt(PrepareSQL(
-        "SELECT game.idGame FROM uniqueid JOIN game ON game.idGame = uniqueid.media_id WHERE "
-        "uniqueid.media_type = '%s' AND uniqueid.type = '%s' AND uniqueid.value = '%s' AND "
-        "game.idPlatform = %i AND game.idGame <> %i",
-        MediaTypeGame, type.c_str(), value.c_str(), idPlatform, exceptGame));
-  }
-  catch (...)
-  {
-    CLog::Log(LOGERROR, "GAME: Failed to look up {} id {}", type, value);
-  }
-  return -1;
+  return FindGames(PrepareSQL(
+      "SELECT game.idGame FROM uniqueid JOIN game ON game.idGame = uniqueid.media_id WHERE "
+      "uniqueid.media_type = '%s' AND uniqueid.type = '%s' AND uniqueid.value = '%s' AND "
+      "game.idPlatform = %i AND game.idGame <> %i ORDER BY game.idGame",
+      MediaTypeGame, type.c_str(), value.c_str(), idPlatform, exceptGame));
 }
 
-int CGameDatabase::FindGameByTitleKey(int idPlatform, const std::string& titleKey, int exceptGame)
+std::vector<int> CGameDatabase::FindGamesByTitleKey(int idPlatform,
+                                                    const std::string& titleKey,
+                                                    int exceptGame)
 {
   if (titleKey.empty())
-    return -1;
+    return {};
+
+  return FindGames(
+      PrepareSQL("SELECT idGame FROM game WHERE idPlatform = %i AND titleKey = '%s' AND "
+                 "idGame <> %i ORDER BY idGame",
+                 idPlatform, titleKey.c_str(), exceptGame));
+}
+
+std::vector<int> CGameDatabase::FindGames(const std::string& sql)
+{
+  std::vector<int> games;
+  if (m_pDB == nullptr || m_pDS == nullptr)
+    return games;
 
   try
   {
-    return GetSingleValueInt(
-        PrepareSQL("SELECT idGame FROM game WHERE idPlatform = %i AND titleKey = '%s' AND "
-                   "idGame <> %i",
-                   idPlatform, titleKey.c_str(), exceptGame));
+    if (m_pDS->query(sql))
+    {
+      while (!m_pDS->eof())
+      {
+        games.emplace_back(m_pDS->fv(0).get_asInt());
+        m_pDS->next();
+      }
+      m_pDS->close();
+    }
   }
   catch (...)
   {
-    CLog::Log(LOGERROR, "GAME: Failed to look up title key {}", titleKey);
+    CLog::Log(LOGERROR, "GAME: Failed to look up games: {}", sql);
   }
-  return -1;
+  return games;
 }
 
 bool CGameDatabase::SetDefaultRelease(int idGame, int idRelease)
