@@ -20121,6 +20121,7 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35543"
+msgid "Versions"
 msgstr ""
 
 #: xbmc/games/library
@@ -20160,18 +20161,22 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35551"
+msgid "Set as default version"
 msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35552"
+msgid "Preferred region"
 msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35553"
+msgid "Where you play. When a game has several versions, the one from here plays and its box art is shown. Failing that, a version for the wider region or the whole world is chosen, then Europe, USA and Japan in turn."
 msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35554"
+msgid "Prefer retail versions"
 msgstr ""
 
 #: xbmc/games/library
@@ -20186,6 +20191,7 @@ msgstr ""
 
 #: xbmc/games/library
 msgctxt "#35557"
+msgid "Decides which of a game's versions plays by default. Choosing a version in the game's versions list always wins."
 msgstr ""
 
 #empty strings from id 35558 to 35559
@@ -20232,14 +20238,17 @@ msgstr ""
 
 #: xbmc/media/MediaType.cpp
 msgctxt "#35568"
+msgid "version"
 msgstr ""
 
 #: xbmc/media/MediaType.cpp
 msgctxt "#35569"
+msgid "versions"
 msgstr ""
 
 #: xbmc/media/MediaType.cpp
 msgctxt "#35570"
+msgid "Version"
 msgstr ""
 
 #. Label of the company that made a games platform, shown in the games library
@@ -20323,10 +20332,12 @@ msgstr ""
 #. Label of the setting choosing which classification board's rating is shown
 #: system/settings/settings.xml
 msgctxt "#35586"
+msgid "Preferred age rating board"
 msgstr ""
 
 #: system/settings/settings.xml
 msgctxt "#35587"
+msgid "Which board's classification a game shows first, when it carries several. The others follow."
 msgstr ""
 
 #: xbmc/games/dialogs/GUIDialogGameInfo.cpp
@@ -20771,6 +20782,207 @@ msgctxt "#35728"
 msgid "Developer"
 msgstr ""
 
+#empty string with id 35729
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35730"
+msgid "PEGI - Europe"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35731"
+msgid "BBFC - United Kingdom"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35732"
+msgid "ESRB - North America"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35733"
+msgid "USK - Germany"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35734"
+msgid "CERO - Japan"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35735"
+msgid "ACB - Australia"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35736"
+msgid "GRAC - South Korea"
+msgstr ""
+
+#. Age rating board and where it rates games, a choice of the preferred board
+#: system/settings/settings.xml
+msgctxt "#35737"
+msgid "ClassInd - Brazil"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35738"
+msgid "Europe"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35739"
+msgid "United Kingdom"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35740"
+msgid "Germany"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35741"
+msgid "France"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35742"
+msgid "Spain"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35743"
+msgid "Italy"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35744"
+msgid "Australia"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35745"
+msgid "USA"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35746"
+msgid "Canada"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35747"
+msgid "Brazil"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35748"
+msgid "Japan"
+msgstr ""
+
+#. Region a player can choose, whose game releases and box art are preferred
+#: system/settings/settings.xml
+msgctxt "#35749"
+msgid "South Korea"
+msgstr ""
+
+#. What a version of a game is made from it as
+#: xbmc/games
+msgctxt "#35750"
+msgid "Hack"
+msgstr ""
+
+#. What a version of a game is made from it as
+#: xbmc/games
+msgctxt "#35751"
+msgid "Fan translation"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35752"
+msgid "Beta"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35753"
+msgid "Prototype"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35754"
+msgid "Sample"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35755"
+msgid "Alpha"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35756"
+msgid "Kiosk"
+msgstr ""
+
+#. How far a version of a game got towards being sold
+#: xbmc/games
+msgctxt "#35757"
+msgid "Debug"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35758"
+msgid "Unlicensed"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35759"
+msgid "Aftermarket"
+msgstr ""
+
+#. Who made a version of a game, where it was not its publisher
+#: xbmc/games
+msgctxt "#35760"
+msgid "Pirate"
+msgstr ""
+
+#. Context menu entry and heading: pick which version of a game to play
+#: xbmc/games
+msgctxt "#35761"
+msgid "Choose version"
+msgstr ""
+
+#. The age rating list's entry for games no board gave an age
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35765"
+msgid "Unrated"
+msgstr ""
+
+#empty strings from id 35766 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

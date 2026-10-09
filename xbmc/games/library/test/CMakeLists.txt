@@ -1,4 +1,4 @@
-set(SOURCES 
+set(SOURCES TestGameAgeRatings.cpp
             TestGameFileIdentity.cpp
             TestGameLibraryTypes.cpp
             TestGameNameParser.cpp
