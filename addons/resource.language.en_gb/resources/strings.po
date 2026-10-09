@@ -19626,7 +19626,6 @@ msgctxt "#35307"
 msgid "Subset completed"
 msgstr ""
 
-#empty strings from id 35313 to 35319
 #. Name of the feature hardcore mode refused, used with #35305
 #: xbmc/cores/RetroPlayer/playback/ReversiblePlayback.cpp
 msgctxt "#35308"
@@ -19640,6 +19639,13 @@ msgctxt "#35309"
 msgid "Rewind"
 msgstr ""
 
+#. Label of the Manual action in the game OSD
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35310"
+msgid "Manual"
+msgstr ""
+
+#empty strings from id 35311 to 35319
 
 #. Label of the Cheats button in the game OSD, heading of the cheats dialog, and
 #. of the cheats group in settings
@@ -19693,7 +19699,16 @@ msgctxt "#35328"
 msgid "0 cheats available"
 msgstr ""
 
-#empty strings from id 35329 to 35330
+#. Label of the setting bounding the disk downloaded manuals may use
+msgctxt "#35329"
+msgid "Maximum size of downloaded manuals"
+msgstr ""
+
+#. Help text for the downloaded manual size limit
+#: system/settings/settings.xml
+msgctxt "#35330"
+msgid "How much disk space downloaded game manuals may use. Once past this, the manuals you have gone longest without opening are removed. Manuals you added yourself are never removed."
+msgstr ""
 
 #. Label of the game OSD button that opens the leaderboards
 #: xbmc/games/dialogs/osd/DialogGameLeaderboards.cpp
@@ -19850,6 +19865,16 @@ msgstr ""
 #. Shown when a submitted score did not beat the player's existing best, {0:s} is that best
 msgctxt "#35358"
 msgid "Your best is still {0:s}"
+msgstr ""
+
+#. Settings button that deletes every downloaded game manual
+msgctxt "#35359"
+msgid "Clear cached manuals"
+msgstr ""
+
+#. Help text for the clear cached manuals button
+msgctxt "#35360"
+msgid "Delete every manual that has been downloaded. They will be fetched again when next opened."
 msgstr ""
 
 #. Setting to show the achievement being attempted over the game
@@ -20009,7 +20034,6 @@ msgctxt "#35511"
 msgid "Current"
 msgstr ""
 
-#empty strings from id 35512 to 35999
 #empty strings from id 35512 to 35519
 
 #: xbmc/games/library
@@ -20765,6 +20789,7 @@ msgctxt "#35703"
 msgid "Hardcore mode: {0:d} of {1:d} achievements unlocked"
 msgstr ""
 
+#empty strings from id 35704 to 35725
 
 #. Label of the context menu item that sets the video filter for a game or folder
 #: xbmc/games/windows/GUIWindowGames.cpp
