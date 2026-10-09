@@ -1,4 +1,5 @@
 set(SOURCES GameAgeRatings.cpp
+            GameDbUrl.cpp
             GameFileIdentity.cpp
             GameLibraryTypes.cpp
             GameListXml.cpp
@@ -8,6 +9,7 @@ set(SOURCES GameAgeRatings.cpp
             ReleasePolicy.cpp)
 
 set(HEADERS GameAgeRatings.h
+            GameDbUrl.h
             GameFileIdentity.h
             GameLibraryTypes.h
             GameListXml.h
