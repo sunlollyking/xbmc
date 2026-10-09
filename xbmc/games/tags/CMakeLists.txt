@@ -1,5 +1,7 @@
-set(SOURCES GameInfoTag.cpp)
+set(SOURCES GameInfoTag.cpp
+            )
 
-set(HEADERS GameInfoTag.h)
+set(HEADERS GameInfoTag.h
+            )
 
 core_add_library(gametags)
