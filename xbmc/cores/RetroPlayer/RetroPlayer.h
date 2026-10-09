@@ -60,6 +60,12 @@ private:
    */
   void SaveVideoSettingsForGame();
 
+  /*!
+   * \brief Get the bezel to frame a game with: its own art, or else the art the
+   *        game library has for it
+   */
+  static std::string GetBezelForGame(const CFileItem& item);
+
 public:
   bool CloseFile(bool reopen = false) override;
   bool IsPlaying() const override;

@@ -1,4 +1,4 @@
-set(SOURCES 
+set(SOURCES TestGameArt.cpp
             TestGameManual.cpp
             TestGameThumbLoader.cpp
             TestGameVideoSettings.cpp)

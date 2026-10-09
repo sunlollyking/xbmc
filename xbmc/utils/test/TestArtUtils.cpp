@@ -464,6 +464,14 @@ TEST_P(FillInDefaultIconTest, FillInDefaultIcon)
 
 INSTANTIATE_TEST_SUITE_P(TestArtUtils, FillInDefaultIconTest, testing::ValuesIn(icon_tests));
 
+TEST(TestArtUtils, FillInDefaultIconZippedGame)
+{
+  CFileItem item("/home/user/game.zip", false);
+  item.GetGameInfoTag()->SetTitle("Game");
+  ART::FillInDefaultIcon(item);
+  EXPECT_EQ(item.GetArt("icon"), "DefaultAddonGame.png");
+}
+
 // ART::GetFolderThumb() tests
 
 struct FolderTest
