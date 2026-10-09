@@ -171,17 +171,23 @@ bool CreditsOtherCompanies(CGameDatabase& db, int idGame, const std::vector<std:
   {
     for (const GameFile& file : release.files)
     {
-      for (const ParsedGameName& name :
-           {CGameNameParser::Parse(FolderName(URIUtils::GetDirectory(file.path)), false),
-            CGameNameParser::Parse(URIUtils::GetFileName(file.path))})
+      const std::string folder = URIUtils::GetDirectory(file.path);
+      std::vector<std::string> fileCredits =
+          CGameNameParser::Credits(CGameNameParser::Parse(FolderName(folder), false));
+      std::ranges::copy(
+          CGameNameParser::Credits(CGameNameParser::Parse(URIUtils::GetFileName(file.path))),
+          std::back_inserter(fileCredits));
+      // A folder of alternate dumps names no one, but the folder above it does
+      if (fileCredits.empty())
+        fileCredits = CGameNameParser::Credits(
+            CGameNameParser::Parse(FolderName(URIUtils::GetParentPath(folder)), false));
+
+      for (const std::string& theirs : fileCredits)
       {
-        for (const std::string& theirs : CGameNameParser::Credits(name))
-        {
-          credited = true;
-          if (std::ranges::any_of(credits, [&theirs](const std::string& ours)
-                                  { return CGameNameParser::SameCompany(ours, theirs); }))
-            return false;
-        }
+        credited = true;
+        if (std::ranges::any_of(credits, [&theirs](const std::string& ours)
+                                { return CGameNameParser::SameCompany(ours, theirs); }))
+          return false;
       }
     }
   }
@@ -1141,10 +1147,15 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     return false;
 
   // A file names the game when its folder holds more than one, and the file
-  // seldom says who made it where the folder does
+  // seldom says who made it where the folder does. A folder of alternate dumps
+  // (alts/) names no one either, so the folder above it is asked too.
   std::vector<std::string> credits = CGameNameParser::Credits(parsed);
-  if (credits.empty() && !fromFolder)
-    credits = CGameNameParser::Credits(CGameNameParser::Parse(FolderName(entry.folder), false));
+  for (const std::string& folder :
+       {fromFolder ? std::string() : entry.folder, URIUtils::GetParentPath(entry.folder)})
+  {
+    if (credits.empty() && !folder.empty())
+      credits = CGameNameParser::Credits(CGameNameParser::Parse(FolderName(folder), false));
+  }
 
   if (m_retailOnly && !IsRetail(parsed))
     return false;
