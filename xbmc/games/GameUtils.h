@@ -74,6 +74,14 @@ public:
   static GameClientPtr GetPlayingGameClient();
 
   /*!
+   * \brief Ask which video filter a game or folder should be drawn with, and
+   *        remember the answer
+   *
+   * \return True if the choice was stored
+   */
+  static bool ChooseAndSetDefaultVideoFilter(const CFileItem& item);
+
+  /*!
    * \brief Tell the player that hardcore mode withheld what they asked for
    *
    * Silently ignoring the request would read as a broken control.
@@ -110,7 +118,52 @@ public:
    */
   static void UpdateInstallableAddons();
 
+  /*!
+   * \brief Act on a game being selected, as the games library settings ask
+   *
+   * Shows the game's information or asks what to do. Only a game in the library
+   * has information to show, so anything else is left to be played.
+   *
+   * \return True if it was dealt with here, false if the caller should play it
+   */
+  static bool OnSelect(const std::shared_ptr<CFileItem>& item);
+
 private:
+  /*!
+   * \brief The emulator remembered for a game, or for the nearest folder above
+   *        it, or failing both the default for the game's platform
+   */
+  static std::string GetRememberedGameClient(const std::string& path);
+
+  /*!
+   * \brief Point an archived game at the one game file inside it, unless its
+   *        remembered emulator opens the archive itself
+   */
+  static void OpenInsideArchive(CFileItem& item);
+
+  /*!
+   * \brief Whether the game's remembered emulator would open it, but can't
+   *        read a file inside an archive
+   *
+   * Offering emulators for other machines instead would be wrong, and the
+   * generic extensions such games use (.rom, .bin) match plenty of them.
+   */
+  static bool NeedsExtracting(const CFileItem& item);
+
+  /*!
+   * \brief The emulator an arcade set should play with, or empty to decide as usual
+   *
+   * An emulator finds a set by name and runs only the version its own romset
+   * list describes, so a remembered emulator that lacks this exact set gives
+   * way to one that has it. An emulator chosen for this one game still stands.
+   */
+  static std::string GetArcadeGameClient(const std::string& path,
+                                         const GameClientVector& candidates,
+                                         const std::string& remembered);
+
+  //! Tell the emulator which name its romset list gives the arcade set at this item
+  static void SetRomset(CFileItem& item);
+
   /*!
    * \brief The emulator remembered for a game, or for the nearest folder above it
    *

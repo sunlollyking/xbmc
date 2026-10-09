@@ -32,14 +32,15 @@ public:
   CSmartPlaylistRule();
   ~CSmartPlaylistRule() override = default;
 
-  std::string GetLocalizedRule() const;
+  std::string GetLocalizedRule(const std::string& type = "") const;
 
   static SortBy TranslateOrder(const char *order);
   static std::string TranslateOrder(SortBy order);
   static Field TranslateGroup(const char *group);
   static std::string TranslateGroup(Field group);
 
-  static std::string GetLocalizedField(int field);
+  static std::string GetLocalizedField(int field, const std::string& type = "");
+  static std::string GetLocalizedOrder(SortBy order, const std::string& type);
   static std::string GetLocalizedGroup(Field group);
   static bool CanGroupMix(Field group);
 
@@ -122,6 +123,7 @@ public:
   const std::string& GetType() const { return m_playlistType; }
   bool IsVideoType() const;
   bool IsMusicType() const;
+  bool IsGameType() const;
 
   void SetMatchAllRules(bool matchAll)
   {
@@ -174,6 +176,7 @@ public:
 
   static bool IsVideoType(const std::string &type);
   static bool IsMusicType(const std::string &type);
+  static bool IsGameType(const std::string& type);
   static bool CheckTypeCompatibility(const std::string &typeLeft, const std::string &typeRight);
 
   bool IsEmpty(bool ignoreSortAndLimit = true) const;

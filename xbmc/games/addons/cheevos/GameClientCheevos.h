@@ -9,6 +9,7 @@
 #pragma once
 
 #include "utils/Observer.h"
+
 #include <atomic>
 #include <string>
 
@@ -169,6 +170,10 @@ private:
   //! callbacks read it on the add-on's thread while loading and closing a game
   //! write it on Kodi's.
   std::atomic<bool> m_encoreModeEnabled{false};
+  //! The leaderboard whose tracker was last logged, or 0 for none. Atomic
+  //! because the tracker arrives on the add-on's thread and a game closing
+  //! clears it on Kodi's.
+  std::atomic<unsigned int> m_loggedTrackerId{0};
 
   //! Hardcore as last applied to this client. Atomic because the setting can
   //! change on the player's thread as well as Kodi's.

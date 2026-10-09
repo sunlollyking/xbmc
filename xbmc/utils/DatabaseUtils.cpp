@@ -9,6 +9,7 @@
 #include "DatabaseUtils.h"
 
 #include "dbwrappers/dataset.h"
+#include "games/database/GameDatabaseColumns.h"
 #include "music/MusicDatabase.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
@@ -241,6 +242,73 @@ std::string DatabaseUtils::GetField(Field field, const MediaType &mediaType, Dat
     if (!result.empty())
       return result;
   }
+  else if (mediaType == MediaTypeGame)
+  {
+    if (field == Field::ID)
+      return "game_view.idGame";
+    else if (field == Field::TITLE)
+    {
+      if (queryPart == DatabaseQueryPart::ORDER_BY)
+        return "CASE WHEN length(game_view.sortTitle) > 0 THEN game_view.sortTitle ELSE "
+               "game_view.title END";
+      return "game_view.title";
+    }
+    else if (field == Field::SORT_TITLE)
+      return "game_view.sortTitle";
+    else if (field == Field::ORIGINAL_TITLE)
+      return "game_view.originalTitle";
+    else if (field == Field::PLOT)
+      return "game_view.overview";
+    else if (field == Field::YEAR)
+      return "game_view.year";
+    // Catalogues score out of 10, 20 or 100; rules and ordering use the same
+    // out-of-ten figure the game's info tag reports
+    else if (field == Field::RATING)
+      return "(CASE WHEN game_view.ratingMax > 0 THEN game_view.rating * 10.0 / "
+             "game_view.ratingMax ELSE game_view.rating END)";
+    else if (field == Field::VOTES)
+      return "game_view.votes";
+    else if (field == Field::USER_RATING)
+      return "game_view.userRating";
+    else if (field == Field::PLAYCOUNT)
+      return "game_view.playCount";
+    else if (field == Field::TIME)
+      return "game_view.playTime";
+    else if (field == Field::LAST_PLAYED)
+      return "game_view.lastPlayed";
+    else if (field == Field::DATE_ADDED)
+      return "game_view.dateAdded";
+    else if (field == Field::STUDIO)
+      return "game_view.platformName";
+    else if (field == Field::MPAA)
+      return "game_view.category";
+    else if (field == Field::FILENAME)
+      return "game_view.strFilename";
+    else if (field == Field::PATH)
+      return "game_view.strPath";
+    else if (field == Field::PLATFORM)
+      return "game_view.platformName";
+    else if (field == Field::GENRE)
+      return "game_view.genres";
+    else if (field == Field::DEVELOPER)
+      return "game_view.developers";
+    else if (field == Field::PLAYERS)
+      return "game_view.playersMax";
+    else if (field == Field::REGION)
+      return "game_view.releaseRegions";
+    else if (field == Field::FAVOURITE)
+      return "game_view.favourite";
+    else if (field == Field::COMPLETED)
+      return "game_view.completed";
+    else if (field == Field::HAS_ACHIEVEMENTS)
+      return "game_view.achievementsTotal";
+    else if (field == Field::COOP)
+      return "game_view.coop";
+    else if (field == Field::SET)
+      return "game_view.collections";
+    else if (field == Field::TAG)
+      return "game_view.idGame";
+  }
   else if (mediaType == MediaTypeMovie)
   {
     std::string result;
@@ -455,7 +523,8 @@ bool DatabaseUtils::GetSelectFields(const Fields &fields, const MediaType &media
 
   // add necessary fields to create the label
   if (mediaType == MediaTypeSong || mediaType == MediaTypeVideo || mediaType == MediaTypeVideoCollection ||
-      mediaType == MediaTypeMusicVideo || mediaType == MediaTypeMovie || mediaType == MediaTypeTvShow || mediaType == MediaTypeEpisode)
+      mediaType == MediaTypeMusicVideo || mediaType == MediaTypeMovie || mediaType == MediaTypeTvShow || mediaType == MediaTypeEpisode ||
+      mediaType == MediaTypeGame)
     sortFields.insert(Field::TITLE);
   if (mediaType == MediaTypeEpisode)
   {
@@ -590,6 +659,14 @@ bool DatabaseUtils::GetDatabaseResults(const MediaType& mediaType,
         CLog::Log(LOGWARNING, "GetDatabaseResults: unable to retrieve value of field {}",
                   resultSet.record_header[fieldIndex].name);
 
+      if (value.first == Field::RATING && mediaType == MediaTypeGame &&
+          resultSet.record_header.size() > KODI::GAME::GAMEDB_RATING_MAX)
+      {
+        const float max = resultSet.records[index]->at(KODI::GAME::GAMEDB_RATING_MAX).get_asFloat();
+        if (max > 0.0f)
+          value.second = value.second.asFloat() * 10.0f / max;
+      }
+
       if (value.first == Field::YEAR &&
           (mediaType == MediaTypeTvShow || mediaType == MediaTypeEpisode ||
            mediaType == MediaTypeMovie))
@@ -608,7 +685,8 @@ bool DatabaseUtils::GetDatabaseResults(const MediaType& mediaType,
 
     result[Field::MEDIA_TYPE] = mediaType;
     if (mediaType == MediaTypeMovie || mediaType == MediaTypeVideoCollection ||
-        mediaType == MediaTypeTvShow || mediaType == MediaTypeMusicVideo)
+        mediaType == MediaTypeTvShow || mediaType == MediaTypeMusicVideo ||
+        mediaType == MediaTypeGame)
       result[Field::LABEL] = result.at(Field::TITLE).asString();
     else if (mediaType == MediaTypeEpisode)
     {
@@ -873,6 +951,55 @@ int DatabaseUtils::GetField(Field field, const MediaType &mediaType, bool asInde
       // the first field is the item's ID and the second is the item's file ID
       index += 2;
     }
+  }
+  else if (mediaType == MediaTypeGame)
+  {
+    if (field == Field::ID)
+      return KODI::GAME::GAMEDB_ID;
+    else if (field == Field::TITLE)
+      return KODI::GAME::GAMEDB_TITLE;
+    else if (field == Field::SORT_TITLE)
+      return KODI::GAME::GAMEDB_SORT_TITLE;
+    else if (field == Field::ORIGINAL_TITLE)
+      return KODI::GAME::GAMEDB_ORIGINAL_TITLE;
+    else if (field == Field::PLOT)
+      return KODI::GAME::GAMEDB_OVERVIEW;
+    else if (field == Field::YEAR)
+      return KODI::GAME::GAMEDB_YEAR;
+    else if (field == Field::RATING)
+      return KODI::GAME::GAMEDB_RATING;
+    else if (field == Field::VOTES)
+      return KODI::GAME::GAMEDB_VOTES;
+    else if (field == Field::USER_RATING)
+      return KODI::GAME::GAMEDB_USER_RATING;
+    else if (field == Field::PLAYCOUNT)
+      return KODI::GAME::GAMEDB_PLAY_COUNT;
+    else if (field == Field::TIME)
+      return KODI::GAME::GAMEDB_PLAY_TIME;
+    else if (field == Field::LAST_PLAYED)
+      return KODI::GAME::GAMEDB_LAST_PLAYED;
+    else if (field == Field::DATE_ADDED)
+      return KODI::GAME::GAMEDB_DATE_ADDED;
+    else if (field == Field::STUDIO)
+      return KODI::GAME::GAMEDB_PLATFORM_NAME;
+    else if (field == Field::MPAA)
+      return KODI::GAME::GAMEDB_CATEGORY;
+    else if (field == Field::FILENAME)
+      return KODI::GAME::GAMEDB_FILENAME;
+    else if (field == Field::PATH)
+      return KODI::GAME::GAMEDB_PATH;
+    else if (field == Field::PLATFORM)
+      return KODI::GAME::GAMEDB_PLATFORM_NAME;
+    else if (field == Field::GENRE)
+      return KODI::GAME::GAMEDB_GENRES;
+    else if (field == Field::DEVELOPER)
+      return KODI::GAME::GAMEDB_DEVELOPERS;
+    else if (field == Field::PLAYERS)
+      return KODI::GAME::GAMEDB_PLAYERS_MAX;
+    else if (field == Field::REGION)
+      return KODI::GAME::GAMEDB_RELEASE_REGIONS;
+    else if (field == Field::COOP)
+      return KODI::GAME::GAMEDB_COOP;
   }
   else if (mediaType == MediaTypeMovie)
   {

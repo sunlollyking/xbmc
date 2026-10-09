@@ -21,6 +21,7 @@
 #include "addons/addoninfo/AddonType.h"
 #include "dialogs/GUIDialogContextMenu.h"
 #include "favourites/ContextMenus.h"
+#include "games/ContextMenus.h"
 #include "messaging/ApplicationMessenger.h"
 #include "music/ContextMenus.h"
 #include "pvr/PVRContextMenus.h"
@@ -94,6 +95,8 @@ void CContextMenuManager::Init()
       std::make_shared<CONTEXTMENU::CAlbumInfo>(),
       std::make_shared<CONTEXTMENU::CArtistInfo>(),
       std::make_shared<CONTEXTMENU::CSongInfo>(),
+      std::make_shared<CONTEXTMENU::CGameMarkCompleted>(),
+      std::make_shared<CONTEXTMENU::CGameMarkNotCompleted>(),
       std::make_shared<CONTEXTMENU::CVideoMarkWatched>(),
       std::make_shared<CONTEXTMENU::CVideoMarkUnWatched>(),
       std::make_shared<CONTEXTMENU::CVideoRemoveResumePoint>(),

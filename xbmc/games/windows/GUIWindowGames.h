@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "games/GameThumbLoader.h"
 #include "windows/GUIMediaWindow.h"
 
 class CGUIDialogProgress;
@@ -36,14 +37,18 @@ protected:
   bool OnContextButton(int itemNumber, CONTEXT_BUTTON button) override;
   bool OnAddMediaSource() override;
   bool GetDirectory(const std::string& strDirectory, CFileItemList& items) override;
+  bool Update(const std::string& strDirectory, bool updateFilterPath = true) override;
   std::string GetStartFolder(const std::string& dir) override;
 
   bool OnClickMsg(int controlId, int actionId);
   void OnItemInfo(int itemNumber);
   bool PlayGame(const CFileItem& item);
+  void ChooseVersionAndPlay(int idGame);
   bool CanPlay(const CFileItem& item) const;
 
   CGUIDialogProgress* m_dlgProgress = nullptr;
+
+  CGameThumbLoader m_thumbLoader;
 };
 } // namespace GAME
 } // namespace KODI

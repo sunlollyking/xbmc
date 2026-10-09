@@ -668,6 +668,11 @@ bool CDirectoryProvider::OnClick(const std::shared_ptr<CGUIListItem>& item)
       return true;
   }
 
+  // A game follows the games library's select action, as it does in the Games window
+  if (targetItem->HasGameInfoTag() && !targetItem->IsFolder() &&
+      KODI::GAME::CGameUtils::OnSelect(targetItem))
+    return true;
+
   // exec the execute string for the original (!) item
   CFileItem fileItem{*std::static_pointer_cast<CFileItem>(item)};
 

@@ -394,6 +394,25 @@ bool CGameClient::OpenFile(const CFileItem& file,
     }
   }
 
+  if (const std::string romset = file.GetProperty("game.romset").asString(); !romset.empty())
+  {
+    std::string name = URIUtils::GetFileName(path);
+    URIUtils::RemoveExtension(name);
+    const std::vector<std::string> companions =
+        StringUtils::Split(file.GetProperty("game.romset.companions").asString(), ';');
+    if (name != romset || !companions.empty())
+    {
+      path = PresentAsRomset(path, romset, companions);
+      if (path.empty())
+      {
+        // "Failed to play game"
+        // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+        MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
+        return false;
+      }
+    }
+  }
+
   GAME_ERROR error = GAME_ERROR_FAILED;
 
   // Loading the game might require the stream subsystem to be initialized
@@ -836,6 +855,43 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
   CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted copy", CURL::GetRedacted(game));
 
   return CSpecialProtocol::TranslatePath(game);
+}
+
+std::string CGameClient::PresentAsRomset(const std::string& path,
+                                         const std::string& romset,
+                                         const std::vector<std::string>& companions)
+{
+  if (!IsSafeName(romset))
+    return "";
+
+  const std::string folder = ExtractedFolder(path);
+  if (!XFILE::CDirectory::Exists(folder) && !XFILE::CDirectory::Create(folder))
+    return "";
+
+  const std::string target =
+      URIUtils::AddFileToFolder(folder, romset + URIUtils::GetExtension(path));
+  if (!XFILE::CFile::Exists(target) && !CopyWhole(path, target))
+  {
+    CLog::Log(LOGERROR, "GameClient: Failed to copy {} as {}", CURL::GetRedacted(path), romset);
+    return "";
+  }
+
+  // Each companion arrives as "set=path"
+  for (const std::string& companion : companions)
+  {
+    const size_t equals = companion.find('=');
+    if (equals == std::string::npos || !IsSafeName(companion.substr(0, equals)))
+      continue;
+    const std::string from = companion.substr(equals + 1);
+    const std::string beside = URIUtils::AddFileToFolder(folder, companion.substr(0, equals) +
+                                                                     URIUtils::GetExtension(from));
+    if (!XFILE::CFile::Exists(beside) && !CopyWhole(from, beside))
+      CLog::Log(LOGWARNING, "GameClient: Failed to place {} beside {}", CURL::GetRedacted(from),
+                romset);
+  }
+
+  CLog::Log(LOGDEBUG, "GameClient: Playing {} as {}", CURL::GetRedacted(path), romset);
+  return CSpecialProtocol::TranslatePath(target);
 }
 
 std::string CGameClient::ExtractFolder(const std::string& archivePath)
