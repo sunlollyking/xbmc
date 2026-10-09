@@ -158,7 +158,7 @@ struct Patterns
   Patterns()
   {
     revision.RegComp("^(rev|revision|version|v)\\.? ?([0-9][0-9a-z.]*|[a-z])$");
-    disc.RegComp("^(disc|disk|side|tape|cd|cart|part) ?([0-9a-z]+)( of ([0-9]+))?$");
+    disc.RegComp("^(disc|disk|side|tape|cd|cart|part) ?([0-9]+[a-z]?|[a-z])( of ([0-9]+))?$");
     dataDisk.RegComp(
         "^(.+ )?(data|user|save|scenario|music|sound|map|character|backup|utility) dis[ck]( .+)?$");
     tosecYear.RegComp("^(19|20)([0-9x?]{2})(-[0-9]{2}(-[0-9]{2})?)?$");
@@ -371,8 +371,8 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
       out.licence = Licence::PIRATE;
     else if (tl == "bios")
       out.status = ReleaseStatus::PROGRAM;
-    else
-      out.unknownTags.emplace_back(tag);
+    // Any other flag describes the dump ([FD], [extras]), not who made it, so
+    // it isn't kept with the unknown tags that can credit a company
 
     pos = close + 1;
   }

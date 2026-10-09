@@ -48,6 +48,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <map>
 #include <tuple>
 
@@ -665,6 +666,26 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   return found;
 }
 
+int CGameInfoScanner::FindSameGame(const PlatformInfo& platform,
+                                   const CGameScraper* scraper,
+                                   const std::string& candidateId,
+                                   const std::string& title,
+                                   const std::vector<std::string>& credits,
+                                   int exceptGame)
+{
+  std::vector<int> games;
+  if (scraper != nullptr && !candidateId.empty())
+    games = m_database.FindGamesByUniqueId(platform.id, scraper->ID(), candidateId, exceptGame);
+  std::ranges::copy(
+      m_database.FindGamesByTitleKey(platform.id, CGameLibraryTypes::TitleKey(title), exceptGame),
+      std::back_inserter(games));
+
+  const auto same =
+      std::ranges::find_if(games, [this, &credits](int idGame)
+                           { return !CreditsOtherCompanies(m_database, idGame, credits); });
+  return same != games.end() ? *same : -1;
+}
+
 const GameScrapeCandidate* CGameInfoScanner::ChooseCandidate(
     CGameScraper& scraper, GameScrapeRequest& request, std::vector<GameScrapeCandidate>& candidates)
 {
@@ -1119,6 +1140,12 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   if (parsed.displayTitle.empty())
     return false;
 
+  // A file names the game when its folder holds more than one, and the file
+  // seldom says who made it where the folder does
+  std::vector<std::string> credits = CGameNameParser::Credits(parsed);
+  if (credits.empty() && !fromFolder)
+    credits = CGameNameParser::Credits(CGameNameParser::Parse(FolderName(entry.folder), false));
+
   if (m_retailOnly && !IsRetail(parsed))
     return false;
 
@@ -1519,15 +1546,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     // name named this one thing when it was added and the catalogue names it
     // another now. Two dumps of one game were then two games. Fold them
     // together, keeping whichever row knows more.
-    int other = -1;
-    if (scraper != nullptr && !candidateId.empty())
-      other = m_database.FindGameByUniqueId(platform.id, scraper->ID(), candidateId, refreshGameId);
-    if (other <= 0)
-      other = m_database.FindGameByTitleKey(platform.id,
-                                            CGameLibraryTypes::TitleKey(tag.GetTitle()),
-                                            refreshGameId);
-    if (other > 0 && CreditsOtherCompanies(m_database, other, CGameNameParser::Credits(parsed)))
-      other = -1;
+    const int other =
+        FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits, refreshGameId);
     if (other > 0)
     {
       int keep = other;
@@ -1542,13 +1562,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   }
 
   // Another dump of a game already in the library becomes one of its releases
-  int idGame = -1;
-  if (scraper != nullptr && !candidateId.empty())
-    idGame = m_database.FindGameByUniqueId(platform.id, scraper->ID(), candidateId);
-  if (idGame <= 0)
-    idGame = m_database.FindGameByTitleKey(platform.id, CGameLibraryTypes::TitleKey(tag.GetTitle()));
-  if (idGame > 0 && CreditsOtherCompanies(m_database, idGame, CGameNameParser::Credits(parsed)))
-    idGame = -1;
+  const int idGame = FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits, -1);
 
   if (idGame > 0)
   {

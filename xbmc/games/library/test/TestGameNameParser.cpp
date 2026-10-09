@@ -137,6 +137,12 @@ TEST(TestGameNameParser, CreditsTheCompanyInATagOfItsOwn)
   EXPECT_TRUE(CGameNameParser::Credits(CGameNameParser::Parse("Sonic (USA, Europe).md")).empty());
   EXPECT_TRUE(
       CGameNameParser::Credits(CGameNameParser::Parse("Elite (1985)(Firebird)[a].d64")).empty());
+  // A flag in square brackets describes the dump
+  EXPECT_TRUE(CGameNameParser::Credits(CGameNameParser::Parse("Artemis [HD].zip")).empty());
+  EXPECT_TRUE(CGameNameParser::Credits(CGameNameParser::Parse("Mirage [extras].zip")).empty());
+  // A company whose name starts like a disc label is still a company
+  EXPECT_EQ(CGameNameParser::Credits(CGameNameParser::Parse("Mirage (Discovery)", false)),
+            std::vector<std::string>{"Discovery"});
 }
 
 TEST(TestGameNameParser, TellsCompaniesApart)
