@@ -74,6 +74,14 @@ public:
   static GameClientPtr GetPlayingGameClient();
 
   /*!
+   * \brief Ask which video filter a game or folder should be drawn with, and
+   *        remember the answer
+   *
+   * \return True if the choice was stored
+   */
+  static bool ChooseAndSetDefaultVideoFilter(const CFileItem& item);
+
+  /*!
    * \brief Tell the player that hardcore mode withheld what they asked for
    *
    * Silently ignoring the request would read as a broken control.
@@ -111,6 +119,27 @@ public:
   static void UpdateInstallableAddons();
 
 private:
+  /*!
+   * \brief The emulator remembered for a game, or for the nearest folder above
+   *        it, or failing both the default for the game's platform
+   */
+  static std::string GetRememberedGameClient(const std::string& path);
+
+  /*!
+   * \brief Point an archived game at the one game file inside it, unless its
+   *        remembered emulator opens the archive itself
+   */
+  static void OpenInsideArchive(CFileItem& item);
+
+  /*!
+   * \brief Whether the game's remembered emulator would open it, but can't
+   *        read a file inside an archive
+   *
+   * Offering emulators for other machines instead would be wrong, and the
+   * generic extensions such games use (.rom, .bin) match plenty of them.
+   */
+  static bool NeedsExtracting(const CFileItem& item);
+
   /*!
    * \brief The emulator remembered for a game, or for the nearest folder above it
    *

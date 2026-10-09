@@ -30,6 +30,7 @@
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/IFileDirectory.h"
 #include "filesystem/SpecialProtocol.h"
+#include "games/VideoFilters.h"
 #include "games/addons/GameClient.h"
 #include "games/database/GameDatabase.h"
 #include "games/dialogs/GUIDialogSelectGameClient.h"
@@ -96,6 +97,8 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
     }
     else
     {
+      OpenInsideArchive(item);
+
       if (!CGUIDialogSelectSavestate::ShowAndGetSavestate(item.GetDynPath(), savestatePath))
         return false;
 
@@ -130,6 +133,12 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
         if (!defaultClient.empty())
         {
           item.GetGameInfoTag()->SetGameClient(defaultClient);
+        }
+        else if (NeedsExtracting(item))
+        {
+          // "Failed to play game"
+          // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+          MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
         }
         else
         {
@@ -184,8 +193,7 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
   return !item.GetGameInfoTag()->GetGameClient().empty();
 }
 
-std::string CGameUtils::GetDefaultGameClient(const std::string& path,
-                                             const GameClientVector& candidates)
+std::string CGameUtils::GetRememberedGameClient(const std::string& path)
 {
   if (path.empty())
     return "";
@@ -194,7 +202,24 @@ std::string CGameUtils::GetDefaultGameClient(const std::string& path,
   if (!db.Open())
     return "";
 
-  const std::string gameClient = db.GameClients().GetGameClientForGame(path);
+  std::string gameClient = db.GameClients().GetGameClientForGame(path);
+  if (gameClient.empty())
+  {
+    // A library game plays with what its platform plays with: a collection is
+    // arranged by machine, and the emulator belongs to the machine
+    const int idPlatform = db.GetPlatformIdForGame(path);
+    PlatformInfo platform;
+    if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+      gameClient = platform.defaultGameClient;
+  }
+
+  return gameClient;
+}
+
+std::string CGameUtils::GetDefaultGameClient(const std::string& path,
+                                             const GameClientVector& candidates)
+{
+  const std::string gameClient = GetRememberedGameClient(path);
   if (gameClient.empty())
     return "";
 
@@ -228,6 +253,12 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   if (path.empty())
     return false;
 
+  // A platform in the library is not a folder on a disk, so what is chosen for
+  // it is stored against the machine
+  const int idPlatform = item.HasProperty("platformid")
+                             ? static_cast<int>(item.GetProperty("platformid").asInteger())
+                             : -1;
+
   // A folder can be given anything later, so it offers every emulator that is
   // installed. A game only offers the ones that can open it.
   GameClientVector emulators;
@@ -254,7 +285,10 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   if (!db.Open())
     return false;
 
-  const std::string currentGameClient = db.GameClients().GetGameClient(path);
+  PlatformInfo platform;
+  const bool forPlatform = idPlatform > 0 && db.GetPlatform(idPlatform, platform);
+  const std::string currentGameClient =
+      forPlatform ? platform.defaultGameClient : db.GameClients().GetGameClient(path);
 
   dialog->Reset();
   dialog->SetHeading(CVariant{35510}); // "Default emulator"
@@ -295,7 +329,10 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
   // An empty path is the "None" entry, which forgets rather than stores
   const std::string gameClient = items[selectedIndex]->GetPath();
 
-  if (!db.GameClients().SetGameClient(path, gameClient))
+  const bool stored = forPlatform
+                          ? db.SetPlatformDefaults(idPlatform, gameClient, platform.defaultVideoFilter)
+                          : db.GameClients().SetGameClient(path, gameClient);
+  if (!stored)
     return false;
 
   if (gameClient.empty())
@@ -304,6 +341,179 @@ bool CGameUtils::ChooseAndSetDefaultGameClient(const CFileItem& item)
     CLog::Log(LOGDEBUG, "GAME: Remembered emulator {} for {}", gameClient, CURL::GetRedacted(path));
 
   return true;
+}
+
+bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
+{
+  const std::string path = item.GetPath();
+  if (path.empty())
+    return false;
+
+  CGUIDialogSelect* dialog =
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+          WINDOW_DIALOG_SELECT);
+  if (dialog == nullptr)
+    return false;
+
+  CGameDatabase db;
+  if (!db.Open())
+    return false;
+
+  PlatformInfo platform;
+  const int idPlatform = item.HasProperty("platformid")
+                             ? static_cast<int>(item.GetProperty("platformid").asInteger())
+                             : -1;
+  const bool forPlatform = idPlatform > 0 && db.GetPlatform(idPlatform, platform);
+  const std::string currentVideoFilter =
+      forPlatform ? platform.defaultVideoFilter : db.VideoSettings().GetVideoFilter(path);
+
+  dialog->Reset();
+  dialog->SetHeading(CVariant{35726}); // "Default video filter"
+  dialog->SetUseDetails(true);
+
+  CFileItemList items;
+
+  // First, so that clearing is as easy to reach as setting
+  {
+    CFileItemPtr noneItem = std::make_shared<CFileItem>(
+        CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(231)); // "None"
+    noneItem->SetProperty("game.videofilter", CVariant{""});
+    items.Add(std::move(noneItem));
+  }
+
+  // No game is running, so nothing can say which scaling methods it supports
+  GetVideoFilters(items);
+
+  for (int i = 0; i < items.Size(); ++i)
+  {
+    if (items[i]->GetProperty("game.videofilter").asString() == currentVideoFilter &&
+        !currentVideoFilter.empty())
+    {
+      items[i]->SetLabel2(
+          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35511)); // "Current"
+      items[i]->Select(true);
+    }
+  }
+
+  dialog->SetItems(items);
+  dialog->Open();
+
+  if (!dialog->IsConfirmed())
+    return false;
+
+  const int selectedIndex = dialog->GetSelectedItem();
+  if (selectedIndex < 0 || selectedIndex >= items.Size())
+    return false;
+
+  // An empty filter is the "None" entry, which forgets rather than stores
+  const std::string videoFilter = items[selectedIndex]->GetProperty("game.videofilter").asString();
+
+  const bool stored =
+      forPlatform ? db.SetPlatformDefaults(idPlatform, platform.defaultGameClient, videoFilter)
+                  : db.VideoSettings().SetVideoFilter(path, videoFilter);
+  if (!stored)
+    return false;
+
+  if (videoFilter.empty())
+    CLog::Log(LOGDEBUG, "GAME: Forgot the video filter for {}", CURL::GetRedacted(path));
+  else
+    CLog::Log(LOGDEBUG, "GAME: Remembered video filter {} for {}", videoFilter,
+              CURL::GetRedacted(path));
+
+  return true;
+}
+
+void CGameUtils::OpenInsideArchive(CFileItem& item)
+{
+  const std::string archivePath = item.GetDynPath();
+  CFileItem contents(archivePath, false);
+  if (URIUtils::IsInArchive(archivePath) || !contents.IsFileFolder(FileFolderType::ALWAYS))
+    return;
+
+  // Arcade sets are archives by design, and an emulator that asks for the
+  // archive is given it whole
+  const std::string gameClient = GetRememberedGameClient(item.GetPath());
+  if (!gameClient.empty())
+  {
+    GameClientVector candidates;
+    bool bHasVfsGameClient;
+    GetInstalledGameClients(item, candidates, bHasVfsGameClient);
+    if (std::ranges::any_of(candidates, [&gameClient](const GameClientPtr& candidate)
+                            { return candidate->ID() == gameClient; }))
+      return;
+  }
+
+  // An archive holding a single game is that game, as it is when browsing
+  std::string gamePath;
+  const std::unique_ptr<XFILE::IFileDirectory> directory{
+      XFILE::CFileDirectoryFactory::Create(CURL{archivePath}, &contents)};
+  if (directory)
+  {
+    CFileItemList files;
+    if (!directory->GetDirectory(contents.GetURL(), files))
+      return;
+
+    std::vector<std::string> games;
+    for (const auto& file : files)
+    {
+      if (!file->IsFolder() && HasGameExtension(file->GetPath()))
+        games.push_back(file->GetPath());
+    }
+
+    if (games.size() > 1)
+    {
+      // Several disks of one game, for the emulator the platform remembers:
+      // start at the first, and the rest are found beside it
+      const std::string extension = URIUtils::GetExtension(games.front());
+      if (gameClient.empty() ||
+          !std::ranges::all_of(games, [&extension](const std::string& game)
+                               { return URIUtils::GetExtension(game) == extension; }))
+        return;
+      std::ranges::stable_sort(games,
+                               [](const std::string& lhs, const std::string& rhs)
+                               {
+                                 const bool lhsStarts = IsStartDisk(lhs);
+                                 const bool rhsStarts = IsStartDisk(rhs);
+                                 return lhsStarts != rhsStarts ? lhsStarts : lhs < rhs;
+                               });
+    }
+
+    if (!games.empty())
+      gamePath = games.front();
+  }
+  else if (!contents.IsFolder() && contents.GetPath() != archivePath &&
+           HasGameExtension(contents.GetPath()))
+  {
+    gamePath = contents.GetPath();
+  }
+
+  if (gamePath.empty())
+    return;
+
+  CLog::Log(LOGDEBUG, "GAME: Opening {} from inside {}", CURL::GetRedacted(gamePath),
+            CURL::GetRedacted(archivePath));
+  item.SetDynPath(gamePath);
+}
+
+bool CGameUtils::NeedsExtracting(const CFileItem& item)
+{
+  const std::string gameClientId = GetRememberedGameClient(item.GetPath());
+  if (gameClientId.empty())
+    return false;
+
+  ADDON::AddonPtr addon;
+  if (!CServiceBroker::GetAddonMgr().GetAddon(gameClientId, addon, ADDON::AddonType::GAMEDLL,
+                                              ADDON::OnlyEnabled::CHOICE_NO))
+    return false;
+
+  const auto gameClient = std::static_pointer_cast<CGameClient>(addon);
+  const CURL translatedUrl(CSpecialProtocol::TranslatePath(item.GetDynPath()));
+  const bool bIsLocalFile =
+      (translatedUrl.GetProtocol() == "file" || translatedUrl.GetProtocol().empty());
+
+  return !bIsLocalFile && !URIUtils::IsInArchive(translatedUrl.Get()) &&
+         !gameClient->SupportsVFS() &&
+         gameClient->IsExtensionValid(URIUtils::GetExtension(translatedUrl.Get()));
 }
 
 void CGameUtils::GetInstalledGameClients(const CFileItem& file,

@@ -40,6 +40,7 @@
 #include "games/addons/disc/GameClientDiscs.h"
 #include "games/addons/input/GameClientInput.h"
 #include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryTypes.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -77,6 +78,68 @@ CRetroPlayer::~CRetroPlayer()
 {
   CServiceBroker::GetWinSystem()->UnregisterRenderLoop(this);
   CloseFile();
+}
+
+void CRetroPlayer::ApplyVideoSettingsForGame(const std::string& gamePath)
+{
+  m_videoSettingsPath.clear();
+  if (gamePath.empty())
+    return;
+
+  GAME::CGameDatabase db;
+  if (!db.Open())
+    return;
+
+  // Each setting the game doesn't have comes from the nearest folder above it
+  // that does, then its platform, then Kodi's defaults
+  GAME::GameVideoSettings inherited = db.VideoSettings().GetFolderVideoSettings(gamePath);
+  const int idPlatform = db.GetPlatformIdForGame(gamePath);
+  GAME::PlatformInfo platform;
+  if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+    inherited.Inherit(GAME::GameVideoSettings::FromPlatform(platform));
+  inherited.Inherit(GAME::GameVideoSettings::FromGameSettings(
+      CMediaSettings::GetInstance().GetDefaultGameSettings()));
+
+  GAME::GameVideoSettings settings = db.VideoSettings().GetVideoSettings(gamePath);
+  settings.Inherit(inherited);
+
+  m_videoSettingsPath = gamePath;
+  m_inheritedVideoSettings = std::move(inherited);
+
+  ::CGameSettings& gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
+  if (GAME::GameVideoSettings::FromGameSettings(gameSettings) == settings)
+    return;
+
+  CLog::Log(
+      LOGDEBUG,
+      "RetroPlayer[PLAYER]: Using video filter \"{}\", stretch mode {}, rotation {}, bezel {} "
+      "for {}",
+      settings.videoFilter.value_or(""), settings.stretchMode.value_or(""),
+      settings.rotationDegCCW.value_or(0), settings.bezelEnabled.value_or(false),
+      CURL::GetRedacted(gamePath));
+
+  settings.ApplyTo(gameSettings);
+  gameSettings.NotifyObservers(ObservableMessageSettingsChanged);
+}
+
+void CRetroPlayer::SaveVideoSettingsForGame()
+{
+  if (m_videoSettingsPath.empty())
+    return;
+
+  // Only what differs from what the game gets anyway is kept, so a game that
+  // was never changed goes on following its folder and platform
+  const GAME::GameVideoSettings changed =
+      GAME::GameVideoSettings::FromGameSettings(
+          CMediaSettings::GetInstance().GetCurrentGameSettings())
+          .Difference(m_inheritedVideoSettings);
+
+  GAME::CGameDatabase db;
+  if (db.Open() && db.VideoSettings().SetVideoSettings(m_videoSettingsPath, changed))
+    CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Remembered {} video settings for {}",
+              changed.IsEmpty() ? "no" : "changed", CURL::GetRedacted(m_videoSettingsPath));
+
+  m_videoSettingsPath.clear();
 }
 
 bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options)
@@ -171,6 +234,14 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
   m_guiMessenger = std::make_unique<CGUIGameMessenger>(*m_processInfo);
   m_renderManager = std::make_unique<CRPRenderManager>(*m_processInfo);
 
+  // A preset that has since been uninstalled fails to load and the game draws
+  // unfiltered, which is the right answer for a filter that is gone. The
+  // render manager resets the game settings to the defaults, so this has to
+  // come after it. The library knows a zipped game by its archive, not the
+  // file inside it that it is opened as.
+  if (!bStandalone)
+    ApplyVideoSettingsForGame(fileCopy.GetPath());
+
   std::unique_lock lock(m_mutex);
 
   if (IsPlaying())
@@ -235,6 +306,9 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
     RegisterWindowCallbacks();
     m_playbackControl = std::make_unique<CGUIPlaybackControl>(*this);
     m_callback.OnPlayBackStarted(fileCopy);
+
+    if (CGameDatabase library; library.Open())
+      library.MarkPlayed(fileCopy.GetPath());
     m_callback.OnAVStarted(fileCopy);
     if (!bStandalone)
       m_autoSave = std::make_unique<CRetroPlayerAutoSave>(*this, m_gameServices.GameSettings());
@@ -257,6 +331,8 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
 bool CRetroPlayer::CloseFile(bool reopen /* = false */)
 {
   CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Closing file");
+
+  SaveVideoSettingsForGame();
 
   const bool autosaveEligible = m_autoSave && m_autoSave->HasInitialDelayElapsed();
   m_autoSave.reset();

@@ -13,6 +13,7 @@
 #include "cores/RetroPlayer/guibridge/IGameCallback.h"
 #include "cores/RetroPlayer/playback/IPlaybackControl.h"
 #include "games/GameTypes.h"
+#include "games/GameVideoSettings.h"
 #include "guilib/DispResource.h"
 #include "threads/CriticalSection.h"
 
@@ -46,6 +47,20 @@ public:
 
   // implementation of IPlayer
   bool OpenFile(const CFileItem& file, const CPlayerOptions& options) override;
+
+private:
+  /*!
+   * \brief Draw a game the way it was last played, or else the way its folder
+   *        or platform says
+   */
+  void ApplyVideoSettingsForGame(const std::string& gamePath);
+
+  /*!
+   * \brief Remember for the game what it was changed to while playing
+   */
+  void SaveVideoSettingsForGame();
+
+public:
   bool CloseFile(bool reopen = false) override;
   bool IsPlaying() const override;
   bool CanPause() const override;
@@ -160,6 +175,8 @@ private:
 
   // Game parameters
   GAME::GameClientPtr m_gameClient;
+  std::string m_videoSettingsPath; // The game its video settings are kept for
+  GAME::GameVideoSettings m_inheritedVideoSettings; // What it gets without its own
 
   // Synchronization parameters
   CCriticalSection m_mutex;
