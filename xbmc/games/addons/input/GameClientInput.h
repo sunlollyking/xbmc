@@ -177,6 +177,9 @@ private:
    */
   mutable std::recursive_mutex m_portMutex;
 
+  // Applied to joysticks opened while the game is paused too
+  bool m_bRumbleEnabled{true};
+
   /*!
    * \brief Keyboard handler
    *
