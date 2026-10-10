@@ -101,7 +101,7 @@ public:
   void HardwareReset();
 
   // Output functions
-  void StopRumble();
+  void EnableRumble(bool bEnabled);
 
   // Input callbacks
   bool ReceiveInputEvent(const game_input_event& eventStruct);

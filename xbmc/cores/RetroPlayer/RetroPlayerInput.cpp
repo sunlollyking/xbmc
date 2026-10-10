@@ -61,13 +61,14 @@ void CRetroPlayerInput::SetSpeed(double speed)
   if (speed != 0)
   {
     m_inputPollHandle->Activate();
+    m_gameClient->Input().EnableRumble(true);
   }
   else
   {
     m_inputPollHandle->Deactivate();
 
     // A paused game can't stop its own motors
-    m_gameClient->Input().StopRumble();
+    m_gameClient->Input().EnableRumble(false);
   }
 }
 

@@ -53,11 +53,13 @@ void CGameClientJoystick::UnregisterInput(JOYSTICK::IInputProvider* inputProvide
   m_portInput->UnregisterInput(inputProvider);
 }
 
-void CGameClientJoystick::StopRumble()
+void CGameClientJoystick::EnableRumble(bool bEnabled)
 {
   std::lock_guard<std::mutex> lock(m_rumbleMutex);
 
-  StopMotors();
+  m_bRumbleEnabled = bEnabled;
+  if (!bEnabled)
+    StopMotors();
 }
 
 void CGameClientJoystick::StopMotors()
@@ -237,6 +239,11 @@ JOYSTICK::IInputReceiver* CGameClientJoystick::InputReceiver(void)
 bool CGameClientJoystick::SetRumble(const std::string& feature, float magnitude)
 {
   std::lock_guard<std::mutex> lock(m_rumbleMutex);
+
+  // A frame that was still running when the game paused can ask for rumble
+  // after the motors were stopped
+  if (!m_bRumbleEnabled && magnitude > 0.0f)
+    return false;
 
   bool bHandled = false;
 

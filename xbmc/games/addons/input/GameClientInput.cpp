@@ -752,12 +752,12 @@ void CGameClientInput::HardwareReset()
     m_hardware->OnResetButton();
 }
 
-void CGameClientInput::StopRumble()
+void CGameClientInput::EnableRumble(bool bEnabled)
 {
   std::lock_guard<std::recursive_mutex> lock(m_portMutex);
 
   for (const auto& [portAddress, joystick] : m_joysticks)
-    joystick->StopRumble();
+    joystick->EnableRumble(bEnabled);
 }
 
 bool CGameClientInput::ReceiveInputEvent(const game_input_event& event)
