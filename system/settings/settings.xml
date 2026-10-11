@@ -582,6 +582,11 @@
           <default>false</default>
           <control type="toggle" />
         </setting>
+        <setting id="slideshow.hdrpictures" type="boolean" label="36643" help="36644">
+          <level>1</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
       </group>
     </category>
     <category id="language" label="14218" help="38106">
