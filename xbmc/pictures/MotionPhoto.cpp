@@ -11,8 +11,12 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "PictureXmp.h"
+#include "ServiceBroker.h"
+#include "dialogs/GUIDialogBusy.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "messaging/ApplicationMessenger.h"
+#include "threads/IRunnable.h"
 #include "utils/Crc32.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -20,9 +24,12 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <map>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 using namespace XFILE;
 
@@ -96,6 +103,31 @@ bool IsLivePhotoStill(const std::string& path)
   return false;
 }
 
+class CLivePhotoCheck : public IRunnable
+{
+public:
+  explicit CLivePhotoCheck(std::vector<std::string> pictures)
+    : m_pictures(std::move(pictures)),
+      m_isLivePhoto(m_pictures.size(), false)
+  {
+  }
+
+  void Run() override
+  {
+    for (size_t i = 0; i < m_pictures.size() && !m_cancelled; ++i)
+      m_isLivePhoto[i] = IsLivePhotoStill(m_pictures[i]);
+  }
+
+  void Cancel() override { m_cancelled = true; }
+
+  bool IsLivePhoto(size_t i) const { return m_isLivePhoto[i]; }
+
+private:
+  const std::vector<std::string> m_pictures;
+  std::vector<bool> m_isLivePhoto;
+  std::atomic<bool> m_cancelled{false};
+};
+
 std::string GetLivePhotoKey(const std::string& path)
 {
   std::string key = path;
@@ -119,6 +151,9 @@ void GroupLivePhotos(CFileItemList& items)
   if (pictures.empty())
     return;
 
+  // Clips paired with a picture by name, last first so they can be removed by index
+  std::vector<std::pair<int, std::shared_ptr<CFileItem>>> clips;
+  std::vector<std::string> paths;
   for (int i = items.Size() - 1; i >= 0; --i)
   {
     const std::shared_ptr<CFileItem> item = items[i];
@@ -126,11 +161,31 @@ void GroupLivePhotos(CFileItemList& items)
       continue;
 
     const auto picture = pictures.find(GetLivePhotoKey(item->GetPath()));
-    if (picture == pictures.end() || !IsLivePhotoStill(picture->second->GetPath()))
+    if (picture == pictures.end())
       continue;
 
-    picture->second->SetProperty("motionclip", item->GetPath());
-    items.Remove(i);
+    clips.emplace_back(i, picture->second);
+    paths.emplace_back(picture->second->GetPath());
+  }
+
+  if (clips.empty())
+    return;
+
+  // Reading the pictures can take a while on a network share
+  CLivePhotoCheck check(std::move(paths));
+  if (CServiceBroker::GetGUI() && CServiceBroker::GetAppMessenger()->IsProcessThread())
+    CGUIDialogBusy::Wait(&check, 100, true);
+  else
+    check.Run();
+
+  for (size_t i = 0; i < clips.size(); ++i)
+  {
+    if (!check.IsLivePhoto(i))
+      continue;
+
+    const auto& [index, picture] = clips[i];
+    picture->SetProperty("motionclip", items[index]->GetPath());
+    items.Remove(index);
   }
 }
 

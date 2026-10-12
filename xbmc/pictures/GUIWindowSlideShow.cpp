@@ -774,6 +774,10 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
     m_hdrEntered = m_hdrEntered || m_hdrOutput;
   }
 
+  // A new visit to a moving photo plays its clip again, even if a video was showing in between
+  if (m_iMotionSlide != m_iCurrentSlide)
+    m_iMotionSlide = -1;
+
   // While browsing by hand, a moving photo plays its clip each time it comes up. Its clip isn't
   // HDR, so it doesn't play while the display is in HDR.
   if ((!m_bSlideShow || m_bPause) && !m_bPlayingVideo && !m_hdrOutput &&

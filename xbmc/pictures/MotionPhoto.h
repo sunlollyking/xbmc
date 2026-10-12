@@ -17,6 +17,9 @@ namespace KODI::PICTURE
 /*!
  * \brief Hide the clip of each Live Photo (a .mov named like a picture next to it, which Apple's
  * maker note marks as a Live Photo) and store its path in the picture's "motionclip" property.
+ *
+ * It reads each picture named like a .mov. Called on the GUI thread, it waits behind the busy
+ * dialog, and a pair it's cancelled before checking stays a picture and a video.
  */
 void GroupLivePhotos(CFileItemList& items);
 
