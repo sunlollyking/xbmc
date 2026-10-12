@@ -1449,6 +1449,26 @@ void CGUIWindowSlideShow::SetHdrOutput(bool hdr)
     picture.iWidth = static_cast<unsigned int>(winSystem->GetGfxContext().GetWidth());
     picture.iHeight = static_cast<unsigned int>(winSystem->GetGfxContext().GetHeight());
 
+    // Describe the pictures as HDR10 mastered on a 1000-nit display, the brightest a gain map is
+    // drawn. Some displays stay in SDR when this is left empty.
+    picture.hasDisplayMetadata = true;
+    AVMasteringDisplayMetadata& display = picture.displayMetadata;
+    display.display_primaries[0][0] = av_make_q(708, 1000);
+    display.display_primaries[0][1] = av_make_q(292, 1000);
+    display.display_primaries[1][0] = av_make_q(170, 1000);
+    display.display_primaries[1][1] = av_make_q(797, 1000);
+    display.display_primaries[2][0] = av_make_q(131, 1000);
+    display.display_primaries[2][1] = av_make_q(46, 1000);
+    display.white_point[0] = av_make_q(3127, 10000);
+    display.white_point[1] = av_make_q(3290, 10000);
+    display.max_luminance = av_make_q(1000, 1);
+    display.min_luminance = av_make_q(5, 1000);
+    display.has_primaries = 1;
+    display.has_luminance = 1;
+    picture.hasLightMetadata = true;
+    picture.lightMetadata.MaxCLL = 1000;
+    picture.lightMetadata.MaxFALL = 400;
+
     winSystem->SetVideoOutput(&picture);
     winSystem->SetColorimetry(&picture);
     if (winSystem->SetHDR(&picture) && winSystem->SetGuiCompositing(AVCOL_TRC_SMPTE2084))
