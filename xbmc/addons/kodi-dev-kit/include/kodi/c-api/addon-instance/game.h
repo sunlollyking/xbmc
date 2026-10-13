@@ -1434,6 +1434,82 @@ extern "C"
   } ATTR_PACKED game_rc_leaderboard_tracker;
 
   //============================================================================
+  /// @brief **What an achievement means for finishing the game**
+  ///
+  /// Since game API 8.5.0.
+  ///
+  typedef enum GAME_RC_ACHIEVEMENT_TYPE
+  {
+    /// @brief Neither needed to finish the game nor at risk of being missed
+    GAME_RC_ACHIEVEMENT_TYPE_STANDARD = 0,
+
+    /// @brief Can be missed for good if the player passes the point to earn it
+    GAME_RC_ACHIEVEMENT_TYPE_MISSABLE = 1,
+
+    /// @brief Needed to beat the game
+    GAME_RC_ACHIEVEMENT_TYPE_PROGRESSION = 2,
+
+    /// @brief Earned for beating the game, of which a game may have several
+    GAME_RC_ACHIEVEMENT_TYPE_WIN = 3,
+  } GAME_RC_ACHIEVEMENT_TYPE;
+
+  //============================================================================
+  /// @brief **One achievement set of the loaded game**
+  ///
+  /// The game's own set comes first, followed by any subsets such as bonus
+  /// sets. Since game API 8.5.0.
+  ///
+  typedef struct game_rc_achievement_set
+  {
+    /// @brief Unique RetroAchievements ID of the set
+    unsigned int id;
+
+    /// @brief Title of the set, or `NULL` if unknown
+    const char* title;
+
+    /// @brief URL of the set's badge, or `NULL`
+    const char* badge_url;
+  } ATTR_PACKED game_rc_achievement_set;
+
+  //============================================================================
+  /// @brief **The set and type of one achievement**
+  ///
+  /// Since game API 8.5.0.
+  ///
+  typedef struct game_rc_achievement_details
+  {
+    /// @brief Unique RetroAchievements ID of the achievement
+    unsigned int achievement_id;
+
+    /// @brief ID of the set the achievement belongs to
+    unsigned int set_id;
+
+    /// @brief What the achievement means for finishing the game
+    GAME_RC_ACHIEVEMENT_TYPE type;
+  } ATTR_PACKED game_rc_achievement_details;
+
+  //============================================================================
+  /// @brief **Payload of @ref AddonToKodiFuncTable_Game::RCOnAchievementSets**
+  ///
+  /// Kept apart from @ref game_rc_game_loaded so that its achievements keep the
+  /// layout older versions of Kodi read them with. Since game API 8.5.0.
+  ///
+  typedef struct game_rc_achievement_sets
+  {
+    /// @brief The game's sets, its own first
+    const game_rc_achievement_set* sets;
+
+    /// @brief Number of elements in @ref sets
+    unsigned int set_count;
+
+    /// @brief The set and type of each achievement
+    const game_rc_achievement_details* achievements;
+
+    /// @brief Number of elements in @ref achievements
+    unsigned int achievement_count;
+  } ATTR_PACKED game_rc_achievement_sets;
+
+  //============================================================================
   /// @brief **Payload of @ref AddonToKodiFuncTable_Game::RCOnChallengeIndicator**
   ///
   /// Sent while an achievement's trigger is primed - the player is inside an
@@ -1643,6 +1719,14 @@ extern "C"
      * A ratio above 1 is the speed asked for; anything else leaves it to Kodi.
      */
     void (*SetFastForwarding)(KODI_HANDLE kodiInstance, bool fastForward, double ratio);
+
+    /*!
+     * @brief Tell Kodi the loaded game's achievement sets, and which set and
+     * type each of its achievements has.
+     *
+     * Call it after RCOnGameLoaded(). Since game API 8.5.0.
+     */
+    void (*RCOnAchievementSets)(KODI_HANDLE kodiInstance, const game_rc_achievement_sets* data);
   } AddonToKodiFuncTable_Game;
 
   /*!
@@ -1719,6 +1803,7 @@ extern "C"
     // Entries added since 8.2.0 go last, so an add-on built against an older
     // version still fills in the ones before them where Kodi looks for them
     GAME_ERROR(__cdecl* RunFrameSpeculative)(const struct AddonInstance_Game*);
+    GAME_ERROR(__cdecl* RCSetAchievementSetEnabled)(const AddonInstance_Game*, unsigned int, bool);
   } KodiToAddonFuncTable_Game;
 
   /*!
