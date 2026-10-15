@@ -338,7 +338,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
 
     DatabaseResults results;
     results.reserve(rowsFound);
-    if (!SortUtils::SortFromDataset(sortDescription, MediaTypeGame, *m_pDS, results))
+    if (!SortUtils::SortFromDataset(sortDescription, KODI::MEDIA::TYPE::GAME, *m_pDS, results))
       return false;
 
     items.Reserve(results.size());
@@ -441,7 +441,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       ids.emplace_back(static_cast<int>(item->GetProperty("gameid").asInteger()));
 
     std::map<int, KODI::ART::Artwork> art;
-    if (GetArtForItems(ids, MediaTypeGame, art))
+    if (GetArtForItems(ids, KODI::MEDIA::TYPE::GAME, art))
     {
       for (const auto& item : items)
       {

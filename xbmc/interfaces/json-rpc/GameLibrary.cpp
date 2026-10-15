@@ -79,7 +79,7 @@ JSONRPC_STATUS CGameLibrary::GetPlatforms(const std::string& method,
     item->SetFolder(true);
     FillPlatformItem(*item, platform);
     KODI::ART::Artwork art;
-    if (db.GetArtForItem(platform.id, MediaTypeGamePlatform, art))
+    if (db.GetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM, art))
       item->SetArt(art);
     items.Add(item);
   }
@@ -107,7 +107,7 @@ JSONRPC_STATUS CGameLibrary::GetPlatformDetails(const std::string& method,
   item->SetFolder(true);
   FillPlatformItem(*item, platform);
   KODI::ART::Artwork art;
-  if (db.GetArtForItem(platform.id, MediaTypeGamePlatform, art))
+  if (db.GetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM, art))
     item->SetArt(art);
 
   HandleFileItem("platformid", true, "platformdetails", item, parameterObject,
@@ -190,7 +190,7 @@ JSONRPC_STATUS CGameLibrary::GetGameDetails(const std::string& method,
     item->SetPath(tag.GetURL());
   item->SetProperty("gameid", idGame);
   KODI::ART::Artwork art;
-  if (db.GetArtForItem(idGame, MediaTypeGame, art))
+  if (db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     item->SetArt(art);
 
   HandleFileItem("gameid", true, "gamedetails", item, parameterObject,

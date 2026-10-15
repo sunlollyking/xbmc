@@ -385,11 +385,11 @@ public:
    */
   ///@{
   bool SetArtForItem(int mediaId,
-                     const MediaType& mediaType,
+                     KODI::MEDIA::TYPE mediaType,
                      const std::string& artType,
                      const std::string& url);
-  bool SetArtForItem(int mediaId, const MediaType& mediaType, const KODI::ART::Artwork& art);
-  bool GetArtForItem(int mediaId, const MediaType& mediaType, KODI::ART::Artwork& art);
+  bool SetArtForItem(int mediaId, KODI::MEDIA::TYPE mediaType, const KODI::ART::Artwork& art);
+  bool GetArtForItem(int mediaId, KODI::MEDIA::TYPE mediaType, KODI::ART::Artwork& art);
 
   /*!
    * \brief Read the art of many items at once, by id
@@ -397,7 +397,7 @@ public:
    * A listing of a full set would otherwise be one query per game.
    */
   bool GetArtForItems(const std::vector<int>& mediaIds,
-                      const MediaType& mediaType,
+                      KODI::MEDIA::TYPE mediaType,
                       std::map<int, KODI::ART::Artwork>& art);
 
   //! \brief Let a skin that asks for a thumb or a poster find the box front
@@ -405,9 +405,9 @@ public:
 
   //! \brief Ask for a box's spines upright, since some are scanned on their side
   static void StandSpinesUpright(KODI::ART::Artwork& art);
-  std::string GetArtForItem(int mediaId, const MediaType& mediaType, const std::string& artType);
-  bool RemoveArtForItem(int mediaId, const MediaType& mediaType, const std::string& artType);
-  bool GetArtTypes(const MediaType& mediaType, std::vector<std::string>& artTypes);
+  std::string GetArtForItem(int mediaId, KODI::MEDIA::TYPE mediaType, const std::string& artType);
+  bool RemoveArtForItem(int mediaId, KODI::MEDIA::TYPE mediaType, const std::string& artType);
+  bool GetArtTypes(KODI::MEDIA::TYPE mediaType, std::vector<std::string>& artTypes);
   ///@}
 
 protected:

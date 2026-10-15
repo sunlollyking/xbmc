@@ -181,7 +181,8 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         CVariant platformId;
         KODI::ART::Artwork art;
         if (dbUrl.GetOption("platformid", platformId) &&
-            db.GetArtForItem(static_cast<int>(platformId.asInteger()), MediaTypeGamePlatform, art))
+            db.GetArtForItem(static_cast<int>(platformId.asInteger()),
+                             KODI::MEDIA::TYPE::GAME_PLATFORM, art))
         {
           // On the list and not on the rows: a row carries the glyph that says
           // where it leads and nothing else, because a skin handed the
@@ -217,7 +218,7 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         return false;
 
       KODI::ART::Artwork art;
-      if (!db.GetArtForItem(static_cast<int>(gameId.asInteger()), MediaTypeGame, art))
+      if (!db.GetArtForItem(static_cast<int>(gameId.asInteger()), KODI::MEDIA::TYPE::GAME, art))
         return true; // a game with no pictures is empty, not broken
 
       for (const auto& [type, url] : art)

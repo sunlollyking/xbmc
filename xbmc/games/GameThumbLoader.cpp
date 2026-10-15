@@ -200,18 +200,18 @@ bool CGameThumbLoader::LoadLibraryArt(CFileItem& item)
   }
 
   int mediaId = -1;
-  const char* mediaType = nullptr;
+  KODI::MEDIA::TYPE mediaType = KODI::MEDIA::TYPE::NONE;
   if (item.HasProperty("gameid"))
   {
     mediaId = static_cast<int>(item.GetProperty("gameid").asInteger());
-    mediaType = MediaTypeGame;
+    mediaType = KODI::MEDIA::TYPE::GAME;
   }
   else if (item.HasProperty("platformid"))
   {
     mediaId = static_cast<int>(item.GetProperty("platformid").asInteger());
-    mediaType = MediaTypeGamePlatform;
+    mediaType = KODI::MEDIA::TYPE::GAME_PLATFORM;
   }
-  if (mediaId <= 0 || mediaType == nullptr)
+  if (mediaId <= 0 || mediaType == KODI::MEDIA::TYPE::NONE)
     return false;
 
   KODI::ART::Artwork art;

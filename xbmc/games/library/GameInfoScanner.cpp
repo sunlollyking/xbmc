@@ -571,14 +571,15 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   const bool isSource = m_database.GetPathContent(folder, own, foundDirectly) && foundDirectly;
 
   // A root folder's own picture stands in for the platform until one is scraped
-  if (isSource && m_database.GetArtForItem(platform.id, MediaTypeGamePlatform, "thumb").empty())
+  if (isSource &&
+      m_database.GetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM, "thumb").empty())
   {
     for (const char* name : {"folder.jpg", "folder.png"})
     {
       const std::string picture = URIUtils::AddFileToFolder(folder, name);
       if (XFILE::CFile::Exists(picture, false))
       {
-        m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, "thumb", picture);
+        m_database.SetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM, "thumb", picture);
         break;
       }
     }
@@ -858,7 +859,7 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
     const auto pick = picks.find(type);
     if (pick == picks.end())
       continue;
-    m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type, pick->second);
+    m_database.SetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM, type, pick->second);
 
     int extra = 0;
     for (const GameScrapeArt& piece : pieces)
@@ -867,8 +868,8 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
         continue;
       if (++extra > MAX_EXTRA_ART)
         break;
-      m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, type + std::to_string(extra),
-                               piece.url);
+      m_database.SetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM,
+                               type + std::to_string(extra), piece.url);
     }
   }
 
@@ -881,7 +882,8 @@ void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const Plat
       const auto found = picks.find(type);
       if (found != picks.end())
       {
-        m_database.SetArtForItem(platform.id, MediaTypeGamePlatform, "thumb", found->second);
+        m_database.SetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM, "thumb",
+                                 found->second);
         break;
       }
     }
@@ -1520,7 +1522,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     }
     tag.SetTags(tags);
     KODI::ART::Artwork existingArt;
-    m_database.GetArtForItem(refreshGameId, MediaTypeGame, existingArt);
+    m_database.GetArtForItem(refreshGameId, KODI::MEDIA::TYPE::GAME, existingArt);
     const auto wasFront = existingArt.find("boxfront");
     const std::string oldFront = wasFront != existingArt.end() ? wasFront->second : "";
     for (const auto& [type, url] : art)
@@ -1620,7 +1622,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
         existing.SetDefaultReleaseId(keepDefault);
       }
       KODI::ART::Artwork existingArt;
-      m_database.GetArtForItem(idGame, MediaTypeGame, existingArt);
+      m_database.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, existingArt);
       for (const auto& [type, url] : art)
       {
         if (!existingArt.contains(type))

@@ -164,7 +164,7 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
     details.SetReleases(releases);
     details.SetDefaultReleaseId(idDefaultRelease);
 
-    SetArtForItem(idGame, MediaTypeGame, art);
+    SetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art);
 
     CommitTransaction();
     details.SetDatabaseId(idGame);
@@ -231,16 +231,16 @@ int CGameDatabase::SetReleaseForGame(int idGame, GameRelease& release)
 void CGameDatabase::SetRatingsForGame(int idGame, CGameInfoTag& details)
 {
   m_pDS->exec(PrepareSQL("DELETE FROM rating WHERE media_id = %i AND media_type = '%s'", idGame,
-                         MediaTypeGame));
+                         KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str()));
 
   int idDefault = -1;
   for (const auto& [type, rating] : details.GetRatings())
   {
     m_pDS->exec(PrepareSQL("INSERT INTO rating (media_id, media_type, rating_type, rating, max, "
                            "votes) VALUES (%i, '%s', '%s', %f, %f, %i)",
-                           idGame, MediaTypeGame, type.c_str(),
-                           static_cast<double>(rating.rating), static_cast<double>(rating.max),
-                           rating.votes));
+                           idGame, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(),
+                           type.c_str(), static_cast<double>(rating.rating),
+                           static_cast<double>(rating.max), rating.votes));
     if (idDefault < 0 || type == details.GetDefaultRatingType())
       idDefault = static_cast<int>(m_pDS->lastinsertid());
   }
@@ -251,14 +251,15 @@ void CGameDatabase::SetRatingsForGame(int idGame, CGameInfoTag& details)
 void CGameDatabase::SetUniqueIdsForGame(int idGame, CGameInfoTag& details)
 {
   m_pDS->exec(PrepareSQL("DELETE FROM uniqueid WHERE media_id = %i AND media_type = '%s'", idGame,
-                         MediaTypeGame));
+                         KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str()));
 
   int idDefault = -1;
   for (const auto& [type, value] : details.GetUniqueIDs())
   {
     m_pDS->exec(PrepareSQL("INSERT INTO uniqueid (media_id, media_type, type, value) VALUES (%i, "
                            "'%s', '%s', '%s')",
-                           idGame, MediaTypeGame, type.c_str(), value.c_str()));
+                           idGame, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(),
+                           type.c_str(), value.c_str()));
     if (idDefault < 0 || type == details.GetDefaultUniqueIDType())
       idDefault = static_cast<int>(m_pDS->lastinsertid());
   }
@@ -268,15 +269,15 @@ void CGameDatabase::SetUniqueIdsForGame(int idGame, CGameInfoTag& details)
 
 void CGameDatabase::SetAgeRatingsForGame(int idGame, const CGameInfoTag& details)
 {
-  m_pDS->exec(PrepareSQL("DELETE FROM agerating WHERE media_id = %i AND media_type = '%s'",
-                         idGame, MediaTypeGame));
+  m_pDS->exec(PrepareSQL("DELETE FROM agerating WHERE media_id = %i AND media_type = '%s'", idGame,
+                         KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str()));
 
   for (const GameAgeRating& rating : details.GetAgeRatings())
   {
     m_pDS->exec(PrepareSQL("INSERT INTO agerating (media_id, media_type, board, value, "
                            "descriptors) VALUES (%i, '%s', '%s', '%s', '%s')",
-                           idGame, MediaTypeGame, rating.board.c_str(), rating.value.c_str(),
-                           rating.descriptors.c_str()));
+                           idGame, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(),
+                           rating.board.c_str(), rating.value.c_str(), rating.descriptors.c_str()));
   }
 }
 
@@ -287,7 +288,7 @@ void CGameDatabase::LoadRatings(int idGame, CGameInfoTag& details)
 
   if (m_pDS->query(PrepareSQL("SELECT rating_type, rating, max, votes FROM rating WHERE media_id "
                               "= %i AND media_type = '%s'",
-                              idGame, MediaTypeGame)))
+                              idGame, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str())))
   {
     while (!m_pDS->eof())
     {
@@ -310,9 +311,9 @@ void CGameDatabase::LoadUniqueIds(int idGame, CGameInfoTag& details)
   std::map<std::string, std::string> ids;
   const std::string defaultType = details.GetDefaultUniqueIDType();
 
-  if (m_pDS->query(PrepareSQL(
-          "SELECT type, value FROM uniqueid WHERE media_id = %i AND media_type = '%s'", idGame,
-          MediaTypeGame)))
+  if (m_pDS->query(
+          PrepareSQL("SELECT type, value FROM uniqueid WHERE media_id = %i AND media_type = '%s'",
+                     idGame, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str())))
   {
     while (!m_pDS->eof())
     {
@@ -377,7 +378,7 @@ void CGameDatabase::LoadAgeRatings(int idGame, CGameInfoTag& details)
 
   if (m_pDS->query(PrepareSQL("SELECT board, value, descriptors FROM agerating WHERE media_id = "
                               "%i AND media_type = '%s'",
-                              idGame, MediaTypeGame)))
+                              idGame, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str())))
   {
     while (!m_pDS->eof())
     {
@@ -417,8 +418,9 @@ std::string CGameDatabase::GameAgeSQL()
   // Made from the classifications the library holds, so one stored by any
   // scraper is grouped where it fits best
   std::string age;
-  if (m_pDS2->query(PrepareSQL(
-          "SELECT DISTINCT board, value FROM agerating WHERE media_type = '%s'", MediaTypeGame)))
+  if (m_pDS2->query(
+          PrepareSQL("SELECT DISTINCT board, value FROM agerating WHERE media_type = '%s'",
+                     KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str())))
   {
     while (!m_pDS2->eof())
     {
@@ -446,7 +448,7 @@ std::string CGameDatabase::GameAgeSQL()
   return "COALESCE((SELECT " + age +
          " FROM agerating WHERE agerating.media_id = game_view.idGame AND agerating.media_type = "
          "'" +
-         MediaTypeGame + "' AND " + age + " > 0 ORDER BY " + rank +
+         KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME) + "' AND " + age + " > 0 ORDER BY " + rank +
          ", agerating.agerating_id LIMIT 1), 0)";
 }
 
@@ -639,12 +641,16 @@ bool CGameDatabase::MergeGameInto(int idFrom, int idInto)
         "INSERT INTO art (media_id, media_type, type, url) SELECT %i, '%s', type, url FROM art "
         "WHERE media_id = %i AND media_type = '%s' AND type NOT IN (SELECT type FROM art WHERE "
         "media_id = %i AND media_type = '%s')",
-        idInto, MediaTypeGame, idFrom, MediaTypeGame, idInto, MediaTypeGame));
+        idInto, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(), idFrom,
+        KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(), idInto,
+        KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str()));
     m_pDS->exec(PrepareSQL(
         "INSERT INTO uniqueid (media_id, media_type, type, value) SELECT %i, '%s', type, value "
         "FROM uniqueid WHERE media_id = %i AND media_type = '%s' AND type NOT IN (SELECT type "
         "FROM uniqueid WHERE media_id = %i AND media_type = '%s')",
-        idInto, MediaTypeGame, idFrom, MediaTypeGame, idInto, MediaTypeGame));
+        idInto, KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(), idFrom,
+        KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(), idInto,
+        KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str()));
 
     // Whatever is left belongs to the emptied row and goes with it
     m_pDS->exec(PrepareSQL("DELETE FROM game WHERE idGame = %i", idFrom));
@@ -679,7 +685,8 @@ std::vector<int> CGameDatabase::FindGamesByUniqueId(int idPlatform,
       "SELECT game.idGame FROM uniqueid JOIN game ON game.idGame = uniqueid.media_id WHERE "
       "uniqueid.media_type = '%s' AND uniqueid.type = '%s' AND uniqueid.value = '%s' AND "
       "game.idPlatform = %i AND game.idGame <> %i ORDER BY game.idGame",
-      MediaTypeGame, type.c_str(), value.c_str(), idPlatform, exceptGame));
+      KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(), type.c_str(), value.c_str(), idPlatform,
+      exceptGame));
 }
 
 std::vector<int> CGameDatabase::FindGamesByTitleKey(int idPlatform,
@@ -766,10 +773,10 @@ int CGameDatabase::SetAchievementProgress(const std::string& source,
       if (id.empty() || counts.total <= 0)
         continue;
 
-      const int idGame = GetSingleValueInt(
-          PrepareSQL("SELECT media_id FROM uniqueid WHERE media_type = '%s' AND type = '%s' AND "
-                     "value = '%s'",
-                     MediaTypeGame, source.c_str(), id.c_str()));
+      const int idGame = GetSingleValueInt(PrepareSQL(
+          "SELECT media_id FROM uniqueid WHERE media_type = '%s' AND type = '%s' AND "
+          "value = '%s'",
+          KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(), source.c_str(), id.c_str()));
       if (idGame <= 0)
         continue;
 

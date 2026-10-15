@@ -17,11 +17,11 @@ using namespace KODI;
 using namespace GAME;
 
 bool CGameDatabase::SetArtForItem(int mediaId,
-                                  const MediaType& mediaType,
+                                  KODI::MEDIA::TYPE mediaType,
                                   const std::string& artType,
                                   const std::string& url)
 {
-  if (mediaId <= 0 || mediaType.empty() || artType.empty())
+  if (mediaId <= 0 || mediaType == KODI::MEDIA::TYPE::NONE || artType.empty())
     return false;
 
   try
@@ -29,7 +29,7 @@ bool CGameDatabase::SetArtForItem(int mediaId,
     const std::string sql =
         PrepareSQL("SELECT art_id, url FROM art WHERE media_id = %i AND media_type = '%s' AND type "
                    "= '%s'",
-                   mediaId, mediaType.c_str(), artType.c_str());
+                   mediaId, KODI::MEDIA::NameOf(mediaType).c_str(), artType.c_str());
     if (m_pDS->query(sql) && !m_pDS->eof())
     {
       const int artId = m_pDS->fv(0).get_asInt();
@@ -44,7 +44,8 @@ bool CGameDatabase::SetArtForItem(int mediaId,
       m_pDS->close();
       m_pDS->exec(PrepareSQL("INSERT INTO art (media_id, media_type, type, url) VALUES (%i, '%s', "
                              "'%s', '%s')",
-                             mediaId, mediaType.c_str(), artType.c_str(), url.c_str()));
+                             mediaId, KODI::MEDIA::NameOf(mediaType).c_str(), artType.c_str(),
+                             url.c_str()));
     }
     return true;
   }
@@ -56,7 +57,7 @@ bool CGameDatabase::SetArtForItem(int mediaId,
 }
 
 bool CGameDatabase::SetArtForItem(int mediaId,
-                                  const MediaType& mediaType,
+                                  KODI::MEDIA::TYPE mediaType,
                                   const KODI::ART::Artwork& art)
 {
   bool ok = true;
@@ -70,13 +71,13 @@ bool CGameDatabase::SetArtForItem(int mediaId,
   return ok;
 }
 
-bool CGameDatabase::GetArtForItem(int mediaId, const MediaType& mediaType, KODI::ART::Artwork& art)
+bool CGameDatabase::GetArtForItem(int mediaId, KODI::MEDIA::TYPE mediaType, KODI::ART::Artwork& art)
 {
   try
   {
-    const std::string sql = PrepareSQL(
-        "SELECT type, url FROM art WHERE media_id = %i AND media_type = '%s'", mediaId,
-        mediaType.c_str());
+    const std::string sql =
+        PrepareSQL("SELECT type, url FROM art WHERE media_id = %i AND media_type = '%s'", mediaId,
+                   KODI::MEDIA::NameOf(mediaType).c_str());
     if (m_pDS->query(sql))
     {
       while (!m_pDS->eof())
@@ -127,7 +128,7 @@ void CGameDatabase::StandSpinesUpright(KODI::ART::Artwork& art)
 }
 
 bool CGameDatabase::GetArtForItems(const std::vector<int>& mediaIds,
-                                   const MediaType& mediaType,
+                                   KODI::MEDIA::TYPE mediaType,
                                    std::map<int, KODI::ART::Artwork>& art)
 {
   if (mediaIds.empty())
@@ -146,8 +147,9 @@ bool CGameDatabase::GetArtForItems(const std::vector<int>& mediaIds,
         ids.emplace_back(std::to_string(mediaIds[i]));
 
       const std::string sql =
-          PrepareSQL("SELECT media_id, type, url FROM art WHERE media_type = '%s' AND media_id IN (",
-                     mediaType.c_str()) +
+          PrepareSQL(
+              "SELECT media_id, type, url FROM art WHERE media_type = '%s' AND media_id IN (",
+              KODI::MEDIA::NameOf(mediaType).c_str()) +
           StringUtils::Join(ids, ",") + ")";
 
       if (!m_pDS->query(sql))
@@ -176,14 +178,14 @@ bool CGameDatabase::GetArtForItems(const std::vector<int>& mediaIds,
 }
 
 std::string CGameDatabase::GetArtForItem(int mediaId,
-                                         const MediaType& mediaType,
+                                         KODI::MEDIA::TYPE mediaType,
                                          const std::string& artType)
 {
   try
   {
-    return GetSingleValue(PrepareSQL(
-        "SELECT url FROM art WHERE media_id = %i AND media_type = '%s' AND type = '%s'", mediaId,
-        mediaType.c_str(), artType.c_str()));
+    return GetSingleValue(
+        PrepareSQL("SELECT url FROM art WHERE media_id = %i AND media_type = '%s' AND type = '%s'",
+                   mediaId, KODI::MEDIA::NameOf(mediaType).c_str(), artType.c_str()));
   }
   catch (...)
   {
@@ -193,20 +195,20 @@ std::string CGameDatabase::GetArtForItem(int mediaId,
 }
 
 bool CGameDatabase::RemoveArtForItem(int mediaId,
-                                     const MediaType& mediaType,
+                                     KODI::MEDIA::TYPE mediaType,
                                      const std::string& artType)
 {
   return ExecuteQuery(
       PrepareSQL("DELETE FROM art WHERE media_id = %i AND media_type = '%s' AND type = '%s'",
-                 mediaId, mediaType.c_str(), artType.c_str()));
+                 mediaId, KODI::MEDIA::NameOf(mediaType).c_str(), artType.c_str()));
 }
 
-bool CGameDatabase::GetArtTypes(const MediaType& mediaType, std::vector<std::string>& artTypes)
+bool CGameDatabase::GetArtTypes(KODI::MEDIA::TYPE mediaType, std::vector<std::string>& artTypes)
 {
   try
   {
     if (m_pDS->query(PrepareSQL("SELECT DISTINCT type FROM art WHERE media_type = '%s'",
-                                mediaType.c_str())))
+                                KODI::MEDIA::NameOf(mediaType).c_str())))
     {
       while (!m_pDS->eof())
       {

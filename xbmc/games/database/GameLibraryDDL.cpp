@@ -9,7 +9,6 @@
 #include "GameLibraryDDL.h"
 
 #include "dbwrappers/Database.h"
-#include "media/MediaType.h"
 #include "utils/log.h"
 
 #include <string>
@@ -327,14 +326,12 @@ void CGameLibraryDDL::CreateTriggers(CDatabase& db)
                   "DELETE FROM developer_link WHERE idGame = old.idGame; "
                   "DELETE FROM publisher_link WHERE idGame = old.idGame; "
                   "DELETE FROM collection_link WHERE idGame = old.idGame; "
-                  "DELETE FROM art WHERE media_id = old.idGame AND media_type = '" MediaTypeGame
-                  "'; "
-                  "DELETE FROM rating WHERE media_id = old.idGame AND media_type = '" MediaTypeGame
-                  "'; "
+                  "DELETE FROM art WHERE media_id = old.idGame AND media_type = 'game'; "
+                  "DELETE FROM rating WHERE media_id = old.idGame AND media_type = 'game'; "
                   "DELETE FROM agerating WHERE media_id = old.idGame AND media_type "
-                  "= '" MediaTypeGame "'; "
+                  "= 'game'; "
                   "DELETE FROM uniqueid WHERE media_id = old.idGame AND media_type "
-                  "= '" MediaTypeGame "'; "
+                  "= 'game'; "
                   "UPDATE game SET idParentGame = NULL WHERE idParentGame = old.idGame; "
                   "END");
 
@@ -342,25 +339,25 @@ void CGameLibraryDDL::CreateTriggers(CDatabase& db)
                   "DELETE FROM files WHERE idRelease = old.idRelease; "
                   "DELETE FROM release_region WHERE idRelease = old.idRelease; "
                   "DELETE FROM art WHERE media_id = old.idRelease AND media_type "
-                  "= '" MediaTypeGameRelease "'; "
+                  "= 'release'; "
                   "DELETE FROM uniqueid WHERE media_id = old.idRelease AND media_type "
-                  "= '" MediaTypeGameRelease "'; "
+                  "= 'release'; "
                   "END");
 
   db.ExecuteQuery("CREATE TRIGGER delete_platform AFTER DELETE ON platform FOR EACH ROW BEGIN "
                   "DELETE FROM art WHERE media_id = old.idPlatform AND media_type "
-                  "= '" MediaTypeGamePlatform "'; "
+                  "= 'platform'; "
                   "DELETE FROM uniqueid WHERE media_id = old.idPlatform AND media_type "
-                  "= '" MediaTypeGamePlatform "'; "
+                  "= 'platform'; "
                   "UPDATE path SET idPlatform = NULL WHERE idPlatform = old.idPlatform; "
                   "END");
 
   db.ExecuteQuery("CREATE TRIGGER delete_collection AFTER DELETE ON collection FOR EACH ROW BEGIN "
                   "DELETE FROM collection_link WHERE idCollection = old.idCollection; "
                   "DELETE FROM art WHERE media_id = old.idCollection AND media_type "
-                  "= '" MediaTypeGameCollection "'; "
+                  "= 'gamecollection'; "
                   "DELETE FROM uniqueid WHERE media_id = old.idCollection AND media_type "
-                  "= '" MediaTypeGameCollection "'; "
+                  "= 'gamecollection'; "
                   "END");
 }
 

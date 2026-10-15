@@ -93,10 +93,14 @@ void CGameDatabase::SetPlatformIds(int idPlatform,
 
     m_pDS->exec(PrepareSQL("DELETE FROM uniqueid WHERE media_id = %i AND media_type = '%s' AND "
                            "type = '%s'",
-                           idPlatform, MediaTypeGamePlatform, provider.c_str()));
+                           idPlatform,
+                           KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME_PLATFORM).c_str(),
+                           provider.c_str()));
     m_pDS->exec(PrepareSQL("INSERT INTO uniqueid (media_id, media_type, type, value) VALUES (%i, "
                            "'%s', '%s', '%s')",
-                           idPlatform, MediaTypeGamePlatform, provider.c_str(), id.c_str()));
+                           idPlatform,
+                           KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME_PLATFORM).c_str(),
+                           provider.c_str(), id.c_str()));
   }
 }
 
@@ -191,7 +195,8 @@ bool CGameDatabase::GetPlatform(int idPlatform, PlatformInfo& platform)
 
     if (m_pDS->query(PrepareSQL("SELECT type, value FROM uniqueid WHERE media_id = %i AND "
                                 "media_type = '%s'",
-                                idPlatform, MediaTypeGamePlatform)))
+                                idPlatform,
+                                KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME_PLATFORM).c_str())))
     {
       while (!m_pDS->eof())
       {
@@ -295,7 +300,7 @@ bool CGameDatabase::GetPlatformsNav(const std::string& baseDir,
     item->SetLabel2(std::to_string(platform.gameCount));
 
     KODI::ART::Artwork art;
-    if (GetArtForItem(platform.id, MediaTypeGamePlatform, art))
+    if (GetArtForItem(platform.id, KODI::MEDIA::TYPE::GAME_PLATFORM, art))
       item->SetArt(art);
 
     items.Add(item);

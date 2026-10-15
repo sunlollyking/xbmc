@@ -156,7 +156,7 @@ std::string CRetroPlayer::GetBezelForGame(const CFileItem& item)
   if (idGame <= 0)
     return "";
 
-  return db.GetArtForItem(idGame, MediaTypeGame, "bezel");
+  return db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, "bezel");
 }
 
 bool CRetroPlayer::OpenFile(const CFileItem& file, const CPlayerOptions& options)

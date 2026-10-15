@@ -133,7 +133,7 @@ void CGUIDialogGameInfo::Reload()
     *m_item->GetGameInfoTag() = tag;
     CGameDatabase::SetAgeProperties(*m_item, CGameAgeRatings::AgeOf(tag.GetAgeRatings()));
     KODI::ART::Artwork art;
-    if (db.GetArtForItem(idGame, MediaTypeGame, art))
+    if (db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     {
       for (const auto& [type, url] : art)
       {
@@ -308,7 +308,7 @@ void CGUIDialogGameInfo::OnChooseArt()
   const int idGame = static_cast<int>(m_item->GetProperty("gameid").asInteger());
   CGameDatabase db;
   KODI::ART::Artwork stored;
-  if (!db.Open() || !db.GetArtForItem(idGame, MediaTypeGame, stored))
+  if (!db.Open() || !db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, stored))
     return;
 
   // The alternatives a scraper offered are stored as "boxfront1", "boxfront2"
@@ -379,7 +379,8 @@ void CGUIDialogGameInfo::OnChooseArt()
     items.Add(item);
   }
 
-  std::vector<CMediaSource> sources(*CMediaSourceSettings::GetInstance().GetSources("games"));
+  std::vector<CMediaSource> sources(
+      CMediaSourceSettings::GetInstance().GetSources(KODI::MEDIA::MediaSection::GAMES));
   CServiceBroker::GetMediaManager().GetLocalDrives(sources);
   std::string result;
   if (!CGUIDialogFileBrowser::ShowAndGetImage(items, sources, Localize(13511), result) ||
@@ -410,10 +411,10 @@ void CGUIDialogGameInfo::OnChooseArt()
         ++next;
       freedSlot = type + std::to_string(next);
     }
-    db.SetArtForItem(idGame, MediaTypeGame, freedSlot, current);
+    db.SetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, freedSlot, current);
   }
   else if (!freedSlot.empty())
-    db.RemoveArtForItem(idGame, MediaTypeGame, freedSlot);
+    db.RemoveArtForItem(idGame, KODI::MEDIA::TYPE::GAME, freedSlot);
 
   // A thumb and a poster that only showed the box front follow it
   std::vector<std::string> shown{type};
@@ -428,9 +429,9 @@ void CGUIDialogGameInfo::OnChooseArt()
   for (const std::string& slot : shown)
   {
     if (chosen.empty())
-      db.RemoveArtForItem(idGame, MediaTypeGame, slot);
+      db.RemoveArtForItem(idGame, KODI::MEDIA::TYPE::GAME, slot);
     else
-      db.SetArtForItem(idGame, MediaTypeGame, slot, chosen);
+      db.SetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, slot, chosen);
     m_item->SetArt(slot, chosen);
   }
 

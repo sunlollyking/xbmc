@@ -194,7 +194,7 @@ void CGameDatabase::ExportArt(int idGame,
                               bool overwrite)
 {
   KODI::ART::Artwork art;
-  if (!GetArtForItem(idGame, MediaTypeGame, art))
+  if (!GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     return;
 
   for (const auto& [type, url] : art)
@@ -338,10 +338,10 @@ int CGameDatabase::FindGameForImport(const tinyxml2::XMLElement* element, const 
   // Otherwise whichever catalogue named it, which survives the files moving
   for (const auto& [type, value] : tag.GetUniqueIDs())
   {
-    const int idGame = GetSingleValueInt(
-        PrepareSQL("SELECT media_id FROM uniqueid WHERE media_type = '%s' AND type = '%s' AND "
-                   "value = '%s'",
-                   MediaTypeGame, type.c_str(), value.c_str()));
+    const int idGame = GetSingleValueInt(PrepareSQL(
+        "SELECT media_id FROM uniqueid WHERE media_type = '%s' AND type = '%s' AND "
+        "value = '%s'",
+        KODI::MEDIA::NameOf(KODI::MEDIA::TYPE::GAME).c_str(), type.c_str(), value.c_str()));
     if (idGame > 0)
       return idGame;
   }
