@@ -11,6 +11,8 @@
 #include "ServiceBroker.h"
 #include "rendering/gl/RenderSystemGL.h"
 
+#include <algorithm>
+
 using namespace KODI::SHADER;
 
 GLint CShaderUtilsGL::TranslateWrapType(WrapType wrapType)
@@ -41,6 +43,7 @@ std::string CShaderUtilsGL::GetGLSLVersion(std::string& source)
 {
   unsigned int version;
   std::string versionString;
+  std::string profile;
 
   const size_t sourceVersionPosition = source.find("#version ");
 
@@ -54,15 +57,24 @@ std::string CShaderUtilsGL::GetGLSLVersion(std::string& source)
     {
       version = std::stoul(sourceVersion, &sourceVersionSize, 10);
 
+      // A profile, such as "core", may follow the version number
+      const size_t profileStart =
+          std::min(sourceVersion.find_first_not_of(" \t", sourceVersionSize), sourceVersion.size());
+      const size_t profileEnd =
+          std::min(sourceVersion.find_first_not_of("abcdefghijklmnopqrstuvwxyz", profileStart),
+                   sourceVersion.size());
+      profile = sourceVersion.substr(profileStart, profileEnd - profileStart);
+
       // Keep only source code after the version define
-      source = sourceVersion.substr(sourceVersionSize);
+      source = sourceVersion.substr(profile.empty() ? sourceVersionSize : profileEnd);
     }
     else
     {
       return "\n";
     }
 
-    versionString = "#version " + std::to_string(version) + "\n";
+    versionString =
+        "#version " + std::to_string(version) + (profile.empty() ? "" : " " + profile) + "\n";
   }
   // Set GLSL version according to GL version
   else
