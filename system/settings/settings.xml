@@ -582,6 +582,11 @@
           <default>false</default>
           <control type="toggle" />
         </setting>
+        <setting id="slideshow.showdate" type="boolean" label="36645" help="36646">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
       </group>
     </category>
     <category id="language" label="14218" help="38106">
@@ -1947,10 +1952,6 @@
           <level>1</level>
           <control type="button" format="action" />
         </setting>
-        <setting id="pvrclient.menuhook" type="action" label="19280" help="36252">
-          <level>1</level>
-          <control type="button" format="action" />
-        </setting>
         <setting id="pvrmanager.clientpriorities" type="action" label="19240" help="36210">
           <level>2</level>
           <dependencies>
@@ -2151,6 +2152,11 @@
         <setting id="pvrmenu.closechannelosdonswitch" type="boolean" label="19303" help="36235">
           <level>2</level>
           <default>true</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="pvrmenu.providerchannelosd" type="boolean" label="19358" help="36462">
+          <level>2</level>
+          <default>false</default>
           <control type="toggle" />
         </setting>
         <setting id="pvrplayback.confirmchannelswitch" type="boolean" label="19281" help="36231">
@@ -3928,6 +3934,7 @@
             <or>
               <condition>HAVE_ANDROID</condition>
               <condition>HAVE_TVOS</condition>
+              <condition>HAVE_WASM</condition>
             </or>
           </requirement>
           <level>1</level>

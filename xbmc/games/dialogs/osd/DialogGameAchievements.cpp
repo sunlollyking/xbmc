@@ -34,6 +34,7 @@
 #include "resources/ResourcesComponent.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/ArtTypes.h"
 #include "utils/JSONVariantParser.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
@@ -431,7 +432,7 @@ void CDialogGameAchievements::RefreshList()
                                       ? achievement.badgeUrl
                                       : achievement.lockedBadgeUrl;
     if (!badgeUrl.empty())
-      item->SetArt("icon", badgeUrl);
+      item->SetArt(ART::TYPE::ICON, badgeUrl);
 
     // Not shown; carried so the selection survives a resort
     item->SetProperty(ACHIEVEMENT_ID, achievement.id);

@@ -545,6 +545,7 @@ void CRPRenderManager::SetSpeed(double speed)
 
 void CRPRenderManager::FrameMove()
 {
+  FlushRendered();
   CheckFlush();
 
   bool bIsConfigured = false;
@@ -569,6 +570,12 @@ void CRPRenderManager::FrameMove()
     for (auto& renderer : m_renderers)
       renderer->FrameMove();
   }
+}
+
+void CRPRenderManager::FlushRendered()
+{
+  for (IRenderBufferPool* pool : m_processInfo.GetBufferManager().GetBufferPools())
+    pool->FlushRendered();
 }
 
 void CRPRenderManager::CheckFlush()
@@ -666,6 +673,10 @@ void CRPRenderManager::RenderWindow(bool bClear, const RESOLUTION_INFO& coordsRe
 
   m_renderContext.SetRenderingResolution(m_renderContext.GetVideoResolution(), false);
 
+  if (bClear && renderBuffer == nullptr)
+    m_renderContext.Clear(m_renderContext.UseLimitedColor() ? UTILS::COLOR::LIMITED_BLACK
+                                                            : UTILS::COLOR::BLACK);
+
   const std::shared_ptr<CRenderBezel> bezel = GetBezel();
   const CRect screen = m_renderContext.GetViewWindow();
   if (bezel && m_renderContext.GetGameSettings().BezelEnabled())
@@ -738,7 +749,8 @@ void CRPRenderManager::RenderControl(bool bClear,
     CRect region = renderRegion;
     region.Intersect(old);
     m_renderContext.SetScissors(region);
-    m_renderContext.Clear(UTILS::COLOR::BLACK);
+    m_renderContext.Clear(m_renderContext.UseLimitedColor() ? UTILS::COLOR::LIMITED_BLACK
+                                                            : UTILS::COLOR::BLACK);
     m_renderContext.SetScissors(old);
   }
 

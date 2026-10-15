@@ -158,6 +158,7 @@ public:
   bool SupportsFolders() const;
   const std::string& GetEmulatorName() const { return m_emulatorName; }
   const std::string& GetPlatforms() const { return m_platforms; }
+  const std::string& GetLibretroCore() const { return m_libretroCore; }
   bool SupportsDiscControl() const { return m_supportsDiscControl; }
 
   // Start/stop gameplay
@@ -320,6 +321,7 @@ private:
   static bool cb_enable_hardware_rendering(void* kodiInstance,
                                            const game_hw_rendering_properties* properties);
   static void cb_close_game(KODI_HANDLE kodiInstance);
+  static void cb_report_missing_file(KODI_HANDLE kodiInstance, const char* path);
   static double cb_get_playback_speed(KODI_HANDLE kodiInstance);
   static void cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForward, double ratio);
   static void cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo);
@@ -406,6 +408,7 @@ private:
   bool m_bSupportsAllExtensions = false;
   std::string m_emulatorName;
   std::string m_platforms;
+  std::string m_libretroCore;
   bool m_supportsDiscControl{false};
 
   // Properties of the current playing file
@@ -425,6 +428,7 @@ private:
   std::atomic<double> m_playbackSpeed{1.0};
   std::atomic<double> m_fastForwardSpeed{0.0}; // The speed set for the client, or 0
   std::string m_gamePath;
+  std::string m_missingFile; // The first file the client reported missing while loading
   bool m_bRequiresGameLoop = false;
   mutable size_t m_serializeSize = 0;
   IGameInputCallback* m_input = nullptr; // The input callback passed to OpenFile()

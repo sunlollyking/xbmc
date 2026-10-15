@@ -4580,6 +4580,10 @@
       {
         "name": "plot",
         "$ref": "Optional.String"
+      },
+      {
+        "name": "sorttitle",
+        "$ref": "Optional.String"
       }
     ],
     "returns": "string"
@@ -5263,7 +5267,8 @@
   },
   "VideoLibrary.SetSourceContent": {
     "type": "method",
-    "description": "Assigns a content type and scraper to a video source path, as the 'Set content' dialog does",
+    "description":
+        "Assigns a content type and scraper to a video source path, as the 'Set content' dialog does",
     "transport": "Response",
     "permission": "UpdateData",
     "params": [
@@ -5272,7 +5277,8 @@
         "type": "string",
         "required": true,
         "minLength": 1,
-        "description": "Path the content binding applies to. A trailing separator is added if missing"
+        "description":
+            "Path the content binding applies to. A trailing separator is added if missing"
       },
       {
         "name": "content",
@@ -5331,7 +5337,8 @@
           "exclude",
           "remove"
         ],
-        "description": "Only used when content is \"none\". \"clear\" unbinds the scraper, \"exclude\" also excludes the path from scanning, \"remove\" additionally deletes the items already scraped from it"
+        "description":
+            "Only used when content is \"none\". \"clear\" unbinds the scraper, \"exclude\" also excludes the path from scanning, \"remove\" additionally deletes the items already scraped from it"
       },
       {
         "name": "refresh",

@@ -53,27 +53,7 @@ std::optional<std::string> CIso3166_1::Alpha3ToAlpha2(std::string_view code)
   return std::nullopt;
 }
 
-bool CIso3166_1::ContainsAlpha3(std::string_view code)
-{
-  return std::ranges::binary_search(TableISO3166_1ByAlpha3, code, {}, &ISO3166_1::alpha3);
-}
-
 bool CIso3166_1::ContainsAlpha2(std::string_view code)
 {
   return std::ranges::binary_search(TableISO3166_1, code, {}, &ISO3166_1::alpha2);
-}
-
-std::optional<std::string> CIso3166_1::LookupByCode(std::string_view code)
-{
-  std::optional<ISO3166_1> entry;
-
-  if (code.size() == 2)
-    entry = FindAlpha2(code);
-  else if (code.size() == 3)
-    entry = FindAlpha3(code);
-
-  if (entry.has_value())
-    return std::string{entry->name};
-
-  return std::nullopt;
 }

@@ -1,3 +1,4 @@
-set(SOURCES TestGameInfoTagLoader.cpp)
+set(SOURCES TestGameInfoTag.cpp
+            TestGameInfoTagLoader.cpp)
 
-core_add_test_library(games_tags_test)
+core_add_test_library(test_games_tags)

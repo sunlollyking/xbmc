@@ -26,6 +26,7 @@
 #include "messaging/ApplicationMessenger.h"
 #include "playlists/PlayListTypes.h"
 #include "settings/SkinSettings.h"
+#include "utils/ArtTypes.h"
 #include "utils/ArtUtils.h"
 #include "utils/CharsetConverter.h"
 #include "utils/FileUtils.h"
@@ -5730,8 +5731,11 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///   \table_row3{   <b>`ListItem.Genre`</b>,
 ///                  \anchor ListItem_Genre
 ///                  _string_,
-///     @return The genre of the currently selected song\, album or movie in a
+///     @return The genre of the currently selected song\, album\, movie or game in a
 ///     container.
+///     <p><hr>
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Genre `ListItem.Genre`\endlink extended
+///     to support games
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.Genre(separator)`</b>,
@@ -6712,7 +6716,10 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///   \table_row3{   <b>`ListItem.Plot`</b>,
 ///                  \anchor ListItem_Plot
 ///                  _string_,
-///     @return The complete Text Summary of Video in a container.
+///     @return The complete Text Summary of Video or a game in a container.
+///     <p><hr>
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Plot `ListItem.Plot`\endlink extended
+///     to support games
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.IMDBNumber`</b>,
@@ -7492,6 +7499,9 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///     @return The game platform (e.g. "Atari 2600") (RETROPLAYER).
 ///     <p><hr>
 ///     @skinning_v18 **[New Infolabel]** \link ListItem_Platform `ListItem.Platform`\endlink
+///
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Platform `ListItem.Platform`\endlink
+///     now available for games in a container.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.Genres`</b>,
@@ -7508,6 +7518,9 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///     @return The game publisher (e.g. "Nintendo") (RETROPLAYER).
 ///     <p><hr>
 ///     @skinning_v18 **[New Infolabel]** \link ListItem_Publisher `ListItem.Publisher`\endlink
+///
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Publisher `ListItem.Publisher`\endlink
+///     now available for games in a container.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.Developer`</b>,
@@ -7516,6 +7529,9 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///     @return The game developer (e.g. "Square") (RETROPLAYER).
 ///     <p><hr>
 ///     @skinning_v18 **[New Infolabel]** \link ListItem_Developer `ListItem.Developer`\endlink
+///
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Developer `ListItem.Developer`\endlink
+///     now available for games in a container.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.Overview`</b>,
@@ -11502,7 +11518,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
       else if (prop.Name() == "property")
       {
         if (StringUtils::EqualsNoCase(prop.param(), "fanart_image"))
-          return AddMultiInfo(CGUIInfo(PLAYER_ITEM_ART, "fanart"));
+          return AddMultiInfo(CGUIInfo(PLAYER_ITEM_ART, ART::TYPE::FANART));
 
         return AddMultiInfo(CGUIInfo(MUSICPLAYER_PROPERTY, prop.param()));
       }
@@ -11892,7 +11908,7 @@ int CGUIInfoManager::TranslateListItem(const Property& cat,
     if (prop.Name() == "property" && StringUtils::EqualsNoCase(prop.param(), "fanart_image"))
     {
       ret = LISTITEM_ART;
-      data3 = "fanart";
+      data3 = ART::TYPE::FANART;
     }
     else if (prop.Name() == "property" || prop.Name() == "art" || prop.Name() == "rating" ||
              prop.Name() == "votes" || prop.Name() == "ratingandvotes" || prop.Name() == "uniqueid")
@@ -12389,9 +12405,9 @@ void CGUIInfoManager::ResetCurrentItem()
   m_infoProviders.InitCurrentItem(nullptr);
 }
 
-void CGUIInfoManager::UpdateCurrentItem(const CFileItem& item)
+void CGUIInfoManager::UpdateCurrentItem(const CFileItem& item, bool replaceLabels /* = true */)
 {
-  m_currentFile->UpdateInfo(item);
+  m_currentFile->UpdateInfo(item, replaceLabels);
 }
 
 void CGUIInfoManager::SetCurrentItem(const CFileItem& item)
@@ -12407,10 +12423,10 @@ void CGUIInfoManager::SetCurrentItem(const CFileItem& item)
 void CGUIInfoManager::SetCurrentAlbumThumb(const std::string& thumbFileName)
 {
   if (CFileUtils::Exists(thumbFileName))
-    m_currentFile->SetArt("thumb", thumbFileName);
+    m_currentFile->SetArt(ART::TYPE::THUMB, thumbFileName);
   else
   {
-    m_currentFile->SetArt("thumb", "");
+    m_currentFile->SetArt(ART::TYPE::THUMB, "");
     ART::FillInDefaultIcon(*m_currentFile);
   }
 }
@@ -12603,14 +12619,14 @@ std::string CGUIInfoManager::GetMultiInfoItemLabel(const CFileItem* item,
       case LISTITEM_PROGRAM_COUNT:
         return std::to_string(item->GetProgramCount());
       case LISTITEM_ACTUAL_ICON:
-        return item->GetArt("icon");
+        return item->GetArt(ART::TYPE::ICON);
       case LISTITEM_ICON:
       {
         std::string strThumb = item->GetThumbHideIfUnwatched(item);
         if (strThumb.empty())
-          strThumb = item->GetArt("icon");
+          strThumb = item->GetArt(ART::TYPE::ICON);
         if (fallback)
-          *fallback = item->GetArt("icon");
+          *fallback = item->GetArt(ART::TYPE::ICON);
         return strThumb;
       }
       case LISTITEM_ART:

@@ -35,7 +35,6 @@
 #include "guilib/GUIWindowManager.h"
 #include "guilib/StereoscopicsManager.h" //! @todo Remove me
 #include "input/InputManager.h"
-#include "interfaces/json-rpc/JSONRPC.h" //! @todo Remove me
 #include "music/MusicLibraryQueue.h"
 #include "network/Network.h" //! @todo Remove me
 #include "network/NetworkServices.h" //! @todo Remove me
@@ -422,8 +421,6 @@ void CProfileManager::FinalizeLoadProfile()
 
   weatherManager.Refresh();
 
-  JSONRPC::CJSONRPC::Initialize();
-
   // Restart context menu manager
   contextMenuManager.Init();
 
@@ -558,7 +555,6 @@ void CProfileManager::CreateProfileFolders()
   CDirectory::Create(GetThumbnailsFolder());
   CDirectory::Create(GetVideoThumbFolder());
   CDirectory::Create(GetBookmarksThumbFolder());
-  CDirectory::Create(GetSavestatesFolder());
   for (size_t hex = 0; hex < 16; hex++)
     CDirectory::Create(
         URIUtils::AddFileToFolder(GetThumbnailsFolder(), StringUtils::Format("{:x}", hex)));
@@ -719,14 +715,6 @@ std::string CProfileManager::GetLibraryFolder() const
     return URIUtils::AddFileToFolder(GetProfileUserDataFolder(), "library");
 
   return URIUtils::AddFileToFolder(GetUserDataFolder(), "library");
-}
-
-std::string CProfileManager::GetSavestatesFolder() const
-{
-  if (GetCurrentProfile().hasDatabases())
-    return URIUtils::AddFileToFolder(GetProfileUserDataFolder(), "Savestates");
-
-  return URIUtils::AddFileToFolder(GetUserDataFolder(), "Savestates");
 }
 
 std::string CProfileManager::GetSettingsFile() const

@@ -108,6 +108,7 @@ public:
   bool BeginClientFrame();
   void EndClientFrame();
   void DestroyContext();
+  void FlushRendered();
 
   // Hardware rendering functions
   bool Create(unsigned int width, unsigned int height);

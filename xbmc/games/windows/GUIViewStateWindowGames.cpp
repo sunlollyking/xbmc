@@ -21,6 +21,7 @@
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "view/ViewState.h"
+#include "view/ViewStateNames.h"
 #include "view/ViewStateSettings.h"
 
 #include <assert.h>
@@ -28,6 +29,7 @@
 
 using namespace KODI;
 using namespace GAME;
+using KODI::MEDIA::MediaSection;
 
 CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   : CGUIViewState(items)
@@ -101,7 +103,7 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     AddSortMethod(SortBy::SIZE, 553,
                   LABEL_MASKS("%L", "%I", "%L", "%I")); // Filename, Size | Label, Size
 
-    const CViewState* viewState = CViewStateSettings::GetInstance().Get("games");
+    const CViewState* viewState = CViewStateSettings::GetInstance().Get(VIEW::STATE::GAMES);
     if (viewState)
     {
       SetSortMethod(viewState->m_sortDescription);
@@ -113,9 +115,9 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   LoadViewState(items.GetPath(), WINDOW_GAMES);
 }
 
-std::string CGUIViewStateWindowGames::GetLockType()
+std::optional<KODI::MEDIA::MediaSection> CGUIViewStateWindowGames::GetLockType()
 {
-  return "games";
+  return KODI::MEDIA::MediaSection::GAMES;
 }
 
 std::string CGUIViewStateWindowGames::GetExtensions()
@@ -133,20 +135,13 @@ std::string CGUIViewStateWindowGames::GetExtensions()
 
 std::vector<CMediaSource>& CGUIViewStateWindowGames::GetSources()
 {
-  std::vector<CMediaSource>* pGameSources = CMediaSourceSettings::GetInstance().GetSources("games");
-
-  // Guard against source type not existing
-  if (pGameSources == nullptr)
-  {
-    static std::vector<CMediaSource> empty;
-    return empty;
-  }
-
-  return *pGameSources;
+  return CMediaSourceSettings::GetInstance().GetSources(MediaSection::GAMES);
 }
 
 void CGUIViewStateWindowGames::SaveViewState()
 {
-  const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb") ? "gameslibrary" : "games";
+  const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb")
+                              ? VIEW::STATE::GAMES_LIBRARY
+                              : VIEW::STATE::GAMES;
   SaveViewToDb(m_items.GetPath(), WINDOW_GAMES, CViewStateSettings::GetInstance().Get(viewState));
 }

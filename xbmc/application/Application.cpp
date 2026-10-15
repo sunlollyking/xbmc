@@ -17,7 +17,6 @@
 #include "GUILargeTextureManager.h"
 #include "GUIPassword.h"
 #include "GUIUserMessages.h"
-#include "HDRStatus.h"
 #include "PartyModeManager.h"
 #include "PlayListPlayer.h"
 #include "SectionLoader.h"
@@ -139,10 +138,8 @@
 #include "utils/AlarmClock.h"
 #include "utils/CPUInfo.h"
 #include "utils/CharsetConverter.h"
-#include "utils/ContentUtils.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/LangCodeExpander.h"
-#include "utils/PlayerUtils.h"
 #include "utils/RegExp.h"
 #include "utils/Screenshot.h"
 #include "utils/StringUtils.h"
@@ -172,9 +169,6 @@
 #endif
 #if defined(TARGET_POSIX) && defined(HAS_FILESYSTEM_SMB)
 #include "platform/posix/filesystem/SMBFile.h"
-#endif
-#ifndef TARGET_POSIX
-#include "platform/win32/threads/Win32Exception.h"
 #endif
 
 #include <array>
@@ -219,7 +213,6 @@ using KODI::MESSAGING::HELPERS::DialogResponse;
 
 using namespace std::chrono_literals;
 
-#define MAX_FFWD_SPEED 5
 
 CApplication::CApplication(void)
   :
@@ -557,6 +550,9 @@ bool CApplication::InitWindow(RESOLUTION res)
 
 bool CApplication::Initialize()
 {
+  // Must precede anything that can dispatch a JSON-RPC call
+  CJSONRPC::Initialize();
+
   m_pActiveAE->Start();
   // restore AE's previous volume state
 
@@ -751,10 +747,6 @@ bool CApplication::Initialize()
     // rendered while we load the main window or enter the master lock key
     CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SPLASH);
   }
-
-  // Must stay above the window activation below: that can raise a modal dialog, whose nested
-  // render loop reaches anything after it only once the dialog has been dismissed.
-  CJSONRPC::Initialize();
 
   CServiceBroker::RegisterSpeechRecognition(speech::ISpeechRecognition::CreateInstance());
 
@@ -1055,70 +1047,9 @@ bool CApplication::OnAction(const CAction &action)
     CScreenShot::TakeScreenshot();
     return true;
   }
-  // Display HDR : toggle HDR on/off
-  if (action.GetID() == ACTION_HDR_TOGGLE)
-  {
-    // Only enables manual HDR toggle if no video is playing or auto HDR switch is disabled
-    if (appPlayer->IsPlayingVideo() && CServiceBroker::GetWinSystem()->IsHDRDisplaySettingEnabled())
-      return true;
-
-    HDR_STATUS hdrStatus = CServiceBroker::GetWinSystem()->ToggleHDR();
-
-    if (hdrStatus == HDR_STATUS::HDR_OFF)
-    {
-      CGUIDialogKaiToast::QueueNotification(
-          CGUIDialogKaiToast::Info,
-          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(34220),
-          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(34221));
-    }
-    else if (hdrStatus == HDR_STATUS::HDR_ON)
-    {
-      CGUIDialogKaiToast::QueueNotification(
-          CGUIDialogKaiToast::Info,
-          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(34220),
-          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(34222));
-    }
+  if (appPlayer->OnVideoDisplayAction(action))
     return true;
-  }
-  // Tone Mapping : switch to next tone map method
-  if (action.GetID() == ACTION_CYCLE_TONEMAP_METHOD)
-  {
-    // Only enables tone mapping switch if display is not HDR capable or HDR is not enabled
-    if (CServiceBroker::GetWinSystem()->IsHDRDisplaySettingEnabled())
-      return true;
 
-    if (appPlayer->IsPlayingVideo())
-    {
-      CVideoSettings vs = appPlayer->GetVideoSettings();
-      vs.m_ToneMapMethod = static_cast<ETONEMAPMETHOD>(static_cast<int>(vs.m_ToneMapMethod) + 1);
-      if (vs.m_ToneMapMethod >= VS_TONEMAPMETHOD_MAX)
-        vs.m_ToneMapMethod =
-            static_cast<ETONEMAPMETHOD>(static_cast<int>(VS_TONEMAPMETHOD_OFF) + 1);
-
-      appPlayer->SetVideoSettings(vs);
-
-      int code = 0;
-      switch (vs.m_ToneMapMethod)
-      {
-        case VS_TONEMAPMETHOD_REINHARD:
-          code = 36555;
-          break;
-        case VS_TONEMAPMETHOD_ACES:
-          code = 36557;
-          break;
-        case VS_TONEMAPMETHOD_HABLE:
-          code = 36558;
-          break;
-        default:
-          throw std::logic_error("Tonemapping method not found. Did you forget to add a mapping?");
-      }
-      CGUIDialogKaiToast::QueueNotification(
-          CGUIDialogKaiToast::Info,
-          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(34224),
-          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(code), 1000, false, 500);
-    }
-    return true;
-  }
   // built in functions : execute the built-in
   if (action.GetID() == ACTION_BUILT_IN_FUNCTION)
   {
@@ -1219,7 +1150,7 @@ bool CApplication::OnAction(const CAction &action)
       {
         db.SetVideoUserRating(m_itemCurrentFile->GetVideoInfoTag()->m_iDbId,
                               m_itemCurrentFile->GetVideoInfoTag()->m_iUserRating,
-                              m_itemCurrentFile->GetVideoInfoTag()->m_type);
+                              m_itemCurrentFile->GetVideoInfoTag()->GetMediaType());
         db.Close();
       }
       // send a message to all windows to tell them to update the fileitem (eg playlistplayer, media windows)
@@ -1293,107 +1224,12 @@ bool CApplication::OnAction(const CAction &action)
   if (CServiceBroker::GetGUI()->GetStereoscopicsManager().OnAction(action))
     return true;
 
-  if (appPlayer->IsPlaying())
-  {
-    // forward channel switches to the player - he knows what to do
-    if (action.GetID() == ACTION_CHANNEL_UP || action.GetID() == ACTION_CHANNEL_DOWN)
-    {
-      appPlayer->OnAction(action);
-      return true;
-    }
+  // play unpauses as a pause does, through the whole chain again
+  if (action.GetID() == ACTION_PLAYER_PLAY && appPlayer->IsPlaying() && appPlayer->IsPaused())
+    return OnAction(CAction(ACTION_PAUSE));
 
-    // pause : toggle pause action
-    if (action.GetID() == ACTION_PAUSE)
-    {
-      appPlayer->Pause();
-      // go back to normal play speed on unpause
-      if (!appPlayer->IsPaused() && appPlayer->GetPlaySpeed() != 1)
-        appPlayer->SetPlaySpeed(1);
-
-      CGUIComponent *gui = CServiceBroker::GetGUI();
-      if (gui)
-        gui->GetAudioManager().Enable(appPlayer->IsPaused());
-      return true;
-    }
-    // play: unpause or set playspeed back to normal
-    if (action.GetID() == ACTION_PLAYER_PLAY)
-    {
-      // if currently paused - unpause
-      if (appPlayer->IsPaused())
-        return OnAction(CAction(ACTION_PAUSE));
-      // if we do a FF/RW then go back to normal speed
-      if (appPlayer->GetPlaySpeed() != 1)
-        appPlayer->SetPlaySpeed(1);
-      return true;
-    }
-    if (!appPlayer->IsPaused())
-    {
-      if (action.GetID() == ACTION_PLAYER_FORWARD || action.GetID() == ACTION_PLAYER_REWIND)
-      {
-        float playSpeed = appPlayer->GetPlaySpeed();
-
-        if (action.GetID() == ACTION_PLAYER_REWIND && (playSpeed == 1)) // Enables Rewinding
-          playSpeed *= -2;
-        else if (action.GetID() == ACTION_PLAYER_REWIND && playSpeed > 1) //goes down a notch if you're FFing
-          playSpeed /= 2;
-        else if (action.GetID() == ACTION_PLAYER_FORWARD && playSpeed < 1) //goes up a notch if you're RWing
-          playSpeed /= 2;
-        else
-          playSpeed *= 2;
-
-        if (action.GetID() == ACTION_PLAYER_FORWARD && playSpeed == -1) //sets iSpeed back to 1 if -1 (didn't plan for a -1)
-          playSpeed = 1;
-        if (playSpeed > 32 || playSpeed < -32)
-          playSpeed = 1;
-
-        appPlayer->SetPlaySpeed(playSpeed);
-        return true;
-      }
-      else if ((action.GetAmount() || appPlayer->GetPlaySpeed() != 1) &&
-               (action.GetID() == ACTION_ANALOG_REWIND || action.GetID() == ACTION_ANALOG_FORWARD))
-      {
-        // calculate the speed based on the amount the button is held down
-        int iPower = (int)(action.GetAmount() * MAX_FFWD_SPEED + 0.5f);
-        // amount can be negative, for example rewind and forward share the same axis
-        iPower = std::abs(iPower);
-        // returns 0 -> MAX_FFWD_SPEED
-        int iSpeed = 1 << iPower;
-        if (iSpeed != 1 && action.GetID() == ACTION_ANALOG_REWIND)
-          iSpeed = -iSpeed;
-        appPlayer->SetPlaySpeed(static_cast<float>(iSpeed));
-        if (iSpeed == 1)
-          CLog::Log(LOGDEBUG,"Resetting playspeed");
-        return true;
-      }
-      else if (action.GetID() == ACTION_PLAYER_INCREASE_TEMPO)
-      {
-        CPlayerUtils::AdvanceTempoStep(appPlayer, TempoStepChange::INCREASE);
-        return true;
-      }
-      else if (action.GetID() == ACTION_PLAYER_DECREASE_TEMPO)
-      {
-        CPlayerUtils::AdvanceTempoStep(appPlayer, TempoStepChange::DECREASE);
-        return true;
-      }
-    }
-    // allow play to unpause
-    else
-    {
-      if (action.GetID() == ACTION_PLAYER_PLAY)
-      {
-        // unpause, and set the playspeed back to normal
-        appPlayer->Pause();
-
-        CGUIComponent *gui = CServiceBroker::GetGUI();
-        if (gui)
-          gui->GetAudioManager().Enable(appPlayer->IsPaused());
-
-        appPlayer->SetPlaySpeed(1);
-        return true;
-      }
-    }
-  }
-
+  if (appPlayer->OnPlaybackAction(action))
+    return true;
 
   if (action.GetID() == ACTION_SWITCH_PLAYER)
   {
@@ -1426,74 +1262,8 @@ bool CApplication::OnAction(const CAction &action)
   if (CServiceBroker::GetPeripherals().OnAction(action))
     return true;
 
-  if (action.GetID() == ACTION_MUTE)
-  {
-    const auto appVolume = GetComponent<CApplicationVolumeHandling>();
-    appVolume->ToggleMute();
-    appVolume->ShowVolumeBar(&action);
+  if (GetComponent<CApplicationVolumeHandling>()->OnAction(action))
     return true;
-  }
-
-  if (action.GetID() == ACTION_TOGGLE_DIGITAL_ANALOG)
-  {
-    const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-    bool passthrough = settings->GetBool(CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGH);
-    settings->SetBool(CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGH, !passthrough);
-
-    if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_SETTINGS_SYSTEM)
-    {
-      CGUIMessage msg(GUI_MSG_WINDOW_INIT, 0,0,WINDOW_INVALID,CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow());
-      CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
-    }
-    return true;
-  }
-
-  // Check for global volume control
-  if ((action.GetAmount() && (action.GetID() == ACTION_VOLUME_UP || action.GetID() == ACTION_VOLUME_DOWN)) || action.GetID() == ACTION_VOLUME_SET)
-  {
-    const auto appVolume = GetComponent<CApplicationVolumeHandling>();
-
-    // The level cannot be applied to a bitstream, but with volume control enabled
-    // it is still adjusted and announced, so an external processor can follow it
-    const bool volumeControl = !appPlayer->IsPassthrough() ||
-                               CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-                                   CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGHVOLUMECONTROL);
-    if (volumeControl)
-    {
-      if (appVolume->IsMuted())
-        appVolume->UnMute();
-      float volume = appVolume->GetVolumeRatio();
-      int volumesteps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_AUDIOOUTPUT_VOLUMESTEPS);
-      // sanity check
-      if (volumesteps == 0)
-        volumesteps = 90;
-
-// Android has steps based on the max available volume level
-#if defined(TARGET_ANDROID)
-      float step = (CApplicationVolumeHandling::VOLUME_MAXIMUM -
-                    CApplicationVolumeHandling::VOLUME_MINIMUM) /
-                   CXBMCApp::GetMaxSystemVolume();
-#else
-      float step = (CApplicationVolumeHandling::VOLUME_MAXIMUM -
-                    CApplicationVolumeHandling::VOLUME_MINIMUM) /
-                   volumesteps;
-
-      if (action.GetRepeat())
-        step *= action.GetRepeat() * 50; // 50 fps
-#endif
-      if (action.GetID() == ACTION_VOLUME_UP)
-        volume += action.GetAmount() * action.GetAmount() * step;
-      else if (action.GetID() == ACTION_VOLUME_DOWN)
-        volume -= action.GetAmount() * action.GetAmount() * step;
-      else
-        volume = action.GetAmount() * step;
-      if (volume != appVolume->GetVolumeRatio())
-        appVolume->SetVolume(volume, false);
-    }
-    // show visual feedback of volume or passthrough indicator
-    appVolume->ShowVolumeBar(&action);
-    return true;
-  }
 
   if (action.GetID() == ACTION_GUIPROFILE_BEGIN)
   {
@@ -1583,7 +1353,8 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
 
     // Open the door for external calls e.g python exactly here.
     // Window size can be between 2 and 10ms and depends on number of continuous requests
-    if (m_WaitingExternalCalls)
+    // Stop() has already released the guard; don't take it back on the way out
+    if (m_WaitingExternalCalls && !m_bStop)
     {
       CSingleExit ex(CServiceBroker::GetWinSystem()->GetGfxContext());
       m_frameMoveGuard.unlock();
@@ -2442,10 +2213,14 @@ void CApplication::Process()
 
   {
     // Allow processing of script threads to let them shut down properly.
+    // Stop() has already released the guard; don't take it back on the way out
+    const bool releaseGuard = !m_bStop;
     CSingleExit ex(CServiceBroker::GetWinSystem()->GetGfxContext());
-    m_frameMoveGuard.unlock();
+    if (releaseGuard)
+      m_frameMoveGuard.unlock();
     CScriptInvocationManager::GetInstance().Process();
-    m_frameMoveGuard.lock();
+    if (releaseGuard)
+      m_frameMoveGuard.lock();
   }
 
   // process messages, even if a movie is playing

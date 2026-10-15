@@ -362,6 +362,9 @@ bool CRetroPlayer::CloseFile(bool reopen /* = false */)
 
   UnregisterWindowCallbacks();
 
+  if (m_renderManager)
+    m_renderManager->FlushRendered();
+
   m_playbackControl.reset();
 
   std::unique_lock lock(m_mutex);
@@ -816,7 +819,13 @@ void CRetroPlayer::SetSpeedInternal(double speed)
   if (speed == 0.0)
     m_playback->PauseAsync();
   else
+  {
     m_playback->SetSpeed(speed);
+
+    // Rewinding runs the game loop slower than the speed shown
+    if (speed < 0.0 && m_gameClient && m_gameClient->RequiresGameLoop())
+      m_renderManager->SetSpeed(m_playback->GetSpeed());
+  }
 }
 
 void CRetroPlayer::OnSpeedChange(double newSpeed)

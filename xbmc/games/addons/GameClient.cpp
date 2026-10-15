@@ -119,6 +119,7 @@ constexpr double CLIENT_FAST_FORWARD_SPEED = 16.0;
 
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
+constexpr const char* GAME_PROPERTY_LIBRETRO_CORE = "libretro_core";
 
 /*!
  * \brief Holds a hardware-rendering client's context current for a call into it
@@ -207,6 +208,9 @@ CGameClient::CGameClient(const ADDON::AddonInfoPtr& addonInfo)
       addonInfo->Type(AddonType::GAMEDLL)->GetValue(GAME_PROPERTY_PLATFORMS).asString();
   if (!platforms.empty())
     m_platforms = platforms;
+
+  m_libretroCore =
+      addonInfo->Type(AddonType::GAMEDLL)->GetValue(GAME_PROPERTY_LIBRETRO_CORE).asString();
 }
 
 CGameClient::~CGameClient(void)
@@ -262,18 +266,13 @@ bool CGameClient::Initialize(void)
   if (!CDirectory::Exists(Profile()))
     CDirectory::Create(Profile());
 
-  // Ensure directory exists for savestates
-  const CGameServices& gameServices = CServiceBroker::GetGameServices();
-  std::string savestatesDir = URIUtils::AddFileToFolder(gameServices.GetSavestatesFolder(), ID());
-  if (!CDirectory::Exists(savestatesDir))
-    CDirectory::Create(savestatesDir);
-
   if (!AddonProperties().InitializeProperties())
     return false;
 
   m_ifc.game->toKodi->kodiInstance = this;
   m_ifc.game->toKodi->EnableHardwareRendering = cb_enable_hardware_rendering;
   m_ifc.game->toKodi->CloseGame = cb_close_game;
+  m_ifc.game->toKodi->ReportMissingFile = cb_report_missing_file;
   m_ifc.game->toKodi->GetPlaybackSpeed = cb_get_playback_speed;
   m_ifc.game->toKodi->SetFastForwarding = cb_set_fast_forwarding;
   m_ifc.game->toKodi->SetGameTiming = cb_set_game_timing;
@@ -427,6 +426,8 @@ bool CGameClient::OpenFile(const CFileItem& file,
 
   const auto loadGame = [this, &path]()
   {
+    m_missingFile.clear();
+
     GAME_ERROR loadError = GAME_ERROR_FAILED;
     try
     {
@@ -687,7 +688,7 @@ void CGameClient::NotifyError(GAME_ERROR error)
     const std::string& wanted = Streams().HardwareRenderingRefusedWanted();
     const std::string& available = Streams().HardwareRenderingRefusedAvailable();
 
-    if (!wanted.empty() && !available.empty())
+    if (!available.empty())
     {
       // Failed to play game
       MESSAGING::HELPERS::ShowOKDialogText(
@@ -696,19 +697,13 @@ void CGameClient::NotifyError(GAME_ERROR error)
               CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35300), wanted,
               available)});
     }
-    else if (!wanted.empty())
+    else
     {
       // Failed to play game
       MESSAGING::HELPERS::ShowOKDialogText(
           CVariant{35210},
           CVariant{StringUtils::Format(
               CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35301), wanted)});
-    }
-    else
-    {
-      // Failed to play game
-      // This game requires OpenGL support for 3D rendering. OpenGL support is still under development.
-      MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35271});
     }
   }
   else if (!missingResource.empty())
@@ -720,6 +715,18 @@ void CGameClient::NotifyError(GAME_ERROR error)
         CVariant{StringUtils::Format(
             CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35211),
             missingResource)});
+  }
+  else if (error == GAME_ERROR_MISSING_FILES)
+  {
+    const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+    // Failed to play game
+    // The emulator "%s" couldn't find %s, a file it needs.
+    // The emulator "%s" couldn't find files it needs, such as BIOS files.
+    MESSAGING::HELPERS::ShowOKDialogText(
+        CVariant{35210},
+        CVariant{m_missingFile.empty()
+                     ? StringUtils::Format(strings.Get(35241), Name())
+                     : StringUtils::Format(strings.Get(35240), Name(), m_missingFile)});
   }
   else
   {
@@ -946,6 +953,8 @@ bool CGameClient::CopyTree(const std::string& from, const std::string& to)
 void CGameClient::CloseFile()
 {
   std::unique_lock lock(m_critSection);
+
+  m_missingFile.clear();
 
   if (m_bIsPlaying)
   {
@@ -1340,6 +1349,7 @@ void CGameClient::LogAddonProperties(void) const
   CLog::Log(LOGINFO, "GAME: Supports VFS:        {}", m_bSupportsVFS);
   CLog::Log(LOGINFO, "GAME: Supports standalone: {}", m_bSupportsStandalone);
   CLog::Log(LOGINFO, "GAME: Disc control:        {}", m_supportsDiscControl);
+  CLog::Log(LOGINFO, "GAME: Libretro core:       {}", m_libretroCore);
   CLog::Log(LOGINFO, "GAME: ------------------------------------");
 }
 
@@ -1417,6 +1427,20 @@ void CGameClient::cb_close_game(KODI_HANDLE kodiInstance)
 {
   CServiceBroker::GetAppMessenger()->PostMsg(TMSG_GUI_ACTION, WINDOW_INVALID, -1,
                                              static_cast<void*>(new CAction(ACTION_STOP)));
+}
+
+void CGameClient::cb_report_missing_file(KODI_HANDLE kodiInstance, const char* path)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || path == nullptr)
+    return;
+
+  CLog::Log(LOGWARNING, "GameClient: {} couldn't find {}", gameClient->ID(), path);
+
+  // The first file is the one to name, as clients often look for a file under several names
+  std::unique_lock lock(gameClient->m_critSection);
+  if (gameClient->m_missingFile.empty())
+    gameClient->m_missingFile = path;
 }
 
 double CGameClient::cb_get_playback_speed(KODI_HANDLE kodiInstance)

@@ -20,6 +20,7 @@
 #include "application/Application.h"
 #include "application/ApplicationPlayer.h"
 #include "application/ApplicationPowerHandling.h"
+#include "guilib/GUIAudioManager.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "input/actions/Action.h"
@@ -36,6 +37,7 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "storage/MediaManager.h"
+#include "utils/ItemProperties.h"
 #include "utils/PlayerUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -167,9 +169,15 @@ static int PlayerControl(const std::vector<std::string>& params)
   }
   else if (paramlow =="rewind" || paramlow == "forward")
   {
-    if (appPlayer->IsPlaying() && !appPlayer->IsPaused())
+    const bool wasPaused = appPlayer->IsPaused();
+    // FF/RW while paused is only supported for video outside of menus
+    if (appPlayer->IsPlaying() &&
+        (!wasPaused ||
+         (appPlayer->IsPlayingVideo() && !appPlayer->IsPlayingGame() && !appPlayer->IsInMenu())))
     {
       float playSpeed = appPlayer->GetPlaySpeed();
+      if (playSpeed == 0)
+        playSpeed = 1;
 
       if (paramlow == "rewind" && playSpeed == 1) // Enables Rewinding
         playSpeed *= -2;
@@ -188,6 +196,10 @@ static int PlayerControl(const std::vector<std::string>& params)
         playSpeed = 1;
 
       appPlayer->SetPlaySpeed(playSpeed);
+
+      CGUIComponent* gui = CServiceBroker::GetGUI();
+      if (wasPaused && gui)
+        gui->GetAudioManager().Enable(appPlayer->IsPaused());
     }
   }
   else if (paramlow == "tempoup" || paramlow == "tempodown")
@@ -195,9 +207,9 @@ static int PlayerControl(const std::vector<std::string>& params)
     if (appPlayer->SupportsTempo() && appPlayer->IsPlaying() && !appPlayer->IsPaused())
     {
       if (paramlow == "tempodown")
-        CPlayerUtils::AdvanceTempoStep(appPlayer, TempoStepChange::DECREASE);
+        CPlayerUtils::AdvanceTempoStep(*appPlayer, TempoStepChange::DECREASE);
       else if (paramlow == "tempoup")
-        CPlayerUtils::AdvanceTempoStep(appPlayer, TempoStepChange::INCREASE);
+        CPlayerUtils::AdvanceTempoStep(*appPlayer, TempoStepChange::INCREASE);
     }
   }
   else if (StringUtils::StartsWithNoCase(params[0], "tempo"))
@@ -570,7 +582,7 @@ int PlayOrQueueMedia(const std::vector<std::string>& params,
   }
 
   if (!item.IsFolder() && item.IsPlugin())
-    item.SetProperty("IsPlayable", true);
+    item.SetProperty(ITEM::PROPERTY::IS_PLAYABLE, true);
 
   if (forcePlay && askToResume)
   {

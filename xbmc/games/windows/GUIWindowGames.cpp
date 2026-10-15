@@ -56,6 +56,7 @@ namespace
 // own action ids so the setting reads the same as the video one
 } // namespace
 using namespace GAME;
+using KODI::MEDIA::MediaSection;
 
 #define CONTROL_BTNVIEWASICONS 2
 #define CONTROL_BTNSORTBY 3
@@ -96,7 +97,7 @@ bool CGUIWindowGames::OnMessage(CGUIMessage& message)
         if (db.Open() && db.HasContent())
           message.SetStringParam("gamedb://platforms/");
         else
-          message.SetStringParam(CMediaSourceSettings::GetInstance().GetDefaultSource("games"));
+          message.SetStringParam(CMediaSourceSettings::GetInstance().GetDefaultSource(MediaSection::GAMES));
       }
 
       //! @todo
@@ -216,7 +217,7 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
     if (m_vecItems->IsVirtualDirectoryRoot() || m_vecItems->IsSourcesPath())
     {
       // Context buttons for a sources path, like "Add Source", "Remove Source", etc.
-      CGUIDialogContextMenu::GetContextButtons("games", item, buttons);
+      CGUIDialogContextMenu::GetContextButtons(MediaSection::GAMES, item, buttons);
     }
     else
     {
@@ -284,7 +285,7 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
   {
     if (m_vecItems->IsVirtualDirectoryRoot() || m_vecItems->IsSourcesPath())
     {
-      if (CGUIDialogContextMenu::OnContextButton("games", item, button))
+      if (CGUIDialogContextMenu::OnContextButton(MediaSection::GAMES, item, button))
       {
         Update(m_vecItems->GetPath());
         return true;
@@ -381,7 +382,7 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
 
 bool CGUIWindowGames::OnAddMediaSource()
 {
-  return CGUIDialogMediaSource::ShowAndAddMediaSource("games");
+  return CGUIDialogMediaSource::ShowAndAddMediaSource(MediaSection::GAMES);
 }
 
 bool CGUIWindowGames::Update(const std::string& strDirectory, bool updateFilterPath /* = true */)
@@ -484,7 +485,8 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
     {
       std::string source;
       if (m_rootDir.IsSource(items.GetPath(),
-                             CMediaSourceSettings::GetInstance().GetSources("games"), &source))
+                             &CMediaSourceSettings::GetInstance().GetSources(MediaSection::GAMES),
+                             &source))
         label = std::move(source);
     }
   }
@@ -535,7 +537,7 @@ std::string CGUIWindowGames::GetStartFolder(const std::string& dir)
     if (iIndex < static_cast<int>(shares.size()) && shares[iIndex].GetLockInfo().IsLocked())
     {
       CFileItem item(shares[iIndex]);
-      if (!g_passwordManager.IsItemUnlocked(&item, "games"))
+      if (!g_passwordManager.IsItemUnlocked(&item, MediaSection::GAMES))
         return "";
     }
     if (bIsSourceName)

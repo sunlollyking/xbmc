@@ -278,7 +278,7 @@ void CGUIDialogGameContentSettings::InitializeSettings()
     AddButton(playGroup, SETTING_VIDEO_FILTER, 35726, SettingLevel::Basic);
     AddButton(playGroup, SETTING_STRETCH_MODE, 35233, SettingLevel::Basic);
     AddButton(playGroup, SETTING_ROTATION, 35227, SettingLevel::Basic);
-    AddButton(playGroup, SETTING_BEZEL, 35241, SettingLevel::Basic);
+    AddButton(playGroup, SETTING_BEZEL, 35244, SettingLevel::Basic);
   }
 }
 
@@ -592,7 +592,7 @@ bool CGUIDialogGameContentSettings::ChooseBezel()
   const std::vector<std::string> labels{Localize(571), Localize(305), Localize(1223)};
   const int selected = !m_videoSettings.bezelEnabled ? 0 : *m_videoSettings.bezelEnabled ? 1 : 2;
 
-  const int chosen = Choose(35241, labels, selected); // Bezel
+  const int chosen = Choose(35244, labels, selected); // Bezel
   if (chosen < 0)
     return false;
 

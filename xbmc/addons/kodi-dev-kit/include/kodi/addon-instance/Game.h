@@ -279,6 +279,23 @@ public:
   }
   //----------------------------------------------------------------------------
 
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
+  /// The <libretro_core> property from addon.xml, such as "fceumm_libretro".
+  ///
+  /// @return The core's name, or an empty string if addon.xml has none or
+  ///         Kodi's game API is older than 8.2.1
+  ///
+  /// @remarks Only called from the add-on itself
+  ///
+  std::string LibretroCore() const
+  {
+    if (!IsInstanceAPIVersionAtLeast(8, 2, 1) || m_instanceData->props->libretro_core == nullptr)
+      return "";
+    return m_instanceData->props->libretro_core;
+  }
+  //----------------------------------------------------------------------------
+
   ///@}
 
   //--==----==----==----==----==----==----==----==----==----==----==----==----==--
@@ -423,6 +440,23 @@ public:
 
   //============================================================================
   /// @brief **Callback to Kodi Function**\n
+  /// Name a file the game client looked for and couldn't find, such as a
+  /// BIOS file, so Kodi can tell the user which one is missing.
+  ///
+  /// @param[in] path The file's path, relative to the system directory
+  ///
+  /// @remarks Call it before returning @ref GAME_ERROR_MISSING_FILES. It does
+  ///          nothing with a Kodi older than game API 8.3.0.
+  ///
+  void ReportMissingFile(const std::string& path)
+  {
+    if (IsInstanceAPIVersionAtLeast(8, 3, 0))
+      m_instanceData->toKodi->ReportMissingFile(m_instanceData->toKodi->kodiInstance, path.c_str());
+  }
+  //----------------------------------------------------------------------------
+
+  //============================================================================
+  /// @brief **Callback to Kodi Function**\n
   /// Get the speed the game is being played back at
   ///
   /// @return The speed as a multiple of normal speed
@@ -477,12 +511,14 @@ public:
   /// tape. Kodi leaves a speed the user chose alone: it only fast-forwards from
   /// normal speed, and only returns to normal speed from the one it set.
   ///
-  /// @remarks Only called from the add-on itself
+  /// @remarks Only called from the add-on itself. It does nothing with a Kodi
+  ///          older than game API 8.5.0.
   ///
   void SetFastForwarding(bool fastForward, double ratio)
   {
-    m_instanceData->toKodi->SetFastForwarding(m_instanceData->toKodi->kodiInstance, fastForward,
-                                              ratio);
+    if (IsInstanceAPIVersionAtLeast(8, 5, 0))
+      m_instanceData->toKodi->SetFastForwarding(m_instanceData->toKodi->kodiInstance, fastForward,
+                                                ratio);
   }
   //----------------------------------------------------------------------------
 
@@ -1707,8 +1743,8 @@ private:
 
     instance->game->toAddon->FreeString = ADDON_FreeString;
 
-    // Added in 8.3.0. An older Kodi's table ends before this entry.
-    if (IsInstanceAPIVersionAtLeast(8, 3, 0))
+    // Added in 8.4.0. An older Kodi's table ends before this entry.
+    if (IsInstanceAPIVersionAtLeast(8, 4, 0))
       instance->game->toAddon->RunFrameSpeculative = ADDON_RunFrameSpeculative;
 
     m_instanceData = instance->game;
