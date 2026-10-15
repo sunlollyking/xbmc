@@ -206,7 +206,18 @@ int CActiveAEResampleFFMPEG::Resample(uint8_t **dst_buffer, int dst_samples, uin
         (src_samples * ratio - src_samples) * m_dst_rate / m_src_rate + m_compensationRemainder;
     delta = static_cast<int>(exact);
     m_compensationRemainder = exact - delta;
-    distance = src_samples*m_dst_rate/m_src_rate;
+    // libswresample spreads the compensation over this many output samples, so it counts the ones
+    // the call produces. The uncompensated count leaves a speed-up's compensation unfinished.
+    const int produced = src_samples * m_dst_rate / m_src_rate;
+    distance = produced + delta;
+    // A call this short makes too little output to spread the compensation
+    // over, which libswresample refuses. Leave it for the next call.
+    if (produced <= 0 || distance <= 0)
+    {
+      m_compensationRemainder += delta;
+      delta = 0;
+      distance = 0;
+    }
     m_doesResample = true;
   }
   else
