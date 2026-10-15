@@ -74,7 +74,7 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     }
     SetSortOrder(SortOrder::ASCENDING);
 
-    const CViewState* viewState = CViewStateSettings::GetInstance().Get("gameslibrary");
+    const CViewState* viewState = CViewStateSettings::GetInstance().Get(VIEW::STATE::GAMES_LIBRARY);
     if (viewState)
     {
       SetSortMethod(viewState->m_sortDescription);

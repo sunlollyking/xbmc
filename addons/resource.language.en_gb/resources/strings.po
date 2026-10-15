@@ -20849,7 +20849,47 @@ msgctxt "#35703"
 msgid "Hardcore mode: {0:d} of {1:d} achievements unlocked"
 msgstr ""
 
-#empty strings from id 35704 to 35725
+#empty strings from id 35704 to 35709
+
+#. Marks a locked achievement that can be missed for good
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35710"
+msgid "Missable"
+msgstr ""
+
+#. Button that picks which of a game's achievement sets is shown
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35711"
+msgid "Achievement set"
+msgstr ""
+
+#. An achievement set whose progression and win achievements are all earned
+#: xbmc/games/addons/cheevos/GameClientCheevos.cpp
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35712"
+msgid "Beaten"
+msgstr ""
+
+#. How close an achievement set is to being beaten, {0:d} earned of {1:d} needed
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+#, c++-format
+msgctxt "#35713"
+msgid "{0:d} of {1:d} to beat"
+msgstr ""
+
+#. An achievement set the player turned off
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35714"
+msgid "Turned off"
+msgstr ""
+
+#. The game's own achievement set, as opposed to its subsets
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35715"
+msgid "Main Set"
+msgstr ""
+
+#empty strings from id 35716 to 35725
 
 #. Label of the context menu item that sets the video filter for a game or folder
 #: xbmc/games/windows/GUIWindowGames.cpp
@@ -24195,7 +24235,17 @@ msgctxt "#36642"
 msgid "No orphaned add-ons to remove."
 msgstr ""
 
-#empty strings from id 36643 to 36644
+#. Label of a setting to show pictures that have HDR information in HDR
+#: system/settings/settings.xml
+msgctxt "#36643"
+msgid "Show HDR pictures in HDR"
+msgstr ""
+
+#. Description of setting with label #36643 "Show HDR pictures in HDR"
+#: system/settings/settings.xml
+msgctxt "#36644"
+msgid "Switch an HDR display to HDR for pictures that have HDR information, such as Ultra HDR photos from phones. It stays in HDR for the rest of the slideshow, apart from videos, which set the display up for themselves. Moving photos don't play their clip while it's in HDR."
+msgstr ""
 
 #. Label of setting "Pictures -> Slideshow -> Show date and time metadata on screen"
 #: system/settings/settings.xml

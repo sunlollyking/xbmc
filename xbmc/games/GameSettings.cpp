@@ -63,6 +63,7 @@ const std::string SETTING_GAMES_ACHIEVEMENTS_LOGGED_IN = "gamesachievements.logg
 const std::string SETTING_GAMES_ACHIEVEMENTS_API_KEY = "gamesachievements.apikey";
 const std::string SETTING_GAMES_ACHIEVEMENTS_REFRESH_PROGRESS =
     "gamesachievements.refreshprogress";
+const std::string SETTING_GAMES_ACHIEVEMENTS_DISABLED_SETS = "gamesachievements.disabledsets";
 
 //! What the scraper add-ons call the same two credentials
 constexpr const char* SCRAPER_SETTING_USERNAME = "ra_username";
@@ -211,6 +212,28 @@ void CGameSettings::ShareAchievementCredentials() const
     if (changed)
       scraper->SaveSettings();
   }
+}
+
+bool CGameSettings::IsAchievementSetDisabled(unsigned int setId) const
+{
+  const std::vector<std::string> disabled =
+      StringUtils::Split(m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_DISABLED_SETS), ",");
+  return std::ranges::find(disabled, std::to_string(setId)) != disabled.end();
+}
+
+void CGameSettings::SetAchievementSetDisabled(unsigned int setId, bool disabled)
+{
+  std::vector<std::string> sets =
+      StringUtils::Split(m_settings->GetString(SETTING_GAMES_ACHIEVEMENTS_DISABLED_SETS), ",");
+  const std::string id = std::to_string(setId);
+
+  std::erase(sets, id);
+  std::erase(sets, "");
+  if (disabled)
+    sets.emplace_back(id);
+
+  m_settings->SetString(SETTING_GAMES_ACHIEVEMENTS_DISABLED_SETS, StringUtils::Join(sets, ","));
+  m_settings->Save();
 }
 
 void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setting)

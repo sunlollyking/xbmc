@@ -46,6 +46,7 @@ xbmc/music/test                   test/music
 xbmc/network/test                 test/network
 xbmc/pictures/metadata/test       test/pictures/metadata
 xbmc/peripherals/test             test/peripherals
+xbmc/pictures/test                test/pictures
 xbmc/playlists/test               test/playlists
 xbmc/pvr/channels/test            test/pvrchannels
 xbmc/pvr/epg/test                 test/pvrepg
