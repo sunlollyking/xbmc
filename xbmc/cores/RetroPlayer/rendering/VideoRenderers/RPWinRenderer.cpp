@@ -357,7 +357,8 @@ void CRPWinRenderer::Render(CD3DTexture& target, uint8_t alpha)
 
       // Render shaders to an intermediate texture. The output shader handles
       // the final transform and alpha.
-      if (!m_shaderPreset->RenderUpdate(*renderBufferTarget, *presetTarget))
+      if (!m_shaderPreset->RenderUpdate(*renderBufferTarget, *presetTarget,
+                                        {m_fullDestWidth, m_fullDestHeight}))
       {
         m_bShadersNeedUpdate = false;
         m_bUseShaderPreset = false;

@@ -151,7 +151,8 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    if (m_shaderPreset->RenderUpdate(*sourceTexture, *targetTexture))
+    if (m_shaderPreset->RenderUpdate(*sourceTexture, *targetTexture,
+                                     {m_fullDestWidth, m_fullDestHeight}))
     {
       glActiveTexture(GL_TEXTURE0); // GUI shader samples from texture unit 0
       glBindTexture(m_textureTarget, targetTexture->GetTextureID());
