@@ -120,6 +120,7 @@ constexpr double CLIENT_FAST_FORWARD_SPEED = 16.0;
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 constexpr const char* GAME_PROPERTY_LIBRETRO_CORE = "libretro_core";
+constexpr const char* GAME_PROPERTY_SAVESTATE_FEATURES = "savestate_features";
 
 /*!
  * \brief Holds a hardware-rendering client's context current for a call into it
@@ -211,6 +212,8 @@ CGameClient::CGameClient(const ADDON::AddonInfoPtr& addonInfo)
 
   m_libretroCore =
       addonInfo->Type(AddonType::GAMEDLL)->GetValue(GAME_PROPERTY_LIBRETRO_CORE).asString();
+  m_savestateFeatures =
+      addonInfo->Type(AddonType::GAMEDLL)->GetValue(GAME_PROPERTY_SAVESTATE_FEATURES).asString();
 }
 
 CGameClient::~CGameClient(void)
