@@ -77,11 +77,14 @@ public:
   void CloseStream() override;
 
 private:
+  void UpdateResampleRatio(double packetSecs);
+
   CRPProcessInfo& m_processInfo;
   IAE::StreamPtr m_pAudioStream;
   bool m_bAudioEnabled = true;
   bool m_bAudioSuppressed = false;
-  double m_playbackRate = 1.0;
+  double m_resampleRatio = 1.0;
+  double m_cacheSecs = 0.0;
   std::atomic<bool> m_restoreDelay{false};
   double m_playingDelay = 0.0;
   unsigned int m_framesToSkip = 0;
