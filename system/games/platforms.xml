@@ -1263,7 +1263,7 @@
     <sortname>MS-DOS</sortname>
     <manufacturer>Microsoft</manufacturer>
     <type>computer</type>
-    <media>disc</media>
+    <media>disk</media>
     <released>1981</released>
     <extensions>7z bas bat bin com conf cue dat dosz dsk exe game gog ima img iso mdf wad z5 z8 zip</extensions>
     <alias>PC Dos</alias>

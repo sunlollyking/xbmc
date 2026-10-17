@@ -427,7 +427,11 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
       return !file.serial.empty();
     }
 
-    return HashWhole(path, file, media == MediaFormat::UNKNOWN ? MAX_HASH_SIZE : MAX_ROM_HASH_SIZE);
+    const uint64_t limit = media == MediaFormat::UNKNOWN ? MAX_HASH_SIZE : MAX_ROM_HASH_SIZE;
+    if (file.size > limit)
+      return false;
+
+    return HashWhole(path, file, limit);
   }
   catch (...)
   {
