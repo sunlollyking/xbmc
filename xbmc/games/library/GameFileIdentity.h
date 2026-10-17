@@ -43,6 +43,11 @@ public:
   static constexpr uint64_t MAX_HASH_SIZE = 64 * 1024 * 1024;
 
   /*!
+   * \brief How far into a disc image its header is looked for before giving up
+   */
+  static constexpr uint64_t MAX_DISC_SCAN = 2ULL * 1024 * 1024 * 1024;
+
+  /*!
    * \brief Fill in what can be learnt about a file
    *
    * \param path The game file, which may be an archive or a cue sheet
@@ -60,8 +65,10 @@ public:
    * Reads PlayStation (SYSTEM.CNF), Saturn, Mega-CD and Dreamcast headers.
    * The result is normalised to upper-case letters and digits, as the
    * catalogues key on.
+   *
+   * \param maxRead How far into the image to look for the header
    */
-  static std::string ReadDiscSerial(const std::string& trackPath);
+  static std::string ReadDiscSerial(const std::string& trackPath, uint64_t maxRead = MAX_DISC_SCAN);
 
   //! \brief The serial a disc header holds, once the header has been found
   static std::string SerialFromHeader(const std::string& data, size_t at, int console);
