@@ -85,6 +85,8 @@ void CGameInfoTag::Reset()
   m_achievementsEarned = 0;
   m_achievementsHardcore = 0;
   m_strLastUnlock.clear();
+  m_rating = 0.0f;
+  m_strAgeRating.clear();
 }
 
 CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
@@ -150,6 +152,8 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_achievementsEarned = tag.m_achievementsEarned;
     m_achievementsHardcore = tag.m_achievementsHardcore;
     m_strLastUnlock = tag.m_strLastUnlock;
+    m_rating = tag.m_rating;
+    m_strAgeRating = tag.m_strAgeRating;
   }
   return *this;
 }
@@ -182,7 +186,8 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
          m_strLastPlayed == tag.m_strLastPlayed &&
          m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
-         m_completed == tag.m_completed;
+         m_completed == tag.m_completed && m_rating == tag.m_rating &&
+         m_strAgeRating == tag.m_strAgeRating;
 }
 
 void CGameInfoTag::SetDevelopers(const std::vector<std::string>& developers)
@@ -205,6 +210,12 @@ void CGameInfoTag::SetPlayers(int min, int max)
   m_playersMax = std::max(max, m_playersMin);
 }
 
+void CGameInfoTag::SetPlayers(unsigned int players)
+{
+  m_playersMax = static_cast<int>(players);
+  m_playersMin = std::min(m_playersMin, m_playersMax);
+}
+
 void CGameInfoTag::SetRating(const std::string& type, const GameRating& rating)
 {
   m_ratings[type] = rating;
@@ -222,7 +233,7 @@ void CGameInfoTag::SetRatings(const std::map<std::string, GameRating>& ratings,
     m_strDefaultRating = ratings.empty() ? "" : ratings.begin()->first;
 }
 
-GameRating CGameInfoTag::GetRating(const std::string& type /* = "" */) const
+GameRating CGameInfoTag::GetRatingDetails(const std::string& type /* = "" */) const
 {
   const auto it = m_ratings.find(type.empty() ? m_strDefaultRating : type);
   if (it == m_ratings.end())
@@ -237,10 +248,18 @@ GameRating CGameInfoTag::GetRating(const std::string& type /* = "" */) const
   return rating;
 }
 
+float CGameInfoTag::GetRating() const
+{
+  if (!m_ratings.empty())
+    return GetRatingDetails().rating;
+
+  return m_rating;
+}
+
 std::string CGameInfoTag::GetAgeRating() const
 {
   if (m_ageRatings.empty())
-    return "";
+    return m_strAgeRating;
 
   const GameAgeRating& rating = m_ageRatings.front();
   if (rating.board.empty())
@@ -374,6 +393,8 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_achievementsEarned;
     ar << m_achievementsHardcore;
     ar << m_strLastUnlock;
+    ar << m_rating;
+    ar << m_strAgeRating;
   }
   else
   {
@@ -466,6 +487,8 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_achievementsEarned;
     ar >> m_achievementsHardcore;
     ar >> m_strLastUnlock;
+    ar >> m_rating;
+    ar >> m_strAgeRating;
   }
 }
 
@@ -509,9 +532,8 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["category"] = std::string(CGameLibraryTypes::ToString(m_category));
   value["matchedby"] = std::string(CGameLibraryTypes::ToString(m_matchMethod));
 
-  const GameRating rating = GetRating();
-  value["rating"] = rating.rating;
-  value["votes"] = rating.votes;
+  value["rating"] = GetRating();
+  value["votes"] = GetRatingDetails().votes;
   value["ratings"] = CVariant(CVariant::VariantTypeObject);
   for (const auto& [type, r] : m_ratings)
   {
@@ -594,10 +616,10 @@ void CGameInfoTag::ToSortable(SortItem& sortable, Field field) const
       sortable[Field::PLOT] = m_strOverview;
       break;
     case Field::RATING:
-      sortable[Field::RATING] = GetRating().rating;
+      sortable[Field::RATING] = GetRating();
       break;
     case Field::VOTES:
-      sortable[Field::VOTES] = GetRating().votes;
+      sortable[Field::VOTES] = GetRatingDetails().votes;
       break;
     case Field::USER_RATING:
       sortable[Field::USER_RATING] = m_userRating;

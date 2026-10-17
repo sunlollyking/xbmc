@@ -178,6 +178,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
     case LISTITEM_LASTPLAYED:
     case LISTITEM_DATE_ADDED:
     case LISTITEM_MPAA:
+    case LISTITEM_AGERATING:
     case LISTITEM_SET:
     case LISTITEM_TAG:
     case LISTITEM_TRAILER:
@@ -275,17 +276,19 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           return !value.empty();
         case LISTITEM_RATING:
         {
-          const GameRating rating = tag->GetRating(info.GetData3());
-          if (rating.rating > 0.0f)
+          const float rating = info.GetData3().empty()
+                                   ? tag->GetRating()
+                                   : tag->GetRatingDetails(info.GetData3()).rating;
+          if (rating > 0.0f)
           {
-            value = StringUtils::FormatNumber(rating.rating);
+            value = StringUtils::FormatNumber(rating);
             return true;
           }
           break;
         }
         case LISTITEM_VOTES:
         {
-          const GameRating rating = tag->GetRating(info.GetData3());
+          const GameRating rating = tag->GetRatingDetails(info.GetData3());
           if (rating.votes > 0)
           {
             value = std::to_string(rating.votes);
@@ -321,6 +324,7 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           break;
         }
         case LISTITEM_MPAA:
+        case LISTITEM_AGERATING:
           value = tag->GetAgeRating();
           return !value.empty();
         case LISTITEM_SET:

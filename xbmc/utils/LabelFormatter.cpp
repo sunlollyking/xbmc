@@ -289,8 +289,8 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       value = StringUtils::Format("{:.1f}", music->GetRating());
     else if (movie && movie->GetRating().rating != 0.f)
       value = StringUtils::Format("{:.1f}", movie->GetRating().rating);
-    else if (game && game->GetRating().rating != 0.f)
-      value = StringUtils::Format("{:.1f}", game->GetRating().rating);
+    else if (game && game->GetRating() != 0.f)
+      value = StringUtils::Format("{:.1f}", game->GetRating());
     break;
   case 'C': // programs count
     value = std::to_string(item->GetProgramCount());

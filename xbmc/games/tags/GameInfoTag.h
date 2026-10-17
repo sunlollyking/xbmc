@@ -180,6 +180,10 @@ public:
   int GetPlayersMax() const { return m_playersMax; }
   void SetPlayers(int min, int max);
 
+  // Most players at once, or 0 if unknown
+  unsigned int GetPlayers() const { return static_cast<unsigned int>(m_playersMax); }
+  void SetPlayers(unsigned int players);
+
   bool IsCoop() const { return m_coop; }
   void SetCoop(bool coop) { m_coop = coop; }
 
@@ -203,16 +207,27 @@ public:
    *
    * \param type The source, such as "igdbcritic", or empty for the rating to show
    */
-  GameRating GetRating(const std::string& type = "") const;
+  GameRating GetRatingDetails(const std::string& type = "") const;
+
+  // Rating, out of 10: the rating to show from a source, or else the one set
+  // here. A value outside 0 to 10, or NaN, is ignored.
+  float GetRating() const;
+  void SetRating(float rating)
+  {
+    if (rating >= 0.0f && rating <= 10.0f)
+      m_rating = rating;
+  }
   const std::string& GetDefaultRatingType() const { return m_strDefaultRating; }
 
   const std::vector<GameAgeRating>& GetAgeRatings() const { return m_ageRatings; }
   void SetAgeRatings(const std::vector<GameAgeRating>& ratings) { m_ageRatings = ratings; }
 
   /*!
-   * \brief The age rating to show, e.g. "ESRB E" or "PEGI 12"
+   * \brief The age rating to show, e.g. "ESRB E" or "PEGI 12": from the boards
+   *        above, or else the one set here
    */
   std::string GetAgeRating() const;
+  void SetAgeRating(const std::string& strAgeRating) { m_strAgeRating = strAgeRating; }
 
   const std::map<std::string, std::string>& GetUniqueIDs() const { return m_uniqueIds; }
   void SetUniqueID(const std::string& type, const std::string& value, bool isDefault = false);
@@ -355,7 +370,9 @@ private:
   // Ratings and identifiers
   std::map<std::string, GameRating> m_ratings;
   std::string m_strDefaultRating;
+  float m_rating;
   std::vector<GameAgeRating> m_ageRatings;
+  std::string m_strAgeRating;
   std::map<std::string, std::string> m_uniqueIds;
   std::string m_strDefaultUniqueId;
 
