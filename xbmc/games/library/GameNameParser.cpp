@@ -192,14 +192,15 @@ struct Patterns
   Patterns()
   {
     revision.RegComp("^(rev|revision|version|v)\\.? ?([0-9][0-9a-z.]*|[a-z])$");
-    disc.RegComp("^(disc|disk|side|tape|cd|cart|part) ?([0-9]+[a-z]?|[a-z])( of ([0-9]+))?$");
+    disc.RegComp(
+        "^(disc|disk|side|tape|cd|cart|part) ?([0-9]{1,4}[a-z]?|[a-z])( of ([0-9]{1,4}))?$");
     dataDisk.RegComp(
         "^(.+ )?(data|user|save|scenario|music|sound|map|character|backup|utility) dis[ck]( .+)?$");
     tosecYear.RegComp("^(19|20)([0-9x?]{2})(-[0-9]{2}(-[0-9]{2})?)?$");
     beta.RegComp("^beta( ?[0-9]+)?$");
     proto.RegComp("^proto(type)?( ?[0-9]+)?$");
     sample.RegComp("^sample$");
-    demo.RegComp("^(demo|kiosk|preview|trial|taikenban)");
+    demo.RegComp("^(demo|kiosk|preview|trial|taikenban)\\b");
     alpha.RegComp("^alpha$");
     debug.RegComp("^debug( version)?$");
     program.RegComp("^(check |sample |test )?program$");
