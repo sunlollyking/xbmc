@@ -80,6 +80,22 @@ constexpr std::array<std::pair<std::string_view, std::string_view>, 54> regionNa
     {"il", "Israel"},
 }};
 
+// TOSEC writes a country in capitals, "(DE)", and a language in lower case,
+// "(de)". These are the countries whose code is also a language's.
+constexpr std::array<std::pair<std::string_view, std::string_view>, 11> tosecCountries{{
+    {"DE", "Germany"},
+    {"FR", "France"},
+    {"IT", "Italy"},
+    {"ES", "Spain"},
+    {"NL", "Netherlands"},
+    {"PT", "Portugal"},
+    {"PL", "Poland"},
+    {"FI", "Finland"},
+    {"NO", "Norway"},
+    {"RU", "Russia"},
+    {"AR", "Argentina"},
+}};
+
 constexpr std::array<std::string_view, 40> languageCodes{
     "en", "ja", "fr", "de", "es", "it", "nl", "pt", "sv", "no", "da", "fi", "zh", "ko",
     "pl", "ru", "cs", "hu", "el", "tr", "ar", "he", "ca", "th", "hr", "ro", "bg", "uk",
@@ -134,7 +150,12 @@ bool AllRegions(const std::vector<std::string>& parts, std::vector<std::string>&
   codes.clear();
   for (const std::string& p : parts)
   {
-    const std::string name = CGameNameParser::RegionName(Lower(p));
+    std::string name = CGameNameParser::RegionName(Lower(p));
+    for (const auto& [code, country] : tosecCountries)
+    {
+      if (name.empty() && code == p)
+        name = country;
+    }
     if (name.empty())
       return false;
     codes.emplace_back(name);

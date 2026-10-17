@@ -38,9 +38,15 @@ class CGameFileIdentity
 public:
   /*!
    * \brief Files larger than this are treated as disc images and read only
-   *        as far as their header
+   *        as far as their header, unless their platform's media is known
    */
   static constexpr uint64_t MAX_HASH_SIZE = 64 * 1024 * 1024;
+
+  /*!
+   * \brief How large a file of a platform not on discs is hashed: Nintendo DS
+   *        cartridges run to 512 MB
+   */
+  static constexpr uint64_t MAX_ROM_HASH_SIZE = 1024 * 1024 * 1024;
 
   /*!
    * \brief How far into a disc image its header is looked for before giving up
@@ -85,7 +91,7 @@ public:
   static std::string NormaliseSerial(std::string serial);
 
 private:
-  static bool HashWhole(const std::string& path, GameFile& file);
+  static bool HashWhole(const std::string& path, GameFile& file, uint64_t maxSize = MAX_HASH_SIZE);
   static bool HashArchive(const std::string& path, GameFile& file);
   static bool HashLargestMember(const std::string& path, GameFile& file);
   static std::string ReadArchivedDiscSerial(const std::string& path);
