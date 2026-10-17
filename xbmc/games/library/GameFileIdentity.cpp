@@ -234,7 +234,7 @@ std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath, uint
   return "";
 }
 
-bool CGameFileIdentity::HashWhole(const std::string& path, GameFile& file)
+bool CGameFileIdentity::HashWhole(const std::string& path, GameFile& file, uint64_t maxSize)
 {
   XFILE::CFile in;
   if (!in.Open(path, XFILE::READ_NO_CACHE))
@@ -257,7 +257,7 @@ bool CGameFileIdentity::HashWhole(const std::string& path, GameFile& file)
     crc = crc32(crc, reinterpret_cast<const Bytef*>(buffer.data()), static_cast<uInt>(n));
     md5.Update(buffer.data(), static_cast<size_t>(n));
     total += static_cast<uint64_t>(n);
-    if (total > MAX_HASH_SIZE)
+    if (total > maxSize)
       return false;
   }
 
@@ -419,13 +419,15 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
     // A disc is known by the serial printed in its own header. Hashing the
     // container matches nothing: the catalogues key discs by serial, and every
     // rip of one game differs by however it was made.
-    if (media == MediaFormat::DISC || file.size > MAX_HASH_SIZE)
+    // A file too large for a cartridge is taken for a disc only when the
+    // platform's media isn't known.
+    if (media == MediaFormat::DISC || (media == MediaFormat::UNKNOWN && file.size > MAX_HASH_SIZE))
     {
       file.serial = ReadDiscSerial(path);
       return !file.serial.empty();
     }
 
-    return HashWhole(path, file);
+    return HashWhole(path, file, media == MediaFormat::UNKNOWN ? MAX_HASH_SIZE : MAX_ROM_HASH_SIZE);
   }
   catch (...)
   {

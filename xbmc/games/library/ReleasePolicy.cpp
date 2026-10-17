@@ -31,7 +31,8 @@ std::string_view WiderRegion(std::string_view region)
     return "Europe";
   if (region == "Canada" || region == "Brazil")
     return "USA";
-  if (region == "Korea")
+  if (region == "Korea" || region == "China" || region == "Taiwan" || region == "Hong Kong" ||
+      region == "India")
     return "Asia";
   return "";
 }
@@ -94,12 +95,14 @@ int CReleasePolicy::StatusRank(const GameRelease& release)
   return rank;
 }
 
-int CReleasePolicy::RevisionRank(const GameRelease& release)
+std::vector<int> CReleasePolicy::RevisionRank(const GameRelease& release)
 {
-  // "Rev 2" > "Rev 1" > none; "v1.1" > "v1.0"; "Rev B" > "Rev A"
+  // Compared part by part: "v1.10" is newer than "v1.9" and older than "v2.0".
+  // A letter counts by its place in the alphabet: "Rev B" is newer than "Rev A".
   std::string_view rev = release.revision;
+  std::vector<int> parts;
   if (rev.empty())
-    return 0;
+    return parts;
 
   for (std::string_view word : {"revision", "version", "rev", "v"})
   {
@@ -110,20 +113,26 @@ int CReleasePolicy::RevisionRank(const GameRelease& release)
     }
   }
 
-  int value = 0;
-  bool seenDigit = false;
+  bool inNumber = false;
   for (const char c : rev)
   {
     const auto u = static_cast<unsigned char>(c);
     if (std::isdigit(u))
     {
-      value = value * 10 + (c - '0');
-      seenDigit = true;
+      if (!inNumber)
+        parts.push_back(0);
+      if (parts.back() < 100000000)
+        parts.back() = parts.back() * 10 + (c - '0');
+      inNumber = true;
     }
-    else if (std::isalpha(u) && !seenDigit)
-      value = std::tolower(u) - 'a' + 1;
+    else
+    {
+      inNumber = false;
+      if (std::isalpha(u) && parts.empty())
+        parts.push_back(std::tolower(u) - 'a' + 1);
+    }
   }
-  return value + 1;
+  return parts;
 }
 
 int CReleasePolicy::DumpRank(const GameRelease& release)

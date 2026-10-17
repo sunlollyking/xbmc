@@ -172,6 +172,20 @@ TEST(TestGameNameParser, LeavesADiscNumberTooLongToBeOne)
   EXPECT_EQ(parsed.title, "Game");
 }
 
+TEST(TestGameNameParser, TellsATosecCountryFromALanguage)
+{
+  const ParsedGameName german = CGameNameParser::Parse("Game (1990)(Publisher)(DE).adf");
+  EXPECT_EQ(german.regions, (std::vector<std::string>{"Germany"}));
+  EXPECT_TRUE(german.languages.empty());
+
+  const ParsedGameName inGerman = CGameNameParser::Parse("Game (1990)(Publisher)(de).adf");
+  EXPECT_TRUE(inGerman.regions.empty());
+  EXPECT_EQ(inGerman.languages, (std::vector<std::string>{"de"}));
+
+  EXPECT_EQ(CGameNameParser::Parse("Game (Europe) (En,Fr,De).sfc").languages,
+            (std::vector<std::string>{"en", "fr", "de"}));
+}
+
 TEST(TestGameNameParser, ReadsATosecNameWithNoPublisher)
 {
   const ParsedGameName parsed = CGameNameParser::Parse("Game (1990)(-)(PAL).adf");

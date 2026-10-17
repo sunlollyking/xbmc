@@ -58,7 +58,7 @@ public:
 private:
   int RegionRank(const GameRelease& release) const;
   static int StatusRank(const GameRelease& release);
-  static int RevisionRank(const GameRelease& release);
+  static std::vector<int> RevisionRank(const GameRelease& release);
   static int DumpRank(const GameRelease& release);
 
   std::vector<std::string> m_regionPriority;

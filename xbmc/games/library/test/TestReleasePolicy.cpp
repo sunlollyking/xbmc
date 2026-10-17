@@ -39,6 +39,8 @@ TEST(TestReleasePolicy, PutsThePlayersRegionFirst)
             (std::vector<std::string>{"United Kingdom", "Europe", "World", "USA", "Japan"}));
   EXPECT_EQ(CReleasePolicy::RegionPriority("Japan"),
             (std::vector<std::string>{"Japan", "World", "Europe", "USA"}));
+  EXPECT_EQ(CReleasePolicy::RegionPriority("China"),
+            (std::vector<std::string>{"China", "Asia", "World", "Europe", "USA", "Japan"}));
   EXPECT_EQ(CReleasePolicy::RegionPriority("Canada"),
             (std::vector<std::string>{"Canada", "USA", "World", "Europe", "Japan"}));
 }
@@ -75,6 +77,13 @@ TEST(TestReleasePolicy, PrefersTheNewestRevision)
             1);
   EXPECT_EQ(
       PolicyFor("Europe").PickDefault({Release({"Europe"}, "v1.1"), Release({"Europe"}, "v1.10")}),
+      1);
+  // Each part of a version is compared as a number
+  EXPECT_EQ(
+      PolicyFor("Europe").PickDefault({Release({"Europe"}, "v2.0"), Release({"Europe"}, "v1.10")}),
+      0);
+  EXPECT_EQ(
+      PolicyFor("Europe").PickDefault({Release({"Europe"}, "v1.9"), Release({"Europe"}, "v1.10")}),
       1);
   // Letters count by their place in the alphabet, whichever they are
   EXPECT_EQ(

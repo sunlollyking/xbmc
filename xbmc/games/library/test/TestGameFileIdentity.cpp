@@ -8,6 +8,7 @@
 
 #include "FileItemList.h"
 #include "filesystem/Directory.h"
+#include "filesystem/File.h"
 #include "games/library/GameFileIdentity.h"
 #include "test/TestUtils.h"
 #include "utils/URIUtils.h"
@@ -180,4 +181,27 @@ TEST(TestGameFileIdentity, StartsAfreshForEachFile)
 
   EXPECT_TRUE(file.members.empty());
   EXPECT_EQ(file.crc32, MEMBER_CRC32);
+}
+
+TEST(TestGameFileIdentity, HashesACartridgeTooLargeToTellFromADisc)
+{
+  // 65 MB of zeros, over the size a file of unknown media is hashed at
+  XFILE::CFile* rom = XBMC_CREATETEMPFILE(".nds");
+  ASSERT_NE(rom, nullptr);
+  const std::vector<char> chunk(1024 * 1024);
+  for (int i = 0; i < 65; ++i)
+    ASSERT_EQ(rom->Write(chunk.data(), chunk.size()), static_cast<ssize_t>(chunk.size()));
+  rom->Flush();
+  const std::string path = XBMC_TEMPFILEPATH(rom);
+
+  GameFile file;
+  EXPECT_TRUE(CGameFileIdentity::Identify(path, file, MediaFormat::CARTRIDGE));
+  EXPECT_EQ(file.crc32, "97d38551");
+  EXPECT_EQ(file.md5, "0a9739d8f171bb3a216168a2b7376e2e");
+
+  GameFile unknown;
+  EXPECT_FALSE(CGameFileIdentity::Identify(path, unknown, MediaFormat::UNKNOWN));
+  EXPECT_TRUE(unknown.crc32.empty());
+
+  XBMC_DELETETEMPFILE(rom);
 }
