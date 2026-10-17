@@ -157,6 +157,16 @@ TEST(TestGameNameParser, StillReadsATosecName)
   EXPECT_EQ(parsed.displayTitle, "Savage");
 }
 
+TEST(TestGameNameParser, ReadsATosecCountry)
+{
+  const ParsedGameName parsed = CGameNameParser::Parse("1942 (1986)(Elite)(GB).tap");
+  EXPECT_EQ(parsed.regions, (std::vector<std::string>{"United Kingdom"}));
+  EXPECT_EQ(parsed.publisher, "Elite");
+  EXPECT_TRUE(CGameNameParser::Credits(parsed).empty());
+  EXPECT_EQ(CGameNameParser::Parse("Galaga (1983)(Namco)(SE).tap").regions,
+            (std::vector<std::string>{"Sweden"}));
+}
+
 TEST(TestGameNameParser, DropsAScenesReleaseNumber)
 {
   EXPECT_EQ(CGameNameParser::Parse("2797 Kimi no Yusha (JP).zip").title, "Kimi no Yusha");

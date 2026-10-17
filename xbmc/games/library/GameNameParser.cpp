@@ -21,7 +21,7 @@ using namespace GAME;
 
 namespace
 {
-constexpr std::array<std::pair<std::string_view, std::string_view>, 41> regionNames{{
+constexpr std::array<std::pair<std::string_view, std::string_view>, 54> regionNames{{
     {"usa", "USA"},
     {"us", "USA"},
     {"u", "USA"},
@@ -63,6 +63,21 @@ constexpr std::array<std::pair<std::string_view, std::string_view>, 41> regionNa
     {"scandinavia", "Scandinavia"},
     {"latin america", "Latin America"},
     {"unknown", "Unknown"},
+    // TOSEC's ISO 3166 country codes, apart from those that are also language
+    // codes, such as "de" and "fr", which a language tag needs
+    {"gb", "United Kingdom"},
+    {"au", "Australia"},
+    {"se", "Sweden"},
+    {"dk", "Denmark"},
+    {"gr", "Greece"},
+    {"br", "Brazil"},
+    {"mx", "Mexico"},
+    {"kr", "Korea"},
+    {"cn", "China"},
+    {"tw", "Taiwan"},
+    {"hk", "Hong Kong"},
+    {"in", "India"},
+    {"il", "Israel"},
 }};
 
 constexpr std::array<std::string_view, 40> languageCodes{
