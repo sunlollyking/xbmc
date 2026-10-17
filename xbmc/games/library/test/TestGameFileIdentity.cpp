@@ -151,6 +151,16 @@ TEST(TestGameFileIdentity, ReadsTheSerialOfAnArchivedDisc)
   EXPECT_EQ(file.serial, "SLUS01234");
 }
 
+TEST(TestGameFileIdentity, ReadsTheSerialOfAnArchivedPspDisc)
+{
+  // psp.zip holds one disc image and no cue sheet
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/psp.zip"),
+                                          file, MediaFormat::DISC));
+
+  EXPECT_EQ(file.serial, "ULUS10080");
+}
+
 TEST(TestGameFileIdentity, ReadsAQuotedGdiTrack)
 {
   const std::string track =
