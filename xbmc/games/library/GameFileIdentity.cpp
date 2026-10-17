@@ -73,14 +73,16 @@ std::string ReadHead(const std::string& path, size_t bytes)
   return data;
 }
 
-// Streams an archive member through the decompressor rather than letting the
-// zip backend copy it whole into special://temp first, which it does for
-// anything deflated over 4 MB and never cleans up. Everything here reads front
-// to back, so nothing needs to seek.
+// Streams a zip member through the decompressor rather than letting the zip
+// backend copy it whole into special://temp first, which it does for anything
+// deflated over 4 MB and never cleans up. Everything here reads front to back,
+// so nothing needs to seek. Other archives are read by VFS add-ons, which take
+// the option as part of the name and open nothing.
 std::string Uncached(const std::string& memberPath)
 {
   CURL url(memberPath);
-  url.SetOptions("?cache=no");
+  if (url.IsProtocol("zip"))
+    url.SetOptions("?cache=no");
   return url.Get();
 }
 
@@ -258,6 +260,10 @@ bool CGameFileIdentity::HashWhole(const std::string& path, GameFile& file)
     if (total > MAX_HASH_SIZE)
       return false;
   }
+
+  // A read that ends early hashes part of the file, which matches nothing
+  if (file.size != 0 && total != file.size)
+    return false;
 
   file.crc32 = StringUtils::Format("{:08x}", static_cast<uint32_t>(crc));
   file.md5 = StringUtils::ToLower(md5.Finalize());
