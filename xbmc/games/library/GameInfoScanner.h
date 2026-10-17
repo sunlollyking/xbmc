@@ -174,6 +174,14 @@ private:
   //! \brief Describe the machine itself, once, with its own pictures
   void ScrapePlatform(const GamePathContent& content, const PlatformInfo& platform);
 
+  /*!
+   * \brief Bring a platform the library already holds up to the catalogue
+   *
+   * A correction in the catalogue, such as the media a machine's games come
+   * on, reaches a library made before it. Saved only when something changed.
+   */
+  void FollowCatalogue(PlatformInfo& platform);
+
   //! \brief Whether the library may ask the internet, or reads what is on this disk
   static bool DownloadsAllowed();
 
