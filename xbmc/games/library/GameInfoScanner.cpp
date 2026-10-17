@@ -797,6 +797,11 @@ bool CGameInfoScanner::RefreshGame(int idGame)
   for (const GameFile& file : release->files)
     entry.files.emplace_back(file.path);
 
+  // A scan names a game after its folder when the folder holds only that game.
+  // The title it gave the release says which of the two names it read.
+  const ParsedGameName fromFolder = CGameNameParser::Parse(FolderName(entry.folder), false);
+  entry.nameFromFolder = !fromFolder.title.empty() && fromFolder.title == release->title;
+
   m_bRunning = true;
   const bool ok = ScanEntry(entry, content, platform, idGame);
   m_bRunning = false;
@@ -1546,6 +1551,16 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
         }
       }
     }
+    // A refresh that found nothing about the game leaves it as it was, apart
+    // from what it read from the file
+    if (matchedBy == MatchMethod::NONE)
+    {
+      existing.SetReleases(releases);
+      KODI::ART::Artwork existingArt;
+      m_database.GetArtForItem(refreshGameId, KODI::MEDIA::TYPE::GAME, existingArt);
+      return m_database.SetDetailsForGame(existing, existingArt) > 0;
+    }
+
     tag.SetReleases(releases);
     tag.SetDefaultReleaseId(existing.GetDefaultReleaseId());
     tag.SetUserRating(existing.GetUserRating());
@@ -1607,9 +1622,12 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     // A refresh can settle on an identity some other row already has: the file
     // name named this one thing when it was added and the catalogue names it
     // another now. Two dumps of one game were then two games. Fold them
-    // together, keeping whichever row knows more.
+    // together, keeping whichever row knows more -- but only on a match by hash
+    // or serial, as a name can match the wrong game.
+    const bool sure = matchedBy == MatchMethod::HASH || matchedBy == MatchMethod::SERIAL;
     const int other =
-        FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits, refreshGameId);
+        sure ? FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits, refreshGameId)
+             : -1;
     if (other > 0)
     {
       int keep = other;
