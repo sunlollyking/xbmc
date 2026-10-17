@@ -104,8 +104,9 @@ bool CFileUtils::RenameFile(const std::string &strFile)
 
 bool CFileUtils::RemoteAccessAllowed(const std::string &strPath)
 {
-  constexpr std::array sections{MediaSection::PROGRAMS, MediaSection::FILES, MediaSection::VIDEO,
-                                MediaSection::MUSIC, MediaSection::PICTURES};
+  constexpr std::array sections{MediaSection::PROGRAMS, MediaSection::FILES,
+                                MediaSection::VIDEO,    MediaSection::MUSIC,
+                                MediaSection::PICTURES, MediaSection::GAMES};
 
   std::string realPath = URIUtils::GetRealPath(strPath);
   // for rar:// and zip:// paths we need to extract the path to the archive
@@ -119,6 +120,12 @@ bool CFileUtils::RemoteAccessAllowed(const std::string &strPath)
     return true;
   else if (URIUtils::IsVideoDb(realPath))
     return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "gamedb://"))
+    return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "library://games"))
+    return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "sources://games"))
+    return true;
   else if (StringUtils::StartsWithNoCase(realPath, "library://video"))
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "library://music"))
@@ -127,6 +134,8 @@ bool CFileUtils::RemoteAccessAllowed(const std::string &strPath)
     return true;
   else if (CUtil::IsInPlaylistsFolder(realPath, MediaSection::MUSIC) ||
            CUtil::IsInPlaylistsFolder(realPath, MediaSection::VIDEO))
+    return true;
+  else if (StringUtils::StartsWithNoCase(realPath, "special://gameplaylists"))
     return true;
   else if (StringUtils::StartsWithNoCase(realPath, "special://skin"))
     return true;
