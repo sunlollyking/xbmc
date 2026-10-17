@@ -42,6 +42,7 @@ struct ParsedGameName
   bool dataDisk{false}; // one the game asks for once it runs: user, data, scenario...
   int year{0};
   std::string publisher; // TOSEC names the publisher in the file name
+  bool tosec{false}; // named the TOSEC way: a date, then the publisher
   std::vector<std::string> unknownTags;
 };
 
@@ -85,8 +86,9 @@ public:
    *
    * Collections of Japanese computer games give one tag the parser doesn't
    * otherwise know, sometimes marked as doujin: "Tetris (Doujin - Noripy)",
-   * "Teki wa Kaizoku (D-Photon - Victor)". A TOSEC publisher is left out, as a
-   * budget label reissuing a game is credited there too.
+   * "Teki wa Kaizoku (D-Photon - Victor)". A TOSEC name credits nothing: its
+   * publisher may be a budget label reissuing the game, and its other fields
+   * say what the release runs on.
    */
   static std::vector<std::string> Credits(const ParsedGameName& name);
 

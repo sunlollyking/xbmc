@@ -424,7 +424,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
   // Parenthesised tags: No-Intro, Redump and TOSEC attributes
   rest.clear();
   pos = 0;
-  bool tosec = false;
+  bool publisherRead = false;
   while (pos < name.size())
   {
     const size_t open = name.find('(', pos);
@@ -548,7 +548,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
     }
     if (Matches(re.tosecYear, tl))
     {
-      tosec = true;
+      out.tosec = true;
       if (std::isdigit(static_cast<unsigned char>(tl[2])) &&
           std::isdigit(static_cast<unsigned char>(tl[3])))
         out.year = std::stoi(tl.substr(0, 4));
@@ -565,9 +565,10 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
     }
     if (noise)
       continue;
-    // TOSEC: the tag after the year names the publisher
-    if (tosec && out.publisher.empty() && !std::isdigit(static_cast<unsigned char>(tag[0])))
+    // TOSEC: the tag after the year names the publisher, "-" when it's unknown
+    if (out.tosec && !publisherRead && !std::isdigit(static_cast<unsigned char>(tag[0])))
     {
+      publisherRead = true;
       out.publisher = (tag == "-") ? "" : tag;
       continue;
     }
@@ -584,7 +585,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
 
 std::vector<std::string> CGameNameParser::Credits(const ParsedGameName& name)
 {
-  if (name.unknownTags.size() != 1)
+  if (name.tosec || name.unknownTags.size() != 1)
     return {};
 
   std::string tag = name.unknownTags.front();
