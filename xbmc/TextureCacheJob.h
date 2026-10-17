@@ -100,6 +100,20 @@ public:
    */
   static bool MayBeAnImage(const std::string& mimeType);
 
+  /*!
+   \brief Stand a picture up if it was asked for upright and stored lying down
+
+   Asked for with the image option orientation=portrait, for pictures such as a
+   box's spine that are drawn standing but sometimes scanned on their side. A
+   picture that is wider than it is tall is turned a quarter clockwise.
+
+   \return The orientation to draw the picture with
+   */
+  static int UprightOrientation(const IMAGE_FILES::CImageFileURL& imageURL,
+                                unsigned int width,
+                                unsigned int height,
+                                int orientation);
+
   std::string m_url;
   CTextureDetails m_oldDetails;
   CTextureDetails m_details;
