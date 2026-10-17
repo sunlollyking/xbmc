@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "GameClientCallbacks.h"
+#include "GameClientFastForward.h"
 #include "GameClientInGameSaves.h"
 #include "GameClientProperties.h"
 #include "GameClientTranslator.h"
@@ -20,8 +21,6 @@
 #include "addons/BinaryAddonCache.h"
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/FileDirectoryFactory.h"
@@ -112,22 +111,6 @@ bool CopyWhole(const std::string& from, const std::string& to)
   return false;
 }
 
-//! The speed a client gets when it asks to fast-forward and leaves the speed to
-//! Kodi, and the most it can ask for. The game loop goes no faster than the
-//! client can run frames.
-constexpr double CLIENT_FAST_FORWARD_SPEED = 16.0;
-
-//! The speed a client's fast-forward request moves the player to from a speed,
-//! given the speed set for the client (0 if none). Only normal speed and the
-//! client's own speed change, so a speed the user chose is left alone.
-double FastForwardTarget(double requested, double speed, double set)
-{
-  if (requested > 0.0)
-    return (set == 0.0 && speed == 1.0) || (set != 0.0 && speed == set) ? requested : speed;
-
-  return set != 0.0 && speed == set ? 1.0 : speed;
-}
-
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 constexpr const char* GAME_PROPERTY_LIBRETRO_CORE = "libretro_core";
@@ -190,7 +173,8 @@ std::string NormalizeExtension(const std::string& strExtension)
 CGameClient::CGameClient(const ADDON::AddonInfoPtr& addonInfo)
   : CAddonDll(addonInfo, ADDON::AddonType::GAMEDLL),
     m_subsystems(CGameClientSubsystem::CreateSubsystems(*this, *m_ifc.game, m_critSection)),
-    m_bIsPlaying(false)
+    m_bIsPlaying(false),
+    m_fastForward(std::make_unique<CGameClientFastForward>())
 {
   using namespace ADDON;
 
@@ -985,10 +969,7 @@ void CGameClient::CloseFile()
     m_serializeSize = 0;
     m_input = nullptr;
 
-    // A fast-forward request goes no further than its game
-    m_fastForward->requested = 0.0;
-    m_fastForward->expectedSpeed = 0.0;
-    ++m_fastForward->session;
+    m_fastForward->Reset();
 
     Input().Stop();
 
@@ -1469,92 +1450,16 @@ double CGameClient::cb_get_playback_speed(KODI_HANDLE kodiInstance)
   if (!gameClient)
     return 0.0;
 
-  const double expected = gameClient->m_fastForward->expectedSpeed;
-  return expected > 0.0 ? expected : gameClient->m_playbackSpeed.load();
+  return gameClient->m_fastForward->ClientSpeed(gameClient->m_playbackSpeed);
 }
 
 void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForward, double ratio)
 {
   CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
-  if (gameClient == nullptr)
+  if (!gameClient)
     return;
 
-  const auto messenger = CServiceBroker::GetAppMessenger();
-  if (!messenger)
-    return;
-
-  FastForward& state = *gameClient->m_fastForward;
-  const double requested =
-      fastForward
-          ? (ratio > 1.0 && ratio <= CLIENT_FAST_FORWARD_SPEED ? ratio : CLIENT_FAST_FORWARD_SPEED)
-          : 0.0;
-  state.requested = requested;
-
-  // A client can read the speed back in its next frame, before the change is
-  // applied, and act on the old one: VICE won't warp a tape load if it still
-  // sees the fast-forward it just ended. Until then it sees the speed it will
-  // get, as it would from RetroArch.
-  ++state.waiting;
-  const bool expecting = state.expectedSpeed > 0.0;
-  const double speed = expecting ? state.expectedSpeed.load() : gameClient->m_playbackSpeed.load();
-  const double set = expecting ? state.expectedSet.load() : static_cast<double>(state.set.load());
-  const double target = FastForwardTarget(requested, speed, set);
-  state.expectedSet = requested > 0.0 ? (target != speed ? target : set) : 0.0;
-  state.expectedSpeed = target;
-
-  // The call comes from inside a frame, and changing speed waits on the game
-  // loop. The application thread applies it, as it does a speed the user
-  // picks, so it can't overlap the player closing. Each callback applies the
-  // latest request.
-  struct Callback
-  {
-    MESSAGING::ThreadMessageCallback message;
-    std::shared_ptr<FastForward> state;
-  };
-  auto* callback = new Callback{{}, gameClient->m_fastForward};
-  callback->message.userptr = callback;
-  callback->message.callback = [](void* data)
-  {
-    std::unique_ptr<Callback> callback(static_cast<Callback*>(data));
-    ApplyFastForward(*callback->state);
-
-    // With every request applied, the client sees the player's speed again
-    if (--callback->state->waiting == 0)
-      callback->state->expectedSpeed = 0.0;
-  };
-  messenger->PostMsg(TMSG_CALLBACK, -1, -1, &callback->message);
-}
-
-void CGameClient::ApplyFastForward(FastForward& fastForward)
-{
-  // A speed set while an earlier game was playing isn't this game's
-  const unsigned int session = fastForward.session;
-  if (fastForward.setSession != session)
-  {
-    fastForward.set = 0.0f;
-    fastForward.setSession = session;
-  }
-
-  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-  if (!appPlayer || !appPlayer->IsPlayingGame())
-    return;
-
-  const double requested = fastForward.requested;
-  const float speed = appPlayer->GetPlaySpeed();
-  const auto target = static_cast<float>(FastForwardTarget(requested, static_cast<double>(speed),
-                                                           static_cast<double>(fastForward.set)));
-  if (target != speed)
-  {
-    appPlayer->SetPlaySpeed(target);
-
-    // The speed the player took, which needn't be the one asked for, as the
-    // player can round it or refuse it
-    const float taken = appPlayer->GetPlaySpeed();
-    if (requested > 0.0 && taken != speed)
-      fastForward.set = taken;
-  }
-  if (requested == 0.0)
-    fastForward.set = 0.0f;
+  gameClient->m_fastForward->Request(fastForward, ratio, gameClient->m_playbackSpeed);
 }
 
 void CGameClient::cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo)
