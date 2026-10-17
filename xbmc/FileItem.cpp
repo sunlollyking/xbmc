@@ -23,6 +23,7 @@
 #include "filesystem/VideoDatabaseDirectory/DirectoryNode.h"
 #include "filesystem/VideoDatabaseDirectory/QueryParams.h"
 #include "games/GameUtils.h"
+#include "games/database/GameDatabase.h"
 #include "games/tags/GameInfoTag.h"
 #include "media/MediaType.h"
 #include "music/Album.h"

@@ -17,6 +17,7 @@
 #include "games/addons/disc/GameClientDiscModel.h"
 #include "games/addons/disc/GameClientDiscTransport.h"
 #include "games/addons/disc/GameClientDiscXML.h"
+#include "games/database/GameDatabase.h"
 #include "utils/FileUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"

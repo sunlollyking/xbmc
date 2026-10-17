@@ -11,32 +11,42 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "ServiceBroker.h"
+#include "URL.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "cores/RetroPlayer/guibridge/GUIGameRenderManager.h"
 #include "cores/RetroPlayer/guibridge/GUIGameSettingsHandle.h"
 #include "dialogs/GUIDialogKaiToast.h"
+#include "filesystem/CurlFile.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/dialogs/DialogGameDefines.h"
+#include "games/tags/GameInfoTag.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIMacros.h"
 #include "guilib/GUIMessage.h"
+#include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
+#include "guilib/guiinfo/GUIInfoLabels.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/ArtTypes.h"
+#include "utils/JSONVariantParser.h"
 #include "utils/StringUtils.h"
+#include "utils/SystemInfo.h"
 #include "utils/Variant.h"
+#include "utils/log.h"
 #include "view/GUIViewControl.h"
 #include "view/ViewState.h"
 
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <set>
 
 using namespace KODI;
 using namespace GAME;

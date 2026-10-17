@@ -10,6 +10,13 @@
 
 #include "GameClientTable.h"
 #include "dbwrappers/Database.h"
+#include "media/MediaType.h"
+#include "utils/Artwork.h"
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+#include <tinyxml2.h>
 
 namespace KODI
 {

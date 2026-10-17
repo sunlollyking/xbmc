@@ -8,9 +8,12 @@
 
 #pragma once
 
+#include "games/AchievementRuntime.h"
 #include "guilib/GUIDialog.h"
+#include "jobs/JobQueue.h"
 
 #include <memory>
+#include <optional>
 
 class CFileItemList;
 class CGUIMessage;

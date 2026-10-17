@@ -7,6 +7,7 @@
  */
 
 #include "TextureCacheJob.h"
+#include "imagefiles/ImageFileURL.h"
 
 #include <gtest/gtest.h>
 

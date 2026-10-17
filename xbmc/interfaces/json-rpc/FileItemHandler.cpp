@@ -11,6 +11,7 @@
 #include "AudioLibrary.h"
 #include "FileItemList.h"
 #include "FileOperations.h"
+#include "games/tags/GameInfoTag.h"
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "VideoLibrary.h"
