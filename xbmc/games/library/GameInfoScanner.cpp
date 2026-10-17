@@ -410,6 +410,7 @@ std::pair<CInfoScanner::ScanComplete, CInfoScanner::ContentFound> CGameInfoScann
               strDirectory, content.idPlatform);
     return {ScanComplete::Completed, ContentFound::None};
   }
+  FollowCatalogue(platform);
 
   const bool found = ScanFolder(strDirectory, content, platform);
   return {m_bRunning ? ScanComplete::Completed : ScanComplete::Stopped,
@@ -788,6 +789,7 @@ bool CGameInfoScanner::RefreshGame(int idGame)
   PlatformInfo platform;
   if (!m_database.GetPlatform(content.idPlatform, platform))
     return false;
+  FollowCatalogue(platform);
 
   Entry entry;
   entry.path = playPath;
@@ -836,6 +838,30 @@ PlatformInfo CGameInfoScanner::MergeScrapedPlatform(const PlatformInfo& curated,
     merged.overview = curated.overview;
 
   return merged;
+}
+
+void CGameInfoScanner::FollowCatalogue(PlatformInfo& platform)
+{
+  const PlatformInfo* curated = m_catalogue ? m_catalogue->GetPlatform(platform.slug) : nullptr;
+  if (curated == nullptr)
+    return;
+
+  PlatformInfo merged = MergeScrapedPlatform(*curated, platform);
+  merged.id = platform.id;
+
+  const auto identity = [](const PlatformInfo& p)
+  {
+    return std::tie(p.name, p.sortName, p.extensions, p.aliases, p.providerIds, p.manufacturer,
+                    p.family, p.type, p.media, p.released, p.discontinued, p.overview);
+  };
+  if (identity(merged) == identity(platform))
+    return;
+
+  if (m_database.SetPlatformDetails(merged))
+  {
+    CLog::Log(LOGINFO, "GAME: Brought {} up to the platform catalogue", merged.name);
+    platform = merged;
+  }
 }
 
 void CGameInfoScanner::ScrapePlatform(const GamePathContent& content, const PlatformInfo& platform)
@@ -1490,19 +1516,33 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       return false;
     tag.SetDatabaseId(refreshGameId);
 
-    // The releases are kept as they are, but what the refresh learnt about an
-    // arcade set belongs to its file
+    // The releases are kept as they are, but what the refresh learnt about the
+    // file it read belongs to that file: what identifies it, and an arcade
+    // set's emulators. A file it couldn't read keeps what it had.
     std::vector<GameRelease> releases = existing.GetReleases();
     const auto scanned = std::ranges::find_if(release.files, [&playPath](const GameFile& f)
                                               { return f.path == playPath; });
-    if (scanned != release.files.end() && !scanned->romsets.empty())
+    if (scanned != release.files.end())
     {
+      const bool identified =
+          !scanned->crc32.empty() || !scanned->md5.empty() || !scanned->serial.empty();
       for (GameRelease& known : releases)
       {
         for (GameFile& file : known.files)
         {
-          if (file.path == playPath)
+          if (file.path != playPath)
+            continue;
+          if (!scanned->romsets.empty())
             file.romsets = scanned->romsets;
+          if (identified)
+          {
+            file.crc32 = scanned->crc32;
+            file.md5 = scanned->md5;
+            file.sha1 = scanned->sha1;
+            file.serial = scanned->serial;
+            if (!scanned->serial.empty())
+              known.serial = scanned->serial;
+          }
         }
       }
     }
