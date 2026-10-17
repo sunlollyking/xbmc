@@ -28,6 +28,7 @@ set(SOURCES AddonsDirectory.cpp
             IDirectory.cpp
             IFile.cpp
             ImageFile.cpp
+            GameDatabaseDirectory.cpp
             LibraryDirectory.cpp
             MultiPathDirectory.cpp
             MultiPathFile.cpp
@@ -100,6 +101,7 @@ set(HEADERS AddonsDirectory.h
             IFileDirectory.h
             IFileTypes.h
             ImageFile.h
+            GameDatabaseDirectory.h
             LibraryDirectory.h
             LibraryPaths.h
             MultiPathDirectory.h

@@ -27,6 +27,7 @@
 #ifdef HAS_ISO9660PP
 #include "ISO9660Directory.h"
 #endif
+#include "GameDatabaseDirectory.h"
 #include "LibraryDirectory.h"
 #include "MultiPathDirectory.h"
 #include "MusicDatabaseDirectory.h"
@@ -133,7 +134,7 @@ IDirectory* CDirectoryFactory::Create(const CURL& url)
 
   struct __stat64 st = {};
   static constexpr auto excludedProtocols =
-      make_set<std::string_view>({"upnp", "addons", "favourites", "sources"});
+      make_set<std::string_view>({"upnp", "addons", "favourites", "sources", "gamedb"});
   const bool exclude{excludedProtocols.contains(url.GetProtocol())};
   if (!exclude && CFile::Stat(URIUtils::SubstitutePath(url), &st) == 0)
   {
@@ -197,6 +198,7 @@ IDirectory* CDirectoryFactory::Create(const CURL& url)
   if (url.IsProtocol("musicdb")) return new CMusicDatabaseDirectory();
   if (url.IsProtocol("musicsearch")) return new CMusicSearchDirectory();
   if (url.IsProtocol("videodb")) return new CVideoDatabaseDirectory();
+  if (url.IsProtocol("gamedb")) return new CGameDatabaseDirectory();
   if (url.IsProtocol("library")) return new CLibraryDirectory();
   if (url.IsProtocol("favourites")) return new CFavouritesDirectory();
 #if defined(TARGET_ANDROID)

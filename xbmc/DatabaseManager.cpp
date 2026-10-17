@@ -81,8 +81,12 @@ bool CDatabaseManager::InitializeInternal()
   //       before CVideoDatabase.
   if (CViewDatabase db; !UpdateDatabase(db))
     return false;
+  // Not fatal, unlike the others. All this database remembers is which emulator
+  // to open a game with, and being unable to remember that is worth a line in
+  // the log and nothing more. Failing here would stop Kodi starting at all,
+  // which is a steep price for a convenience.
   if (KODI::GAME::CGameDatabase db; !UpdateDatabase(db))
-    return false;
+    CLog::LogF(LOGWARNING, "Failed to open the game database, emulators won't be remembered");
   if (CTextureDatabase db; !UpdateDatabase(db))
     return false;
   if (CMusicDatabase db; !UpdateDatabase(db, &advancedSettings->m_databaseMusic))

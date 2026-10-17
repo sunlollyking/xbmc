@@ -32,7 +32,7 @@ struct MediaTypeInfo
 };
 
 // clang-format off
-constexpr std::array<MediaTypeInfo, 12> MEDIA_TYPES{{
+constexpr std::array<MediaTypeInfo, 15> MEDIA_TYPES{{
     {TYPE::MUSIC,            "music",        "music",              true,    249},
     {TYPE::ARTIST,           "artist",       CONTENT::ARTISTS,     true,    557},
     {TYPE::ALBUM,            "album",        CONTENT::ALBUMS,      true,    558},
@@ -45,6 +45,9 @@ constexpr std::array<MediaTypeInfo, 12> MEDIA_TYPES{{
     {TYPE::SEASON,           "season",       CONTENT::SEASONS,     true,  20373},
     {TYPE::EPISODE,          "episode",      CONTENT::EPISODES,    false, 20359},
     {TYPE::VIDEO_VERSION,    "videoversion", CONTENT::VIDEOVERSIONS, false, 40012},
+    {TYPE::GAME,             "game",         "games",              false, 35565},
+    {TYPE::GAME_PLATFORM,    "platform",     "platforms",          true,  35549},
+    {TYPE::GAME_RELEASE,     "release",      "releases",           false, 35570},
 }};
 // clang-format on
 
