@@ -22,27 +22,26 @@ namespace GAME
  *
  * \brief Which of a game's releases plays by default
  *
- * The "one game, one ROM" rule as the user set it: their regions in order of
+ * The "one game, one ROM" rule: the player's regions in order of
  * preference, then whether a finished release beats a beta or prototype, a
  * newer revision beats an older, and a verified dump beats an unverified
- * one. The user's own choice for a game, made in its releases list, always
- * beats the policy.
+ * one.
  */
 class CReleasePolicy
 {
 public:
-  /*!
-   * \brief Read the policy from the user's settings
-   */
-  CReleasePolicy();
-
-  /*!
-   * \brief A policy with explicit values, for tests
-   */
   CReleasePolicy(std::vector<std::string> regionPriority,
                  bool preferRetail,
                  bool preferNewestRevision,
                  bool preferVerified);
+
+  /*!
+   * \brief The regions a player in one region gets releases from, best first
+   *
+   * Their own region, the wider region it belongs to, the whole world, then
+   * Europe, USA and Japan, the regions most games were released in.
+   */
+  static std::vector<std::string> RegionPriority(const std::string& region);
 
   /*!
    * \brief The release that should play, or -1 for an empty list

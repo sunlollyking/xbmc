@@ -264,6 +264,26 @@ std::vector<std::string> ReadM3U(const std::string& path)
   }
   return discs;
 }
+
+//! The player's choice of which version of a game plays
+CReleasePolicy PolicyFromSettings()
+{
+  std::string region = SETTING_GAMELIBRARY_REGION_DEFAULT;
+  bool preferRetail = true;
+  bool preferNewestRevision = true;
+  bool preferVerified = true;
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  if (settings)
+  {
+    if (const std::string chosen = settings->GetString(SETTING_GAMELIBRARY_REGION); !chosen.empty())
+      region = chosen;
+    preferRetail = settings->GetBool(SETTING_GAMELIBRARY_PREFERRETAIL);
+    preferNewestRevision = settings->GetBool(SETTING_GAMELIBRARY_PREFERNEWESTREVISION);
+    preferVerified = settings->GetBool(SETTING_GAMELIBRARY_PREFERVERIFIED);
+  }
+  return CReleasePolicy(CReleasePolicy::RegionPriority(region), preferRetail, preferNewestRevision,
+                        preferVerified);
+}
 } // namespace
 
 CGameInfoScanner::CGameInfoScanner() = default;
@@ -541,7 +561,7 @@ void CGameInfoScanner::FillRequest(const Entry& entry,
   request.raHash = identity.raHash;
   request.size = identity.size;
   request.regions = parsed.regions;
-  request.preferredRegions = CReleasePolicy().GetRegionPriority();
+  request.preferredRegions = PolicyFromSettings().GetRegionPriority();
   request.languages = parsed.languages;
   request.year = parsed.year;
   request.members = identity.members;
@@ -1357,7 +1377,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
         // A logo is lettering: one from a region that writes in another script
         // comes after a logo that names no region, which is nearly always in
         // English.
-        const std::vector<std::string> regionPriority = CReleasePolicy().GetRegionPriority();
+        const std::vector<std::string> regionPriority = PolicyFromSettings().GetRegionPriority();
         static constexpr std::array otherScripts = {"Japan",  "Korea",     "China",
                                                     "Taiwan", "Hong Kong", "Russia"};
         const auto rank = [&regionPriority, &release](const GameScrapeArt& piece, bool lettering)
@@ -1601,7 +1621,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       // The policy decides which release plays unless the user already chose
       if (existing.GetMatchMethod() != MatchMethod::MANUAL)
       {
-        const int best = CReleasePolicy().PickDefault(releases);
+        const int best = PolicyFromSettings().PickDefault(releases);
         if (best >= 0)
         {
           for (GameRelease& r : releases)

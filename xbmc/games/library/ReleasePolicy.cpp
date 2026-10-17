@@ -8,9 +8,7 @@
 
 #include "ReleasePolicy.h"
 
-#include "ServiceBroker.h"
-#include "settings/Settings.h"
-#include "settings/SettingsComponent.h"
+#include "utils/StringUtils.h"
 
 #include <algorithm>
 #include <array>
@@ -37,8 +35,20 @@ std::string_view WiderRegion(std::string_view region)
     return "Asia";
   return "";
 }
+} // namespace
 
-std::vector<std::string> RegionPriority(const std::string& region)
+CReleasePolicy::CReleasePolicy(std::vector<std::string> regionPriority,
+                               bool preferRetail,
+                               bool preferNewestRevision,
+                               bool preferVerified)
+  : m_regionPriority(std::move(regionPriority)),
+    m_preferRetail(preferRetail),
+    m_preferNewestRevision(preferNewestRevision),
+    m_preferVerified(preferVerified)
+{
+}
+
+std::vector<std::string> CReleasePolicy::RegionPriority(const std::string& region)
 {
   std::vector<std::string> regions;
   const auto add = [&regions](std::string_view name)
@@ -52,33 +62,6 @@ std::vector<std::string> RegionPriority(const std::string& region)
   for (std::string_view fallback : FALLBACK_REGIONS)
     add(fallback);
   return regions;
-}
-} // namespace
-
-CReleasePolicy::CReleasePolicy()
-{
-  std::string region = SETTING_GAMELIBRARY_REGION_DEFAULT;
-  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-  if (settings)
-  {
-    if (const std::string chosen = settings->GetString(SETTING_GAMELIBRARY_REGION); !chosen.empty())
-      region = chosen;
-    m_preferRetail = settings->GetBool(SETTING_GAMELIBRARY_PREFERRETAIL);
-    m_preferNewestRevision = settings->GetBool(SETTING_GAMELIBRARY_PREFERNEWESTREVISION);
-    m_preferVerified = settings->GetBool(SETTING_GAMELIBRARY_PREFERVERIFIED);
-  }
-  m_regionPriority = RegionPriority(region);
-}
-
-CReleasePolicy::CReleasePolicy(std::vector<std::string> regionPriority,
-                               bool preferRetail,
-                               bool preferNewestRevision,
-                               bool preferVerified)
-  : m_regionPriority(std::move(regionPriority)),
-    m_preferRetail(preferRetail),
-    m_preferNewestRevision(preferNewestRevision),
-    m_preferVerified(preferVerified)
-{
 }
 
 int CReleasePolicy::RegionRank(const GameRelease& release) const
@@ -113,25 +96,32 @@ int CReleasePolicy::StatusRank(const GameRelease& release)
 
 int CReleasePolicy::RevisionRank(const GameRelease& release)
 {
-  // "Rev 2" > "Rev 1" > none; "v1.1" > "v1.0"; a letter counts as its position
-  const std::string& rev = release.revision;
+  // "Rev 2" > "Rev 1" > none; "v1.1" > "v1.0"; "Rev B" > "Rev A"
+  std::string_view rev = release.revision;
   if (rev.empty())
     return 0;
+
+  for (std::string_view word : {"revision", "version", "rev", "v"})
+  {
+    if (StringUtils::StartsWithNoCase(rev, word))
+    {
+      rev.remove_prefix(word.size());
+      break;
+    }
+  }
+
   int value = 0;
   bool seenDigit = false;
   for (const char c : rev)
   {
-    if (std::isdigit(static_cast<unsigned char>(c)))
+    const auto u = static_cast<unsigned char>(c);
+    if (std::isdigit(u))
     {
       value = value * 10 + (c - '0');
       seenDigit = true;
     }
-    else if (std::isalpha(static_cast<unsigned char>(c)) && !seenDigit &&
-             std::string_view("rev").find(static_cast<char>(std::tolower(c))) == std::string_view::npos &&
-             std::string_view("version").find(static_cast<char>(std::tolower(c))) == std::string_view::npos)
-    {
-      value = std::tolower(static_cast<unsigned char>(c)) - 'a' + 1;
-    }
+    else if (std::isalpha(u) && !seenDigit)
+      value = std::tolower(u) - 'a' + 1;
   }
   return value + 1;
 }
