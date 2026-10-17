@@ -116,6 +116,17 @@ bool CopyWhole(const std::string& from, const std::string& to)
 //! Kodi. The game loop goes no faster than the client can run frames.
 constexpr double CLIENT_FAST_FORWARD_SPEED = 16.0;
 
+//! The speed a client's fast-forward request moves the player to from a speed,
+//! given the speed set for the client (0 if none). Only normal speed and the
+//! client's own speed change, so a speed the user chose is left alone.
+double FastForwardTarget(double requested, double speed, double set)
+{
+  if (requested > 0.0)
+    return (set == 0.0 && speed == 1.0) || (set != 0.0 && speed == set) ? requested : speed;
+
+  return set != 0.0 && speed == set ? 1.0 : speed;
+}
+
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 constexpr const char* GAME_PROPERTY_LIBRETRO_CORE = "libretro_core";
@@ -975,6 +986,7 @@ void CGameClient::CloseFile()
 
     // A fast-forward request goes no further than its game
     m_fastForward->requested = 0.0;
+    m_fastForward->expectedSpeed = 0.0;
     ++m_fastForward->session;
 
     Input().Stop();
@@ -1456,7 +1468,8 @@ double CGameClient::cb_get_playback_speed(KODI_HANDLE kodiInstance)
   if (!gameClient)
     return 0.0;
 
-  return gameClient->m_playbackSpeed;
+  const double expected = gameClient->m_fastForward->expectedSpeed;
+  return expected > 0.0 ? expected : gameClient->m_playbackSpeed.load();
 }
 
 void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForward, double ratio)
@@ -1465,12 +1478,25 @@ void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForw
   if (gameClient == nullptr)
     return;
 
-  gameClient->m_fastForward->requested =
-      fastForward ? (ratio > 1.0 ? ratio : CLIENT_FAST_FORWARD_SPEED) : 0.0;
-
   const auto messenger = CServiceBroker::GetAppMessenger();
   if (!messenger)
     return;
+
+  FastForward& state = *gameClient->m_fastForward;
+  const double requested = fastForward ? (ratio > 1.0 ? ratio : CLIENT_FAST_FORWARD_SPEED) : 0.0;
+  state.requested = requested;
+
+  // A client can read the speed back in its next frame, before the change is
+  // applied, and act on the old one: VICE won't warp a tape load if it still
+  // sees the fast-forward it just ended. Until then it sees the speed it will
+  // get, as it would from RetroArch.
+  ++state.waiting;
+  const bool expecting = state.expectedSpeed > 0.0;
+  const double speed = expecting ? state.expectedSpeed.load() : gameClient->m_playbackSpeed.load();
+  const double set = expecting ? state.expectedSet.load() : static_cast<double>(state.set.load());
+  const double target = FastForwardTarget(requested, speed, set);
+  state.expectedSet = requested > 0.0 ? (target != speed ? target : set) : 0.0;
+  state.expectedSpeed = target;
 
   // The call comes from inside a frame, and changing speed waits on the game
   // loop. The application thread applies it, as it does a speed the user
@@ -1487,6 +1513,10 @@ void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForw
   {
     std::unique_ptr<Callback> callback(static_cast<Callback*>(data));
     ApplyFastForward(*callback->state);
+
+    // With every request applied, the client sees the player's speed again
+    if (--callback->state->waiting == 0)
+      callback->state->expectedSpeed = 0.0;
   };
   messenger->PostMsg(TMSG_CALLBACK, -1, -1, &callback->message);
 }
@@ -1507,30 +1537,20 @@ void CGameClient::ApplyFastForward(FastForward& fastForward)
 
   const double requested = fastForward.requested;
   const float speed = appPlayer->GetPlaySpeed();
-  if (requested > 0.0)
+  const auto target = static_cast<float>(FastForwardTarget(requested, static_cast<double>(speed),
+                                                           static_cast<double>(fastForward.set)));
+  if (target != speed)
   {
-    // Only from normal speed or the speed set for the client, so a speed the
-    // user chose is left alone
-    const bool fromNormal = fastForward.set == 0.0f && speed == 1.0f;
-    const bool fromClient = fastForward.set != 0.0f && speed == fastForward.set;
-    if ((fromNormal || fromClient) && speed != static_cast<float>(requested))
-    {
-      appPlayer->SetPlaySpeed(static_cast<float>(requested));
+    appPlayer->SetPlaySpeed(target);
 
-      // The speed the player took, which needn't be the one asked for, as
-      // the player can round it or refuse it
-      const float set = appPlayer->GetPlaySpeed();
-      if (set != speed)
-        fastForward.set = set;
-    }
+    // The speed the player took, which needn't be the one asked for, as the
+    // player can round it or refuse it
+    const float taken = appPlayer->GetPlaySpeed();
+    if (requested > 0.0 && taken != speed)
+      fastForward.set = taken;
   }
-  else if (fastForward.set != 0.0f)
-  {
-    // Only from the speed set for the client
-    if (speed == fastForward.set)
-      appPlayer->SetPlaySpeed(1.0f);
+  if (requested == 0.0)
     fastForward.set = 0.0f;
-  }
 }
 
 void CGameClient::cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo)

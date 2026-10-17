@@ -337,8 +337,13 @@ private:
   {
     std::atomic<double> requested{0.0}; // The speed asked for, or 0
     std::atomic<unsigned int> session{0}; // Counts the games closed
-    float set = 0.0f; // The speed set for the client, or 0
+    std::atomic<float> set{0.0f}; // The speed set for the client, or 0
     unsigned int setSession = 0;
+
+    // What the client sees while requests wait for the application thread
+    std::atomic<unsigned int> waiting{0};
+    std::atomic<double> expectedSpeed{0.0}; // 0 when none are waiting
+    std::atomic<double> expectedSet{0.0};
   };
   static void ApplyFastForward(FastForward& fastForward);
   static void cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo);
