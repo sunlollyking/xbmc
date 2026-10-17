@@ -157,6 +157,21 @@ TEST(TestGameNameParser, StillReadsATosecName)
   EXPECT_EQ(parsed.displayTitle, "Savage");
 }
 
+TEST(TestGameNameParser, CreditsAPublisherWhoseNameStartsLikeATag)
+{
+  const ParsedGameName parsed = CGameNameParser::Parse("Savage (1988)(Demonware).adf");
+  EXPECT_EQ(parsed.status, ReleaseStatus::RETAIL);
+  EXPECT_EQ(parsed.publisher, "Demonware");
+  EXPECT_EQ(CGameNameParser::Parse("Savage (Demo 2).adf").status, ReleaseStatus::DEMO);
+}
+
+TEST(TestGameNameParser, LeavesADiscNumberTooLongToBeOne)
+{
+  const ParsedGameName parsed = CGameNameParser::Parse("Game (Disc 99999999999).cue");
+  EXPECT_EQ(parsed.disc, 0);
+  EXPECT_EQ(parsed.title, "Game");
+}
+
 TEST(TestGameNameParser, ReadsATosecCountry)
 {
   const ParsedGameName parsed = CGameNameParser::Parse("1942 (1986)(Elite)(GB).tap");
