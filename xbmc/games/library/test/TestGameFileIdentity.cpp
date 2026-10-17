@@ -14,6 +14,7 @@
 #include "utils/URIUtils.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -160,6 +161,36 @@ TEST(TestGameFileIdentity, ReadsTheSerialOfAnArchivedPspDisc)
                                           file, MediaFormat::DISC));
 
   EXPECT_EQ(file.serial, "ULUS10080");
+}
+
+TEST(TestGameFileIdentity, ReadsADsCartridgesGameCode)
+{
+  for (const auto& [code, expected] :
+       {std::pair<std::string, std::string>{"VFSV", "VFSV"}, {"####", ""}})
+  {
+    XFILE::CFile* rom = XBMC_CREATETEMPFILE(".nds");
+    ASSERT_NE(rom, nullptr);
+    std::string header(0x200, '\0');
+    header.replace(0x0C, 4, code);
+    ASSERT_EQ(rom->Write(header.data(), header.size()), static_cast<ssize_t>(header.size()));
+    rom->Flush();
+
+    GameFile file;
+    EXPECT_TRUE(CGameFileIdentity::Identify(XBMC_TEMPFILEPATH(rom), file, MediaFormat::CARTRIDGE));
+    EXPECT_EQ(file.serial, expected) << code;
+    EXPECT_FALSE(file.crc32.empty());
+
+    XBMC_DELETETEMPFILE(rom);
+  }
+}
+
+TEST(TestGameFileIdentity, ReadsTheGameCodeOfAnArchivedDsCartridge)
+{
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/ds.zip"),
+                                          file, MediaFormat::CARTRIDGE));
+
+  EXPECT_EQ(file.serial, "VFSV");
 }
 
 TEST(TestGameFileIdentity, ReadsAQuotedGdiTrack)

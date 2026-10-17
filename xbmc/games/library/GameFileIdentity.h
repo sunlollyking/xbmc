@@ -29,6 +29,8 @@ namespace GAME
  * not the archive. Disc images are never hashed whole: the serial their
  * boot sector or system file carries is read instead, the way RetroArch and
  * the catalogues themselves identify discs.
+ * A Nintendo DS cartridge's game code is read too, as it still names a dump
+ * whose hash the catalogues don't hold.
  *
  * Every read is bounded. A file that cannot be read is left unidentified,
  * never a reason to stop a scan.

@@ -37,6 +37,7 @@ constexpr size_t CHUNK_SIZE = 1024 * 1024;
 constexpr std::array<const char*, 2> archiveExtensions{".zip", ".7z"};
 constexpr std::array<const char*, 2> sheetExtensions{".cue", ".gdi"};
 constexpr std::array<const char*, 3> programExtensions{".exe", ".com", ".bat"};
+constexpr std::array<const char*, 1> dsExtensions{".nds"};
 
 constexpr std::string_view SATURN_MAGIC = "SEGA SEGASATURN";
 constexpr std::string_view MEGACD_MAGIC = "SEGADISCSYSTEM";
@@ -96,6 +97,18 @@ std::string HeaderField(const std::string& data, size_t offset, size_t length)
     value.erase(nul);
   StringUtils::Trim(value);
   return value;
+}
+
+//! The four letters a Nintendo DS cartridge's header names its game by, "VFSV",
+//! or empty for homebrew, which leaves them blank or fills them with '#'
+std::string DsGameCode(const std::string& path)
+{
+  const std::string code = HeaderField(ReadHead(path, 0x10), 0x0C, 4);
+  const bool valid =
+      code.size() == 4 &&
+      std::ranges::all_of(code,
+                          [](char c) { return (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'); });
+  return valid ? code : "";
 }
 } // namespace
 
@@ -352,7 +365,11 @@ bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& fil
   // catalogue knows the game by it.
   if (count > 1 && program)
     return false;
-  if (!best || best->GetSize() > static_cast<int64_t>(MAX_HASH_SIZE))
+  if (!best)
+    return false;
+  if (HasExtension(best->GetPath(), dsExtensions))
+    file.serial = DsGameCode(Uncached(best->GetPath()));
+  if (best->GetSize() > static_cast<int64_t>(MAX_HASH_SIZE))
     return false;
 
   GameFile member;
@@ -437,11 +454,14 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
       return !file.serial.empty();
     }
 
+    if (HasExtension(path, dsExtensions))
+      file.serial = DsGameCode(path);
+
     const uint64_t limit = media == MediaFormat::UNKNOWN ? MAX_HASH_SIZE : MAX_ROM_HASH_SIZE;
     if (file.size > limit)
-      return false;
+      return !file.serial.empty();
 
-    return HashWhole(path, file, limit);
+    return HashWhole(path, file, limit) || !file.serial.empty();
   }
   catch (...)
   {
