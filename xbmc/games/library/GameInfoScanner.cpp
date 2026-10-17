@@ -1179,7 +1179,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   // The file name knows what this dump is better than a catalogue does, which
   // describes the game rather than the copy in hand. A scraper may still name
   // an edition later where the name said nothing.
-  if (!parsed.translation.empty())
+  if (parsed.translated)
     tag.SetEdition("Fan Translation");
   else if (parsed.hack)
     tag.SetEdition("Mod");

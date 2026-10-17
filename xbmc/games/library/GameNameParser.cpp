@@ -72,13 +72,33 @@ constexpr std::array<std::string_view, 40> languageCodes{
 };
 
 constexpr std::array<std::string_view, 15> noiseTags{
-    "gb compatible",     "sgb enhanced",  "enhancement chip",   "rumble version",
-    "virtual console",   "nintendo power", "np",                "st",
-    "mb",                "wii virtual console", "3ds virtual console", "wii u virtual console",
-    "switch online",     "lock-on",       "en,ja",
+    "gb compatible",
+    "sgb enhanced",
+    "enhancement chip",
+    "rumble version",
+    "virtual console",
+    "nintendo power",
+    "np",
+    "st",
+    "mb",
+    "wii virtual console",
+    "3ds virtual console",
+    "wii u virtual console",
+    "switch online",
+    "lock-on",
+    "en,ja",
 };
 
 constexpr std::array<std::string_view, 7> articles{"the", "a", "an", "le", "la", "les", "der"};
+
+// GoodTools names a translation's language in three letters: "[T+Ger]"
+constexpr std::array<std::pair<std::string_view, std::string_view>, 26> translationLanguages{{
+    {"ara", "ar"}, {"bra", "pt"}, {"bul", "bg"}, {"cat", "ca"}, {"chi", "zh"}, {"cze", "cs"},
+    {"dan", "da"}, {"dut", "nl"}, {"eng", "en"}, {"fin", "fi"}, {"fre", "fr"}, {"ger", "de"},
+    {"gre", "el"}, {"heb", "he"}, {"hun", "hu"}, {"ita", "it"}, {"jap", "ja"}, {"kor", "ko"},
+    {"nor", "no"}, {"pol", "pl"}, {"por", "pt"}, {"rom", "ro"}, {"rus", "ru"}, {"spa", "es"},
+    {"swe", "sv"}, {"tur", "tr"},
+}};
 
 std::string Lower(std::string_view s)
 {
@@ -152,7 +172,6 @@ struct Patterns
   CRegExp alt{true};
   CRegExp alternateSet{true};
   CRegExp extension{true};
-  CRegExp leadingNumber{true};
   CRegExp sceneNumber;
 
   Patterns()
@@ -172,11 +191,9 @@ struct Patterns
     alt.RegComp("^alt( ?[0-9]+)?$");
     alternateSet.RegComp("^(alt|set) ?[0-9]+$");
     extension.RegComp("\\.[a-z0-9]{1,4}$");
-    leadingNumber.RegComp("^0[0-9]{2,4} +-? *");
-    // A scene set numbers every release, "2797 Kimi no Yusha (JP)", past the
-    // zero-padded range above. Its two-letter region and its lack of a date
-    // tell it from a title that starts with a number, "1943 Kai (Japan)" or
-    // TOSEC's "1942 (1986)(Elite)(GB)".
+    // A scene set numbers every release, "2797 Kimi no Yusha (JP)". Its
+    // two-letter region and its lack of a date tell it from a title that starts
+    // with a number, "1943 Kai (Japan)" or TOSEC's "1942 (1986)(Elite)(GB)".
     sceneNumber.RegComp("^[0-9]{4} +(?=.*\\((?:JP|EU|US|FR|KS|DE|IT|ES|NL|AU)\\))"
                         "(?!.*\\([0-9]{4}\\))");
   }
@@ -184,7 +201,8 @@ struct Patterns
 
 Patterns& GetPatterns()
 {
-  static Patterns patterns;
+  // CRegExp keeps the last match, so each thread needs its own
+  thread_local Patterns patterns;
   return patterns;
 }
 
@@ -262,8 +280,7 @@ std::string CGameNameParser::ParseWhdLoadName(std::string_view fileName)
   // The title is whatever precedes the version, which every slave carries
   static const std::string version = "_v";
   const size_t at = name.find(version);
-  if (at == std::string::npos || at == 0 ||
-      at + version.size() >= name.size() ||
+  if (at == std::string::npos || at == 0 || at + version.size() >= name.size() ||
       !std::isdigit(static_cast<unsigned char>(name[at + version.size()])))
     return "";
   name.erase(at);
@@ -282,8 +299,7 @@ std::string CGameNameParser::ParseWhdLoadName(std::string_view fileName)
       const unsigned char prev = static_cast<unsigned char>(name[i - 1]);
       const bool startsWord = std::isupper(c) && (std::islower(prev) || std::isdigit(prev));
       // "UFOEnemy" splits before the last capital of a run, not inside it
-      const bool endsAcronym = std::isupper(c) && std::isupper(prev) &&
-                               i + 1 < name.size() &&
+      const bool endsAcronym = std::isupper(c) && std::isupper(prev) && i + 1 < name.size() &&
                                std::islower(static_cast<unsigned char>(name[i + 1]));
       // "Turrican3" is two words, "A10" is one: a lone letter before the digits
       // belongs to them
@@ -315,9 +331,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
   std::string name(fileName);
   if (hasExtension && Matches(re.extension, Lower(name)))
     name.erase(name.size() - re.extension.GetFindLen());
-  if (Matches(re.leadingNumber, name))
-    name.erase(0, re.leadingNumber.GetFindLen());
-  else if (Matches(re.sceneNumber, name))
+  if (Matches(re.sceneNumber, name))
     name.erase(0, re.sceneNumber.GetFindLen());
 
   // Neo Kobe gives how to load a game in braces: "Apploon {V1 mode, MON R G8F00}"
@@ -357,17 +371,30 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
     if (tl == "!")
       out.verified = true;
     else if (tl.starts_with("t+") || tl.starts_with("t-"))
-      out.translation = tl.substr(2, 2);
-    else if ((!tl.empty() && tl[0] == 'b' && tl.find_first_not_of("0123456789", 1) == std::string::npos) ||
+    {
+      // "[T+Ger1.00_Translator]"
+      out.translated = true;
+      const std::string code = tl.substr(2, 3);
+      for (const auto& [goodTools, iso] : translationLanguages)
+      {
+        if (goodTools == code)
+          out.translation = iso;
+      }
+    }
+    else if ((!tl.empty() && tl[0] == 'b' &&
+              tl.find_first_not_of("0123456789", 1) == std::string::npos) ||
              tl == "bad" || tl.starts_with("bad "))
       out.bad = true;
     // Neo Kobe names another dump of the same disks "[Set 2]" or "[Alt 1]"
-    else if ((!tl.empty() && tl[0] == 'a' && tl.find_first_not_of("0123456789", 1) == std::string::npos) ||
+    else if ((!tl.empty() && tl[0] == 'a' &&
+              tl.find_first_not_of("0123456789", 1) == std::string::npos) ||
              Matches(re.alternateSet, tl))
       out.alternate = true;
-    else if (!tl.empty() && tl[0] == 'h' && tl.find_first_not_of("0123456789", 1) == std::string::npos)
+    else if (!tl.empty() && tl[0] == 'h' &&
+             tl.find_first_not_of("0123456789", 1) == std::string::npos)
       out.hack = true;
-    else if (!tl.empty() && tl[0] == 'p' && tl.find_first_not_of("0123456789", 1) == std::string::npos)
+    else if (!tl.empty() && tl[0] == 'p' &&
+             tl.find_first_not_of("0123456789", 1) == std::string::npos)
       out.licence = Licence::PIRATE;
     else if (tl == "bios")
       out.status = ReleaseStatus::PROGRAM;
@@ -431,9 +458,10 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
     {
       const std::string number = re.disc.GetMatch(2);
       const std::string total = re.disc.GetMatch(4);
-      out.disc = std::isdigit(static_cast<unsigned char>(number[0]))
-                     ? std::stoi(number)
-                     : static_cast<int>(std::tolower(static_cast<unsigned char>(number[0])) - 'a' + 1);
+      out.disc =
+          std::isdigit(static_cast<unsigned char>(number[0]))
+              ? std::stoi(number)
+              : static_cast<int>(std::tolower(static_cast<unsigned char>(number[0])) - 'a' + 1);
       out.discs = total.empty() ? 0 : std::stoi(total);
       continue;
     }

@@ -71,6 +71,17 @@ std::string ReadHead(const std::string& path, size_t bytes)
   return data;
 }
 
+// Streams an archive member through the decompressor rather than letting the
+// zip backend copy it whole into special://temp first, which it does for
+// anything deflated over 4 MB and never cleans up. Everything here reads front
+// to back, so nothing needs to seek.
+std::string Uncached(const std::string& memberPath)
+{
+  CURL url(memberPath);
+  url.SetOptions("?cache=no");
+  return url.Get();
+}
+
 std::string HeaderField(const std::string& data, size_t offset, size_t length)
 {
   if (offset >= data.size())
@@ -114,19 +125,15 @@ std::string CGameFileIdentity::FirstTrack(const std::string& sheetPath)
 
   if (ext == ".gdi")
   {
-    // Line: <track> <lba> <type> <sector size> <file> <offset>; track 3 holds the data
-    for (const std::string& line : StringUtils::Split(sheet, '\n'))
+    // Line: <track> <lba> <type> <sector size> <file> <offset>; track 3 holds the
+    // data. A file name with spaces is quoted.
+    CRegExp gdi(true);
+    if (gdi.RegComp("(?m)^[ \\t]*3[ \\t]+[0-9]+[ \\t]+[0-9]+[ \\t]+[0-9]+[ \\t]+"
+                    "(?:\"([^\"]+)\"|([^ \\t\\r\\n]+))") &&
+        gdi.RegFind(sheet) >= 0)
     {
-      std::string trimmed = line;
-      StringUtils::Trim(trimmed);
-      std::vector<std::string> parts = StringUtils::Split(trimmed, ' ');
-      std::erase_if(parts, [](const std::string& p) { return p.empty(); });
-      if (parts.size() >= 5 && parts[0] == "3")
-      {
-        std::string file = parts[4];
-        StringUtils::Trim(file, "\"");
-        return URIUtils::AddFileToFolder(folder, file);
-      }
+      const std::string quoted = gdi.GetMatch(1);
+      return URIUtils::AddFileToFolder(folder, quoted.empty() ? gdi.GetMatch(2) : quoted);
     }
     return "";
   }
@@ -174,7 +181,7 @@ std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath)
   // as DiscJuggler's puts the data track wherever it lands: measured on real
   // images, anywhere from 1 MB to 460 MB in. So the file is read through until
   // the header appears and reading stops the moment it does, which is no
-  // dearer than the hashing this replaces and usually far cheaper.
+  // dearer than hashing the file and usually far cheaper.
   static constexpr std::array<std::pair<std::string_view, int>, 3> magics{{
       {DREAMCAST_MAGIC, 0},
       {SATURN_MAGIC, 1},
@@ -284,29 +291,35 @@ bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
     return true;
 
   if (members.size() != 1)
-    return false;
+    return !file.members.empty();
 
   file.crc32 = members.front().crc32;
   file.size = members.front().size;
   return true;
 }
 
-bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& file)
+bool CGameFileIdentity::ArchiveFiles(const std::string& path, CFileItemList& files)
 {
-  // The archive is browsed as a folder; its largest member is the ROM
-  const std::string archiveUrl = URIUtils::CreateArchivePath(
-      StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip" ? "zip" : "archive", CURL(path),
-      "").Get();
+  const std::string archiveUrl =
+      URIUtils::CreateArchivePath(
+          StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip" ? "zip" : "archive",
+          CURL(path), "")
+          .Get();
 
   // The members are wanted as files. Letting Kodi convert them to directories
   // offers each one to every VFS add-on in turn to ask whether it is itself an
   // archive, so one bad add-on takes the whole scan down with it: vfs.rar
   // segfaults on some names, and a library scan is thousands of chances to hit
   // one. Nothing here needs a nested archive opened, only the member list.
+  return XFILE::CDirectory::GetDirectory(
+      archiveUrl, files, "", XFILE::DIR_FLAG_NO_FILE_DIRS | XFILE::DIR_FLAG_NO_FILE_INFO);
+}
+
+bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& file)
+{
+  // The largest member is the ROM
   CFileItemList members;
-  if (!XFILE::CDirectory::GetDirectory(archiveUrl, members, "",
-                                       XFILE::DIR_FLAG_NO_FILE_DIRS |
-                                           XFILE::DIR_FLAG_NO_FILE_INFO))
+  if (!ArchiveFiles(path, members))
     return false;
 
   std::shared_ptr<CFileItem> best;
@@ -320,16 +333,9 @@ bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& fil
   if (!best || best->GetSize() > static_cast<int64_t>(MAX_HASH_SIZE))
     return false;
 
-  // Stream the member through the decompressor rather than letting the zip
-  // backend copy it whole into special://temp first, which it does for anything
-  // deflated over 4 MB and never cleans up. Hashing is one pass front to back,
-  // so nothing here needs to seek.
-  CURL memberUrl(best->GetPath());
-  memberUrl.SetOptions("?cache=no");
-
   GameFile member;
   member.size = static_cast<uint64_t>(best->GetSize());
-  if (!HashWhole(memberUrl.Get(), member))
+  if (!HashWhole(Uncached(best->GetPath()), member))
     return false;
 
   file.crc32 = member.crc32;
@@ -338,8 +344,41 @@ bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& fil
   return true;
 }
 
+std::string CGameFileIdentity::ReadArchivedDiscSerial(const std::string& path)
+{
+  CFileItemList members;
+  if (!ArchiveFiles(path, members))
+    return "";
+
+  // A cue sheet or GDI file names the data track. Without one, the largest
+  // file is the disc image.
+  std::string track;
+  for (const auto& member : members)
+  {
+    if (!member->IsFolder() && HasExtension(member->GetPath(), sheetExtensions))
+    {
+      track = FirstTrack(member->GetPath());
+      break;
+    }
+  }
+  if (track.empty())
+  {
+    std::shared_ptr<CFileItem> largest;
+    for (const auto& member : members)
+    {
+      if (!member->IsFolder() && (!largest || member->GetSize() > largest->GetSize()))
+        largest = member;
+    }
+    if (largest)
+      track = largest->GetPath();
+  }
+
+  return track.empty() ? "" : ReadDiscSerial(Uncached(track));
+}
+
 bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaFormat media)
 {
+  file = GameFile{};
   file.path = path;
 
   XFILE::CFile probe;
@@ -358,7 +397,12 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
     }
 
     if (HasExtension(path, archiveExtensions))
-      return HashArchive(path, file);
+    {
+      const bool hashed = HashArchive(path, file);
+      if (media == MediaFormat::DISC)
+        file.serial = ReadArchivedDiscSerial(path);
+      return hashed || !file.serial.empty();
+    }
 
     // A disc is known by the serial printed in its own header. Hashing the
     // container matches nothing: the catalogues key discs by serial, and every
