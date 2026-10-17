@@ -85,27 +85,6 @@ TEST(TestGameFileIdentity, ListsEveryFileOfAnArcadeSet)
   EXPECT_EQ(file.members[2].crc32, "01281d6c");
 }
 
-TEST(TestGameFileIdentity, KnowsAZipOfOneFileInAFolderByItsDirectory)
-{
-  // nested.zip holds one file, under a folder as a merged arcade set files a
-  // clone's chips. Only the zip's directory says what it is.
-  GameFile file;
-  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/nested.zip"),
-                                          file, MediaFormat::CARTRIDGE));
-
-  EXPECT_EQ(file.crc32, "f5765659");
-  EXPECT_EQ(file.size, 45U);
-  EXPECT_TRUE(file.members.empty());
-}
-
-TEST(TestGameFileIdentity, ListsNothingForAZipOfOneGame)
-{
-  GameFile file;
-  CGameFileIdentity::Identify(XBMC_REF_FILE_PATH(ARCHIVE), file, MediaFormat::CARTRIDGE);
-
-  EXPECT_TRUE(file.members.empty());
-}
-
 TEST(TestGameFileIdentity, StoresEachEmulatorsNameForAnArcadeSet)
 {
   const std::vector<EmulatorRomset> romsets{
@@ -127,4 +106,68 @@ TEST(TestGameFileIdentity, StoresEachEmulatorsNameForAnArcadeSet)
   EXPECT_TRUE(nameOnly[0].gameClient.empty());
   EXPECT_EQ(nameOnly[0].romset, "aodk");
   EXPECT_TRUE(RomsetsFromString("").empty());
+}
+
+TEST(TestGameFileIdentity, KnowsAZipOfOneFileInAFolderByItsDirectory)
+{
+  // nested.zip holds one file, under a folder as a merged arcade set files a
+  // clone's chips. Only the zip's directory says what it is.
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/nested.zip"),
+                                          file, MediaFormat::CARTRIDGE));
+
+  EXPECT_EQ(file.crc32, "f5765659");
+  EXPECT_EQ(file.size, 45U);
+  EXPECT_TRUE(file.members.empty());
+}
+
+TEST(TestGameFileIdentity, ListsNothingForAZipOfOneGame)
+{
+  GameFile file;
+  CGameFileIdentity::Identify(XBMC_REF_FILE_PATH(ARCHIVE), file, MediaFormat::CARTRIDGE);
+
+  EXPECT_TRUE(file.members.empty());
+}
+
+TEST(TestGameFileIdentity, KnowsASetFiledInAFolderByItsFiles)
+{
+  // folder.zip holds two files, both under one folder
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/folder.zip"),
+                                          file, MediaFormat::CARTRIDGE));
+
+  ASSERT_EQ(file.members.size(), 2U);
+  EXPECT_EQ(file.members[0].name, "set/074-p1.p1");
+  EXPECT_EQ(file.members[1].crc32, "d22102e3");
+}
+
+TEST(TestGameFileIdentity, ReadsTheSerialOfAnArchivedDisc)
+{
+  // disc.zip holds a cue sheet, its data track and a larger audio track
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/disc.zip"),
+                                          file, MediaFormat::DISC));
+
+  EXPECT_EQ(file.serial, "SLUS01234");
+}
+
+TEST(TestGameFileIdentity, ReadsAQuotedGdiTrack)
+{
+  const std::string track =
+      CGameFileIdentity::FirstTrack(XBMC_REF_FILE_PATH("xbmc/games/library/test/quoted.gdi"));
+
+  EXPECT_EQ(URIUtils::GetFileName(track), "Crazy Taxi (Track 3).bin");
+}
+
+TEST(TestGameFileIdentity, StartsAfreshForEachFile)
+{
+  GameFile file;
+  CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/arcade.zip"), file,
+                              MediaFormat::CARTRIDGE);
+  ASSERT_FALSE(file.members.empty());
+
+  CGameFileIdentity::Identify(XBMC_REF_FILE_PATH(ARCHIVE), file, MediaFormat::CARTRIDGE);
+
+  EXPECT_TRUE(file.members.empty());
+  EXPECT_EQ(file.crc32, MEMBER_CRC32);
 }

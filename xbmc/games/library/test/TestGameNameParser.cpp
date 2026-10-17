@@ -9,11 +9,66 @@
 #include "games/library/GameNameParser.h"
 
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 using namespace KODI;
 using namespace GAME;
+
+TEST(TestGameNameParser, ReadsANoIntroName)
+{
+  const ParsedGameName parsed = CGameNameParser::Parse(
+      "Legend of Zelda, The - A Link to the Past (USA, Europe) (En,Fr,De) (Rev 1).sfc");
+  EXPECT_EQ(parsed.title, "Legend of Zelda, The - A Link to the Past");
+  EXPECT_EQ(parsed.displayTitle, "The Legend of Zelda - A Link to the Past");
+  EXPECT_EQ(parsed.regions, (std::vector<std::string>{"USA", "Europe"}));
+  EXPECT_EQ(parsed.languages, (std::vector<std::string>{"en", "fr", "de"}));
+  EXPECT_EQ(parsed.revision, "Rev 1");
+  EXPECT_EQ(parsed.status, ReleaseStatus::RETAIL);
+  EXPECT_TRUE(parsed.unknownTags.empty());
+}
+
+TEST(TestGameNameParser, ReadsARedumpDiscAndItsStatus)
+{
+  const ParsedGameName parsed =
+      CGameNameParser::Parse("Final Fantasy VII (Japan) (Disc 2 of 3) (Beta).cue");
+  EXPECT_EQ(parsed.title, "Final Fantasy VII");
+  EXPECT_EQ(parsed.regions, (std::vector<std::string>{"Japan"}));
+  EXPECT_EQ(parsed.disc, 2);
+  EXPECT_EQ(parsed.discs, 3);
+  EXPECT_EQ(parsed.status, ReleaseStatus::BETA);
+  EXPECT_EQ(CGameNameParser::Parse("Sonic CD (Europe) (Proto).cue").status,
+            ReleaseStatus::PROTOTYPE);
+  EXPECT_EQ(CGameNameParser::Parse("Tetris (World) (Unl).gb").licence, Licence::UNLICENSED);
+}
+
+TEST(TestGameNameParser, ReadsGoodToolsFlags)
+{
+  const ParsedGameName verified = CGameNameParser::Parse("Super Mario Bros. (W) [!].nes");
+  EXPECT_EQ(verified.title, "Super Mario Bros.");
+  EXPECT_EQ(verified.regions, (std::vector<std::string>{"World"}));
+  EXPECT_TRUE(verified.verified);
+  EXPECT_TRUE(CGameNameParser::Parse("Super Mario Bros. (W) [h1].nes").hack);
+  EXPECT_TRUE(CGameNameParser::Parse("Super Mario Bros. (W) [b1].nes").bad);
+}
+
+TEST(TestGameNameParser, ReadsTheLanguageOfAFanTranslation)
+{
+  const ParsedGameName french = CGameNameParser::Parse("Super Mario Bros. (W) [T+Fre].nes");
+  EXPECT_TRUE(french.translated);
+  EXPECT_EQ(french.translation, "fr");
+  EXPECT_EQ(CGameNameParser::Parse("Mother (J) [T+Ger1.00_Translator].nes").translation, "de");
+  EXPECT_EQ(CGameNameParser::Parse("Mother (J) [T-Spa].nes").translation, "es");
+  EXPECT_EQ(CGameNameParser::Parse("Mother (J) [T+Por].nes").translation, "pt");
+  EXPECT_EQ(CGameNameParser::Parse("Mother (J) [T+Pol].nes").translation, "pl");
+
+  // Still a translation when the language isn't one it knows
+  const ParsedGameName unknown = CGameNameParser::Parse("Mother (J) [T+Xyz].nes");
+  EXPECT_TRUE(unknown.translated);
+  EXPECT_TRUE(unknown.translation.empty());
+  EXPECT_FALSE(CGameNameParser::Parse("Mother (J).nes").translated);
+}
 
 TEST(TestGameNameParser, TellsADataDiskFromTheGamesOwn)
 {
@@ -56,7 +111,8 @@ TEST(TestGameNameParser, SeparatesTheWordsOfAWhdLoadName)
 TEST(TestGameNameParser, KeepsAnAcronymWhole)
 {
   // The split goes before the last capital of a run, not through the middle of it
-  EXPECT_EQ(CGameNameParser::ParseWhdLoadName("UFOEnemyUnknown_v1.0_AGA_0157"), "UFO Enemy Unknown");
+  EXPECT_EQ(CGameNameParser::ParseWhdLoadName("UFOEnemyUnknown_v1.0_AGA_0157"),
+            "UFO Enemy Unknown");
 }
 
 TEST(TestGameNameParser, SeparatesADigitFromTheWordBeforeIt)
@@ -70,8 +126,9 @@ TEST(TestGameNameParser, DropsATagThatNeverCloses)
 {
   // Extracted sets routinely hit a 64 character filename limit, which cuts a
   // name mid-tag. What follows the stray bracket is half an attribute, not part
-  // of the title, and keeping it stopped the whole set from matching.
-  EXPECT_EQ(CGameNameParser::Parse("Bulldog (1988)(Ariolasoft UK LTD)(Tape 2.tap").title, "Bulldog");
+  // of the title, and keeping it would stop the whole set from matching.
+  EXPECT_EQ(CGameNameParser::Parse("Bulldog (1988)(Ariolasoft UK LTD)(Tape 2.tap").title,
+            "Bulldog");
   EXPECT_EQ(CGameNameParser::Parse("Samurai Trilogy (1988)(Ariolasoft UK LT2.tap").title,
             "Samurai Trilogy");
   EXPECT_EQ(CGameNameParser::Parse("Auf Wiedersehen Monty (1988)(Ariolasoft .tap").title,
@@ -111,6 +168,8 @@ TEST(TestGameNameParser, DropsAScenesReleaseNumber)
 TEST(TestGameNameParser, KeepsATitleThatStartsWithANumber)
 {
   EXPECT_EQ(CGameNameParser::Parse("1943 Kai (Japan).zip").title, "1943 Kai");
+  EXPECT_EQ(CGameNameParser::Parse("007 - The World Is Not Enough (USA).z64").title,
+            "007 - The World Is Not Enough");
   EXPECT_EQ(CGameNameParser::Parse("2002 FIFA World Cup (USA) (En,Es).cue").title,
             "2002 FIFA World Cup");
   EXPECT_EQ(CGameNameParser::Parse("1942 (1986)(Elite)(GB).tap").title, "1942");

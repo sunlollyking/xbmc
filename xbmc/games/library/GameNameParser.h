@@ -35,7 +35,8 @@ struct ParsedGameName
   bool bad{false};
   bool verified{false};
   bool hack{false};
-  std::string translation; // language code of a fan translation, or empty
+  bool translated{false}; // a fan translation
+  std::string translation; // the language it is translated into, when the tag names one
   int disc{0};
   int discs{0};
   bool dataDisk{false}; // one the game asks for once it runs: user, data, scenario...

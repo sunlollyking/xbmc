@@ -13,6 +13,8 @@
 #include <cstdint>
 #include <string>
 
+class CFileItemList;
+
 namespace KODI
 {
 namespace GAME
@@ -35,15 +37,10 @@ class CGameFileIdentity
 {
 public:
   /*!
-   * \brief Files larger than this are treated as disc images and only their
-   *        header is read
+   * \brief Files larger than this are treated as disc images and read only
+   *        as far as their header
    */
   static constexpr uint64_t MAX_HASH_SIZE = 64 * 1024 * 1024;
-
-  /*!
-   * \brief How much of a disc image is searched for its serial
-   */
-  static constexpr uint64_t DISC_HEADER_SIZE = 4 * 1024 * 1024;
 
   /*!
    * \brief Fill in what can be learnt about a file
@@ -83,6 +80,10 @@ private:
   static bool HashWhole(const std::string& path, GameFile& file);
   static bool HashArchive(const std::string& path, GameFile& file);
   static bool HashLargestMember(const std::string& path, GameFile& file);
+  static std::string ReadArchivedDiscSerial(const std::string& path);
+
+  //! \brief The files in an archive, without opening any of them
+  static bool ArchiveFiles(const std::string& path, CFileItemList& files);
 
   /*!
    * \brief Every file in a zip, from its directory, without decompressing any
