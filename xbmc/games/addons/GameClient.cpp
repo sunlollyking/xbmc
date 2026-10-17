@@ -113,7 +113,8 @@ bool CopyWhole(const std::string& from, const std::string& to)
 }
 
 //! The speed a client gets when it asks to fast-forward and leaves the speed to
-//! Kodi. The game loop goes no faster than the client can run frames.
+//! Kodi, and the most it can ask for. The game loop goes no faster than the
+//! client can run frames.
 constexpr double CLIENT_FAST_FORWARD_SPEED = 16.0;
 
 //! The speed a client's fast-forward request moves the player to from a speed,
@@ -1483,7 +1484,10 @@ void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForw
     return;
 
   FastForward& state = *gameClient->m_fastForward;
-  const double requested = fastForward ? (ratio > 1.0 ? ratio : CLIENT_FAST_FORWARD_SPEED) : 0.0;
+  const double requested =
+      fastForward
+          ? (ratio > 1.0 && ratio <= CLIENT_FAST_FORWARD_SPEED ? ratio : CLIENT_FAST_FORWARD_SPEED)
+          : 0.0;
   state.requested = requested;
 
   // A client can read the speed back in its next frame, before the change is
