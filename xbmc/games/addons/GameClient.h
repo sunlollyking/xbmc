@@ -330,6 +330,17 @@ private:
   static void cb_report_missing_file(KODI_HANDLE kodiInstance, const char* path);
   static double cb_get_playback_speed(KODI_HANDLE kodiInstance);
   static void cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForward, double ratio);
+
+  // A fast-forward the client asked for. Speed changes run later on the
+  // application thread, which holds this rather than the client.
+  struct FastForward
+  {
+    std::atomic<double> requested{0.0}; // The speed asked for, or 0
+    std::atomic<unsigned int> session{0}; // Counts the games closed
+    float set = 0.0f; // The speed set for the client, or 0
+    unsigned int setSession = 0;
+  };
+  static void ApplyFastForward(FastForward& fastForward);
   static void cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo);
   static bool cb_start_stream(KODI_HANDLE kodiInstance, KODI_GAME_STREAM_HANDLE stream);
   static KODI_GAME_STREAM_HANDLE cb_open_stream(KODI_HANDLE kodiInstance,
@@ -435,7 +446,7 @@ private:
   // would read as paused and have a client behave as though the user had
   // stopped the game before it started.
   std::atomic<double> m_playbackSpeed{1.0};
-  std::atomic<double> m_fastForwardSpeed{0.0}; // The speed set for the client, or 0
+  const std::shared_ptr<FastForward> m_fastForward = std::make_shared<FastForward>();
   std::string m_gamePath;
   std::string m_missingFile; // The first file the client reported missing while loading
   bool m_bRequiresGameLoop = false;

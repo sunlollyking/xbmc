@@ -39,7 +39,6 @@
 #include "guilib/WindowIDs.h"
 #include "input/actions/Action.h"
 #include "input/actions/ActionIDs.h"
-#include "jobs/JobManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "resources/LocalizeStrings.h"
@@ -974,6 +973,10 @@ void CGameClient::CloseFile()
     m_serializeSize = 0;
     m_input = nullptr;
 
+    // A fast-forward request goes no further than its game
+    m_fastForward->requested = 0.0;
+    ++m_fastForward->session;
+
     Input().Stop();
 
     if (SupportsDiscControl())
@@ -1462,32 +1465,72 @@ void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForw
   if (gameClient == nullptr)
     return;
 
-  double from;
-  double to;
-  if (fastForward)
+  gameClient->m_fastForward->requested =
+      fastForward ? (ratio > 1.0 ? ratio : CLIENT_FAST_FORWARD_SPEED) : 0.0;
+
+  const auto messenger = CServiceBroker::GetAppMessenger();
+  if (!messenger)
+    return;
+
+  // The call comes from inside a frame, and changing speed waits on the game
+  // loop. The application thread applies it, as it does a speed the user
+  // picks, so it can't overlap the player closing. Each callback applies the
+  // latest request.
+  struct Callback
   {
-    from = 1.0;
-    to = ratio > 1.0 ? ratio : CLIENT_FAST_FORWARD_SPEED;
-    gameClient->m_fastForwardSpeed = to;
-  }
-  else
+    MESSAGING::ThreadMessageCallback message;
+    std::shared_ptr<FastForward> state;
+  };
+  auto* callback = new Callback{{}, gameClient->m_fastForward};
+  callback->message.userptr = callback;
+  callback->message.callback = [](void* data)
   {
-    from = gameClient->m_fastForwardSpeed.exchange(0.0);
-    to = 1.0;
-    if (from == 0.0)
-      return;
+    std::unique_ptr<Callback> callback(static_cast<Callback*>(data));
+    ApplyFastForward(*callback->state);
+  };
+  messenger->PostMsg(TMSG_CALLBACK, -1, -1, &callback->message);
+}
+
+void CGameClient::ApplyFastForward(FastForward& fastForward)
+{
+  // A speed set while an earlier game was playing isn't this game's
+  const unsigned int session = fastForward.session;
+  if (fastForward.setSession != session)
+  {
+    fastForward.set = 0.0f;
+    fastForward.setSession = session;
   }
 
-  // The call comes from inside a frame, and changing speed waits on the game loop
-  CServiceBroker::GetJobManager()->Submit(
-      [from, to]()
-      {
-        const auto appPlayer =
-            CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-        if (appPlayer && appPlayer->IsPlayingGame() &&
-            static_cast<double>(appPlayer->GetPlaySpeed()) == from)
-          appPlayer->SetPlaySpeed(static_cast<float>(to));
-      });
+  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
+  if (!appPlayer || !appPlayer->IsPlayingGame())
+    return;
+
+  const double requested = fastForward.requested;
+  const float speed = appPlayer->GetPlaySpeed();
+  if (requested > 0.0)
+  {
+    // Only from normal speed or the speed set for the client, so a speed the
+    // user chose is left alone
+    const bool fromNormal = fastForward.set == 0.0f && speed == 1.0f;
+    const bool fromClient = fastForward.set != 0.0f && speed == fastForward.set;
+    if ((fromNormal || fromClient) && speed != static_cast<float>(requested))
+    {
+      appPlayer->SetPlaySpeed(static_cast<float>(requested));
+
+      // The speed the player took, which needn't be the one asked for, as
+      // the player can round it or refuse it
+      const float set = appPlayer->GetPlaySpeed();
+      if (set != speed)
+        fastForward.set = set;
+    }
+  }
+  else if (fastForward.set != 0.0f)
+  {
+    // Only from the speed set for the client
+    if (speed == fastForward.set)
+      appPlayer->SetPlaySpeed(1.0f);
+    fastForward.set = 0.0f;
+  }
 }
 
 void CGameClient::cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo)
