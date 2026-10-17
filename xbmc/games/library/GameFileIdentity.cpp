@@ -36,7 +36,6 @@ constexpr size_t CHUNK_SIZE = 1024 * 1024;
 
 constexpr std::array<const char*, 2> archiveExtensions{".zip", ".7z"};
 constexpr std::array<const char*, 2> sheetExtensions{".cue", ".gdi"};
-constexpr std::array<const char*, 5> trackExtensions{".bin", ".img", ".iso", ".raw", ".mdf"};
 constexpr std::array<const char*, 3> programExtensions{".exe", ".com", ".bat"};
 
 constexpr std::string_view SATURN_MAGIC = "SEGA SEGASATURN";
