@@ -37,8 +37,6 @@ protected:
   void RefreshList() override;
 
 private:
-  void InitScalingMethods();
-  void InitVideoFilters();
   void InitGetMoreButton();
   void OnGetMore();
   void OnGetMoreComplete();
