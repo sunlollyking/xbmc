@@ -1,6 +1,8 @@
 set(SOURCES GameAgeRatings.cpp
             GameDbUrl.cpp
             GameFileIdentity.cpp
+            GameInfoScanner.cpp
+            GameLibraryQueue.cpp
             GameLibraryTypes.cpp
             GameListXml.cpp
             GameNameParser.cpp
@@ -11,6 +13,8 @@ set(SOURCES GameAgeRatings.cpp
 set(HEADERS GameAgeRatings.h
             GameDbUrl.h
             GameFileIdentity.h
+            GameInfoScanner.h
+            GameLibraryQueue.h
             GameLibraryTypes.h
             GameListXml.h
             GameNameParser.h
