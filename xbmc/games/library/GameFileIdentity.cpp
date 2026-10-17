@@ -42,8 +42,9 @@ constexpr std::string_view SATURN_MAGIC = "SEGA SEGASATURN";
 constexpr std::string_view MEGACD_MAGIC = "SEGADISCSYSTEM";
 constexpr std::string_view DREAMCAST_MAGIC = "SEGA SEGAKATANA";
 
-//! A track that a cue sheet or GDI file names has its header near the start.
-//! Looking further into one in an archive would decompress the whole track.
+//! In an archive, a disc's header is looked for only near the start of its data
+//! track or image. Looking further would decompress the whole of it, often for
+//! a disc whose header this doesn't know.
 constexpr uint64_t MAX_ARCHIVED_TRACK_SCAN = 16 * 1024 * 1024;
 
 bool HasExtension(const std::string& path, const auto& extensions)
@@ -220,6 +221,10 @@ std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath, uint
         re.RegFind(window) >= 0)
       return NormaliseSerial(re.GetMatch(1) + re.GetMatch(2) + re.GetMatch(3));
 
+    // So does a PSP disc, in UMD_DATA.BIN: "ULUS-10080|56D3ECEFB2365F41|0001|"
+    if (re.RegComp("([A-Z]{4})-([0-9]{5})\\|[0-9A-F]{16}\\|") && re.RegFind(window) >= 0)
+      return NormaliseSerial(re.GetMatch(1) + re.GetMatch(2));
+
     if (window.size() > OVERLAP)
       window.erase(0, window.size() - OVERLAP);
   }
@@ -351,17 +356,30 @@ std::string CGameFileIdentity::ReadArchivedDiscSerial(const std::string& path)
   if (!ArchiveFiles(path, members))
     return "";
 
-  // Only a disc whose cue sheet or GDI file names its data track is read. The
-  // header of any other disc may not be one this knows.
+  // A cue sheet or GDI file names the data track. Without one, the largest
+  // file is the disc image.
+  std::string track;
   for (const auto& member : members)
   {
     if (!member->IsFolder() && HasExtension(member->GetPath(), sheetExtensions))
     {
-      const std::string track = FirstTrack(member->GetPath());
-      return track.empty() ? "" : ReadDiscSerial(Uncached(track), MAX_ARCHIVED_TRACK_SCAN);
+      track = FirstTrack(member->GetPath());
+      break;
     }
   }
-  return "";
+  if (track.empty())
+  {
+    std::shared_ptr<CFileItem> largest;
+    for (const auto& member : members)
+    {
+      if (!member->IsFolder() && (!largest || member->GetSize() > largest->GetSize()))
+        largest = member;
+    }
+    if (largest)
+      track = largest->GetPath();
+  }
+
+  return track.empty() ? "" : ReadDiscSerial(Uncached(track), MAX_ARCHIVED_TRACK_SCAN);
 }
 
 bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaFormat media)

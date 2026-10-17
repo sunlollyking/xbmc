@@ -62,7 +62,8 @@ public:
   /*!
    * \brief The serial a disc image's header carries, or empty
    *
-   * Reads PlayStation (SYSTEM.CNF), Saturn, Mega-CD and Dreamcast headers.
+   * Reads PlayStation (SYSTEM.CNF), PSP (UMD_DATA.BIN), Saturn, Mega-CD and
+   * Dreamcast headers.
    * The result is normalised to upper-case letters and digits, as the
    * catalogues key on.
    *
