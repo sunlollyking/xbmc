@@ -172,6 +172,20 @@ TEST(TestGameNameParser, LeavesADiscNumberTooLongToBeOne)
   EXPECT_EQ(parsed.title, "Game");
 }
 
+TEST(TestGameNameParser, ReadsATosecNameWithNoPublisher)
+{
+  const ParsedGameName parsed = CGameNameParser::Parse("Game (1990)(-)(PAL).adf");
+  EXPECT_TRUE(parsed.publisher.empty());
+  EXPECT_EQ(parsed.unknownTags, std::vector<std::string>{"PAL"});
+}
+
+TEST(TestGameNameParser, CreditsNoCompanyFromATosecName)
+{
+  EXPECT_TRUE(
+      CGameNameParser::Credits(CGameNameParser::Parse("Game (1993)(Team17)(AGA).adf")).empty());
+  EXPECT_TRUE(CGameNameParser::Credits(CGameNameParser::Parse("Game (1993)(-)(AGA).adf")).empty());
+}
+
 TEST(TestGameNameParser, ReadsATosecCountry)
 {
   const ParsedGameName parsed = CGameNameParser::Parse("1942 (1986)(Elite)(GB).tap");
