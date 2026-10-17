@@ -37,6 +37,7 @@ constexpr size_t CHUNK_SIZE = 1024 * 1024;
 constexpr std::array<const char*, 2> archiveExtensions{".zip", ".7z"};
 constexpr std::array<const char*, 2> sheetExtensions{".cue", ".gdi"};
 constexpr std::array<const char*, 5> trackExtensions{".bin", ".img", ".iso", ".raw", ".mdf"};
+constexpr std::array<const char*, 3> programExtensions{".exe", ".com", ".bat"};
 
 constexpr std::string_view SATURN_MAGIC = "SEGA SEGASATURN";
 constexpr std::string_view MEGACD_MAGIC = "SEGADISCSYSTEM";
@@ -335,13 +336,23 @@ bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& fil
     return false;
 
   std::shared_ptr<CFileItem> best;
+  int count = 0;
+  bool program = false;
   for (const auto& member : members)
   {
     if (member->IsFolder())
       continue;
+    ++count;
+    program = program || HasExtension(member->GetPath(), programExtensions);
     if (!best || member->GetSize() > best->GetSize())
       best = member;
   }
+
+  // An archive of a program and its files is an installed game. Its largest
+  // file is one of the game's own, often one other games share, and no
+  // catalogue knows the game by it.
+  if (count > 1 && program)
+    return false;
   if (!best || best->GetSize() > static_cast<int64_t>(MAX_HASH_SIZE))
     return false;
 

@@ -205,3 +205,15 @@ TEST(TestGameFileIdentity, HashesACartridgeTooLargeToTellFromADisc)
 
   XBMC_DELETETEMPFILE(rom);
 }
+
+TEST(TestGameFileIdentity, DoesNotHashAnInstalledGamesLargestFile)
+{
+  // program.zip holds a program, a data file larger than it and a readme
+  GameFile file;
+  CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/program.zip"), file,
+                              MediaFormat::DISK);
+
+  EXPECT_TRUE(file.crc32.empty());
+  EXPECT_TRUE(file.md5.empty());
+  EXPECT_EQ(file.members.size(), 3U);
+}
