@@ -660,10 +660,10 @@ void CRPRenderManager::SetBezel(const std::string& url)
     m_bezelLoad = load;
   }
 
-  CServiceBroker::GetJobManager()->Submit(
-      [load, url]()
+  m_renderContext.JobManager().Submit(
+      [load, url, textureCache = m_renderContext.TextureCache()]()
       {
-        std::shared_ptr<CRenderBezel> bezel = CRenderBezel::Load(url);
+        std::shared_ptr<CRenderBezel> bezel = CRenderBezel::Load(url, *textureCache);
         std::unique_lock lock(load->mutex);
         load->bezel = std::move(bezel);
         load->done = true;

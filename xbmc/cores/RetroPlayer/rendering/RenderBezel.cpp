@@ -8,7 +8,6 @@
 
 #include "RenderBezel.h"
 
-#include "ServiceBroker.h"
 #include "TextureCache.h"
 #include "guilib/GUITexture.h"
 #include "guilib/Texture.h"
@@ -22,11 +21,16 @@ using namespace RETRO;
 
 namespace
 {
-// Alpha from which a pixel belongs to the frame
-constexpr uint8_t OPAQUE_ALPHA = 250;
+// For FindWindow()
 
-// How far above the centre's alpha a pixel in the window is still glass
-constexpr uint8_t GLASS_TOLERANCE = 32;
+// The frame is fully opaque
+constexpr uint8_t OPAQUE_ALPHA = 255;
+
+// Opaque pixels in a row that start the frame, so a stray one in the glass or
+// the frame's soft edge doesn't end the window
+constexpr unsigned int FRAME_RUN = 3;
+
+// For FramesGame()
 
 // Least the game may shrink to fit the window
 constexpr float MIN_GAME_SCALE = 0.8f;
@@ -48,10 +52,9 @@ CRenderBezel::CRenderBezel(std::unique_ptr<CTexture> texture, const CRect& windo
 
 CRenderBezel::~CRenderBezel() = default;
 
-std::unique_ptr<CRenderBezel> CRenderBezel::Load(const std::string& url)
+std::unique_ptr<CRenderBezel> CRenderBezel::Load(const std::string& url,
+                                                 CTextureCache& textureCache)
 {
-  CTextureCache& textureCache = *CServiceBroker::GetTextureCache();
-
   std::unique_ptr<CTexture> texture;
 
   bool needsRecaching = false;
@@ -80,9 +83,6 @@ std::unique_ptr<CRenderBezel> CRenderBezel::Load(const std::string& url)
     CLog::Log(LOGINFO, "RetroPlayer[RENDER]: Bezel has no window for the game, not showing it");
     return {};
   }
-
-  ClearWindow(texture->GetPixels(), texture->GetWidth(), texture->GetHeight(), texture->GetPitch(),
-              window);
 
   CLog::Log(LOGDEBUG,
             "RetroPlayer[RENDER]: Loaded {}x{} bezel, window ({:.0f},{:.0f})-({:.0f},{:.0f})",
@@ -130,63 +130,44 @@ bool CRenderBezel::FindWindow(const uint8_t* pixels,
   if (pixels == nullptr || width == 0 || height == 0)
     return false;
 
-  auto IsWindow = [pixels, pitch](unsigned int x, unsigned int y)
-  { return pixels[y * pitch + x * 4 + ALPHA_BYTE] < OPAQUE_ALPHA; };
+  auto IsOpaque = [pixels, pitch](unsigned int x, unsigned int y)
+  { return pixels[y * pitch + x * 4 + ALPHA_BYTE] == OPAQUE_ALPHA; };
 
   const unsigned int centreX = width / 2;
   const unsigned int centreY = height / 2;
-  if (!IsWindow(centreX, centreY))
+  if (IsOpaque(centreX, centreY))
     return false;
 
-  unsigned int left = centreX;
-  while (left > 0 && IsWindow(left - 1, centreY))
-    left--;
+  // Steps taken from the centre before the frame begins. Opaque pixels at the
+  // edge of the picture are frame however few they are, as the thin frame
+  // above and below many windows is.
+  auto Reach = [](unsigned int steps, const auto& isOpaqueAt)
+  {
+    unsigned int run = 0;
+    for (unsigned int step = 0; step < steps; step++)
+    {
+      run = isOpaqueAt(step) ? run + 1 : 0;
+      if (run == FRAME_RUN)
+        return step + 1 - FRAME_RUN;
+    }
+    return steps - run;
+  };
 
-  unsigned int right = centreX + 1;
-  while (right < width && IsWindow(right, centreY))
-    right++;
-
-  unsigned int top = centreY;
-  while (top > 0 && IsWindow(centreX, top - 1))
-    top--;
-
-  unsigned int bottom = centreY + 1;
-  while (bottom < height && IsWindow(centreX, bottom))
-    bottom++;
+  const unsigned int left =
+      centreX - Reach(centreX, [&](unsigned int i) { return IsOpaque(centreX - 1 - i, centreY); });
+  const unsigned int right = centreX + 1 +
+                             Reach(width - centreX - 1, [&](unsigned int i)
+                                   { return IsOpaque(centreX + 1 + i, centreY); });
+  const unsigned int top =
+      centreY - Reach(centreY, [&](unsigned int i) { return IsOpaque(centreX, centreY - 1 - i); });
+  const unsigned int bottom = centreY + 1 +
+                              Reach(height - centreY - 1, [&](unsigned int i)
+                                    { return IsOpaque(centreX, centreY + 1 + i); });
 
   window = CRect(static_cast<float>(left), static_cast<float>(top), static_cast<float>(right),
                  static_cast<float>(bottom));
 
   return true;
-}
-
-void CRenderBezel::ClearWindow(uint8_t* pixels,
-                               unsigned int width,
-                               unsigned int height,
-                               unsigned int pitch,
-                               const CRect& window)
-{
-  if (pixels == nullptr || width == 0 || height == 0)
-    return;
-
-  // Glass is flat, so whatever is near the centre's opacity is glass and
-  // whatever is above it is the frame's edge
-  const unsigned int centreAlpha = pixels[(height / 2) * pitch + (width / 2) * 4 + ALPHA_BYTE];
-  const unsigned int glassAlpha = centreAlpha + GLASS_TOLERANCE;
-
-  const unsigned int x2 = std::min(static_cast<unsigned int>(window.x2), width);
-  const unsigned int y2 = std::min(static_cast<unsigned int>(window.y2), height);
-
-  for (unsigned int y = static_cast<unsigned int>(window.y1); y < y2; y++)
-  {
-    uint8_t* row = pixels + y * pitch;
-    for (unsigned int x = static_cast<unsigned int>(window.x1); x < x2; x++)
-    {
-      // A select rather than a branch, which noisy glass would keep mispredicting
-      uint8_t& alpha = row[x * 4 + ALPHA_BYTE];
-      alpha = alpha <= glassAlpha ? 0 : alpha;
-    }
-  }
 }
 
 bool CRenderBezel::FramesGame(const CRect& window,

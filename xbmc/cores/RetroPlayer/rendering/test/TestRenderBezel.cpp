@@ -41,34 +41,34 @@ struct Picture
 TEST(TestRenderBezel, FindsClearWindow)
 {
   Picture picture;
-  picture.Fill(12, 2, 52, 34, 0);
+  picture.Fill(12, 4, 52, 32, 0);
 
   CRect window;
   ASSERT_TRUE(
       CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
-  EXPECT_EQ(CRect(12, 2, 52, 34), window);
+  EXPECT_EQ(CRect(12, 4, 52, 32), window);
 }
 
 TEST(TestRenderBezel, FindsGlassWindow)
 {
   Picture picture;
-  picture.Fill(12, 2, 52, 34, 128);
+  picture.Fill(12, 4, 52, 32, 128);
 
   CRect window;
   ASSERT_TRUE(
       CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
-  EXPECT_EQ(CRect(12, 2, 52, 34), window);
+  EXPECT_EQ(CRect(12, 4, 52, 32), window);
 }
 
 TEST(TestRenderBezel, FindsWindowInPaddedRows)
 {
   Picture picture(16);
-  picture.Fill(12, 2, 52, 34, 0);
+  picture.Fill(12, 4, 52, 32, 0);
 
   CRect window;
   ASSERT_TRUE(
       CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
-  EXPECT_EQ(CRect(12, 2, 52, 34), window);
+  EXPECT_EQ(CRect(12, 4, 52, 32), window);
 }
 
 TEST(TestRenderBezel, FindsWindowReachingEdges)
@@ -91,22 +91,53 @@ TEST(TestRenderBezel, OpaquePictureHasNoWindow)
       CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
 }
 
-TEST(TestRenderBezel, ClearsGlassAndKeepsFrameEdge)
+TEST(TestRenderBezel, CountsSoftEdgeAsWindow)
 {
   Picture picture;
-  picture.Fill(12, 2, 52, 34, 85);
-  picture.Fill(12, 2, 14, 34, 200); // soft edge where the frame meets the window
+  picture.Fill(12, 4, 52, 32, 0);
+  picture.Fill(9, 4, 12, 32, 254); // the frame's soft edge, short of opaque
 
   CRect window;
   ASSERT_TRUE(
       CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
-  CRenderBezel::ClearWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window);
+  EXPECT_EQ(CRect(9, 4, 52, 32), window);
+}
 
-  EXPECT_EQ(0, picture.Alpha(WIDTH / 2, HEIGHT / 2));
-  EXPECT_EQ(0, picture.Alpha(50, 3));
-  EXPECT_EQ(200, picture.Alpha(12, 10));
-  EXPECT_EQ(255, picture.Alpha(5, 10));
-  EXPECT_EQ(255, picture.Alpha(30, 1));
+TEST(TestRenderBezel, IgnoresStrayOpaquePixels)
+{
+  Picture picture;
+  picture.Fill(12, 4, 52, 32, 0);
+  picture.Alpha(20, HEIGHT / 2) = 255;
+  picture.Alpha(40, HEIGHT / 2) = 255;
+  picture.Alpha(41, HEIGHT / 2) = 255;
+
+  CRect window;
+  ASSERT_TRUE(
+      CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
+  EXPECT_EQ(CRect(12, 4, 52, 32), window);
+}
+
+TEST(TestRenderBezel, FindsThinFrameAtPictureEdge)
+{
+  Picture picture;
+  picture.Fill(12, 2, 52, 35, 0); // 2 opaque rows above the window, 1 below
+
+  CRect window;
+  ASSERT_TRUE(
+      CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
+  EXPECT_EQ(CRect(12, 2, 52, 35), window);
+}
+
+TEST(TestRenderBezel, FindsWindowWithNoFrameAtEdge)
+{
+  Picture picture;
+  picture.Fill(12, 0, 52, HEIGHT, 0);
+  picture.Alpha(WIDTH / 2, 1) = 255; // a stray opaque pixel near the edge, not at it
+
+  CRect window;
+  ASSERT_TRUE(
+      CRenderBezel::FindWindow(picture.pixels.data(), WIDTH, HEIGHT, picture.pitch, window));
+  EXPECT_EQ(CRect(12, 0, 52, HEIGHT), window);
 }
 
 TEST(TestRenderBezel, FramesGameOfWindowShape)

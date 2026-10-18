@@ -15,6 +15,7 @@
 #include <string>
 
 class CTexture;
+class CTextureCache;
 
 namespace KODI
 {
@@ -27,6 +28,14 @@ namespace RETRO
  * 4:3. Where its window sits varies from one picture to the next - a picture
  * of an arcade cabinet puts it wherever the cabinet's screen is - so the
  * window is found from the picture itself.
+ *
+ * FindWindow() finds the window once, when the picture loads. The picture is
+ * then drawn as it is, so any glass and the frame's soft inner edge lie over
+ * the game as the artist drew them.
+ *
+ * Finding the window this way assumes the picture's centre is inside it. The
+ * run of opaque pixels that starts the frame is how Kodi reads the picture,
+ * not something the artwork has to be made for.
  */
 class CRenderBezel
 {
@@ -40,10 +49,11 @@ public:
    * thread.
    *
    * \param url The bezel's picture
+   * \param textureCache The cache the picture is kept in
    *
    * \return The bezel, or nullptr if the picture didn't load or has no window
    */
-  static std::unique_ptr<CRenderBezel> Load(const std::string& url);
+  static std::unique_ptr<CRenderBezel> Load(const std::string& url, CTextureCache& textureCache);
 
   /*!
    * \brief The part of the screen the bezel covers, kept to its own shape
@@ -66,9 +76,9 @@ public:
    * \brief Find the window in a picture
    *
    * The window is the run of the middle row and column, either side of the
-   * centre, that the frame doesn't cover. A window may be glass rather than
-   * clear - a photo of a switched-off screen left at part opacity - so
-   * anything short of opaque counts.
+   * centre, before the frame. The frame starts at the first few fully opaque
+   * pixels in a row, or at any fully opaque pixels left at the edge of the
+   * picture, so glass and the frame's soft inner edge are window.
    *
    * \param pixels 32-bit pixels, alpha in the fourth byte
    * \param width The picture's width
@@ -83,23 +93,6 @@ public:
                          unsigned int height,
                          unsigned int pitch,
                          CRect& window);
-
-  /*!
-   * \brief Clear any glass from the window, so it doesn't darken the game
-   *
-   * The soft edge where the frame meets the window is kept.
-   *
-   * \param pixels 32-bit pixels, alpha in the fourth byte
-   * \param width The picture's width
-   * \param height The picture's height
-   * \param pitch The bytes from one row to the next
-   * \param window The window found by FindWindow()
-   */
-  static void ClearWindow(uint8_t* pixels,
-                          unsigned int width,
-                          unsigned int height,
-                          unsigned int pitch,
-                          const CRect& window);
 
   /*!
    * \brief True if the game, drawn inside the window, is framed well enough to
