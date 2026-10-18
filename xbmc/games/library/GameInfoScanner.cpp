@@ -1637,6 +1637,17 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
           !tag.GetOverview().empty())
         std::swap(keep, drop);
       m_database.MergeGameInto(drop, keep);
+
+      // The releases that came across may suit the player better than the one
+      // it played before
+      CGameInfoTag merged;
+      if (m_database.GetGameInfo(keep, merged) && merged.GetMatchMethod() != MatchMethod::MANUAL)
+      {
+        const std::vector<GameRelease>& releases = merged.GetReleases();
+        const int best = PolicyFromSettings().PickDefault(releases);
+        if (best >= 0)
+          m_database.SetDefaultRelease(keep, releases[static_cast<size_t>(best)].id);
+      }
     }
     return true;
   }
