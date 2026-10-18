@@ -153,7 +153,8 @@ private:
    * \brief The game a dump of this identity or title is another release of
    *
    * Games can share both when their files credit different companies, so the
-   * first one whose files don't is the match.
+   * first one whose files don't is the match. A title is not taken where a
+   * catalogue keeps the two games apart.
    *
    * \return The game, or -1 if there is none
    */
@@ -162,6 +163,7 @@ private:
                    const std::string& candidateId,
                    const std::string& title,
                    const std::vector<std::string>& credits,
+                   const std::map<std::string, std::string>& uniqueIds,
                    int exceptGame);
   const struct GameScrapeCandidate* ChooseCandidate(CGameScraper& scraper,
                                                     struct GameScrapeRequest& request,

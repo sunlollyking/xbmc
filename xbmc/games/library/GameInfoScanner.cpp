@@ -151,6 +151,33 @@ std::string FolderName(const std::string& folder)
 }
 
 /*!
+ * \brief Whether a catalogue that files all of a game's releases under one
+ *        entry has the game a title matched under another
+ *
+ * Two games can share a title: the West's King's Field is Japan's King's
+ * Field II. The title key can't tell them apart, but IGDB, ScreenScraper and
+ * LaunchBox each keep them as two entries.
+ */
+bool CataloguedApart(CGameDatabase& db, int idGame, const std::map<std::string, std::string>& ids)
+{
+  static constexpr std::array<const char*, 3> catalogues{"igdb", "screenscraper", "launchbox"};
+
+  CGameInfoTag existing;
+  if (ids.empty() || !db.GetGameInfo(idGame, existing))
+    return false;
+
+  const std::map<std::string, std::string>& theirs = existing.GetUniqueIDs();
+  return std::ranges::any_of(catalogues,
+                             [&ids, &theirs](const char* type)
+                             {
+                               const auto mine = ids.find(type);
+                               const auto other = theirs.find(type);
+                               return mine != ids.end() && other != theirs.end() &&
+                                      !mine->second.empty() && mine->second != other->second;
+                             });
+}
+
+/*!
  * \brief Whether a game's files credit only other companies than these
  *
  * Two games can share a title and nothing else: a homebrew Tetris and the one
@@ -693,14 +720,18 @@ int CGameInfoScanner::FindSameGame(const PlatformInfo& platform,
                                    const std::string& candidateId,
                                    const std::string& title,
                                    const std::vector<std::string>& credits,
+                                   const std::map<std::string, std::string>& uniqueIds,
                                    int exceptGame)
 {
   std::vector<int> games;
   if (scraper != nullptr && !candidateId.empty())
     games = m_database.FindGamesByUniqueId(platform.id, scraper->ID(), candidateId, exceptGame);
-  std::ranges::copy(
-      m_database.FindGamesByTitleKey(platform.id, CGameLibraryTypes::TitleKey(title), exceptGame),
-      std::back_inserter(games));
+  for (const int idGame :
+       m_database.FindGamesByTitleKey(platform.id, CGameLibraryTypes::TitleKey(title), exceptGame))
+  {
+    if (!CataloguedApart(m_database, idGame, uniqueIds))
+      games.push_back(idGame);
+  }
 
   const auto same =
       std::ranges::find_if(games, [this, &credits](int idGame)
@@ -1625,9 +1656,9 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     // together, keeping whichever row knows more -- but only on a match by hash
     // or serial, as a name can match the wrong game.
     const bool sure = matchedBy == MatchMethod::HASH || matchedBy == MatchMethod::SERIAL;
-    const int other =
-        sure ? FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits, refreshGameId)
-             : -1;
+    const int other = sure ? FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits,
+                                          tag.GetUniqueIDs(), refreshGameId)
+                           : -1;
     if (other > 0)
     {
       int keep = other;
@@ -1653,7 +1684,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   }
 
   // Another dump of a game already in the library becomes one of its releases
-  const int idGame = FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits, -1);
+  const int idGame =
+      FindSameGame(platform, scraper, candidateId, tag.GetTitle(), credits, tag.GetUniqueIDs(), -1);
 
   if (idGame > 0)
   {
