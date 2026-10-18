@@ -512,11 +512,11 @@ public:
   /// normal speed, and only returns to normal speed from the one it set.
   ///
   /// @remarks Only called from the add-on itself. It does nothing with a Kodi
-  ///          older than game API 8.5.0.
+  ///          older than game API 8.4.0.
   ///
   void SetFastForwarding(bool fastForward, double ratio)
   {
-    if (IsInstanceAPIVersionAtLeast(8, 5, 0))
+    if (IsInstanceAPIVersionAtLeast(8, 4, 0))
       m_instanceData->toKodi->SetFastForwarding(m_instanceData->toKodi->kodiInstance, fastForward,
                                                 ratio);
   }
@@ -1743,8 +1743,8 @@ private:
 
     instance->game->toAddon->FreeString = ADDON_FreeString;
 
-    // Added in 8.4.0. An older Kodi's table ends before this entry.
-    if (IsInstanceAPIVersionAtLeast(8, 4, 0))
+    // Added in 8.5.0. An older Kodi's table ends before this entry.
+    if (IsInstanceAPIVersionAtLeast(8, 5, 0))
       instance->game->toAddon->RunFrameSpeculative = ADDON_RunFrameSpeculative;
 
     m_instanceData = instance->game;

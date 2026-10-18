@@ -38,6 +38,7 @@ class CGameClientDiscModel;
 
 class CGameClientCheats;
 class CGameClientCheevos;
+class CGameClientFastForward;
 class CGameClientInGameSaves;
 class CGameClientInput;
 class CGameClientProperties;
@@ -426,7 +427,7 @@ private:
   // would read as paused and have a client behave as though the user had
   // stopped the game before it started.
   std::atomic<double> m_playbackSpeed{1.0};
-  std::atomic<double> m_fastForwardSpeed{0.0}; // The speed set for the client, or 0
+  const std::unique_ptr<CGameClientFastForward> m_fastForward;
   std::string m_gamePath;
   std::string m_missingFile; // The first file the client reported missing while loading
   bool m_bRequiresGameLoop = false;
