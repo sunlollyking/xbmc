@@ -3044,6 +3044,59 @@
             <formatlabel>14047</formatlabel>
           </control>
         </setting>
+        <setting id="gamesgeneral.hdrvideofilters" type="boolean" label="35311" help="35312">
+          <requirement>
+            <and>
+              <condition>HAVE_GBM</condition>
+              <condition>HAS_GLES</condition>
+            </and>
+          </requirement>
+          <level>2</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+        <setting id="gamesgeneral.hdrpaperwhite" type="integer" label="35313" help="35314">
+          <requirement>
+            <and>
+              <condition>HAVE_GBM</condition>
+              <condition>HAS_GLES</condition>
+            </and>
+          </requirement>
+          <level>2</level>
+          <default>200</default>
+          <constraints>
+            <minimum>100</minimum>
+            <step>10</step>
+            <maximum>400</maximum>
+          </constraints>
+          <dependencies>
+            <dependency type="enable" setting="gamesgeneral.hdrvideofilters">true</dependency>
+          </dependencies>
+          <control type="spinner" format="string">
+            <formatlabel>35317</formatlabel>
+          </control>
+        </setting>
+        <setting id="gamesgeneral.hdrpeak" type="integer" label="35315" help="35316">
+          <requirement>
+            <and>
+              <condition>HAVE_GBM</condition>
+              <condition>HAS_GLES</condition>
+            </and>
+          </requirement>
+          <level>2</level>
+          <default>1000</default>
+          <constraints>
+            <minimum>400</minimum>
+            <step>100</step>
+            <maximum>4000</maximum>
+          </constraints>
+          <dependencies>
+            <dependency type="enable" setting="gamesgeneral.hdrvideofilters">true</dependency>
+          </dependencies>
+          <control type="spinner" format="string">
+            <formatlabel>35317</formatlabel>
+          </control>
+        </setting>
       </group>
       <group id="2" label="35320">
         <setting id="gamesgeneral.cheatspath" type="path" label="35321" help="35322">

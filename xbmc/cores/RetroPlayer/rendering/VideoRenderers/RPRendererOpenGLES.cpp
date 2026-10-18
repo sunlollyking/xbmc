@@ -8,6 +8,7 @@
 
 #include "RPRendererOpenGLES.h"
 
+#include "RPHdrShaderGLES.h"
 #include "cores/RetroPlayer/buffers/RenderBufferOpenGLES.h"
 #include "cores/RetroPlayer/buffers/RenderBufferPoolOpenGLES.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
@@ -60,6 +61,8 @@ CRPRendererOpenGLES::CRPRendererOpenGLES(const CRenderSettings& renderSettings,
 
   m_context.ApplyStateBlock();
 }
+
+CRPRendererOpenGLES::~CRPRendererOpenGLES() = default;
 
 void CRPRendererOpenGLES::RenderInternal(uint8_t alpha)
 {
@@ -133,13 +136,15 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
           std::make_shared<SHADER::CShaderTextureGLES>(
               static_cast<unsigned int>(targetSize.Width()),
               static_cast<unsigned int>(targetSize.Height()), GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA,
-              false)};
+              false),
+          // HDR target texture, made when first needed
+          nullptr};
       rbTextures->targetTexture->CreateTexture(); // Create new internal texture
       m_RBTexturesMap.emplace(renderBuffer, rbTextures);
     }
 
     std::shared_ptr<SHADER::CShaderTextureGLESRef> sourceTexture = rbTextures->sourceTexture;
-    std::shared_ptr<SHADER::CShaderTextureGLES> targetTexture = rbTextures->targetTexture;
+    SHADER::CShaderTextureGLES& targetTexture = GetTargetTexture(*rbTextures, targetSize);
 
     GLint filter = GL_NEAREST;
     if (m_shaderPreset->GetPasses().front().filterType == SHADER::FilterType::LINEAR)
@@ -151,11 +156,11 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    if (m_shaderPreset->RenderUpdate(*sourceTexture, *targetTexture,
+    if (m_shaderPreset->RenderUpdate(*sourceTexture, targetTexture,
                                      {m_fullDestWidth, m_fullDestHeight}))
     {
       glActiveTexture(GL_TEXTURE0); // GUI shader samples from texture unit 0
-      glBindTexture(m_textureTarget, targetTexture->GetTextureID());
+      glBindTexture(m_textureTarget, targetTexture.GetTextureID());
     }
     else
     {
@@ -178,6 +183,58 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   }
 
+  DrawFrame(alpha, renderBuffer->GetWidth(), renderBuffer->GetHeight());
+}
+
+SHADER::CShaderTextureGLES& CRPRendererOpenGLES::GetTargetTexture(RenderBufferTextures& textures,
+                                                                  const CSize& size)
+{
+  if (m_hdrPeak == 0)
+    return *textures.targetTexture;
+
+  // More than 8 bits, as the HDR shader raises the brightest values steeply
+  if (!textures.hdrTargetTexture)
+  {
+    textures.hdrTargetTexture = std::make_shared<SHADER::CShaderTextureGLES>(
+        static_cast<unsigned int>(size.Width()), static_cast<unsigned int>(size.Height()),
+#if HAS_GLES >= 3
+        GL_HALF_FLOAT, GL_RGBA16F, GL_RGBA,
+#else
+        GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA,
+#endif
+        false);
+    textures.hdrTargetTexture->CreateTexture();
+  }
+
+  return *textures.hdrTargetTexture;
+}
+
+bool CRPRendererOpenGLES::LoadHdrShader()
+{
+  if (m_hdrShader)
+    return true;
+
+  if (m_hdrShaderFailed)
+    return false;
+
+  std::string defines;
+  if (m_context.UseLimitedColor())
+    defines += "#define KODI_LIMITED_RANGE 1\n";
+
+  auto shader = std::make_unique<CRPHdrShaderGLES>(defines);
+  if (!shader->CompileAndLink())
+  {
+    CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Failed to compile the HDR shader");
+    m_hdrShaderFailed = true;
+    return false;
+  }
+
+  m_hdrShader = std::move(shader);
+  return true;
+}
+
+void CRPRendererOpenGLES::DrawFrame(uint8_t alpha, float width, float height)
+{
   if (alpha < 255)
   {
     glEnable(GL_BLEND);
@@ -186,6 +243,32 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
   else
   {
     glDisable(GL_BLEND);
+  }
+
+  // Setup texture coordinates
+  CRect rect = m_sourceRect;
+  rect.x1 /= width;
+  rect.x2 /= width;
+  rect.y1 /= height;
+  rect.y2 /= height;
+
+  if (m_hdrPeak != 0 && LoadHdrShader())
+  {
+    m_hdrShader->SetLuminance(m_hdrPaperWhite, m_hdrPeak);
+    m_hdrShader->SetQuad(m_rotatedDestCoords[0], m_rotatedDestCoords[1], m_rotatedDestCoords[3],
+                         rect);
+    m_hdrShader->Enable();
+
+    dynamic_cast<CRenderSystemGLES&>(*m_context.Rendering()).BindGUIUnitQuad();
+    const GLint posLoc = m_hdrShader->GetPosLoc();
+    glVertexAttribPointer(posLoc, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(posLoc);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDisableVertexAttribArray(posLoc);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_hdrShader->Disable();
+    return;
   }
 
   // Use GUI shader
@@ -206,12 +289,6 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
               (col[3] / 255.0f));
   glUniform1f(depthLoc, -1.0f);
 
-  // Setup texture coordinates
-  CRect rect = m_sourceRect;
-  rect.x1 /= renderBuffer->GetWidth();
-  rect.x2 /= renderBuffer->GetWidth();
-  rect.y1 /= renderBuffer->GetHeight();
-  rect.y2 /= renderBuffer->GetHeight();
 
   // The destination corners are a rotated rectangle: top left, top right, bottom right, bottom left
   dynamic_cast<CRenderSystemGLES&>(*m_context.Rendering())

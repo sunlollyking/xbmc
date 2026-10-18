@@ -47,6 +47,21 @@ public:
   unsigned int RunaheadFrames() const;
   bool SyncPlaybackToDisplay();
   double SyncToDisplayLimit();
+
+  /*!
+   * \brief Whether a game shown with a video filter goes out in HDR
+   *
+   * Only on a display that accepts HDR. The filter's output is brightened
+   * into the display's headroom, which wins back the light a CRT filter's
+   * scanlines and phosphor mask take away.
+   */
+  bool HdrWithVideoFilters() const;
+
+  //! Luminance, in nits, that white is shown at in HDR
+  unsigned int HdrPaperWhite() const;
+
+  //! Luminance, in nits, that a video filter's brightest light may reach in HDR
+  unsigned int HdrPeakLuminance() const;
   std::string GetRAUsername() const;
   std::string GetRAToken() const;
 
