@@ -182,25 +182,11 @@ void CRenderBezel::ClearWindow(uint8_t* pixels,
     uint8_t* row = pixels + y * pitch;
     for (unsigned int x = static_cast<unsigned int>(window.x1); x < x2; x++)
     {
+      // A select rather than a branch, which noisy glass would keep mispredicting
       uint8_t& alpha = row[x * 4 + ALPHA_BYTE];
-      if (alpha <= glassAlpha)
-        alpha = 0;
+      alpha = alpha <= glassAlpha ? 0 : alpha;
     }
   }
-}
-
-bool CRenderBezel::IsShownInStretchMode(STRETCHMODE stretchMode)
-{
-  switch (stretchMode)
-  {
-    case STRETCHMODE::Stretch16x9:
-    case STRETCHMODE::Fullscreen:
-      return false;
-    default:
-      break;
-  }
-
-  return true;
 }
 
 bool CRenderBezel::FramesGame(const CRect& window,

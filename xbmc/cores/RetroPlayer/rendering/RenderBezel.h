@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "cores/GameSettings.h"
 #include "utils/Geometry.h"
 
 #include <memory>
@@ -103,20 +102,13 @@ public:
                           const CRect& window);
 
   /*!
-   * \brief True if a bezel can be shown in the given stretch mode
-   *
-   * Stretching to 16:9 or to the screen asks for the whole screen, so the
-   * bezel steps aside.
-   */
-  static bool IsShownInStretchMode(STRETCHMODE stretchMode);
-
-  /*!
    * \brief True if the game, drawn inside the window, is framed well enough to
    *        show the bezel
    *
    * The game must fit in the window, cover most of it, and not shrink much to
    * do so. A small window, such as a photo of a cabinet with its screen in the
-   * middle, or a window of the wrong shape for the game, is not shown.
+   * middle, a window of the wrong shape for the game, or a game stretched to
+   * fill the screen, is not shown.
    *
    * \param window The window on screen
    * \param gameInWindow Where the game is drawn inside the window

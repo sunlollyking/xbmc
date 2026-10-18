@@ -208,7 +208,7 @@ void CRPBaseRenderer::ManageRenderArea(const IRenderBuffer& renderBuffer)
 
   // A bezel's window stands in for the screen, so the stretch mode fits the
   // game to the window the way it would otherwise fit it to the screen
-  if (!m_bezelWindow.IsEmpty() && CRenderBezel::IsShownInStretchMode(stretchMode))
+  if (!m_bezelWindow.IsEmpty())
   {
     float bezelPixelRatio = framePixelRatio;
     float bezelZoomAmount = 1.0f;

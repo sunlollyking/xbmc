@@ -109,16 +109,6 @@ TEST(TestRenderBezel, ClearsGlassAndKeepsFrameEdge)
   EXPECT_EQ(255, picture.Alpha(30, 1));
 }
 
-TEST(TestRenderBezel, StepsAsideForWideStretchModes)
-{
-  EXPECT_TRUE(CRenderBezel::IsShownInStretchMode(STRETCHMODE::Normal));
-  EXPECT_TRUE(CRenderBezel::IsShownInStretchMode(STRETCHMODE::Stretch4x3));
-  EXPECT_TRUE(CRenderBezel::IsShownInStretchMode(STRETCHMODE::Integer));
-  EXPECT_TRUE(CRenderBezel::IsShownInStretchMode(STRETCHMODE::Original));
-  EXPECT_FALSE(CRenderBezel::IsShownInStretchMode(STRETCHMODE::Stretch16x9));
-  EXPECT_FALSE(CRenderBezel::IsShownInStretchMode(STRETCHMODE::Fullscreen));
-}
-
 TEST(TestRenderBezel, FramesGameOfWindowShape)
 {
   // A console bezel's 4:3 window on a 1080p screen
@@ -145,6 +135,13 @@ TEST(TestRenderBezel, SkipsWindowOfWrongShape)
   // A game turned on its side, in a window made for it upright
   const CRect window(259, 18, 1661, 1061);
   EXPECT_FALSE(CRenderBezel::FramesGame(window, {569, 18, 1351, 1061}, {555, 0, 1365, 1080}));
+}
+
+TEST(TestRenderBezel, SkipsGameStretchedToScreen)
+{
+  // Stretched to fill a 1080p screen, the game would shrink to fit a 4:3 window
+  const CRect window(259, 18, 1661, 1061);
+  EXPECT_FALSE(CRenderBezel::FramesGame(window, {259, 18, 1661, 1061}, {0, 0, 1920, 1080}));
 }
 
 TEST(TestRenderBezel, SkipsGameLargerThanWindow)
