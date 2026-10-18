@@ -753,7 +753,7 @@ bool CGameClientCheevos::SetAchievementSetEnabled(unsigned int setId, bool enabl
 {
   std::unique_lock lock(m_clientAccess);
 
-  // Left unset by a client older than game API 8.5.0
+  // Left unset by a client older than game API 8.6.0
   if (m_struct.toAddon->RCSetAchievementSetEnabled == nullptr)
     return false;
 

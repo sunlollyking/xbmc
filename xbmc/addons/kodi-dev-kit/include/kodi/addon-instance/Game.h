@@ -1183,7 +1183,7 @@ public:
   ///
   /// @return The error, or @ref GAME_ERROR_NO_ERROR on success
   ///
-  /// @note Added in Game API 8.5.0
+  /// @note Added in Game API 8.6.0
   ///
   virtual GAME_ERROR RCSetAchievementSetEnabled(unsigned int setId, bool enabled)
   {
@@ -1505,13 +1505,13 @@ public:
   /// @param[in] data The sets and the achievements' details
   ///
   /// @remarks Only called from the add-on itself, after RCOnGameLoaded(). Does
-  ///          nothing with a version of Kodi older than Game API 8.5.0.
+  ///          nothing with a version of Kodi older than Game API 8.6.0.
   ///
-  /// @note Added in Game API 8.5.0
+  /// @note Added in Game API 8.6.0
   ///
   void RCOnAchievementSets(const game_rc_achievement_sets& data)
   {
-    if (IsInstanceAPIVersionAtLeast(8, 5, 0))
+    if (IsInstanceAPIVersionAtLeast(8, 6, 0))
       m_instanceData->toKodi->RCOnAchievementSets(m_instanceData->toKodi->kodiInstance, &data);
   }
 
@@ -1782,7 +1782,7 @@ private:
     // Added in 8.5.0. An older Kodi's table ends before this entry.
     if (IsInstanceAPIVersionAtLeast(8, 5, 0))
       instance->game->toAddon->RunFrameSpeculative = ADDON_RunFrameSpeculative;
-    if (IsInstanceAPIVersionAtLeast(8, 5, 0))
+    if (IsInstanceAPIVersionAtLeast(8, 6, 0))
       instance->game->toAddon->RCSetAchievementSetEnabled = ADDON_RCSetAchievementSetEnabled;
 
     m_instanceData = instance->game;
