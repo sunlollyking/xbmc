@@ -323,9 +323,6 @@ void CDialogGameAchievements::OnInitWindow()
   m_viewControl->SetCurrentView(DEFAULT_VIEW_LIST);
   RefreshList();
 
-  if (!gameSettings.AchievementsHardcoreOffered())
-    SET_CONTROL_HIDDEN(CONTROL_CHEEVOS_HARDCORE);
-
   CGUIDialog::OnInitWindow();
 }
 
@@ -514,6 +511,9 @@ void CDialogGameAchievements::RefreshList()
       item->SetProperty(ACHIEVEMENT_EARNED, true);
     else if (achievement.type == AchievementType::MISSABLE)
       item->SetProperty(ACHIEVEMENT_MISSABLE, true);
+
+    if (achievement.earnedHardcore)
+      item->SetProperty(ACHIEVEMENT_HARDCORE, true);
 
     // Earned or not, so the player can see what beating the game took
     if (achievement.type == AchievementType::PROGRESSION)

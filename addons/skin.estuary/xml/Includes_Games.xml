@@ -1029,6 +1029,15 @@
 	<include name="GameAchievementItem">
 		<param name="scroll" default="false" />
 		<definition>
+			<!-- RetroAchievements frames a badge earned in hardcore in gold -->
+			<control type="image">
+				<left>16</left>
+				<top>16</top>
+				<width>84</width>
+				<height>84</height>
+				<texture colordiffuse="FFFFF503">colors/white.png</texture>
+				<visible>!String.IsEmpty(ListItem.Property(achievement.hardcore))</visible>
+			</control>
 			<control type="image">
 				<left>18</left>
 				<top>18</top>

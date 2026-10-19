@@ -98,6 +98,15 @@ CDateTime UnlockTime(int64_t unixTime)
 
   return CDateTime::FromUTCDateTime(static_cast<time_t>(unixTime));
 }
+
+/*!
+ * \brief The loaded game's icon, which leaderboard notifications carry so they
+ *        show the game they belong to
+ */
+std::string GameIcon()
+{
+  return CServiceBroker::GetGameServices().AchievementRuntime().GetState().gameIconUrl;
+}
 } // namespace
 
 using namespace KODI;
@@ -163,6 +172,7 @@ void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
   AchievementState achievementState;
   achievementState.gameTitle = gameTitle;
   achievementState.gameId = data.game_id;
+  achievementState.gameIconUrl = SafeString(data.icon_url);
   achievementState.loaded = true;
   achievementState.achievements.reserve(std::min(achievementCount, MAX_ACHIEVEMENTS));
 
@@ -179,6 +189,7 @@ void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
     info.rarity = std::clamp(achievement.rarity, 0.0f, 100.0f);
     info.points = achievement.points;
     info.earned = achievement.unlock_state != GAME_RC_UNLOCK_STATE_LOCKED;
+    info.earnedHardcore = achievement.unlock_state == GAME_RC_UNLOCK_STATE_HARDCORE;
     if (info.earned)
       info.unlockedDate = UnlockTime(achievement.unlock_time);
 
@@ -246,7 +257,8 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   const CDateTime unlockedDate = CDateTime::GetCurrentDateTime();
 
   bool newlyEarned = false;
-  const AchievementState state = runtime.MarkEarned(data.id, unlockedDate, newlyEarned);
+  const AchievementState state =
+      runtime.MarkEarned(data.id, unlockedDate, data.hardcore, newlyEarned);
 
   // Encore re-arms achievements already earned, so a re-trigger is announced
   // even though the runtime has nothing left to change
@@ -582,8 +594,8 @@ void CGameClientCheevos::OnLeaderboardStarted(const game_rc_leaderboard& data)
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" started", data.id, title);
 
   // "Leaderboard attempt started"
-  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35354), title,
-                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+  CGUIDialogKaiToast::QueueNotification(GameIcon(), Localize(35354), title, TOAST_DISPLAY_TIME_MS,
+                                        false, TOAST_MESSAGE_TIME_MS);
 }
 
 void CGameClientCheevos::OnLeaderboardFailed(const game_rc_leaderboard& data)
@@ -593,8 +605,8 @@ void CGameClientCheevos::OnLeaderboardFailed(const game_rc_leaderboard& data)
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" failed", data.id, title);
 
   // "Leaderboard attempt failed"
-  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35355), title,
-                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+  CGUIDialogKaiToast::QueueNotification(GameIcon(), Localize(35355), title, TOAST_DISPLAY_TIME_MS,
+                                        false, TOAST_MESSAGE_TIME_MS);
 }
 
 void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
@@ -610,8 +622,8 @@ void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
       value.empty() ? title : StringUtils::Format("{}  ·  {}", value, title);
 
   // "Leaderboard attempt submitted"
-  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35356), message,
-                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+  CGUIDialogKaiToast::QueueNotification(GameIcon(), Localize(35356), message, TOAST_DISPLAY_TIME_MS,
+                                        false, TOAST_MESSAGE_TIME_MS);
 }
 
 void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show)
@@ -674,8 +686,8 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
     message += StringUtils::Format("  ·  {}", StringUtils::Format(Localize(35358), best));
 
   // "Leaderboard attempt submitted"
-  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35356), message,
-                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+  CGUIDialogKaiToast::QueueNotification(GameIcon(), Localize(35356), message, TOAST_DISPLAY_TIME_MS,
+                                        false, TOAST_MESSAGE_TIME_MS);
 }
 
 void CGameClientCheevos::OnReset()
