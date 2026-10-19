@@ -563,7 +563,9 @@ void CGameInfoTag::Serialize(CVariant& value) const
     CVariant entry;
     entry["releaseid"] = release.id;
     entry["title"] = release.title;
-    entry["regions"] = release.regions;
+    entry["regions"] = CVariant(CVariant::VariantTypeArray);
+    for (const GameRegion& region : release.regions)
+      entry["regions"].push_back(region.ToString());
     entry["languages"] = release.languages;
     entry["revision"] = release.revision;
     entry["status"] = std::string(CGameLibraryTypes::ToString(release.status));

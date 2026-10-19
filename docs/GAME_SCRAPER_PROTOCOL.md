@@ -38,7 +38,8 @@ Query parameters (absent when unknown):
 | `serial` | disc serial normalised to upper-case letters and digits only (`SLUS00300`, `T14402M`) |
 | `rahash` | the RetroAchievements hash, when the platform has one |
 | `size` | the ROM data size in bytes |
-| `regions` | comma list of regions parsed from the name, in full (`USA,Europe`) |
+| `regions` | comma list of regions parsed from the name (`US,150`) |
+| `preferredregions` | comma list of the player's regions, best first (`GB,150,World,US,JP`) |
 | `languages` | comma list of ISO 639-1 codes parsed from the name |
 | `year` | a year parsed from the name (TOSEC) |
 
@@ -57,7 +58,7 @@ candidate's title. Property `gamelibrary.candidate` holds:
 `subtitle`, `regions`, `provider` and `thumb` are optional and exist for one
 reason: when several candidates share a title, a person has to be able to tell
 them apart in the selection dialog. Send the catalogue's own name for the entry
-as `subtitle`, the regions it covers written in full, and an image if one is
+as `subtitle`, the regions it covers, and an image if one is
 free to give.
 
 A candidate may also carry the property `gamelibrary.details` holding the
@@ -132,7 +133,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
      "revision": "", "status": "retail", "licence": "licensed", "serial": "",
      "releasedate": "", "crc32": "24ab4c3a", "md5": "", "sha1": "", "size": 1048576}
   ],
-  "art": {"boxfront": [{"url": "https://...png", "region": "USA"}],
+  "art": {"boxfront": [{"url": "https://...png", "region": "US"}],
           "titlescreen": [{"url": "https://...png"}],
           "screenshot": [{"url": "https://...png"}]},
   "achievements": {"total": 82, "points": 1045},
@@ -145,12 +146,13 @@ Every key is optional except `version` and `title`. Words for `category`,
 `status` and `licence` are the ones in `GameLibraryTypes.cpp`:
 category `retail|hack|homebrew|demo|bios|application`; status
 `retail|beta|proto|sample|demo|alpha|kiosk|debug|program`; licence
-`licensed|unlicensed|aftermarket|homebrew|pirate`. Regions are written in
-full, as No-Intro writes them: `USA`, `Europe`, `Japan`, `World`, `Asia`,
-`Australia`, `Brazil`, `Canada`, `China`, `France`, `Germany`, `Italy`,
-`Korea`, `Netherlands`, `Spain`, `Sweden`, `United Kingdom`, `Unknown` and
-the rest. A provider that speaks region codes translates them at its own
-edge. Art type names are Kodi's: `boxfront boxback boxspine boxfull box3d cart
+`licensed|unlicensed|aftermarket|homebrew|pirate`. A region is a BCP 47
+region subtag: a country's ISO 3166-1 code (`US`, `JP`, `GB`) or a UN M.49
+area (`150` Europe, `142` Asia, `419` Latin America). A market no territory
+names exactly is sent as No-Intro writes it: `World` for a release sold in
+Japan, the USA and Europe alike, `Scandinavia`. A region the source doesn't
+know is left out. A provider that names regions its own way translates them
+at its own edge. Art type names are Kodi's: `boxfront boxback boxspine boxfull box3d cart
 clearlogo marquee banner screenshot titlescreen fanart icon mix flyer map
 bezel`.
 

@@ -18,10 +18,11 @@ using namespace GAME;
 
 namespace
 {
-GameRelease Release(std::vector<std::string> regions, std::string revision = "")
+GameRelease Release(const std::vector<std::string>& regions, std::string revision = "")
 {
   GameRelease release;
-  release.regions = std::move(regions);
+  for (const std::string& region : regions)
+    release.regions.emplace_back(GameRegion::FromString(region));
   release.revision = std::move(revision);
   release.files.emplace_back();
   return release;
@@ -29,87 +30,85 @@ GameRelease Release(std::vector<std::string> regions, std::string revision = "")
 
 CReleasePolicy PolicyFor(const std::string& region)
 {
-  return CReleasePolicy(CReleasePolicy::RegionPriority(region), true, true, true);
+  return CReleasePolicy(CReleasePolicy::RegionPriority(GameRegion::FromString(region)), true, true,
+                        true);
+}
+
+std::vector<std::string> PriorityFor(const std::string& region)
+{
+  std::vector<std::string> codes;
+  for (const GameRegion& preferred : CReleasePolicy::RegionPriority(GameRegion::FromString(region)))
+    codes.emplace_back(preferred.ToString());
+  return codes;
 }
 } // namespace
 
 TEST(TestReleasePolicy, PutsThePlayersRegionFirst)
 {
-  EXPECT_EQ(CReleasePolicy::RegionPriority("United Kingdom"),
-            (std::vector<std::string>{"United Kingdom", "Europe", "World", "USA", "Japan"}));
-  EXPECT_EQ(CReleasePolicy::RegionPriority("Japan"),
-            (std::vector<std::string>{"Japan", "World", "Europe", "USA"}));
-  EXPECT_EQ(CReleasePolicy::RegionPriority("China"),
-            (std::vector<std::string>{"China", "Asia", "World", "Europe", "USA", "Japan"}));
-  EXPECT_EQ(CReleasePolicy::RegionPriority("Canada"),
-            (std::vector<std::string>{"Canada", "USA", "World", "Europe", "Japan"}));
+  EXPECT_EQ(PriorityFor("GB"), (std::vector<std::string>{"GB", "150", "World", "US", "JP"}));
+  EXPECT_EQ(PriorityFor("JP"), (std::vector<std::string>{"JP", "World", "150", "US"}));
+  EXPECT_EQ(PriorityFor("CN"), (std::vector<std::string>{"CN", "142", "World", "150", "US", "JP"}));
+  EXPECT_EQ(PriorityFor("CA"), (std::vector<std::string>{"CA", "US", "World", "150", "JP"}));
 }
 
 TEST(TestReleasePolicy, PlaysTheReleaseFromThePlayersRegion)
 {
-  const std::vector<GameRelease> releases{Release({"USA"}), Release({"Europe"}),
-                                          Release({"Japan"})};
-  EXPECT_EQ(PolicyFor("United Kingdom").PickDefault(releases), 1);
-  EXPECT_EQ(PolicyFor("Japan").PickDefault(releases), 2);
-  EXPECT_EQ(PolicyFor("Brazil").PickDefault(releases), 0);
+  const std::vector<GameRelease> releases{Release({"US"}), Release({"150"}), Release({"JP"})};
+  EXPECT_EQ(PolicyFor("GB").PickDefault(releases), 1);
+  EXPECT_EQ(PolicyFor("JP").PickDefault(releases), 2);
+  EXPECT_EQ(PolicyFor("BR").PickDefault(releases), 0);
 }
 
 TEST(TestReleasePolicy, PlaysAWorldReleaseBeforeAnotherRegions)
 {
-  const std::vector<GameRelease> releases{Release({"USA"}), Release({"World"})};
-  EXPECT_EQ(PolicyFor("Europe").PickDefault(releases), 1);
+  const std::vector<GameRelease> releases{Release({"US"}), Release({"World"})};
+  EXPECT_EQ(PolicyFor("150").PickDefault(releases), 1);
 }
 
 TEST(TestReleasePolicy, PrefersAFinishedRelease)
 {
-  std::vector<GameRelease> releases{Release({"Europe"}), Release({"USA"})};
+  std::vector<GameRelease> releases{Release({"150"}), Release({"US"})};
   releases[0].status = ReleaseStatus::BETA;
-  EXPECT_EQ(PolicyFor("Europe").PickDefault(releases), 1);
+  EXPECT_EQ(PolicyFor("150").PickDefault(releases), 1);
 
-  const CReleasePolicy regionFirst(CReleasePolicy::RegionPriority("Europe"), false, true, true);
+  const CReleasePolicy regionFirst(CReleasePolicy::RegionPriority(GameRegion::FromString("150")),
+                                   false, true, true);
   EXPECT_EQ(regionFirst.PickDefault(releases), 0);
 }
 
 TEST(TestReleasePolicy, PrefersTheNewestRevision)
 {
-  EXPECT_EQ(PolicyFor("Europe").PickDefault(
-                {Release({"Europe"}), Release({"Europe"}, "Rev 2"), Release({"Europe"}, "Rev 1")}),
+  EXPECT_EQ(PolicyFor("150").PickDefault(
+                {Release({"150"}), Release({"150"}, "Rev 2"), Release({"150"}, "Rev 1")}),
             1);
-  EXPECT_EQ(
-      PolicyFor("Europe").PickDefault({Release({"Europe"}, "v1.1"), Release({"Europe"}, "v1.10")}),
-      1);
+  EXPECT_EQ(PolicyFor("150").PickDefault({Release({"150"}, "v1.1"), Release({"150"}, "v1.10")}), 1);
   // Each part of a version is compared as a number
-  EXPECT_EQ(
-      PolicyFor("Europe").PickDefault({Release({"Europe"}, "v2.0"), Release({"Europe"}, "v1.10")}),
-      0);
-  EXPECT_EQ(
-      PolicyFor("Europe").PickDefault({Release({"Europe"}, "v1.9"), Release({"Europe"}, "v1.10")}),
-      1);
+  EXPECT_EQ(PolicyFor("150").PickDefault({Release({"150"}, "v2.0"), Release({"150"}, "v1.10")}), 0);
+  EXPECT_EQ(PolicyFor("150").PickDefault({Release({"150"}, "v1.9"), Release({"150"}, "v1.10")}), 1);
   // Letters count by their place in the alphabet, whichever they are
-  EXPECT_EQ(
-      PolicyFor("Europe").PickDefault({Release({"Europe"}, "Rev A"), Release({"Europe"}, "Rev E"),
-                                       Release({"Europe"}, "Rev B")}),
-      1);
+  EXPECT_EQ(PolicyFor("150").PickDefault(
+                {Release({"150"}, "Rev A"), Release({"150"}, "Rev E"), Release({"150"}, "Rev B")}),
+            1);
 }
 
 TEST(TestReleasePolicy, PrefersAVerifiedDump)
 {
-  std::vector<GameRelease> releases{Release({"Europe"}), Release({"Europe"})};
+  std::vector<GameRelease> releases{Release({"150"}), Release({"150"})};
   releases[1].dump = DumpStatus::VERIFIED;
-  EXPECT_EQ(PolicyFor("Europe").PickDefault(releases), 1);
+  EXPECT_EQ(PolicyFor("150").PickDefault(releases), 1);
 }
 
 TEST(TestReleasePolicy, NeverPlaysABadDumpWhenThereIsAnother)
 {
-  std::vector<GameRelease> releases{Release({"Europe"}, "Rev 1"), Release({"Japan"})};
+  std::vector<GameRelease> releases{Release({"150"}, "Rev 1"), Release({"JP"})};
   releases[0].dump = DumpStatus::BAD;
-  EXPECT_EQ(PolicyFor("Europe").PickDefault(releases), 1);
+  EXPECT_EQ(PolicyFor("150").PickDefault(releases), 1);
 }
 
 TEST(TestReleasePolicy, PlaysOnlyAReleaseWithFiles)
 {
-  std::vector<GameRelease> releases{Release({"Europe"}), Release({"USA"})};
+  std::vector<GameRelease> releases{Release({"150"}), Release({"US"})};
   releases[0].files.clear();
-  EXPECT_EQ(PolicyFor("Europe").PickDefault(releases), 1);
-  EXPECT_EQ(PolicyFor("Europe").PickDefault({}), -1);
+  EXPECT_EQ(PolicyFor("150").PickDefault(releases), 1);
+  EXPECT_EQ(PolicyFor("150").PickDefault({}), -1);
 }

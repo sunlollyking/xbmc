@@ -78,6 +78,15 @@ std::string DisplayTitle(const CGameInfoTag& game, const dbiplus::sql_record* re
   return game.GetTitle();
 }
 
+//! The regions a release was sold in, by the names a listing shows
+std::string RegionNames(const GameRelease& release, const char* separator)
+{
+  std::vector<std::string> names;
+  for (const GameRegion& region : release.regions)
+    names.emplace_back(CGameNameParser::RegionName(region));
+  return StringUtils::Join(names, separator);
+}
+
 std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& release)
 {
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
@@ -108,7 +117,7 @@ std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& releas
   if (!release.revision.empty())
     parts.emplace_back(release.revision);
   if (!release.regions.empty())
-    parts.emplace_back(StringUtils::Join(release.regions, ", "));
+    parts.emplace_back(RegionNames(release, ", "));
   if (!release.languages.empty())
     parts.emplace_back(StringUtils::ToUpper(StringUtils::Join(release.languages, ", ")));
 
@@ -583,11 +592,12 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
         break;
       case GameDbNode::REGIONS:
         numericValue = false;
-        sql = "SELECT region.code AS id, region.code AS label, COUNT(DISTINCT game_view.idGame) "
-              "AS n FROM region JOIN release_region ON release_region.idRegion = region.idRegion "
-              "JOIN gamerelease ON gamerelease.idRelease = release_region.idRelease JOIN "
-              "game_view ON game_view.idGame = gamerelease.idGame " +
-              join + where + " GROUP BY region.code ORDER BY region.code";
+        sql = "SELECT region.code AS id, COALESCE(NULLIF(region.name, ''), region.code) AS label, "
+              "COUNT(DISTINCT game_view.idGame) AS n FROM region JOIN release_region ON "
+              "release_region.idRegion = region.idRegion JOIN gamerelease ON "
+              "gamerelease.idRelease = release_region.idRelease JOIN game_view ON "
+              "game_view.idGame = gamerelease.idGame " +
+              join + where + " GROUP BY region.code, region.name ORDER BY label";
         break;
       case GameDbNode::AGERATINGS:
         sql = "SELECT age AS id, age AS label, COUNT(*) AS n FROM (SELECT DISTINCT "
@@ -674,7 +684,7 @@ bool CGameDatabase::GetReleasesNav(const std::string& baseDir, CFileItemList& it
     const auto item = std::make_shared<CFileItem>(ReleaseLabel(game.GetTitle(), release));
     CGameInfoTag tag = game;
     tag.SetTitle(release.title.empty() ? game.GetTitle() : release.title);
-    tag.SetRegion(StringUtils::Join(release.regions, ","));
+    tag.SetRegion(RegionNames(release, ","));
     tag.SetURL(release.files.front().path);
     *item->GetGameInfoTag() = tag;
     item->SetPath(release.files.front().path);

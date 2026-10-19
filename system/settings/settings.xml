@@ -1834,21 +1834,21 @@
       <group id="2" label="35543">
         <setting id="gamelibrary.region" type="string" label="35552" help="35553">
           <level>0</level>
-          <default>Europe</default>
+          <default>150</default>
           <constraints>
             <options>
-              <option label="35738">Europe</option>
-              <option label="35739">United Kingdom</option>
-              <option label="35740">Germany</option>
-              <option label="35741">France</option>
-              <option label="35742">Spain</option>
-              <option label="35743">Italy</option>
-              <option label="35744">Australia</option>
-              <option label="35745">USA</option>
-              <option label="35746">Canada</option>
-              <option label="35747">Brazil</option>
-              <option label="35748">Japan</option>
-              <option label="35749">Korea</option>
+              <option label="35738">150</option>
+              <option label="35739">GB</option>
+              <option label="35740">DE</option>
+              <option label="35741">FR</option>
+              <option label="35742">ES</option>
+              <option label="35743">IT</option>
+              <option label="35744">AU</option>
+              <option label="35745">US</option>
+              <option label="35746">CA</option>
+              <option label="35747">BR</option>
+              <option label="35748">JP</option>
+              <option label="35749">KR</option>
             </options>
           </constraints>
           <control type="list" format="string" />

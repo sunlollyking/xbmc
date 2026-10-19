@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "language/Territory.h"
+
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -33,7 +35,7 @@ enum class TitleStyle
   ON_DISK = 2,
 };
 constexpr const char* SETTING_GAMELIBRARY_REGION = "gamelibrary.region";
-constexpr const char* SETTING_GAMELIBRARY_REGION_DEFAULT = "Europe";
+constexpr const char* SETTING_GAMELIBRARY_REGION_DEFAULT = "150";
 constexpr const char* SETTING_GAMELIBRARY_AGERATINGBOARD = "gamelibrary.ageratingboard";
 //! The boards after the preferred one, in the order their classifications are shown
 constexpr const char* AGERATINGBOARDS_ORDER = "PEGI,BBFC,ESRB,USK,CERO,ACB,GRAC,CLASS_IND";
@@ -149,6 +151,46 @@ enum class MatchMethod
   GAMELIST,
   NAME,
   MANUAL,
+};
+
+/*!
+ * \ingroup games
+ * \brief Where a release was sold, as its file name gives it
+ *
+ * A country or area is a territory: "US", or "150" for Europe as UN M.49
+ * codes it. A market no territory names exactly keeps the convention's own
+ * word: No-Intro's "World" is the three big release markets, not every
+ * country, and its "Scandinavia" isn't Northern Europe.
+ */
+struct GameRegion
+{
+  LANGUAGE::CTerritory territory;
+  std::string market;
+
+  //! \brief A region from a territory's code, or a market's name when territory is empty
+  static GameRegion Make(std::string_view territory, std::string_view market = {})
+  {
+    return {LANGUAGE::CTerritory::FromCode(territory), std::string(market)};
+  }
+
+  //! \brief The territory's code, or the market's name
+  std::string ToString() const
+  {
+    return territory.ToString().empty() ? market : territory.ToString();
+  }
+
+  //! \brief The region ToString() gave
+  static GameRegion FromString(std::string_view text)
+  {
+    GameRegion region{LANGUAGE::CTerritory::FromCode(text), {}};
+    if (region.territory.ToString().empty())
+      region.market = text;
+    return region;
+  }
+
+  bool IsEmpty() const { return territory.ToString().empty() && market.empty(); }
+
+  bool operator==(const GameRegion& other) const = default;
 };
 
 /*!
@@ -297,7 +339,7 @@ struct GameRelease
 {
   int id{-1};
   std::string title; // the title as this release names it
-  std::vector<std::string> regions; // full names, most specific first: "USA", "Europe"
+  std::vector<GameRegion> regions; // most specific first
   std::vector<std::string> languages; // lower-case ISO 639-1 codes
   std::string revision; // "Rev 1", "v1.1", empty for the first release
   ReleaseStatus status{ReleaseStatus::RETAIL};
