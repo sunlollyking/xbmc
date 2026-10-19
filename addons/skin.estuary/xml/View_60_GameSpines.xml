@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<!--
+		A shelf of spines: far more games fit across the screen than covers do,
+		and the one in hand slides out to show its box above the shelf.
+	-->
+	<include name="GameSpine">
+		<param name="dim" default="FFB4B4B4" />
+		<definition>
+			<control type="image">
+				<left>3</left>
+				<top>40</top>
+				<width>60</width>
+				<height>500</height>
+				<aspectratio align="center" aligny="bottom">keep</aspectratio>
+				<fadetime>200</fadetime>
+				<colordiffuse>$PARAM[dim]</colordiffuse>
+				<texture background="true">$INFO[ListItem.Art(boxspine)]</texture>
+				<visible>!String.IsEmpty(ListItem.Art(boxspine))</visible>
+			</control>
+			<!-- A game with no spine still gets one, with its title down it -->
+			<control type="group">
+				<visible>String.IsEmpty(ListItem.Art(boxspine)) + !ListItem.IsParentFolder</visible>
+				<control type="image">
+					<left>6</left>
+					<top>120</top>
+					<width>54</width>
+					<height>420</height>
+					<texture border="2">colors/white.png</texture>
+					<colordiffuse>FF30343C</colordiffuse>
+				</control>
+				<control type="label">
+					<left>48</left>
+					<top>136</top>
+					<width>388</width>
+					<height>30</height>
+					<angle>270</angle>
+					<font>font12</font>
+					<textcolor>$PARAM[dim]</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</control>
+			<control type="image">
+				<left>6</left>
+				<top>486</top>
+				<width>54</width>
+				<height>54</height>
+				<colordiffuse>$PARAM[dim]</colordiffuse>
+				<texture>DefaultFolderBackSquare.png</texture>
+				<visible>ListItem.IsParentFolder</visible>
+			</control>
+		</definition>
+	</include>
+
+	<include name="View_60_GameSpines">
+		<control type="group">
+			<visible>Control.IsVisible(60)</visible>
+			<control type="image">
+				<left>0</left>
+				<right>0</right>
+				<top>0</top>
+				<bottom>0</bottom>
+				<aspectratio align="center" aligny="center">scale</aspectratio>
+				<fadetime>400</fadetime>
+				<texture background="true">$VAR[GameBackdropVar]</texture>
+			</control>
+			<control type="image">
+				<left>0</left>
+				<right>0</right>
+				<top>0</top>
+				<bottom>0</bottom>
+				<texture>colors/black.png</texture>
+				<colordiffuse>B4FFFFFF</colordiffuse>
+			</control>
+
+			<control type="group">
+				<left>80</left>
+				<top>110</top>
+				<control type="image">
+					<width>760</width>
+					<height>140</height>
+					<aspectratio align="left" aligny="center">keep</aspectratio>
+					<fadetime>300</fadetime>
+					<texture background="true">$INFO[ListItem.Art(clearlogo)]</texture>
+					<visible>!String.IsEmpty(ListItem.Art(clearlogo))</visible>
+				</control>
+				<control type="label">
+					<width>1240</width>
+					<height>140</height>
+					<aligny>center</aligny>
+					<font>font45_title</font>
+					<label>$INFO[ListItem.Title]</label>
+					<shadowcolor>text_shadow</shadowcolor>
+					<visible>String.IsEmpty(ListItem.Art(clearlogo))</visible>
+				</control>
+				<control type="label">
+					<top>150</top>
+					<width>1240</width>
+					<height>36</height>
+					<font>font13</font>
+					<textcolor>grey</textcolor>
+					<label>$VAR[GameFactsLineVar]</label>
+					<shadowcolor>text_shadow</shadowcolor>
+				</control>
+				<control type="textbox">
+					<top>205</top>
+					<width>1100</width>
+					<height>160</height>
+					<font>font12</font>
+					<label>$INFO[ListItem.Plot]</label>
+					<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
+				</control>
+			</control>
+
+			<control type="image">
+				<right>80</right>
+				<top>70</top>
+				<width>420</width>
+				<height>410</height>
+				<aspectratio align="right" aligny="bottom">keep</aspectratio>
+				<fadetime>300</fadetime>
+				<texture background="true">$VAR[GameSpinesBoxVar]</texture>
+				<animation effect="slide" start="0,40" end="0,0" time="300" tween="cubic" easing="out">Visible</animation>
+			</control>
+
+			<!-- The shelf the spines stand on -->
+			<control type="image">
+				<left>40</left>
+				<right>40</right>
+				<top>1010</top>
+				<height>12</height>
+				<texture>colors/white.png</texture>
+				<colordiffuse>30FFFFFF</colordiffuse>
+			</control>
+
+			<control type="fixedlist" id="60">
+				<visible>Container.Content(games) | Container.Content(releases)</visible>
+				<left>60</left>
+				<right>60</right>
+				<top>470</top>
+				<height>560</height>
+				<orientation>horizontal</orientation>
+				<movement>12</movement>
+				<focusposition>12</focusposition>
+				<scrolltime tween="cubic" easing="out">300</scrolltime>
+				<onleft>60</onleft>
+				<onright>60</onright>
+				<onup>9000</onup>
+				<ondown>60</ondown>
+				<viewtype label="$LOCALIZE[31624]">bigwrap</viewtype>
+				<itemlayout width="66" height="560">
+					<include content="GameSpine" />
+				</itemlayout>
+				<focusedlayout width="66" height="560">
+					<control type="group">
+						<animation effect="slide" end="0,-40" time="200" tween="cubic" easing="out" condition="Control.HasFocus(60)">Conditional</animation>
+						<include content="GameSpine">
+							<param name="dim" value="FFFFFFFF" />
+						</include>
+						<control type="image">
+							<left>3</left>
+							<top>548</top>
+							<width>60</width>
+							<height>6</height>
+							<texture>colors/white.png</texture>
+							<colordiffuse>button_focus</colordiffuse>
+							<visible>Control.HasFocus(60)</visible>
+						</control>
+					</control>
+				</focusedlayout>
+			</control>
+		</control>
+	</include>
+</includes>

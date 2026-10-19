@@ -1025,3 +1025,8 @@ msgctxt "#31623"
 msgid "Machines"
 msgstr ""
 
+#. Name of the game view showing a shelf of box spines
+msgctxt "#31624"
+msgid "Spines"
+msgstr ""
+
