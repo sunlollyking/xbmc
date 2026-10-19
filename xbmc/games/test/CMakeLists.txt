@@ -1,4 +1,5 @@
 set(SOURCES TestGameUtils.cpp)
+            TestGameThumbLoader.cpp
             TestGameUtils.cpp
             TestGameVideoSettings.cpp)
 set(HEADERS)

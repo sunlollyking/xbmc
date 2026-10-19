@@ -166,6 +166,7 @@ public:
   static void DeleteVideoDatabaseDirectoryCache();
   static std::string MusicPlaylistsLocation();
   static std::string VideoPlaylistsLocation();
+  static std::string GamePlaylistsLocation();
 
   //! \brief The path listing the playlists of \p section: special://musicplaylists/ or
   //! special://videoplaylists/. Empty for a section without playlists of its own.
