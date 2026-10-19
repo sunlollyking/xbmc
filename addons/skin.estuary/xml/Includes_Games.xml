@@ -1197,7 +1197,8 @@
 
 			<include content="GameIndicator">
 				<param name="condition" value="!String.IsEmpty(RetroPlayer.LeaderboardTracker)" />
-				<param name="title" value="RetroPlayer.LeaderboardTracker" />
+				<param name="title" value="RetroPlayer.LeaderboardTrackerTitle" />
+				<param name="detail" value="RetroPlayer.LeaderboardTracker" />
 				<param name="height" value="56" />
 			</include>
 		</control>
@@ -2286,7 +2287,7 @@
 					<shadowcolor>black</shadowcolor>
 					<label>$INFO[$PARAM[title]]</label>
 					<scroll>true</scroll>
-					<scrollsuffix>   </scrollsuffix>
+					<scrollsuffix> • </scrollsuffix>
 				</control>
 				<control type="label">
 					<description>How far along, where that is counted</description>

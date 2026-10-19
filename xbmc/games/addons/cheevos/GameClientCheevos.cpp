@@ -598,6 +598,9 @@ void CGameClientCheevos::OnLeaderboardStarted(const game_rc_leaderboard& data)
 {
   const std::string title = SafeString(data.title);
 
+  CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardAttempt(data.id, title,
+                                                                               true);
+
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" started", data.id, title);
 
   // "Leaderboard attempt started"
@@ -609,6 +612,8 @@ void CGameClientCheevos::OnLeaderboardFailed(const game_rc_leaderboard& data)
 {
   const std::string title = SafeString(data.title);
 
+  CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardAttempt(data.id, {}, false);
+
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" failed", data.id, title);
 
   // "Leaderboard attempt failed"
@@ -619,6 +624,8 @@ void CGameClientCheevos::OnLeaderboardFailed(const game_rc_leaderboard& data)
 void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
 {
   const std::string title = SafeString(data.title);
+
+  CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardAttempt(data.id, {}, false);
   const std::string value = SafeString(data.value);
 
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" submitted {}", data.id, title,
