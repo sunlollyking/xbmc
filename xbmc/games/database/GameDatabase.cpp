@@ -9,6 +9,9 @@
 #include "GameDatabase.h"
 
 #include "DatabaseTypes.h"
+#include "dbwrappers/dataset.h"
+#include "utils/log.h"
+#include <chrono>
 
 using namespace KODI;
 using namespace GAME;

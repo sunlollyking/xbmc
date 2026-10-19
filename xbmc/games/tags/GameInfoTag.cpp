@@ -9,8 +9,11 @@
 #include "GameInfoTag.h"
 
 #include "utils/Archive.h"
+#include "utils/StringUtils.h"
 #include "utils/Variant.h"
+#include "utils/XMLUtils.h"
 
+#include <algorithm>
 #include <string>
 
 using namespace KODI;

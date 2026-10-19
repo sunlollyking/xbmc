@@ -10,6 +10,7 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "filesystem/Directory.h"
+#include "games/tags/GameInfoTag.h"
 #include "platform/Filesystem.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
