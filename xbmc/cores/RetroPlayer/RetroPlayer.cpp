@@ -297,6 +297,14 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
 
       if (!bStandalone)
       {
+        if (GAME::CGameDatabase db; db.Open())
+        {
+          GAME::PlatformInfo platform;
+          const int idPlatform = db.GetPlatformIdForGame(fileCopy.GetPath());
+          if (idPlatform > 0 && db.GetPlatform(idPlatform, platform))
+            m_gameClient->Input().UsePlatformPorts(platform.slug);
+        }
+
         std::string redactedPath = CURL::GetRedacted(fileCopy.GetDynPath());
         CLog::Log(LOGINFO, "RetroPlayer[PLAYER]: Opening: {}", redactedPath);
         bSuccess = m_gameClient->OpenFile(fileCopy, *m_streamManager, m_input.get());

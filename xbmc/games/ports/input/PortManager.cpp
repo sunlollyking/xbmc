@@ -9,6 +9,7 @@
 #include "PortManager.h"
 
 #include "URL.h"
+#include "Util.h"
 #include "games/controllers/Controller.h"
 #include "games/controllers/types/ControllerHub.h"
 #include "games/controllers/types/ControllerNode.h"
@@ -44,6 +45,7 @@ CPortManager::~CPortManager() = default;
 
 void CPortManager::Initialize(const std::string& profilePath)
 {
+  m_profilePath = profilePath;
   m_xmlPath = URIUtils::AddFileToFolder(profilePath, PORT_XML_FILE);
 }
 
@@ -55,6 +57,7 @@ void CPortManager::Deinitialize()
   m_saveFutures.clear();
 
   m_controllerTree.Clear();
+  m_profilePath.clear();
   m_xmlPath.clear();
 }
 
@@ -93,6 +96,21 @@ void CPortManager::LoadXML()
   DeserializePorts(pRootElement, m_controllerTree.GetPorts());
 }
 
+void CPortManager::UsePlatform(const std::string& platform, const CControllerTree& defaults)
+{
+  if (platform.empty() || m_profilePath.empty())
+    return;
+
+  m_xmlPath = URIUtils::AddFileToFolder(
+      m_profilePath,
+      CUtil::MakeLegalFileName("ports." + platform + ".xml", LegalPath::WIN32_COMPAT));
+  if (CFileUtils::Exists(m_xmlPath))
+  {
+    m_controllerTree = defaults;
+    LoadXML();
+  }
+}
+
 void CPortManager::SaveXMLAsync()
 {
   PortVec ports = m_controllerTree.GetPorts();
@@ -107,7 +125,7 @@ void CPortManager::SaveXMLAsync()
 
   // Save async
   std::future<void> task = std::async(std::launch::async,
-                                      [this, ports = std::move(ports)]()
+                                      [this, ports = std::move(ports), xmlPath = m_xmlPath]()
                                       {
                                         CXBMCTinyXML2 doc;
                                         auto* node = doc.NewElement(XML_ROOT_PORTS);
@@ -119,7 +137,7 @@ void CPortManager::SaveXMLAsync()
                                         doc.InsertEndChild(node);
 
                                         std::lock_guard<std::mutex> lock(m_saveMutex);
-                                        doc.SaveFile(m_xmlPath);
+                                        doc.SaveFile(xmlPath);
                                       });
 
   m_saveFutures.emplace_back(std::move(task));
@@ -127,6 +145,7 @@ void CPortManager::SaveXMLAsync()
 
 void CPortManager::Clear()
 {
+  m_profilePath.clear();
   m_xmlPath.clear();
   m_controllerTree.Clear();
 }
