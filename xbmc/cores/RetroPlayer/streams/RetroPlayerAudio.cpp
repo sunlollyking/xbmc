@@ -25,18 +25,20 @@
 using namespace KODI;
 using namespace RETRO;
 
+// How far the delay may rise above the sink's own latency before the sound is
+// flushed
 const double MAX_DELAY = 0.3; // seconds
 
 // Smaller changes in the resample ratio than this aren't passed to the sound
 const double MIN_RATIO_CHANGE = 0.00001;
 
-// How much sound the stream itself keeps queued. The game's clock and the
-// sound card's never quite agree, and the difference builds up until the
-// delay is too high and the sound is flushed. Speeding the sound up or down
-// by a fraction of a percent keeps the queue here instead.
-const double TARGET_CACHE = 0.02; // seconds
+// How much of the game's sound is kept queued above the sink's own latency.
+// The game's clock and the sound card's never quite agree, and the difference
+// builds up until the delay is too high and the sound is flushed. Speeding the
+// sound up or down by a fraction of a percent keeps the queue here instead.
+const double TARGET_QUEUE = 0.02; // seconds
 const double MAX_DRIFT_CORRECTION = 0.005;
-const double CACHE_SMOOTHING = 1.0; // seconds
+const double QUEUE_SMOOTHING = 1.0; // seconds
 
 // How long to stay quiet between log lines.
 const std::chrono::seconds DROP_LOG_INTERVAL{10};
@@ -108,7 +110,7 @@ bool CRetroPlayerAudio::OpenStream(const StreamProperties& properties)
   // Resampling follows the game's speed and corrects drift
   m_pAudioStream = audioEngine->MakeStream(audioFormat, AESTREAM_FORCE_RESAMPLE);
   m_resampleRatio = 1.0;
-  m_cacheSecs = 0.0;
+  m_queuedSecs = 0.0;
   m_playingDelay = 0.0;
   m_framesToSkip = 0;
 
@@ -134,6 +136,11 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
     if (m_pAudioStream)
     {
       const double delaySecs = m_pAudioStream->GetDelay();
+
+      // What the sink and the engine hold, which the delay never falls below.
+      // Sinks differ by hundreds of milliseconds, so the queue's target and
+      // the flush are measured from here.
+      const double floorSecs = std::max(0.0, delaySecs - m_pAudioStream->GetCacheTime());
 
       const size_t frameSize = m_pAudioStream->GetChannelCount() *
                                (CAEUtil::DataFormatToBits(m_pAudioStream->GetDataFormat()) >> 3);
@@ -162,18 +169,18 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       if (m_framesToSkip == 0)
         m_playingDelay = delaySecs;
 
-      if (delaySecs > MAX_DELAY)
+      if (delaySecs > floorSecs + MAX_DELAY)
       {
         m_pAudioStream->Flush();
         m_resampleRatio = 1.0;
-        m_cacheSecs = 0.0;
+        m_queuedSecs = 0.0;
         skipFrames = 0;
         m_framesToSkip = 0;
         CLog::Log(LOGDEBUG, "RetroPlayer[AUDIO]: Audio delay ({:0.2f} ms) is too high - flushing",
                   delaySecs * 1000);
       }
 
-      UpdateResampleRatio(frameCount / sampleRate);
+      UpdateResampleRatio(frameCount / sampleRate, delaySecs - floorSecs);
 
       const unsigned int accepted =
           m_pAudioStream->AddData(&audioPacket.data, skipFrames, frameCount - skipFrames, nullptr);
@@ -202,7 +209,7 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
   }
 }
 
-void CRetroPlayerAudio::UpdateResampleRatio(double packetSecs)
+void CRetroPlayerAudio::UpdateResampleRatio(double packetSecs, double queuedSecs)
 {
   double correction = 0.0;
 
@@ -210,15 +217,16 @@ void CRetroPlayerAudio::UpdateResampleRatio(double packetSecs)
   // delay back down
   if (m_framesToSkip == 0)
   {
-    m_cacheSecs += std::min(1.0, packetSecs / CACHE_SMOOTHING) *
-                   (m_pAudioStream->GetCacheTime() - m_cacheSecs);
-    correction = std::clamp((TARGET_CACHE - m_cacheSecs) / TARGET_CACHE * MAX_DRIFT_CORRECTION,
+    m_queuedSecs += std::min(1.0, packetSecs / QUEUE_SMOOTHING) * (queuedSecs - m_queuedSecs);
+    correction = std::clamp((TARGET_QUEUE - m_queuedSecs) / TARGET_QUEUE * MAX_DRIFT_CORRECTION,
                             -MAX_DRIFT_CORRECTION, MAX_DRIFT_CORRECTION);
   }
 
-  // Resampling also follows the game when it runs at the screen's rate
-  // instead of its own
-  const double ratio = (1.0 + correction) / m_processInfo.GetDisplayPacing().PlaybackRate();
+  // The correction is the only adjustment, made around the ratio that follows
+  // the game: its own rate, or the screen's when it runs in step with it
+  CDisplayPacing& displayPacing = m_processInfo.GetDisplayPacing();
+  displayPacing.SetDriftCorrection(correction);
+  const double ratio = (1.0 + correction) / displayPacing.PlaybackRate();
   if (std::abs(ratio - m_resampleRatio) > MIN_RATIO_CHANGE)
   {
     m_pAudioStream->SetResampleRatio(ratio);

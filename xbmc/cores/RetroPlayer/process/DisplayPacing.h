@@ -11,6 +11,8 @@
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <functional>
+#include <utility>
 
 namespace KODI
 {
@@ -20,15 +22,31 @@ namespace RETRO
  * \brief When the screen takes the game's frames, and how fast the game runs
  * to keep up with it
  *
- * The renderer reports each frame it takes for the screen. The game loop uses
- * that to finish every frame just before the next one is taken, which runs the
- * game at the display's rate rather than its own, and the audio stream
- * resamples by the same rate so that the sound keeps time with the picture.
+ * The screen's refresh rate comes from the display's reference clock, which
+ * follows its vblanks and its mode changes. The renderer reports each frame it
+ * takes for the screen, which places those refreshes in time. The game loop
+ * uses both to finish every frame just before the next one is taken, which
+ * runs the game at the display's rate rather than its own, and the audio
+ * stream resamples by the same rate so that the sound keeps time with the
+ * picture.
  */
 class CDisplayPacing
 {
 public:
   using Clock = std::chrono::steady_clock;
+
+  /*!
+   * \brief Where the screen's refresh rate comes from
+   *
+   * \param refreshRate Returns the rate in Hz, or zero or less while it isn't
+   *        known, as while the display changes mode
+   *
+   * Set before the game loop starts and cleared after it stops.
+   */
+  void SetRefreshRateSource(std::function<double()> refreshRate)
+  {
+    m_refreshRate = std::move(refreshRate);
+  }
 
   /*!
    * \brief A frame is being taken for the screen
@@ -42,7 +60,8 @@ public:
   /*!
    * \brief The time between frames taken for the screen
    *
-   * \return The interval, or zero if frames aren't being taken regularly
+   * \return The interval, or zero if the refresh rate isn't known or frames
+   *         aren't being taken
    */
   Clock::duration Interval(Clock::time_point now) const;
 
@@ -101,20 +120,23 @@ public:
   void SetPlaybackRate(double rate) { m_playbackRate.store(rate); }
 
   /*!
+   * \brief How much the sound is sped up or slowed down, as a fraction, to
+   * absorb the drift between the game's clock and the sound card's
+   */
+  double DriftCorrection() const { return m_driftCorrection.load(); }
+  void SetDriftCorrection(double correction) { m_driftCorrection.store(correction); }
+
+  /*!
    * \brief Whether the game is running in step with the screen, which every
    * refresh should then show a new frame of
    */
   void SetPaced(bool paced) { m_paced.store(paced); }
 
 private:
-  void Restart(int64_t takeNs);
-  void StartRun(int64_t takeNs);
+  std::function<double()> m_refreshRate;
 
   // Rendering thread only
-  int64_t m_runStartNs{0};
-  int64_t m_runFrames{0};
   int64_t m_lastTakeLocalNs{0};
-  int64_t m_intervalFrames{0};
   int64_t m_pacedRefreshes{0};
   int64_t m_missedRefreshes{0};
 
@@ -125,8 +147,8 @@ private:
 
   // Published for the game loop
   std::atomic<int64_t> m_lastTakeNs{0};
-  std::atomic<int64_t> m_intervalNs{0};
   std::atomic<double> m_playbackRate{1.0};
+  std::atomic<double> m_driftCorrection{0.0};
 };
 } // namespace RETRO
 } // namespace KODI

@@ -194,8 +194,8 @@ bool CGameLoop::PaceToDisplay()
   if (interval == Clock::duration::zero())
   {
     if (PacingChanged(PacingState::NO_INTERVAL))
-      CLog::Log(LOGINFO, "RetroPlayer[PACING]: Not pacing, the screen isn't taking frames "
-                         "regularly");
+      CLog::Log(LOGINFO, "RetroPlayer[PACING]: Not pacing, the display's refresh rate isn't "
+                         "known or the screen isn't taking frames");
     return false;
   }
 

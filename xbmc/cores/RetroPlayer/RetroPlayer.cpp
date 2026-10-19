@@ -28,6 +28,7 @@
 #include "cores/RetroPlayer/rendering/RPRenderManager.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
 #include "cores/RetroPlayer/streams/RPStreamManager.h"
+#include "cores/VideoPlayer/VideoReferenceClock.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
@@ -202,6 +203,11 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
 
   m_processInfo->SetDataCache(&CServiceBroker::GetDataCacheCore());
   m_processInfo->ResetInfo();
+  // The screen's refresh rate follows its vblanks, whether or not videos are
+  // synced to the display
+  m_displayClock = std::make_unique<CVideoReferenceClock>(true);
+  m_processInfo->GetDisplayPacing().SetRefreshRateSource(
+      [clock = m_displayClock.get()] { return clock->GetRefreshRate(); });
   m_processInfo->GetDisplayPacing().SetEnabled(
       m_gameServices.GameSettings().SyncPlaybackToDisplay());
   m_processInfo->GetDisplayPacing().SetMaxRateDifference(
@@ -378,6 +384,7 @@ bool CRetroPlayer::CloseFile(bool reopen /* = false */)
     m_processInfo->ResetInfo();
   }
   m_processInfo.reset();
+  m_displayClock.reset();
   CLog::Log(LOGDEBUG, "RetroPlayer[PLAYER]: Playback stopped");
   m_callback.OnPlayBackStopped();
 

@@ -19,6 +19,8 @@
 
 #include <memory>
 
+class CVideoReferenceClock;
+
 namespace KODI
 {
 namespace GAME
@@ -170,6 +172,7 @@ private:
   GAME::CGameServices& m_gameServices;
 
   // Subsystems
+  std::unique_ptr<CVideoReferenceClock> m_displayClock;
   std::unique_ptr<CRPProcessInfo> m_processInfo;
   std::unique_ptr<CGUIGameMessenger> m_guiMessenger;
   std::unique_ptr<CRPRenderManager> m_renderManager;
