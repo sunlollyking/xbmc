@@ -9,6 +9,7 @@
 #include "DatabaseUtils.h"
 
 #include "dbwrappers/dataset.h"
+#include "games/database/GameDatabaseColumns.h"
 #include "music/MusicDatabase.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
@@ -263,6 +264,43 @@ const DatabaseUtils::View* DatabaseUtils::ViewOf(KODI::MEDIA::TYPE mediaType)
   };
   // clang-format on
 
+  // clang-format off
+  static constexpr std::array GAME_COLUMNS{
+      named(Field::ID,               "game_view.idGame",          KODI::GAME::GAMEDB_ID),
+      named(Field::TITLE,            "game_view.title",           KODI::GAME::GAMEDB_TITLE),
+      named(Field::SORT_TITLE,       "game_view.sortTitle",       KODI::GAME::GAMEDB_SORT_TITLE),
+      named(Field::ORIGINAL_TITLE,   "game_view.originalTitle",   KODI::GAME::GAMEDB_ORIGINAL_TITLE),
+      named(Field::PLOT,             "game_view.overview",        KODI::GAME::GAMEDB_OVERVIEW),
+      named(Field::YEAR,             "game_view.year",            KODI::GAME::GAMEDB_YEAR),
+      // Catalogues score out of 10, 20 or 100; rules and ordering use the same
+      // out-of-ten figure the game's info tag reports
+      named(Field::RATING,           "(CASE WHEN game_view.ratingMax > 0 THEN game_view.rating * 10.0 / "
+                                     "game_view.ratingMax ELSE game_view.rating END)",
+                                                                  KODI::GAME::GAMEDB_RATING),
+      named(Field::VOTES,            "game_view.votes",           KODI::GAME::GAMEDB_VOTES),
+      named(Field::USER_RATING,      "game_view.userRating",      KODI::GAME::GAMEDB_USER_RATING),
+      named(Field::PLAYCOUNT,        "game_view.playCount",       KODI::GAME::GAMEDB_PLAY_COUNT),
+      named(Field::TIME,             "game_view.playTime",        KODI::GAME::GAMEDB_PLAY_TIME),
+      named(Field::LAST_PLAYED,      "game_view.lastPlayed",      KODI::GAME::GAMEDB_LAST_PLAYED),
+      named(Field::DATE_ADDED,       "game_view.dateAdded",       KODI::GAME::GAMEDB_DATE_ADDED),
+      named(Field::STUDIO,           "game_view.platformName",    KODI::GAME::GAMEDB_PLATFORM_NAME),
+      named(Field::MPAA,             "game_view.category",        KODI::GAME::GAMEDB_CATEGORY),
+      named(Field::FILENAME,         "game_view.strFilename",     KODI::GAME::GAMEDB_FILENAME),
+      named(Field::PATH,             "game_view.strPath",         KODI::GAME::GAMEDB_PATH),
+      named(Field::PLATFORM,         "game_view.platformName",    KODI::GAME::GAMEDB_PLATFORM_NAME),
+      named(Field::GENRE,            "game_view.genres",          KODI::GAME::GAMEDB_GENRES),
+      named(Field::DEVELOPER,        "game_view.developers",      KODI::GAME::GAMEDB_DEVELOPERS),
+      named(Field::PLAYERS,          "game_view.playersMax",      KODI::GAME::GAMEDB_PLAYERS_MAX),
+      named(Field::REGION,           "game_view.releaseRegions",  KODI::GAME::GAMEDB_RELEASE_REGIONS),
+      named(Field::FAVOURITE,        "game_view.favourite"),
+      named(Field::COMPLETED,        "game_view.completed"),
+      named(Field::HAS_ACHIEVEMENTS, "game_view.achievementsTotal"),
+      named(Field::COOP,             "game_view.coop",            KODI::GAME::GAMEDB_COOP),
+      named(Field::SET,              "game_view.collections"),
+      named(Field::TAG,              "game_view.idGame"),
+  };
+  // clang-format on
+
   static constexpr View ALBUM_VIEW{"albumview", ALBUM_COLUMNS};
   static constexpr View SONG_VIEW{"songview", SONG_COLUMNS};
   static constexpr View ARTIST_VIEW{"artistview", ARTIST_COLUMNS};
@@ -270,6 +308,7 @@ const DatabaseUtils::View* DatabaseUtils::ViewOf(KODI::MEDIA::TYPE mediaType)
   static constexpr View MOVIE_VIEW{"movie_view", MOVIE_COLUMNS};
   static constexpr View TV_SHOW_VIEW{"tvshow_view", TV_SHOW_COLUMNS};
   static constexpr View EPISODE_VIEW{"episode_view", EPISODE_COLUMNS};
+  static constexpr View GAME_VIEW{"game_view", GAME_COLUMNS};
 
   switch (mediaType)
   {
@@ -287,6 +326,8 @@ const DatabaseUtils::View* DatabaseUtils::ViewOf(KODI::MEDIA::TYPE mediaType)
       return &TV_SHOW_VIEW;
     case KODI::MEDIA::TYPE::EPISODE:
       return &EPISODE_VIEW;
+    case KODI::MEDIA::TYPE::GAME:
+      return &GAME_VIEW;
     default:
       return nullptr;
   }
@@ -372,6 +413,7 @@ bool DatabaseUtils::GetSelectFields(const Fields &fields,
     case KODI::MEDIA::TYPE::MUSIC_VIDEO:
     case KODI::MEDIA::TYPE::MOVIE:
     case KODI::MEDIA::TYPE::TV_SHOW:
+    case KODI::MEDIA::TYPE::GAME:
       sortFields.insert(Field::TITLE);
       break;
     case KODI::MEDIA::TYPE::ALBUM:
@@ -505,6 +547,14 @@ bool DatabaseUtils::GetDatabaseResults(KODI::MEDIA::TYPE mediaType,
         CLog::Log(LOGWARNING, "GetDatabaseResults: unable to retrieve value of field {}",
                   resultSet.record_header[fieldIndex].name);
 
+      if (value.first == Field::RATING && mediaType == KODI::MEDIA::TYPE::GAME &&
+          resultSet.record_header.size() > KODI::GAME::GAMEDB_RATING_MAX)
+      {
+        const float max = resultSet.records[index]->at(KODI::GAME::GAMEDB_RATING_MAX).get_asFloat();
+        if (max > 0.0f)
+          value.second = value.second.asFloat() * 10.0f / max;
+      }
+
       if (value.first == Field::YEAR &&
           (mediaType == KODI::MEDIA::TYPE::TV_SHOW || mediaType == KODI::MEDIA::TYPE::EPISODE ||
            mediaType == KODI::MEDIA::TYPE::MOVIE))
@@ -528,6 +578,7 @@ bool DatabaseUtils::GetDatabaseResults(KODI::MEDIA::TYPE mediaType,
       case KODI::MEDIA::TYPE::VIDEO_COLLECTION:
       case KODI::MEDIA::TYPE::TV_SHOW:
       case KODI::MEDIA::TYPE::MUSIC_VIDEO:
+      case KODI::MEDIA::TYPE::GAME:
         result[Field::LABEL] = result.at(Field::TITLE).asString();
         break;
       case KODI::MEDIA::TYPE::EPISODE:

@@ -22,6 +22,10 @@ namespace KODI
 namespace GAME
 {
 
+// Shared with the GUI info provider, which reads it without game services
+constexpr auto SETTING_GAMES_ACHIEVEMENTS_ONSCREEN_INDICATORS =
+    "gamesachievements.challengeindicator";
+
 /*!
  * \ingroup games
  */
@@ -45,6 +49,15 @@ public:
   double SyncToDisplayLimit();
   std::string GetRAUsername() const;
   std::string GetRAToken() const;
+
+  /*!
+   * \brief The player's RetroAchievements avatar, or empty if not signed in
+   *
+   * The icon for notifications that speak for RetroAchievements, as the
+   * sign-in notification already does. Empty leaves the notification with
+   * Kodi's own icon, which is what a signed-out player should see.
+   */
+  std::string GetRAUserPicUrl() const;
 
   /*!
    * \brief Whether achievements are earned in hardcore mode
@@ -88,6 +101,8 @@ public:
 
   bool GetAchievementsLoggedIn() const;
 
+  bool GetAchievementsOnScreenIndicators() const;
+
   /*!
    * \brief Record whether the player is logged in to RetroAchievements
    *
@@ -107,6 +122,16 @@ private:
                         const std::string& password,
                         std::string token) const;
   bool IsAccountVerified(const std::string& username, const std::string& token) const;
+
+  /*!
+   * \brief Tell the game scrapers who the person is
+   *
+   * The scrapers read achievements with the same account, so a person says it
+   * once here rather than again in every scraper's own settings. A field left
+   * empty here leaves the scraper's own alone, so anyone driving a scraper
+   * directly still can.
+   */
+  void ShareAchievementCredentials() const;
 
   // Construction parameters
   std::shared_ptr<CSettings> m_settings;
