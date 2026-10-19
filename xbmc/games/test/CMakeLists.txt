@@ -1,4 +1,5 @@
-set(SOURCES TestGameUtils.cpp)
+set(SOURCES TestGameArt.cpp
+            TestGameManual.cpp
             TestGameThumbLoader.cpp
             TestGameUtils.cpp
             TestGameVideoSettings.cpp)
