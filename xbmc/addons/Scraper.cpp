@@ -67,13 +67,14 @@ struct ContentMapping
 };
 
 // clang-format off
-const std::array<ContentMapping, 6> content = {{
+const std::array<ContentMapping, 7> content = {{
   {CONTENT::UNKNOWN,     ADDON::ContentType::NONE,        231},
   {CONTENT::ALBUMS,      ADDON::ContentType::ALBUMS,      132},
   {CONTENT::ARTISTS,     ADDON::ContentType::ARTISTS,     133},
   {CONTENT::MOVIES,      ADDON::ContentType::MOVIES,      20342},
   {CONTENT::TVSHOWS,     ADDON::ContentType::TVSHOWS,     20343},
   {CONTENT::MUSICVIDEOS, ADDON::ContentType::MUSICVIDEOS, 20389},
+  {CONTENT::GAMES,       ADDON::ContentType::GAMES,       35550},
 }};
 // clang-format on
 
@@ -131,6 +132,8 @@ AddonType ScraperTypeFromContent(ContentType content)
       return SCRAPER_MOVIES;
     case MUSICVIDEOS:
       return SCRAPER_MUSICVIDEOS;
+    case GAMES:
+      return SCRAPER_GAMES;
     case TVSHOWS:
       return SCRAPER_TVSHOWS;
     default:
