@@ -60,6 +60,13 @@ public:
   void Initialize();
   void Deinitialize();
 
+  /*!
+   * \brief Use the port setup kept for the platform of the game being opened
+   *
+   * \param platform The platform's slug, e.g. "wii"
+   */
+  void UsePlatformPorts(const std::string& platform);
+
   void Start(IGameInputCallback* input);
   void Stop();
 

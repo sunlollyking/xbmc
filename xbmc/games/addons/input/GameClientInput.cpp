@@ -73,6 +73,12 @@ void CGameClientInput::Initialize()
   m_portManager->LoadXML();
 }
 
+void CGameClientInput::UsePlatformPorts(const std::string& platform)
+{
+  std::lock_guard<std::recursive_mutex> lock(m_portMutex);
+  m_portManager->UsePlatform(platform, m_topology->GetControllerTree());
+}
+
 void CGameClientInput::Start(IGameInputCallback* input)
 {
   {
