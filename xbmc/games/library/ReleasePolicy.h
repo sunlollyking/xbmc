@@ -30,7 +30,7 @@ namespace GAME
 class CReleasePolicy
 {
 public:
-  CReleasePolicy(std::vector<std::string> regionPriority,
+  CReleasePolicy(std::vector<GameRegion> regionPriority,
                  bool preferRetail,
                  bool preferNewestRevision,
                  bool preferVerified);
@@ -41,7 +41,7 @@ public:
    * Their own region, the wider region it belongs to, the whole world, then
    * Europe, USA and Japan, the regions most games were released in.
    */
-  static std::vector<std::string> RegionPriority(const std::string& region);
+  static std::vector<GameRegion> RegionPriority(const GameRegion& region);
 
   /*!
    * \brief The release that should play, or -1 for an empty list
@@ -53,7 +53,7 @@ public:
    */
   bool Prefers(const GameRelease& a, const GameRelease& b) const;
 
-  const std::vector<std::string>& GetRegionPriority() const { return m_regionPriority; }
+  const std::vector<GameRegion>& GetRegionPriority() const { return m_regionPriority; }
 
 private:
   int RegionRank(const GameRelease& release) const;
@@ -61,7 +61,7 @@ private:
   static std::vector<int> RevisionRank(const GameRelease& release);
   static int DumpRank(const GameRelease& release);
 
-  std::vector<std::string> m_regionPriority;
+  std::vector<GameRegion> m_regionPriority;
   bool m_preferRetail{true};
   bool m_preferNewestRevision{true};
   bool m_preferVerified{true};

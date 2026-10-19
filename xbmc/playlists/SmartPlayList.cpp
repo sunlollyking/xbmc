@@ -1091,10 +1091,12 @@ std::string CSmartPlaylistRule::FormatWhereClause(const std::string &negate, con
     else if (m_field == static_cast<int>(Field::STUDIO))
       query = gameLink("publisher_link", "idCompany", "company");
     else if (m_field == static_cast<int>(Field::REGION))
-      query = negate + " EXISTS (SELECT 1 FROM gamerelease JOIN release_region ON "
-                       "release_region.idRelease = gamerelease.idRelease JOIN region ON "
-                       "region.idRegion = release_region.idRegion WHERE gamerelease.idGame = " +
-              GetField(static_cast<int>(Field::ID), strType) + " AND region.code" + parameter + ")";
+      query = negate +
+              " EXISTS (SELECT 1 FROM gamerelease JOIN release_region ON "
+              "release_region.idRelease = gamerelease.idRelease JOIN region ON "
+              "region.idRegion = release_region.idRegion WHERE gamerelease.idGame = " +
+              GetField(static_cast<int>(Field::ID), strType) + " AND (region.code" + parameter +
+              " OR region.name" + parameter + "))";
     else if (m_field == static_cast<int>(Field::LAST_PLAYED) ||
              m_field == static_cast<int>(Field::DATE_ADDED))
       query = FormatNullableDate(GetField(m_field, strType), m_operator, parameter);

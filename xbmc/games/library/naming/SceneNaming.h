@@ -8,7 +8,10 @@
 
 #pragma once
 
+#include "games/library/GameLibraryTypes.h"
+
 #include <cstddef>
+#include <optional>
 #include <string_view>
 
 namespace KODI
@@ -41,12 +44,11 @@ public:
   static size_t ReleaseNumberLength(std::string_view name);
 
   /*!
-   * \brief The region a code names, or empty
+   * \brief The region a code names, or nothing
    *
    * \param code The code as the lists write it: "JP", "EU", "KS"
-   * \return The name the game library gives the region: "Japan", "Europe"
    */
-  static std::string_view RegionName(std::string_view code);
+  static std::optional<GameRegion> Region(std::string_view code);
 };
 } // namespace GAME
 } // namespace KODI

@@ -45,8 +45,8 @@ struct GameScrapeRequest
   std::string serial;
   std::string raHash;
   uint64_t size{0};
-  std::vector<std::string> regions;
-  std::vector<std::string> preferredRegions; // the player's, in their order
+  std::vector<GameRegion> regions;
+  std::vector<GameRegion> preferredRegions; // the player's, in their order
   std::vector<std::string> languages;
   int year{0};
   std::vector<ArchiveMember> members; // every file in a zip, for arcade sets
@@ -71,7 +71,7 @@ struct GameScrapeCandidate
 
   // What tells two candidates of the same title apart, when a person has to pick
   std::string subtitle; // the catalogue's own name, e.g. "Sonic 2 (USA, Europe) (Rev A)"
-  std::vector<std::string> regions;
+  std::vector<GameRegion> regions;
   std::string provider; // which source answered
   std::string thumb; // an image to show beside the title
 };
@@ -84,7 +84,7 @@ struct GameScrapeArt
 {
   std::string type;
   std::string url;
-  std::string region;
+  GameRegion region;
   int width{0};
   int height{0};
 };

@@ -19,18 +19,19 @@ using namespace GAME;
 
 namespace
 {
-// KS is South Korea
-constexpr auto regions = std::to_array<std::pair<std::string_view, std::string_view>>({
-    {"AU", "Australia"},
-    {"DE", "Germany"},
-    {"ES", "Spain"},
-    {"EU", "Europe"},
-    {"FR", "France"},
-    {"IT", "Italy"},
-    {"JP", "Japan"},
-    {"KS", "Korea"},
-    {"NL", "Netherlands"},
-    {"US", "USA"},
+// The territory each code is, as BCP 47 codes it. KS is South Korea, and EU
+// UN M.49's Europe rather than BCP 47's European Union.
+constexpr auto territories = std::to_array<std::pair<std::string_view, std::string_view>>({
+    {"AU", "AU"},
+    {"DE", "DE"},
+    {"ES", "ES"},
+    {"EU", "150"},
+    {"FR", "FR"},
+    {"IT", "IT"},
+    {"JP", "JP"},
+    {"KS", "KR"},
+    {"NL", "NL"},
+    {"US", "US"},
 });
 } // namespace
 
@@ -49,12 +50,12 @@ size_t CSceneNaming::ReleaseNumberLength(std::string_view name)
   return static_cast<size_t>(releaseNumber.GetFindLen());
 }
 
-std::string_view CSceneNaming::RegionName(std::string_view code)
+std::optional<GameRegion> CSceneNaming::Region(std::string_view code)
 {
-  for (const auto& [c, name] : regions)
+  for (const auto& [c, territory] : territories)
   {
     if (c == code)
-      return name;
+      return GameRegion::Make(territory);
   }
-  return {};
+  return std::nullopt;
 }

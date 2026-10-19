@@ -184,7 +184,7 @@ bool CGameListXml::Load(const std::string& folder, std::map<std::string, GameLis
         entry.rating = static_cast<float>(value <= 1.0 ? value * 10.0 : value);
     }
 
-    entry.region = CGameNameParser::RegionName(ElementText(element, "region"));
+    entry.region = CGameNameParser::Region(ElementText(element, "region")).value_or(GameRegion{});
     for (std::string language : StringUtils::Split(ElementText(element, "lang"), ','))
     {
       StringUtils::Trim(language);

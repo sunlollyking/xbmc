@@ -127,11 +127,19 @@ bool SameRelease(const GameRelease& a, const GameRelease& b)
     std::ranges::sort(v);
     return v;
   };
+  auto codes = [](const std::vector<GameRegion>& regions)
+  {
+    std::vector<std::string> v;
+    for (const GameRegion& region : regions)
+      v.emplace_back(region.ToString());
+    return v;
+  };
   // Two hacks of one game are two versions however alike their tags are
   if (a.edition != b.edition || (!a.edition.empty() && a.title != b.title))
     return false;
-  return sorted(a.regions) == sorted(b.regions) && sorted(a.languages) == sorted(b.languages) &&
-         a.revision == b.revision && a.status == b.status && a.licence == b.licence;
+  return sorted(codes(a.regions)) == sorted(codes(b.regions)) &&
+         sorted(a.languages) == sorted(b.languages) && a.revision == b.revision &&
+         a.status == b.status && a.licence == b.licence;
 }
 
 /*!
@@ -295,7 +303,7 @@ std::vector<std::string> ReadM3U(const std::string& path)
 //! The player's choice of which version of a game plays
 CReleasePolicy PolicyFromSettings()
 {
-  std::string region = SETTING_GAMELIBRARY_REGION_DEFAULT;
+  GameRegion region = GameRegion::FromString(SETTING_GAMELIBRARY_REGION_DEFAULT);
   bool preferRetail = true;
   bool preferNewestRevision = true;
   bool preferVerified = true;
@@ -303,7 +311,7 @@ CReleasePolicy PolicyFromSettings()
   if (settings)
   {
     if (const std::string chosen = settings->GetString(SETTING_GAMELIBRARY_REGION); !chosen.empty())
-      region = chosen;
+      region = GameRegion::FromString(chosen);
     preferRetail = settings->GetBool(SETTING_GAMELIBRARY_PREFERRETAIL);
     preferNewestRevision = settings->GetBool(SETTING_GAMELIBRARY_PREFERNEWESTREVISION);
     preferVerified = settings->GetBool(SETTING_GAMELIBRARY_PREFERVERIFIED);
@@ -762,7 +770,12 @@ const GameScrapeCandidate* CGameInfoScanner::ChooseCandidate(
       if (candidate.year > 0)
         parts.emplace_back(std::to_string(candidate.year));
       if (!candidate.regions.empty())
-        parts.emplace_back(StringUtils::Join(candidate.regions, ", "));
+      {
+        std::vector<std::string> names;
+        for (const GameRegion& region : candidate.regions)
+          names.emplace_back(CGameNameParser::RegionName(region));
+        parts.emplace_back(StringUtils::Join(names, ", "));
+      }
       if (!candidate.subtitle.empty() && candidate.subtitle != candidate.title)
         parts.emplace_back(candidate.subtitle);
       if (!candidate.provider.empty())
@@ -1439,19 +1452,16 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
         // A logo is lettering: one from a region that writes in another script
         // comes after a logo that names no region, which is nearly always in
         // English.
-        const std::vector<std::string> regionPriority = PolicyFromSettings().GetRegionPriority();
-        static constexpr std::array otherScripts = {"Japan",  "Korea",     "China",
-                                                    "Taiwan", "Hong Kong", "Russia"};
+        const std::vector<GameRegion> regionPriority = PolicyFromSettings().GetRegionPriority();
+        static constexpr std::array otherScripts = {"JP", "KR", "CN", "TW", "HK", "RU"};
         const auto rank = [&regionPriority, &release](const GameScrapeArt& piece, bool lettering)
         {
-          if (piece.region.empty())
+          if (piece.region.IsEmpty())
             return regionPriority.size() + 1;
           if (lettering && std::ranges::any_of(otherScripts, [&piece](const char* region)
-                                               { return StringUtils::EqualsNoCase(region, piece.region); }))
+                                               { return piece.region.ToString() == region; }))
             return regionPriority.size() + 2;
-          const auto preferred =
-              std::ranges::find_if(regionPriority, [&piece](const std::string& region)
-                                   { return StringUtils::EqualsNoCase(region, piece.region); });
+          const auto preferred = std::ranges::find(regionPriority, piece.region);
           if (preferred != regionPriority.end())
             return static_cast<size_t>(preferred - regionPriority.begin());
           if (std::ranges::find(release.regions, piece.region) != release.regions.end())
@@ -1518,7 +1528,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       tag.SetPlayCount(entry.playCount);
     if (!entry.lastPlayed.empty())
       tag.SetLastPlayed(entry.lastPlayed);
-    if (!entry.region.empty() && release.regions.empty())
+    if (!entry.region.IsEmpty() && release.regions.empty())
       release.regions.emplace_back(entry.region);
     if (!entry.languages.empty() && release.languages.empty())
       release.languages = entry.languages;

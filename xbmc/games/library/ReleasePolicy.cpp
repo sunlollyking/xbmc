@@ -20,25 +20,27 @@ using namespace GAME;
 
 namespace
 {
-//! The regions tried after the player's own, in order
-constexpr std::array<std::string_view, 3> FALLBACK_REGIONS{"Europe", "USA", "Japan"};
+//! The regions tried after the player's own, in order: Europe, USA, Japan
+constexpr std::array<std::string_view, 3> FALLBACK_REGIONS{"150", "US", "JP"};
+
+//! No-Intro's market for a release sold in Japan, the USA and Europe alike
+const GameRegion WORLD = GameRegion::Make({}, "World");
 
 //! The wider region whose releases a country gets
-std::string_view WiderRegion(std::string_view region)
+std::string_view WiderRegion(const GameRegion& region)
 {
-  if (region == "United Kingdom" || region == "Germany" || region == "France" ||
-      region == "Spain" || region == "Italy" || region == "Australia")
-    return "Europe";
-  if (region == "Canada" || region == "Brazil")
-    return "USA";
-  if (region == "Korea" || region == "China" || region == "Taiwan" || region == "Hong Kong" ||
-      region == "India")
-    return "Asia";
+  const std::string code = region.ToString();
+  if (code == "GB" || code == "DE" || code == "FR" || code == "ES" || code == "IT" || code == "AU")
+    return "150";
+  if (code == "CA" || code == "BR")
+    return "US";
+  if (code == "KR" || code == "CN" || code == "TW" || code == "HK" || code == "IN")
+    return "142";
   return "";
 }
 } // namespace
 
-CReleasePolicy::CReleasePolicy(std::vector<std::string> regionPriority,
+CReleasePolicy::CReleasePolicy(std::vector<GameRegion> regionPriority,
                                bool preferRetail,
                                bool preferNewestRevision,
                                bool preferVerified)
@@ -49,19 +51,19 @@ CReleasePolicy::CReleasePolicy(std::vector<std::string> regionPriority,
 {
 }
 
-std::vector<std::string> CReleasePolicy::RegionPriority(const std::string& region)
+std::vector<GameRegion> CReleasePolicy::RegionPriority(const GameRegion& region)
 {
-  std::vector<std::string> regions;
-  const auto add = [&regions](std::string_view name)
+  std::vector<GameRegion> regions;
+  const auto add = [&regions](const GameRegion& added)
   {
-    if (!name.empty() && std::ranges::find(regions, name) == regions.end())
-      regions.emplace_back(name);
+    if (!added.IsEmpty() && std::ranges::find(regions, added) == regions.end())
+      regions.emplace_back(added);
   };
   add(region);
-  add(WiderRegion(region));
-  add("World");
+  add(GameRegion::FromString(WiderRegion(region)));
+  add(WORLD);
   for (std::string_view fallback : FALLBACK_REGIONS)
-    add(fallback);
+    add(GameRegion::FromString(fallback));
   return regions;
 }
 
@@ -70,12 +72,12 @@ int CReleasePolicy::RegionRank(const GameRelease& release) const
   // The best-placed region a release covers; a release with no region sits
   // behind every listed one, and an unlisted region behind that
   int best = static_cast<int>(m_regionPriority.size()) + 1;
-  for (const std::string& region : release.regions)
+  for (const GameRegion& region : release.regions)
   {
     const auto it = std::ranges::find(m_regionPriority, region);
     if (it != m_regionPriority.end())
       best = std::min(best, static_cast<int>(it - m_regionPriority.begin()));
-    else if (region == "World")
+    else if (region == WORLD)
       best = std::min(best, static_cast<int>(m_regionPriority.size()));
   }
   if (release.regions.empty())

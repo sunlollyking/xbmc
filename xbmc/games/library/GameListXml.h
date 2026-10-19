@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "GameLibraryTypes.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -33,7 +35,7 @@ struct GameListEntry
   int playersMin{0};
   int playersMax{0};
   float rating{0.0f}; // 0..10, converted from the 0..1 the file uses
-  std::string region; // written in full
+  GameRegion region;
   std::vector<std::string> languages;
   bool favourite{false};
   bool hidden{false};

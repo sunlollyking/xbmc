@@ -415,10 +415,12 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 9; }
+  int GetSchemaVersion() const override { return 10; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:
+  //! \brief Bring regions stored by name, "USA", to the codes they're stored by now
+  void UpdateRegionCodes();
   std::string GetPlayPathForGame(int idGame);
   void ExportArt(int idGame,
                  const std::string& playPath,

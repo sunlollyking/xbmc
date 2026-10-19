@@ -15,6 +15,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "games/library/GameAgeRatings.h"
+#include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -181,7 +182,10 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
 
 int CGameDatabase::SetReleaseForGame(int idGame, GameRelease& release)
 {
-  const std::string regions = StringUtils::Join(release.regions, ",");
+  std::vector<std::string> codes;
+  for (const GameRegion& region : release.regions)
+    codes.emplace_back(region.ToString());
+  const std::string regions = StringUtils::Join(codes, ",");
   const std::string languages = StringUtils::Join(release.languages, ",");
   const std::string status(CGameLibraryTypes::ToString(release.status));
   const std::string licence(CGameLibraryTypes::ToString(release.licence));
@@ -212,11 +216,16 @@ int CGameDatabase::SetReleaseForGame(int idGame, GameRelease& release)
   }
 
   m_pDS->exec(PrepareSQL("DELETE FROM release_region WHERE idRelease = %i", release.id));
-  for (const std::string& code : release.regions)
+  for (const GameRegion& region : release.regions)
   {
-    const int idRegion = AddLookup("region", "idRegion", code, "code");
+    const int idRegion = AddLookup("region", "idRegion", region.ToString(), "code");
     if (idRegion > 0)
     {
+      // The name a listing shows, and a smart playlist rule written by name matches
+      const std::string name = CGameNameParser::RegionName(region);
+      m_pDS->exec(PrepareSQL(
+          "UPDATE region SET name = '%s' WHERE idRegion = %i AND (name IS NULL OR name <> '%s')",
+          name.c_str(), idRegion, name.c_str()));
       m_pDS->exec(PrepareSQL("INSERT INTO release_region (idRegion, idRelease) VALUES (%i, %i)",
                              idRegion, release.id));
     }
@@ -482,9 +491,12 @@ void CGameDatabase::GetReleasesForGame(int idGame, std::vector<GameRelease>& rel
       GameRelease release;
       release.id = m_pDS->fv("idRelease").get_asInt();
       release.title = m_pDS->fv("title").get_asString();
-      release.regions = StringUtils::Split(m_pDS->fv("regions").get_asString(), ',');
+      for (const std::string& code : StringUtils::Split(m_pDS->fv("regions").get_asString(), ','))
+      {
+        if (!code.empty())
+          release.regions.emplace_back(GameRegion::FromString(code));
+      }
       release.languages = StringUtils::Split(m_pDS->fv("languages").get_asString(), ',');
-      std::erase_if(release.regions, [](const std::string& s) { return s.empty(); });
       std::erase_if(release.languages, [](const std::string& s) { return s.empty(); });
       release.revision = m_pDS->fv("revision").get_asString();
       release.status =

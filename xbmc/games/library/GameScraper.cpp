@@ -105,6 +105,27 @@ std::vector<std::string> Strings(const CVariant& value)
   return out;
 }
 
+//! Regions travel as ToString() writes them: "US", "150" or "World"
+std::string JoinRegions(const std::vector<GameRegion>& regions)
+{
+  std::vector<std::string> codes;
+  codes.reserve(regions.size());
+  for (const GameRegion& region : regions)
+    codes.emplace_back(region.ToString());
+  return StringUtils::Join(codes, ",");
+}
+
+std::vector<GameRegion> Regions(const std::vector<std::string>& codes)
+{
+  std::vector<GameRegion> regions;
+  for (const std::string& code : codes)
+  {
+    if (GameRegion region = GameRegion::FromString(code); !region.IsEmpty())
+      regions.emplace_back(std::move(region));
+  }
+  return regions;
+}
+
 bool ParsePayload(const CFileItem& item, const char* property, CVariant& payload)
 {
   const std::string json = item.GetProperty(property).asString();
@@ -136,7 +157,7 @@ void ReadArt(const CVariant& value, std::map<std::string, std::vector<GameScrape
       GameScrapeArt piece;
       piece.type = type;
       piece.url = (*entry)["url"].asString();
-      piece.region = (*entry)["region"].asString();
+      piece.region = GameRegion::FromString((*entry)["region"].asString());
       piece.width = static_cast<int>((*entry)["width"].asInteger());
       piece.height = static_cast<int>((*entry)["height"].asInteger());
       if (!piece.url.empty())
@@ -227,9 +248,9 @@ std::string CGameScraper::BuildUrl(const std::string& action, const GameScrapeRe
   if (request.size > 0)
     url.SetOption("size", std::to_string(request.size));
   if (!request.regions.empty())
-    url.SetOption("regions", StringUtils::Join(request.regions, ","));
+    url.SetOption("regions", JoinRegions(request.regions));
   if (!request.preferredRegions.empty())
-    url.SetOption("preferredregions", StringUtils::Join(request.preferredRegions, ","));
+    url.SetOption("preferredregions", JoinRegions(request.preferredRegions));
   if (!request.members.empty())
   {
     std::string json;
@@ -273,9 +294,9 @@ bool CGameScraper::ReadCandidate(const CFileItem& item,
     candidate.matchedBy = MatchMethod::NAME;
 
   candidate.subtitle = payload["subtitle"].asString();
-  candidate.regions = Strings(payload["regions"]);
+  candidate.regions = Regions(Strings(payload["regions"]));
   if (candidate.regions.empty() && payload["regions"].isString())
-    candidate.regions = StringUtils::Split(payload["regions"].asString(), ",");
+    candidate.regions = Regions(StringUtils::Split(payload["regions"].asString(), ","));
   candidate.provider = payload["provider"].asString();
   candidate.thumb = payload["thumb"].asString();
 
@@ -345,7 +366,7 @@ bool CGameScraper::FindMany(const std::vector<GameScrapeRequest>& requests,
     if (!request.members.empty())
       one["members"] = Members(request.members);
     if (!request.regions.empty())
-      one["regions"] = StringUtils::Join(request.regions, ",");
+      one["regions"] = JoinRegions(request.regions);
     if (!request.languages.empty())
       one["languages"] = StringUtils::Join(request.languages, ",");
     if (request.year > 0)
@@ -593,7 +614,7 @@ bool CGameScraper::ReadDetails(const std::string& id,
         continue;
       GameRelease release;
       release.title = (*it)["title"].asString();
-      release.regions = Strings((*it)["regions"]);
+      release.regions = Regions(Strings((*it)["regions"]));
       release.languages = Strings((*it)["languages"]);
       release.revision = (*it)["revision"].asString();
       release.edition = (*it)["edition"].asString();
