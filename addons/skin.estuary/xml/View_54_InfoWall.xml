@@ -153,6 +153,19 @@
 				<texture fallback="$PARAM[fallback_image]" background="true">$VAR[InfoWallThumbVar]</texture>
 				<aspectratio>scale</aspectratio>
 				<bordersize>20</bordersize>
+				<visible>!Container.Content(platforms)</visible>
+			</control>
+			<control type="image">
+				<left>0</left>
+				<top>10</top>
+				<width>316</width>
+				<height>218</height>
+				<texture fallback="$PARAM[fallback_image]" background="true">$VAR[InfoWallThumbVar]</texture>
+				<!-- A machine's logo is wider than this tile; fill it and the
+				     name is cropped away -->
+				<aspectratio align="center" aligny="center">keep</aspectratio>
+				<bordersize>20</bordersize>
+				<visible>Container.Content(platforms)</visible>
 			</control>
 			<control type="image">
 				<left>20</left>
@@ -274,6 +287,19 @@
 					<texture fallback="DefaultMovies.png" background="true">$INFO[ListItem.Icon]</texture>
 					<aspectratio>scale</aspectratio>
 					<bordersize>20</bordersize>
+					<visible>!Container.Content(platforms)</visible>
+				</control>
+				<control type="image">
+					<left>24</left>
+					<top>-1</top>
+					<width>272</width>
+					<height>270</height>
+					<texture fallback="DefaultMovies.png" background="true">$INFO[ListItem.Icon]</texture>
+					<!-- A machine's logo is wide. Filling a frame this close to
+					     square crops it to a couple of letters, so fit it in -->
+					<aspectratio align="center" aligny="center">keep</aspectratio>
+					<bordersize>20</bordersize>
+					<visible>Container.Content(platforms)</visible>
 				</control>
 			</control>
 			<control type="group">
@@ -385,7 +411,7 @@
 				<preloaditems>2</preloaditems>
 				<pagecontrol>531</pagecontrol>
 				<scrolltime tween="cubic" easing="out">500</scrolltime>
-				<visible>Container.Content(artists) | Container.Content(albums) | Container.Content(sets) | Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(musicvideos) | Container.Content(images) | Container.Content(videos) | Container.Content(games) | $EXP[videoasset_true]</visible>
+				<visible>Container.Content(artists) | Container.Content(albums) | Container.Content(sets) | Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(musicvideos) | Container.Content(images) | Container.Content(videos) | Container.Content(games) | Container.Content(platforms) | Container.Content(releases) | $EXP[videoasset_true]</visible>
 				<itemlayout height="445" width="320" condition="Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | $EXP[videoasset_true] | [Container.Content(musicvideos) + Skin.HasSetting(show_musicvideoposter)]">
 					<control type="group">
 						<left>30</left>
