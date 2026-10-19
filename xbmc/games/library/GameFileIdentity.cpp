@@ -10,7 +10,9 @@
 
 #include "FileItem.h"
 #include "FileItemList.h"
+#include "ServiceBroker.h"
 #include "URL.h"
+#include "addons/VFSEntry.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/ZipManager.h"
@@ -32,9 +34,8 @@ using namespace GAME;
 
 namespace
 {
-constexpr size_t CHUNK_SIZE = 1024 * 1024;
+constexpr size_t CHUNK_SIZE = 1024 * 1024; // 1 MiB
 
-constexpr std::array<const char*, 2> archiveExtensions{".zip", ".7z"};
 constexpr std::array<const char*, 2> sheetExtensions{".cue", ".gdi"};
 constexpr std::array<const char*, 3> programExtensions{".exe", ".com", ".bat"};
 constexpr std::array<const char*, 1> dsExtensions{".nds"};
@@ -46,7 +47,30 @@ constexpr std::string_view DREAMCAST_MAGIC = "SEGA SEGAKATANA";
 //! In an archive, a disc's header is looked for only near the start of its data
 //! track or image. Looking further would decompress the whole of it, often for
 //! a disc whose header this doesn't know.
-constexpr uint64_t MAX_ARCHIVED_TRACK_SCAN = 16 * 1024 * 1024;
+constexpr uint64_t MAX_ARCHIVED_TRACK_SCAN = 16 * 1024 * 1024; // 16 MiB
+
+// The protocol that lists an archive's files: zip's own, or the one the VFS
+// add-on that opens the extension registers, such as vfs.libarchive's for 7z
+// and tar and vfs.rar's for rar
+std::string ArchiveProtocol(const std::string& path)
+{
+  const std::string ext = StringUtils::ToLower(URIUtils::GetExtension(path));
+  if (ext == ".zip")
+    return "zip";
+  if (ext.empty() || !CServiceBroker::IsServiceManagerUp())
+    return "";
+
+  for (const auto& vfsAddon : CServiceBroker::GetVFSAddonCache().GetAddonInstances())
+  {
+    if (!vfsAddon->HasFileDirectories())
+      continue;
+    const std::vector<std::string> extensions = StringUtils::Split(vfsAddon->GetExtensions(), "|");
+    const std::vector<std::string> protocols = StringUtils::Split(vfsAddon->GetProtocols(), "|");
+    if (!protocols.empty() && std::ranges::find(extensions, ext) != extensions.end())
+      return protocols.front();
+  }
+  return "";
+}
 
 bool HasExtension(const std::string& path, const auto& extensions)
 {
@@ -87,11 +111,12 @@ std::string Uncached(const std::string& memberPath)
   return url.Get();
 }
 
+// Empty until the whole field has been read
 std::string HeaderField(const std::string& data, size_t offset, size_t length)
 {
-  if (offset >= data.size())
+  if (offset + length > data.size())
     return "";
-  std::string value = data.substr(offset, std::min(length, data.size() - offset));
+  std::string value = data.substr(offset, length);
   const size_t nul = value.find('\0');
   if (nul != std::string::npos)
     value.erase(nul);
@@ -163,10 +188,11 @@ std::string CGameFileIdentity::FirstTrack(const std::string& sheetPath)
   return "";
 }
 
-std::string CGameFileIdentity::SerialFromHeader(const std::string& data, size_t at, int console)
+std::string CGameFileIdentity::SerialFromHeader(const std::string& data,
+                                                size_t at,
+                                                DiscHeader header)
 {
-  // 0: Dreamcast, 1: Saturn, 2: Mega-CD
-  if (console == 0)
+  if (header == DiscHeader::DREAMCAST)
   {
     // "MK-51171" or "T40201N", sometimes with a second field after a space
     std::string serial = HeaderField(data, at + 0x40, 0x10);
@@ -176,7 +202,7 @@ std::string CGameFileIdentity::SerialFromHeader(const std::string& data, size_t 
     return NormaliseSerial(serial);
   }
 
-  if (console == 1)
+  if (header == DiscHeader::SATURN)
     return NormaliseSerial(HeaderField(data, at + 0x20, 0x10));
 
   std::string serial = HeaderField(data, at + 0x180, 0x10);
@@ -199,11 +225,20 @@ std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath, uint
   // images, anywhere from 1 MB to 460 MB in. So the file is read through until
   // the header appears and reading stops the moment it does, which is no
   // dearer than hashing the file and usually far cheaper.
-  static constexpr std::array<std::pair<std::string_view, int>, 3> magics{{
-      {DREAMCAST_MAGIC, 0},
-      {SATURN_MAGIC, 1},
-      {MEGACD_MAGIC, 2},
+  static constexpr std::array<std::pair<std::string_view, DiscHeader>, 3> magics{{
+      {DREAMCAST_MAGIC, DiscHeader::DREAMCAST},
+      {SATURN_MAGIC, DiscHeader::SATURN},
+      {MEGACD_MAGIC, DiscHeader::MEGA_CD},
   }};
+
+  // PlayStation names itself in text rather than in a header
+  CRegExp playStation(true);
+  if (!playStation.RegComp("BOOT\\s*=\\s*cdrom:\\\\?([A-Z]{4})[_-]?([0-9]{3})\\.?([0-9]{2})"))
+    return "";
+  // So does a PSP disc, in UMD_DATA.BIN: "ULUS-10080|56D3ECEFB2365F41|0001|"
+  CRegExp psp(true);
+  if (!psp.RegComp("([A-Z]{4})-([0-9]{5})\\|[0-9A-F]{16}\\|"))
+    return "";
 
   // Enough of the last chunk is kept for a header that straddles the join
   static constexpr size_t OVERLAP = 0x400;
@@ -220,25 +255,22 @@ std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath, uint
     read += static_cast<uint64_t>(n);
     window.append(buffer.data(), static_cast<size_t>(n));
 
-    for (const auto& [magic, console] : magics)
+    for (const auto& [magic, header] : magics)
     {
       const size_t at = window.find(magic);
       if (at == std::string::npos)
         continue;
-      const std::string serial = SerialFromHeader(window, at, console);
+      const std::string serial = SerialFromHeader(window, at, header);
       if (!serial.empty())
         return serial;
     }
 
-    // PlayStation names itself in text rather than in a header
-    CRegExp re(true);
-    if (re.RegComp("BOOT\\s*=\\s*cdrom:\\\\?([A-Z]{4})[_-]?([0-9]{3})\\.?([0-9]{2})") &&
-        re.RegFind(window) >= 0)
-      return NormaliseSerial(re.GetMatch(1) + re.GetMatch(2) + re.GetMatch(3));
+    if (playStation.RegFind(window) >= 0)
+      return NormaliseSerial(playStation.GetMatch(1) + playStation.GetMatch(2) +
+                             playStation.GetMatch(3));
 
-    // So does a PSP disc, in UMD_DATA.BIN: "ULUS-10080|56D3ECEFB2365F41|0001|"
-    if (re.RegComp("([A-Z]{4})-([0-9]{5})\\|[0-9A-F]{16}\\|") && re.RegFind(window) >= 0)
-      return NormaliseSerial(re.GetMatch(1) + re.GetMatch(2));
+    if (psp.RegFind(window) >= 0)
+      return NormaliseSerial(psp.GetMatch(1) + psp.GetMatch(2));
 
     if (window.size() > OVERLAP)
       window.erase(0, window.size() - OVERLAP);
@@ -301,7 +333,7 @@ bool CGameFileIdentity::ListZip(const std::string& path, std::vector<ArchiveMemb
   return true;
 }
 
-bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
+bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file, uint64_t maxSize)
 {
   // A zip of several files may be an arcade set, which is known by all of them.
   // A zip of one keeps that file's CRC in its directory, which still names it
@@ -312,7 +344,7 @@ bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
   if (members.size() > 1)
     file.members = members;
 
-  if (HashLargestMember(path, file))
+  if (HashLargestMember(path, file, maxSize))
     return true;
 
   if (members.size() != 1)
@@ -325,11 +357,10 @@ bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file)
 
 bool CGameFileIdentity::ArchiveFiles(const std::string& path, CFileItemList& files)
 {
-  const std::string archiveUrl =
-      URIUtils::CreateArchivePath(
-          StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip" ? "zip" : "archive",
-          CURL(path), "")
-          .Get();
+  const std::string protocol = ArchiveProtocol(path);
+  if (protocol.empty())
+    return false;
+  const std::string archiveUrl = URIUtils::CreateArchivePath(protocol, CURL(path), "").Get();
 
   // The members are wanted as files. Letting Kodi convert them to directories
   // offers each one to every VFS add-on in turn to ask whether it is itself an
@@ -340,7 +371,7 @@ bool CGameFileIdentity::ArchiveFiles(const std::string& path, CFileItemList& fil
       archiveUrl, files, "", XFILE::DIR_FLAG_NO_FILE_DIRS | XFILE::DIR_FLAG_NO_FILE_INFO);
 }
 
-bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& file)
+bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& file, uint64_t maxSize)
 {
   // The largest member is the ROM
   CFileItemList members;
@@ -369,12 +400,12 @@ bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& fil
     return false;
   if (HasExtension(best->GetPath(), dsExtensions))
     file.serial = DsGameCode(Uncached(best->GetPath()));
-  if (best->GetSize() > static_cast<int64_t>(MAX_HASH_SIZE))
+  if (best->GetSize() > static_cast<int64_t>(maxSize))
     return false;
 
   GameFile member;
   member.size = static_cast<uint64_t>(best->GetSize());
-  if (!HashWhole(Uncached(best->GetPath()), member))
+  if (!HashWhole(Uncached(best->GetPath()), member, maxSize))
     return false;
 
   file.crc32 = member.crc32;
@@ -435,12 +466,14 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
       return !file.serial.empty();
     }
 
-    if (HasExtension(path, archiveExtensions))
+    const uint64_t limit = media == MediaFormat::UNKNOWN ? MAX_HASH_SIZE : MAX_ROM_HASH_SIZE;
+
+    if (!ArchiveProtocol(path).empty())
     {
-      const bool hashed = HashArchive(path, file);
-      if (media == MediaFormat::DISC)
-        file.serial = ReadArchivedDiscSerial(path);
-      return hashed || !file.serial.empty();
+      if (media != MediaFormat::DISC)
+        return HashArchive(path, file, limit) || !file.serial.empty();
+      file.serial = ReadArchivedDiscSerial(path);
+      return !file.serial.empty();
     }
 
     // A disc is known by the serial printed in its own header. Hashing the
@@ -457,7 +490,6 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
     if (HasExtension(path, dsExtensions))
       file.serial = DsGameCode(path);
 
-    const uint64_t limit = media == MediaFormat::UNKNOWN ? MAX_HASH_SIZE : MAX_ROM_HASH_SIZE;
     if (file.size > limit)
       return !file.serial.empty();
 
