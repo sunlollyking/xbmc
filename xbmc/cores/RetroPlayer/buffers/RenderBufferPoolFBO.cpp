@@ -318,6 +318,7 @@ IRenderBuffer* CRenderBufferPoolFBO::CaptureClientFrame(IRenderBuffer* clientBuf
   GLint prevRead = 0, prevDraw = 0;
   glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &prevRead);
   glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevDraw);
+  const GLboolean scissorEnabled = glIsEnabled(GL_SCISSOR_TEST);
   glDisable(GL_SCISSOR_TEST);
   glBindFramebuffer(GL_READ_FRAMEBUFFER, client->GetCurrentFramebuffer());
   GLint prevReadBuffer = 0;
@@ -336,6 +337,8 @@ IRenderBuffer* CRenderBufferPoolFBO::CaptureClientFrame(IRenderBuffer* clientBuf
   glReadBuffer(prevReadBuffer);
   glBindFramebuffer(GL_READ_FRAMEBUFFER, prevRead);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, prevDraw);
+  if (scissorEnabled)
+    glEnable(GL_SCISSOR_TEST);
 
   if (!ready)
   {
