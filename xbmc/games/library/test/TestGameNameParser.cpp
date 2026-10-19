@@ -190,7 +190,7 @@ TEST(TestGameNameParser, ReadsATosecNameWithNoPublisher)
 {
   const ParsedGameName parsed = CGameNameParser::Parse("Game (1990)(-)(PAL).adf");
   EXPECT_TRUE(parsed.publisher.empty());
-  EXPECT_EQ(parsed.unknownTags, std::vector<std::string>{"PAL"});
+  EXPECT_TRUE(parsed.unknownTags.empty());
 }
 
 TEST(TestGameNameParser, CreditsNoCompanyFromATosecName)
@@ -208,6 +208,53 @@ TEST(TestGameNameParser, ReadsATosecCountry)
   EXPECT_TRUE(CGameNameParser::Credits(parsed).empty());
   EXPECT_EQ(CGameNameParser::Parse("Galaga (1983)(Namco)(SE).tap").regions,
             (std::vector<std::string>{"Sweden"}));
+}
+
+TEST(TestGameNameParser, ReadsATosecCountryWhoseCodeIsALanguagesToo)
+{
+  const ParsedGameName canada = CGameNameParser::Parse("Game (1990)(Publisher)(CA).adf");
+  EXPECT_EQ(canada.regions, (std::vector<std::string>{"Canada"}));
+  EXPECT_TRUE(canada.languages.empty());
+  EXPECT_EQ(CGameNameParser::Parse("Game (1990)(Publisher)(AS).adf").regions,
+            (std::vector<std::string>{"Asia"}));
+}
+
+TEST(TestGameNameParser, ReadsATosecTranslation)
+{
+  const ParsedGameName parsed = CGameNameParser::Parse("Game (1990)(Publisher)[tr de].adf");
+  EXPECT_TRUE(parsed.translated);
+  EXPECT_EQ(parsed.translation, "de");
+}
+
+TEST(TestGameNameParser, ReadsAPrototypesBuildDate)
+{
+  const ParsedGameName parsed =
+      CGameNameParser::Parse("40 Winks (Europe) (En,Es,It) (Proto) (1999-10-07).z64");
+  EXPECT_EQ(parsed.year, 1999);
+  EXPECT_EQ(parsed.status, ReleaseStatus::PROTOTYPE);
+  EXPECT_FALSE(parsed.tosec);
+}
+
+TEST(TestGameNameParser, CreditsNoCompanyForWhatACartridgeWorksWith)
+{
+  EXPECT_TRUE(
+      CGameNameParser::Parse("Balloon Fight GB (Japan) (SGB Enhanced, GB Compatible) (NP).zip")
+          .unknownTags.empty());
+  EXPECT_TRUE(CGameNameParser::Parse("0002 Need for Speed - Underground 2 (US)(M5).zip")
+                  .unknownTags.empty());
+}
+
+TEST(TestGameNameParser, ReadsAGoodToolsCountryOnlyWhereGoodToolsWritesIt)
+{
+  EXPECT_EQ(
+      CGameNameParser::Parse("Corpse Killer - Graveyard Edition (USA) (Disc 1) (R).cue").regions,
+      (std::vector<std::string>{"USA"}));
+}
+
+TEST(TestGameNameParser, RestoresAnArticleTheSetsMove)
+{
+  EXPECT_EQ(CGameNameParser::DisplayTitle("Magische Eenhoorn, De"), "De Magische Eenhoorn");
+  EXPECT_EQ(CGameNameParser::DisplayTitle("Genio de las Palabras, El"), "El Genio de las Palabras");
 }
 
 TEST(TestGameNameParser, DropsAScenesReleaseNumber)
@@ -264,4 +311,30 @@ TEST(TestGameNameParser, TellsCompaniesApart)
   EXPECT_TRUE(CGameNameParser::SameCompany("Onion Soft", "Doujin - Onion Soft"));
   EXPECT_FALSE(CGameNameParser::SameCompany("Noripy", "BPS"));
   EXPECT_FALSE(CGameNameParser::SameCompany("Apollo Technica", "Tsukumo"));
+}
+
+TEST(TestGameNameParser, ReadsANumberTooLargeToBeOne)
+{
+  EXPECT_NO_THROW(CGameNameParser::Parse("Game (U) [h999999999999].nes"));
+  EXPECT_TRUE(CGameNameParser::Parse("Game (U) [h999999999999].nes").hack);
+  EXPECT_NO_THROW(
+      CGameNameParser::Parse("Game (1990)(Publisher)(M999999999999)[a99999999999].adf"));
+  EXPECT_TRUE(
+      CGameNameParser::Parse("Game (1990)(Publisher)(M999999999999)[a99999999999].adf").alternate);
+}
+
+TEST(TestGameNameParser, ReadsEachConventionsCodeForACountry)
+{
+  EXPECT_EQ(CGameNameParser::Parse("Game (D) [!].nes").regions,
+            (std::vector<std::string>{"Netherlands"}));
+  EXPECT_EQ(CGameNameParser::Parse("Game (Nl) [!].nes").regions,
+            (std::vector<std::string>{"Netherlands"}));
+  EXPECT_EQ(CGameNameParser::Parse("0822 Every Day DS Brain Training (KS).zip").regions,
+            (std::vector<std::string>{"Korea"}));
+}
+
+TEST(TestGameNameParser, RestoresTheArticleOfATosecTitle)
+{
+  EXPECT_EQ(CGameNameParser::Parse("Legend of TOSEC, The (1986)(Publisher).adf").displayTitle,
+            "The Legend of TOSEC");
 }

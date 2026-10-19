@@ -14,6 +14,7 @@
 #include "utils/URIUtils.h"
 
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -247,4 +248,87 @@ TEST(TestGameFileIdentity, DoesNotHashAnInstalledGamesLargestFile)
   EXPECT_TRUE(file.crc32.empty());
   EXPECT_TRUE(file.md5.empty());
   EXPECT_EQ(file.members.size(), 3U);
+}
+
+TEST(TestGameFileIdentity, KnowsAnArchivedDiscOnlyByItsSerial)
+{
+  // identity.zip holds a ROM, not a disc with a header
+  GameFile file;
+  EXPECT_FALSE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH(ARCHIVE), file, MediaFormat::DISC));
+  EXPECT_TRUE(file.crc32.empty());
+  EXPECT_TRUE(file.md5.empty());
+}
+
+TEST(TestGameFileIdentity, HashesALargeCartridgeInsideAnArchive)
+{
+  // large.zip holds 65 MB of zeros, over the size a file of unknown media is hashed at
+  const std::string path = XBMC_REF_FILE_PATH("xbmc/games/library/test/large.zip");
+
+  GameFile file;
+  EXPECT_TRUE(CGameFileIdentity::Identify(path, file, MediaFormat::CARTRIDGE));
+  EXPECT_EQ(file.crc32, "97d38551");
+  EXPECT_EQ(file.md5, "0a9739d8f171bb3a216168a2b7376e2e");
+
+  // Unhashed, it is still known by the CRC in the zip's directory
+  GameFile unknown;
+  EXPECT_TRUE(CGameFileIdentity::Identify(path, unknown, MediaFormat::UNKNOWN));
+  EXPECT_EQ(unknown.crc32, "97d38551");
+  EXPECT_TRUE(unknown.md5.empty());
+}
+
+namespace
+{
+// A disc image of zeros with a header written at an offset
+std::string WriteDisc(XFILE::CFile* disc,
+                      size_t size,
+                      size_t at,
+                      std::string_view magic,
+                      size_t serialOffset,
+                      std::string_view serial)
+{
+  std::string data(size, '\0');
+  data.replace(at, magic.size(), magic);
+  data.replace(at + serialOffset, serial.size(), serial);
+  EXPECT_EQ(disc->Write(data.data(), data.size()), static_cast<ssize_t>(data.size()));
+  disc->Flush();
+  return XBMC_TEMPFILEPATH(disc);
+}
+} // namespace
+
+TEST(TestGameFileIdentity, ReadsTheSerialOfEachDiscHeader)
+{
+  struct Disc
+  {
+    std::string_view magic;
+    size_t serialOffset;
+    std::string_view serial;
+    std::string_view expected;
+  };
+  const std::vector<Disc> discs{
+      {"SEGA SEGAKATANA", 0x40, "MK-51171        ", "MK51171"},
+      {"SEGA SEGASATURN", 0x20, "GS-9076   V1.000", "GS9076"},
+      {"SEGADISCSYSTEM", 0x180, "GM MK-4407 -00  ", "MK4407"},
+  };
+
+  for (const Disc& d : discs)
+  {
+    XFILE::CFile* disc = XBMC_CREATETEMPFILE(".bin");
+    ASSERT_NE(disc, nullptr);
+    const std::string path = WriteDisc(disc, 64 * 1024, 0x10, d.magic, d.serialOffset, d.serial);
+    EXPECT_EQ(CGameFileIdentity::ReadDiscSerial(path), d.expected) << d.magic;
+    XBMC_DELETETEMPFILE(disc);
+  }
+}
+
+TEST(TestGameFileIdentity, ReadsAHeaderThatStraddlesTwoReads)
+{
+  // Discs are read a megabyte at a time. Only "MK-5" of the serial is in the first.
+  constexpr size_t READ = 1024 * 1024;
+  XFILE::CFile* disc = XBMC_CREATETEMPFILE(".bin");
+  ASSERT_NE(disc, nullptr);
+  const std::string path =
+      WriteDisc(disc, READ + 64 * 1024, READ - 0x44, "SEGA SEGAKATANA", 0x40, "MK-51171        ");
+
+  EXPECT_EQ(CGameFileIdentity::ReadDiscSerial(path), "MK51171");
+  XBMC_DELETETEMPFILE(disc);
 }

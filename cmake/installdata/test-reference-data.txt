@@ -49,6 +49,7 @@ xbmc/games/library/test/disc.zip
 xbmc/games/library/test/ds.zip
 xbmc/games/library/test/folder.zip
 xbmc/games/library/test/identity.zip
+xbmc/games/library/test/large.zip
 xbmc/games/library/test/nested.zip
 xbmc/games/library/test/program.zip
 xbmc/games/library/test/psp.zip

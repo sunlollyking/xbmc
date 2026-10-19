@@ -274,6 +274,7 @@ struct GameFile
   std::string crc32;
   std::string md5;
   std::string sha1;
+  std::string sha256; // not computed yet
   std::string serial;
   std::string raHash; // the RetroAchievements hash, when the platform has one
   int disc{0}; // 1-based for multi-disc releases, 0 otherwise
