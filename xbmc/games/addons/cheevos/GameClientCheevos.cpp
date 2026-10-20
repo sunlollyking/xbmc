@@ -133,7 +133,14 @@ void CGameClientCheevos::Notify(const Observable& obs, const ObservableMessage m
 
   // Only hardcore is applied as it changes. Encore is read as a game is
   // identified, and SendCredentials() sends it with the next one.
-  const bool hardcore = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+  const bool setting = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+
+  // Turning the setting off and on again asks the client afresh. Any other
+  // change leaves a game that left hardcore where it is.
+  if (!setting)
+    m_hardcoreLeft = false;
+
+  const bool hardcore = setting && !m_hardcoreLeft;
   if (m_hardcoreEnabled.exchange(hardcore) == hardcore)
     return;
 
@@ -222,13 +229,12 @@ void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
   if (achievementState.totalAchievements == 0)
     return;
 
-  // RetroAchievements asks for the mode to be shown as a game starts. The
-  // setting is the mode in force by now: resuming a save state has already
-  // dropped it to casual.
+  // RetroAchievements asks for the mode to be shown as a game starts. The mode
+  // is settled by now: resuming a save state has already dropped it to casual.
   //
   // "Hardcore mode: {0:d} of {1:d} achievements unlocked" or
   // "{0:d} of {1:d} achievements unlocked"
-  const bool hardcore = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+  const bool hardcore = m_hardcoreEnabled;
   const std::string description =
       StringUtils::Format(Localize(hardcore ? 35703 : 35284), achievementState.unlockedAchievements,
                           achievementState.totalAchievements);
@@ -529,8 +535,9 @@ bool CGameClientCheevos::SendCredentials()
 
   CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
-  // Recorded whether or not anyone is signed in: the cheats go by the same
-  // setting as the game loads, and a later change is judged against this
+  // Recorded whether or not anyone is signed in: the cheats go by it as the
+  // game loads, and a later change is judged against it
+  m_hardcoreLeft = false;
   m_hardcoreEnabled = gameSettings.GetAchievementsHardcore();
 
   const std::string username = gameSettings.GetRAUsername();
@@ -748,13 +755,26 @@ bool CGameClientCheevos::SetHardcoreEnabled(bool enabled)
   return false;
 }
 
+void CGameClientCheevos::LeaveHardcore()
+{
+  m_hardcoreLeft = true;
+  if (!m_hardcoreEnabled.exchange(false))
+    return;
+
+  // In the order Notify() turns it off: the client refuses cheats until it has
+  // heard
+  SetHardcoreEnabled(false);
+  m_gameClient.Cheats().SetHardcore(false);
+}
+
 void CGameClientCheevos::DropHardcore()
 {
-  CLog::Log(LOGINFO, "GAME: {} refused hardcore mode, turning it off", m_gameClient.ID());
+  CLog::Log(LOGINFO, "GAME: {} refused hardcore mode, playing this game in casual mode",
+            m_gameClient.ID());
 
+  m_hardcoreLeft = true;
   m_hardcoreEnabled = false;
   m_gameClient.Cheats().SetHardcore(false);
-  CServiceBroker::GetGameServices().GameSettings().SetAchievementsHardcore(false);
 
   // "Hardcore mode turned off. Achievements will be earned in casual mode."
   CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, m_gameClient.Name(),

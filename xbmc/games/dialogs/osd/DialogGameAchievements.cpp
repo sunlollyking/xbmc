@@ -21,6 +21,9 @@
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
+#include "games/GameUtils.h"
+#include "games/addons/GameClient.h"
+#include "games/addons/cheevos/GameClientCheevos.h"
 #include "games/dialogs/DialogGameDefines.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
@@ -724,6 +727,7 @@ void CDialogGameAchievements::OnHardcoreToggled()
   // The whole OSD goes, not just this dialog: the player asked for the game to
   // restart, and leaving them on the menu they opened hides it. An emulator
   // that refused hardcore doesn't restart.
-  if (enabling && gameSettings.GetAchievementsHardcore())
+  const GameClientPtr gameClient = CGameUtils::GetPlayingGameClient();
+  if (enabling && gameClient && gameClient->Cheevos().IsHardcoreActive())
     CServiceBroker::GetGameRenderManager().RegisterGameSettingsDialog()->CloseOSD();
 }

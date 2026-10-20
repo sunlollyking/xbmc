@@ -25,6 +25,7 @@
 #include "games/GameUtils.h"
 #include "games/addons/GameClient.h"
 #include "games/addons/cheats/GameClientCheats.h"
+#include "games/addons/cheevos/GameClientCheevos.h"
 #include "games/library/GameLibraryTypes.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
@@ -696,7 +697,8 @@ bool CGamesGUIInfo::GetBool(bool& value,
     }
     case RETROPLAYER_ACHIEVEMENTS_HARDCORE:
     {
-      value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+      const GameClientPtr gameClient = CGameUtils::GetPlayingGameClient();
+      value = gameClient && gameClient->Cheevos().IsHardcoreActive();
       return true;
     }
     default:
