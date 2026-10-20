@@ -33,10 +33,6 @@ void main()
   if (gui.a == 0.0)
     discard;
 
-  // The GUI drew its colour premultiplied by coverage, and the blend applies
-  // the coverage again
-  gui.rgb /= gui.a;
-
   // sRGB -> linear via LUT (IEC 61966-2-1 EOTF, replaces inline pow)
   vec3 linear = vec3(
     texture2D(u_lutDegamma, vec2(gui.r, 0.5)).r,
@@ -89,5 +85,6 @@ void main()
   result = result * ((235.0 - 16.0) / 255.0) + (16.0 / 255.0);
 #endif
 
-  gl_FragColor = vec4(result, gui.a);
+  // The FBO holds coverage; squaring compensates for PQ/HLG blending and keeps opaque GUI opaque.
+  gl_FragColor = vec4(result, gui.a * gui.a);
 }

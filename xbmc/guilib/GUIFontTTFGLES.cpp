@@ -127,9 +127,7 @@ bool CGUIFontTTFGLES::FirstBegin()
     m_textureStatus = TEXTURE_READY;
   }
 
-  // Coverage accumulates in alpha while the colour builds up premultiplied by
-  // it. Over HDR, Kodi's GUI composite divides the alpha back out before it
-  // converts the colour, so a translucent panel is as opaque as over SDR.
+  // Accumulate coverage; the HDR composite shader squares it to compensate for blending in PQ/HLG.
   glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
   glActiveTexture(GL_TEXTURE0);
