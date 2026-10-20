@@ -18,7 +18,6 @@
 #include "cores/RetroPlayer/guibridge/GUIGameSettingsHandle.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/CurlFile.h"
-#include "dialogs/GUIDialogYesNo.h"
 #include "games/AchievementRuntime.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
@@ -717,19 +716,8 @@ void CDialogGameAchievements::OnHardcoreToggled()
 
   const bool enabling = !gameSettings.GetAchievementsHardcore();
 
-  // Only turning it on is asked about, and only while a game is up: that is
-  // the case that costs the player the session they are in. The radio button
-  // takes its state from the setting, so a refusal here corrects it.
-  //
-  // "Hardcore mode", "Starting a hardcore session restarts the game...", "Continue?"
-  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-  if (enabling && appPlayer->IsPlayingGame() &&
-      !CGUIDialogYesNo::ShowAndGetInput(CVariant{35700},
-                                        CVariant{Localize(35702) + "[CR][CR]" + Localize(19194)}))
-  {
-    return;
-  }
-
+  // Turning it on during a game asks first, and the radio button takes its
+  // state from the setting, so a refusal leaves both as they were
   gameSettings.SetAchievementsHardcore(enabling);
   CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
 

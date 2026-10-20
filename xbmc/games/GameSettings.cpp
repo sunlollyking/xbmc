@@ -13,7 +13,10 @@
 #include "addons/AddonManager.h"
 #include "addons/IAddon.h"
 #include "addons/addoninfo/AddonType.h"
+#include "application/ApplicationComponents.h"
+#include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogKaiToast.h"
+#include "dialogs/GUIDialogYesNo.h"
 #include "events/EventLog.h"
 #include "events/NotificationEvent.h"
 #include "filesystem/CurlFile.h"
@@ -274,6 +277,25 @@ void CGameSettings::OnSettingAction(const std::shared_ptr<const CSetting>& setti
   }
   else if (setting->GetId() == SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT)
     CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_DIALOG_GAME_ACHIEVEMENTS);
+}
+
+bool CGameSettings::OnSettingChanging(const std::shared_ptr<const CSetting>& setting)
+{
+  if (setting == nullptr || setting->GetId() != SETTING_GAMES_ACHIEVEMENTS_HARDCORE ||
+      !std::dynamic_pointer_cast<const CSettingBool>(setting)->GetValue())
+    return true;
+
+  // Only turning it on is asked about, and only while a game is up: that is
+  // the case that costs the player the session they are in. Asked here so
+  // that every way of turning it on asks, the settings window included.
+  const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
+  if (!appPlayer || !appPlayer->IsPlayingGame())
+    return true;
+
+  // "Hardcore mode", "Starting a hardcore session restarts the game...", "Continue?"
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+  return CGUIDialogYesNo::ShowAndGetInput(
+      CVariant{35700}, CVariant{strings.Get(35702) + "[CR][CR]" + strings.Get(19194)});
 }
 
 void CGameSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& setting)

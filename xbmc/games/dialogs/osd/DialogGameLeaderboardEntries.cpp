@@ -132,7 +132,12 @@ public:
     {
       const std::optional<CVariant> own = RequestEntries(StringUtils::Format(
           LBINFO_PLAYER_BODY, m_id, CURL::Encode(m_username), CURL::Encode(m_token)));
-      if (own && own->begin_array() != own->end_array())
+
+      // Kept without it, the player would read as not having entered
+      if (!own)
+        return false;
+
+      if (own->begin_array() != own->end_array())
       {
         LeaderboardEntry entry = ReadEntry(*own->begin_array());
         if (entry.isPlayer)

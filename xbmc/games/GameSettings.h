@@ -135,6 +135,7 @@ public:
 
   // Inherited from ISettingCallback
   void OnSettingAction(const std::shared_ptr<const CSetting>& setting) override;
+  bool OnSettingChanging(const std::shared_ptr<const CSetting>& setting) override;
   void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
 
 private:
