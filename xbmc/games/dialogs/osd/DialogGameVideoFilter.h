@@ -53,6 +53,12 @@ private:
   void InitCategories();
   void BindCategories();
   bool HasCategories();
+
+  /*!
+   * \brief Show the filters of the category the category list has selected
+   */
+  void UpdateCategory();
+  void ApplyVideoFilter(const CFileItem& item);
   void OnGetMore();
   void OnGetMoreComplete();
 
@@ -66,13 +72,14 @@ private:
   {
     std::string path;
     std::string name;
-    std::string folder;
+    std::string category;
   };
 
   // GUI state
   unsigned int m_focusedItemIndex{0};
   unsigned int m_categoryIndex{0};
   bool m_regenerateList{false};
+  bool m_refreshingList{false};
 };
 } // namespace GAME
 } // namespace KODI

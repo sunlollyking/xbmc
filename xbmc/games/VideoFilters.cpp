@@ -53,7 +53,7 @@ struct VideoFilterProperties
 {
   std::string path;
   std::string name;
-  std::string folder;
+  std::string category;
 };
 
 TiXmlNode* GetFirstChildOfNode(TiXmlNode& node, const char* childName)
@@ -151,9 +151,12 @@ void AddShaderPresets(CFileItemList& items)
     if (nameNode)
       videoFilter.name = nameNode->Value();
 
-    const TiXmlNode* folderNode{GetFirstChildOfNode(*child, "folder")};
-    if (folderNode)
-      videoFilter.folder = folderNode->Value();
+    // Presets named their category "folder" before
+    const TiXmlNode* categoryNode{GetFirstChildOfNode(*child, "category")};
+    if (!categoryNode)
+      categoryNode = GetFirstChildOfNode(*child, "folder");
+    if (categoryNode)
+      videoFilter.category = categoryNode->Value();
 
     videoFilters.emplace_back(videoFilter);
   }
@@ -167,7 +170,7 @@ void AddShaderPresets(CFileItemList& items)
       continue;
 
     auto item{std::make_shared<CFileItem>(videoFilter.name)};
-    item->SetLabel2(videoFilter.folder);
+    item->SetLabel2(videoFilter.category);
     item->SetProperty("game.videofilter", CVariant{videoFilter.path});
     item->SetArt("icon", ICON_VIDEO);
 
