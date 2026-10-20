@@ -235,10 +235,15 @@ bool CRPRendererOpenGLES::LoadHdrShader()
 
 void CRPRendererOpenGLES::DrawFrame(uint8_t alpha, float width, float height)
 {
+  // A frame's own alpha means nothing, and an XRGB core or a video filter can
+  // leave it at zero. Over HDR, Kodi lays the GUI on the picture by the GUI's
+  // alpha, so a zero let the picture through where a game was drawn in the GUI.
+  // A fade is blended in instead.
   if (alpha < 255)
   {
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendColor(0.0f, 0.0f, 0.0f, alpha / 255.0f);
+    glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
   }
   else
   {
@@ -272,7 +277,7 @@ void CRPRendererOpenGLES::DrawFrame(uint8_t alpha, float width, float height)
   }
 
   // Use GUI shader
-  m_context.EnableGUIShader(GL_SHADER_METHOD::TEXTURE);
+  m_context.EnableGUIShader(GL_SHADER_METHOD::TEXTURE_NOALPHA);
 
   GLint uniColLoc = m_context.GUIShaderGetUniCol();
   GLint depthLoc = m_context.GUIShaderGetDepth();

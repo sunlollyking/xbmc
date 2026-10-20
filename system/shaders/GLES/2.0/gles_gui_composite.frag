@@ -33,6 +33,10 @@ void main()
   if (gui.a == 0.0)
     discard;
 
+  // The GUI drew its colour premultiplied by coverage, and the blend applies
+  // the coverage again
+  gui.rgb /= gui.a;
+
   // sRGB -> linear via LUT (IEC 61966-2-1 EOTF, replaces inline pow)
   vec3 linear = vec3(
     texture2D(u_lutDegamma, vec2(gui.r, 0.5)).r,
