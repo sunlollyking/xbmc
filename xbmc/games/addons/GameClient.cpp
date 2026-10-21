@@ -841,6 +841,30 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
     names.push_back(name);
   }
 
+  // A disc's sheet names its tracks, which are kept beside it in the archive
+  if (URIUtils::HasExtension(archivedPath, ".cue|.gdi"))
+  {
+    CFileItemList tracks;
+    if (!XFILE::CDirectory::GetDirectory(URIUtils::GetDirectory(archivedPath), tracks, "",
+                                         XFILE::DIR_FLAG_DEFAULTS))
+      return "";
+
+    for (const auto& track : tracks)
+    {
+      const std::string name = URIUtils::GetFileName(track->GetPath());
+      if (track->IsFolder() || URIUtils::HasExtension(name, ".cue|.gdi"))
+        continue;
+      if (!IsSafeName(name))
+        return "";
+      const std::string target = URIUtils::AddFileToFolder(folder, name);
+      if (!XFILE::CFile::Exists(target) && !CopyWhole(track->GetPath(), target))
+      {
+        CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(track->GetPath()));
+        return "";
+      }
+    }
+  }
+
   std::string game = URIUtils::AddFileToFolder(folder, names.front());
 
   // A playlist lets the emulator swap to the other disks
