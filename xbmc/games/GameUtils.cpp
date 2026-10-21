@@ -55,6 +55,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -579,6 +580,19 @@ void CGameUtils::OpenInsideArchive(CFileItem& item)
     {
       if (!file->IsFolder() && HasGameExtension(file->GetPath()))
         games.push_back(file->GetPath());
+    }
+
+    // A playlist or a disc's sheet names the other files, so it is what to open
+    for (const char* sheets : {".m3u", ".cue|.gdi"})
+    {
+      std::vector<std::string> named;
+      std::ranges::copy_if(games, std::back_inserter(named), [sheets](const std::string& game)
+                           { return URIUtils::HasExtension(game, sheets); });
+      if (!named.empty())
+      {
+        games = std::move(named);
+        break;
+      }
     }
 
     if (games.size() > 1)
