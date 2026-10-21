@@ -179,6 +179,19 @@ bool CAgentInput::OnButtonPress(MOUSE::BUTTON_ID button)
   return false;
 }
 
+PERIPHERALS::PeripheralVector CAgentInput::GetPlayerPeripherals() const
+{
+  PERIPHERALS::PeripheralVector peripherals;
+
+  if (m_gameClient)
+  {
+    for (const auto& [portAddress, joystick] : m_gameClient->Input().GetJoystickMap())
+      peripherals.emplace_back(joystick->GetSource());
+  }
+
+  return peripherals;
+}
+
 std::vector<std::shared_ptr<const CAgentController>> CAgentInput::GetControllers() const
 {
   std::lock_guard<std::mutex> lock(m_controllerMutex);
