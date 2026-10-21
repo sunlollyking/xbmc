@@ -19698,37 +19698,7 @@ msgctxt "#35312"
 msgid "Shows games that use a video filter, such as a CRT filter, in HDR on a display that supports it. The light that scanlines and phosphor masks take away comes back from the display's extra brightness."
 msgstr ""
 
-#. Label of the setting for how bright white is in HDR games
-#: system/settings/settings.xml
-msgctxt "#35313"
-msgid "Paper white"
-msgstr ""
-
-#. Help text of setting with label #35313
-#: system/settings/settings.xml
-msgctxt "#35314"
-msgid "How bright ordinary white is shown when a game is in HDR."
-msgstr ""
-
-#. Label of the setting for the brightest light in HDR games
-#: system/settings/settings.xml
-msgctxt "#35315"
-msgid "Peak brightness"
-msgstr ""
-
-#. Help text of setting with label #35315
-#: system/settings/settings.xml
-msgctxt "#35316"
-msgid "How bright the brightest parts of a video filter, such as lit phosphors, may get when a game is in HDR."
-msgstr ""
-
-#. Value of the HDR brightness settings, {0:d} is the luminance
-#: system/settings/settings.xml
-msgctxt "#35317"
-msgid "{0:d} nits"
-msgstr ""
-
-#empty strings from id 35318 to 35319
+#empty strings from id 35313 to 35319
 
 #. Label of the Cheats button in the game OSD, heading of the cheats dialog, and
 #. of the cheats group in settings

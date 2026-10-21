@@ -775,9 +775,6 @@ void CRPRenderManager::RenderWindow(bool bClear,
 
     if (m_hdrOutput)
     {
-      const auto& settings = CServiceBroker::GetGameServices().GameSettings();
-      const unsigned int paperWhite = settings.HdrPaperWhite();
-
       // Kodi lays the GUI over HDR less opaquely than over SDR, and a game's
       // highlights showed through a menu brighter than the menu's text. With
       // a menu open, nothing in the game is brighter than paper white.
@@ -785,7 +782,7 @@ void CRPRenderManager::RenderWindow(bool bClear,
       const bool menuOpen = windowManager.HasVisibleModalDialog() ||
                             windowManager.IsWindowVisible(WINDOW_DIALOG_GAME_OSD);
 
-      renderer->SetHdrLuminance(paperWhite, menuOpen ? paperWhite : settings.HdrPeakLuminance());
+      renderer->SetHdrLuminance(HDR_REFERENCE_WHITE, menuOpen ? HDR_REFERENCE_WHITE : m_hdrPeak);
     }
 
     RenderInternal(renderer, renderBuffer, bClear, 255);
@@ -844,12 +841,10 @@ void CRPRenderManager::SetHdrOutput(bool hdr)
     return;
   }
 
-  const auto& settings = CServiceBroker::GetGameServices().GameSettings();
-  const unsigned int paperWhite = settings.HdrPaperWhite();
-  const unsigned int peak = settings.HdrPeakLuminance();
+  const unsigned int peak = GetHdrPeak(windowing->GetDisplayHDRCapabilities().GetMaxLuminance());
 
   VideoPicture picture;
-  GetHdrOutputPicture(picture, paperWhite, peak);
+  GetHdrOutputPicture(picture, HDR_REFERENCE_WHITE, peak);
 
   if (!windowing->SetVideoOutput(&picture))
     CLog::Log(LOGWARNING, "RetroPlayer[RENDER]: The display has no 10-bit output for HDR");
@@ -869,8 +864,9 @@ void CRPRenderManager::SetHdrOutput(bool hdr)
   }
 
   m_hdrOutput = true;
+  m_hdrPeak = peak;
   CLog::Log(LOGINFO, "RetroPlayer[RENDER]: Showing the game in HDR, white at {} nits, peak {} nits",
-            paperWhite, peak);
+            HDR_REFERENCE_WHITE, peak);
 }
 
 void CRPRenderManager::RenderControl(bool bClear,

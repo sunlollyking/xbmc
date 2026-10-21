@@ -56,12 +56,6 @@ public:
    * scanlines and phosphor mask take away.
    */
   bool HdrWithVideoFilters() const;
-
-  //! Luminance, in nits, that white is shown at in HDR
-  unsigned int HdrPaperWhite() const;
-
-  //! Luminance, in nits, that a video filter's brightest light may reach in HDR
-  unsigned int HdrPeakLuminance() const;
   std::string GetRAUsername() const;
   std::string GetRAToken() const;
 

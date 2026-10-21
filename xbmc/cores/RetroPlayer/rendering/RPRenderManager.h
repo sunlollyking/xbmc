@@ -360,6 +360,7 @@ private:
   uint64_t m_lastFrameTaken{0}; // Rendering thread only
   bool m_hdrOutput{false}; // Rendering thread only
   bool m_hdrRefused{false}; // Rendering thread only
+  unsigned int m_hdrPeak{0}; // Rendering thread only, in nits
   bool m_windowRendered{false}; // Rendering thread only
   std::map<AVPixelFormat, std::map<AVPixelFormat, SwsContext*>> m_scalers; // From -> to -> context
   std::vector<uint8_t> m_cachedFrame;

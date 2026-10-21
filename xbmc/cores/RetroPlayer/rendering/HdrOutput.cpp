@@ -28,6 +28,14 @@ AVRational Chromaticity(double value)
 }
 } // namespace
 
+unsigned int KODI::RETRO::GetHdrPeak(float displayMaxLuminance)
+{
+  if (displayMaxLuminance <= 0.0f)
+    return HDR_DEFAULT_PEAK;
+
+  return std::max(static_cast<unsigned int>(displayMaxLuminance + 0.5f), HDR_REFERENCE_WHITE);
+}
+
 void KODI::RETRO::GetHdrOutputPicture(VideoPicture& picture,
                                       unsigned int paperWhite,
                                       unsigned int peak)

@@ -12,6 +12,21 @@ struct VideoPicture;
 
 namespace KODI::RETRO
 {
+//! Luminance in nits of ordinary white in HDR, the reference white of
+//! ITU-R BT.2408
+constexpr unsigned int HDR_REFERENCE_WHITE = 203;
+
+//! Luminance in nits of the brightest light when the display doesn't say
+constexpr unsigned int HDR_DEFAULT_PEAK = 1000;
+
+/*!
+ * \brief The brightest light a game is shown with in HDR
+ *
+ * \param displayMaxLuminance What the display's EDID asks content to stay
+ *        under, in nits, or 0 if it doesn't say
+ */
+unsigned int GetHdrPeak(float displayMaxLuminance);
+
 /*!
  * \brief Describe the HDR10 output a game is shown in, for the windowing
  *        system's HDR calls

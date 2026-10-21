@@ -42,3 +42,19 @@ TEST(TestHdrOutput, CarriesTheBrightestLight)
   EXPECT_EQ(picture.lightMetadata.MaxCLL, 1000u);
   EXPECT_EQ(picture.lightMetadata.MaxFALL, 200u);
 }
+
+TEST(TestHdrOutput, TakesThePeakFromTheDisplay)
+{
+  EXPECT_EQ(GetHdrPeak(600.4f), 600u);
+  EXPECT_EQ(GetHdrPeak(1499.6f), 1500u);
+}
+
+TEST(TestHdrOutput, AssumesAPeakTheDisplayDoesNotGive)
+{
+  EXPECT_EQ(GetHdrPeak(0.0f), HDR_DEFAULT_PEAK);
+}
+
+TEST(TestHdrOutput, KeepsThePeakAboveWhite)
+{
+  EXPECT_EQ(GetHdrPeak(100.0f), HDR_REFERENCE_WHITE);
+}

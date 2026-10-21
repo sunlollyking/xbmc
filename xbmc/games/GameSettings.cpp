@@ -56,8 +56,6 @@ const std::string SETTING_GAMES_RUNAHEADFRAMES = "gamesgeneral.runaheadframes";
 const std::string SETTING_GAMES_SYNC_TO_DISPLAY = "gamesgeneral.synctodisplay";
 const std::string SETTING_GAMES_SYNC_TO_DISPLAY_LIMIT = "gamesgeneral.synctodisplaylimit";
 const std::string SETTING_GAMES_HDR_VIDEO_FILTERS = "gamesgeneral.hdrvideofilters";
-const std::string SETTING_GAMES_HDR_PAPER_WHITE = "gamesgeneral.hdrpaperwhite";
-const std::string SETTING_GAMES_HDR_PEAK = "gamesgeneral.hdrpeak";
 const std::string SETTING_GAMES_ACHIEVEMENTS_CREATE_ACCOUNT = "gamesachievements.createaccount";
 const std::string SETTING_GAMES_ACHIEVEMENTS_USERNAME = "gamesachievements.username";
 const std::string SETTING_GAMES_ACHIEVEMENTS_PASSWORD = "gamesachievements.password";
@@ -190,16 +188,6 @@ double CGameSettings::SyncToDisplayLimit()
 bool CGameSettings::HdrWithVideoFilters() const
 {
   return m_settings->GetBool(SETTING_GAMES_HDR_VIDEO_FILTERS);
-}
-
-unsigned int CGameSettings::HdrPaperWhite() const
-{
-  return static_cast<unsigned int>(std::max(m_settings->GetInt(SETTING_GAMES_HDR_PAPER_WHITE), 1));
-}
-
-unsigned int CGameSettings::HdrPeakLuminance() const
-{
-  return static_cast<unsigned int>(std::max(m_settings->GetInt(SETTING_GAMES_HDR_PEAK), 1));
 }
 
 std::string CGameSettings::GetRAUsername() const
