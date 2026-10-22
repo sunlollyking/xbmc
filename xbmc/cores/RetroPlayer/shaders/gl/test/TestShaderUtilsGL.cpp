@@ -14,20 +14,36 @@
 
 using namespace KODI::SHADER;
 
-TEST(TestShaderUtilsGL, KeepsTheProfileInTheVersion)
+TEST(TestShaderUtilsGL, DropsTheProfileFromTheVersion)
 {
   std::string source = "#version 330 core\nvoid main() {}\n";
 
-  EXPECT_EQ(CShaderUtilsGL::GetGLSLVersion(source), "#version 330 core\n");
+  EXPECT_EQ(CShaderUtilsGL::GetGLSLVersion(source), "#version 330\n");
   EXPECT_EQ(source, "\nvoid main() {}\n");
 }
 
-TEST(TestShaderUtilsGL, KeepsTheRestOfTheVersionLine)
+TEST(TestShaderUtilsGL, KeepsACommentOnTheVersionLine)
 {
-  std::string source = "#version 330 core /* note\ncontinued */\nvoid main() {}\n";
+  std::string source = "#version 330 core // note\nvoid main() {}\n";
 
-  EXPECT_EQ(CShaderUtilsGL::GetGLSLVersion(source), "#version 330 core\n");
-  EXPECT_EQ(source, " /* note\ncontinued */\nvoid main() {}\n");
+  EXPECT_EQ(CShaderUtilsGL::GetGLSLVersion(source), "#version 330\n");
+  EXPECT_EQ(source, " // note\nvoid main() {}\n");
+}
+
+TEST(TestShaderUtilsGL, KeepsABlockCommentStartedOnTheVersionLine)
+{
+  std::string source = "#version 330 /* comment\ncontinued */\nvoid main() {}\n";
+
+  EXPECT_EQ(CShaderUtilsGL::GetGLSLVersion(source), "#version 330\n");
+  EXPECT_EQ(source, " /* comment\ncontinued */\nvoid main() {}\n");
+}
+
+TEST(TestShaderUtilsGL, KeepsAWordThatIsNotAProfile)
+{
+  std::string source = "#version 330 corelike\nvoid main() {}\n";
+
+  EXPECT_EQ(CShaderUtilsGL::GetGLSLVersion(source), "#version 330\n");
+  EXPECT_EQ(source, " corelike\nvoid main() {}\n");
 }
 
 TEST(TestShaderUtilsGL, KeepsAVersionWithoutAProfile)

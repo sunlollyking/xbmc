@@ -22,12 +22,12 @@ TEST(TestShaderUtilsGLES, DropsTheProfileFromTheVersion)
   EXPECT_EQ(source, "\nvoid main() {}\n");
 }
 
-TEST(TestShaderUtilsGLES, KeepsTheRestOfTheVersionLine)
+TEST(TestShaderUtilsGLES, KeepsACommentOnTheVersionLine)
 {
-  std::string source = "#version 120 /* note\ncontinued */\nvoid main() {}\n";
+  std::string source = "#version 120 /* comment\ncontinued */\nvoid main() {}\n";
 
   EXPECT_EQ(CShaderUtilsGLES::GetGLSLVersion(source), "#version 100\n");
-  EXPECT_EQ(source, " /* note\ncontinued */\nvoid main() {}\n");
+  EXPECT_EQ(source, " /* comment\ncontinued */\nvoid main() {}\n");
 }
 
 TEST(TestShaderUtilsGLES, KeepsAnOpenGLESVersion)

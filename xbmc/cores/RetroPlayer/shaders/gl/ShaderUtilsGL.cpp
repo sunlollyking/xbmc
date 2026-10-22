@@ -11,7 +11,7 @@
 #include "ServiceBroker.h"
 #include "rendering/gl/RenderSystemGL.h"
 
-#include <algorithm>
+#include <string_view>
 
 using namespace KODI::SHADER;
 
@@ -43,7 +43,6 @@ std::string CShaderUtilsGL::GetGLSLVersion(std::string& source)
 {
   unsigned int version;
   std::string versionString;
-  std::string profile;
 
   const size_t sourceVersionPosition = source.find("#version ");
 
@@ -57,24 +56,26 @@ std::string CShaderUtilsGL::GetGLSLVersion(std::string& source)
     {
       version = std::stoul(sourceVersion, &sourceVersionSize, 10);
 
-      // A profile, such as "core", may follow the version number
-      const size_t profileStart =
-          std::min(sourceVersion.find_first_not_of(" \t", sourceVersionSize), sourceVersion.size());
-      const size_t profileEnd =
-          std::min(sourceVersion.find_first_not_of("abcdefghijklmnopqrstuvwxyz", profileStart),
-                   sourceVersion.size());
-      profile = sourceVersion.substr(profileStart, profileEnd - profileStart);
-
-      // Keep only source code after the version define
-      source = sourceVersion.substr(profile.empty() ? sourceVersionSize : profileEnd);
+      // Keep only source code after the version and its profile, if any. The
+      // rest of that line can only be a comment, which may continue past it.
+      size_t versionEnd = sourceVersionSize;
+      const size_t profileStart = sourceVersion.find_first_not_of(" \t", sourceVersionSize);
+      if (profileStart != std::string::npos)
+      {
+        const size_t profileEnd = sourceVersion.find_first_of(" \t\r\n/", profileStart);
+        const std::string_view profile =
+            std::string_view(sourceVersion).substr(profileStart, profileEnd - profileStart);
+        if (profile == "core" || profile == "compatibility" || profile == "es")
+          versionEnd = profileStart + profile.size();
+      }
+      source = sourceVersion.substr(versionEnd);
     }
     else
     {
       return "\n";
     }
 
-    versionString =
-        "#version " + std::to_string(version) + (profile.empty() ? "" : " " + profile) + "\n";
+    versionString = "#version " + std::to_string(version) + "\n";
   }
   // Set GLSL version according to GL version
   else

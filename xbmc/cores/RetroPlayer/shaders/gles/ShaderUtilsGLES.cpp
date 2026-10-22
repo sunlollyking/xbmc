@@ -11,7 +11,7 @@
 #include "ServiceBroker.h"
 #include "rendering/gles/RenderSystemGLES.h"
 
-#include <algorithm>
+#include <string_view>
 
 using namespace KODI::SHADER;
 
@@ -56,16 +56,19 @@ std::string CShaderUtilsGLES::GetGLSLVersion(std::string& source)
     {
       version = std::stoul(sourceVersion, &sourceVersionSize, 10);
 
-      // Skip a profile, such as "core", after the version number. The OpenGL
-      // ES version written below has its own.
-      const size_t profileStart =
-          std::min(sourceVersion.find_first_not_of(" \t", sourceVersionSize), sourceVersion.size());
-      const size_t profileEnd =
-          std::min(sourceVersion.find_first_not_of("abcdefghijklmnopqrstuvwxyz", profileStart),
-                   sourceVersion.size());
-
-      // Keep only source code after the version define
-      source = sourceVersion.substr(profileEnd > profileStart ? profileEnd : sourceVersionSize);
+      // Keep only source code after the version and its profile, if any. The
+      // rest of that line can only be a comment, which may continue past it.
+      size_t versionEnd = sourceVersionSize;
+      const size_t profileStart = sourceVersion.find_first_not_of(" \t", sourceVersionSize);
+      if (profileStart != std::string::npos)
+      {
+        const size_t profileEnd = sourceVersion.find_first_of(" \t\r\n/", profileStart);
+        const std::string_view profile =
+            std::string_view(sourceVersion).substr(profileStart, profileEnd - profileStart);
+        if (profile == "core" || profile == "compatibility" || profile == "es")
+          versionEnd = profileStart + profile.size();
+      }
+      source = sourceVersion.substr(versionEnd);
     }
     else
     {
