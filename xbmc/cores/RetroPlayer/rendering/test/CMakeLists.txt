@@ -4,6 +4,7 @@ set(SOURCES TestBaseRenderBufferPool.cpp
             TestRenderBufferOpenGLES.cpp
             TestRenderBezel.cpp
             TestRenderBufferPoolFBO.cpp
+            TestRenderUtils.cpp
             TestRPProcessInfoEGL.cpp
             TestRPRenderManager.cpp
 )
