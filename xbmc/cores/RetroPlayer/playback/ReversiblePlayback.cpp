@@ -553,7 +553,10 @@ void CReversiblePlayback::FrameEvent()
   {
     if (const unsigned int runaheadFrames = PrepareRunahead(); runaheadFrames > 0)
     {
-      runaheadState = RunaheadFrame(runaheadFrames);
+      if (m_runaheadHeld)
+        RunHeldFrame();
+      else
+        runaheadState = RunaheadFrame(runaheadFrames);
       if (m_restoreFailed)
         return;
     }
@@ -575,6 +578,7 @@ unsigned int CReversiblePlayback::PrepareRunahead()
   {
     m_runaheadStatus = RunaheadStatus::Ready;
     m_runaheadRestoreChecked = false;
+    m_runaheadHeld = false;
   }
 
   const unsigned int frames = m_runaheadFrames;
@@ -665,7 +669,7 @@ const uint8_t* CReversiblePlayback::RunaheadFrame(unsigned int frames)
   m_gameClient->RunFrame(false);
 
   m_runaheadState.resize(memorySize);
-  const bool serialized = m_gameClient->Serialize(m_runaheadState.data(), memorySize);
+  const bool serialized = m_gameClient->SerializeSpeculative(m_runaheadState.data(), memorySize);
   bool ranAhead = serialized;
   bool restored = true;
 
@@ -716,21 +720,40 @@ const uint8_t* CReversiblePlayback::RunaheadFrame(unsigned int frames)
     return nullptr;
   }
 
+  // A client may refuse a state it couldn't load back yet, such as while a tape
+  // is loading. This frame's picture is lost, and the next ones run as they are
+  // until it gives one.
+  if (!serialized)
+  {
+    CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Run-ahead held off: the client refused a state");
+    m_runaheadHeld = true;
+    return nullptr;
+  }
+
   if (!ranAhead)
   {
     // A client that turned out not to support them is held off instead
     if (m_gameClient->SupportsSpeculativeFrames())
     {
       CLog::Log(LOGERROR, "RetroPlayer[SAVE]: Run-ahead disabled: client failed to {}",
-                !serialized      ? "serialize its state"
-                : !restoresState ? "restore its state"
-                                 : "run a speculative frame");
+                !restoresState ? "restore its state" : "run a speculative frame");
       m_runaheadStatus = RunaheadStatus::Failed;
     }
     return nullptr;
   }
 
   return m_runaheadState.data();
+}
+
+void CReversiblePlayback::RunHeldFrame()
+{
+  m_gameClient->RunFrame(false);
+
+  const size_t memorySize = m_gameClient->GetSerializeSize();
+  m_runaheadState.resize(memorySize);
+  m_runaheadHeld = !m_gameClient->SerializeSpeculative(m_runaheadState.data(), memorySize);
+  if (!m_runaheadHeld)
+    CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Run-ahead resumed");
 }
 
 void CReversiblePlayback::UpdateRunahead()
