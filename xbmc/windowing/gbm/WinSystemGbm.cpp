@@ -371,6 +371,8 @@ void CWinSystemGbm::FlipPage(bool rendered, bool videoLayer, bool async)
 
   m_DRM->FlipPage(bo, rendered, videoLayer, async);
 
+  HoldAfterHdrChange();
+
   // !videoLayer alone cannot gate teardown: FlipPage also runs with videoLayer
   // false during a mode switch or renderer swap. use_count reaches 1 only when
   // CRendererDRMPRIME drops its bridge reference, which happens at video stop.
@@ -545,6 +547,30 @@ void CWinSystemGbm::SetColorimetry(const VideoPicture* videoPicture)
     drm->AddProperty(connector, "Colorspace", colorspace.value());
     drm->SetActive(true);
   }
+}
+
+void CWinSystemGbm::HoldAfterHdrChange()
+{
+  const bool hdr = m_hdrBlob.IsValid();
+  if (hdr == m_hdrOutput)
+    return;
+
+  m_hdrOutput = hdr;
+
+  // The display goes blank while it changes into or out of HDR, as it does
+  // for a new refresh rate, so a video waits the same delay before it plays
+  // on. A game isn't held: it isn't paused for a refresh rate either.
+  const auto delay =
+      std::chrono::milliseconds(CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
+                                    "videoscreen.delayrefreshchange") *
+                                100);
+  if (delay <= 0ms || m_lowLatencyPresentation)
+    return;
+
+  CLog::LogF(LOGINFO, "display {} HDR, holding video for {} ms", hdr ? "entered" : "left",
+             delay.count());
+  OnLostDevice();
+  m_dispResetTimer.Set(delay);
 }
 
 void CWinSystemGbm::UpdateContentType()

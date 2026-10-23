@@ -105,6 +105,7 @@ protected:
 
 private:
   void UpdateContentType();
+  void HoldAfterHdrChange();
   static void ApplyLimitGuiSize(void* userptr);
 
   KODI::MESSAGING::ThreadMessageCallback m_limitGuiSizeCallback{ApplyLimitGuiSize, this};
@@ -113,6 +114,7 @@ private:
   KODI::UTILS::Eotf m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
   KODI::UTILS::Colorimetry m_colorimetry = KODI::UTILS::Colorimetry::DEFAULT;
   bool m_gameContentType = false;
+  bool m_hdrOutput = false;
 
   std::unique_ptr<UTILS::CDisplayInfo> m_info;
 };
