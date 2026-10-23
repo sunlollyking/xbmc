@@ -53,6 +53,7 @@
 #include "video/VideoFileItemClassify.h"
 #include "windowing/WinSystem.h"
 
+#include <algorithm>
 #include <memory>
 #include <mutex>
 
@@ -1175,9 +1176,12 @@ bool CGUIWindowSlideShow::OnMessage(CGUIMessage& message)
       else
         m_Resolution = CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution();
 
+      // A slideshow with videos in it stays out of HDR: the display would change mode, and go
+      // blank for a moment, on the way into and out of every video
       m_showHdr = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
                       CSettings::SETTING_SLIDESHOW_HDRPICTURES) &&
-                  m_Image[0]->SupportsHdr() && CServiceBroker::GetWinSystem()->IsHDRDisplay();
+                  m_Image[0]->SupportsHdr() && CServiceBroker::GetWinSystem()->IsHDRDisplay() &&
+                  std::ranges::none_of(m_slides, [](const auto& slide) { return IsVideo(*slide); });
       m_hdrEntered = false;
 
       CGUIDialog::OnMessage(message);

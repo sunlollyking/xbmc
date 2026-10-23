@@ -24277,7 +24277,7 @@ msgstr ""
 #. Description of setting with label #36643 "Show HDR pictures in HDR"
 #: system/settings/settings.xml
 msgctxt "#36644"
-msgid "Switch an HDR display to HDR for pictures that have HDR information, such as Ultra HDR photos from phones. It stays in HDR for the rest of the slideshow, apart from videos, which set the display up for themselves. Moving photos don't play their clip while it's in HDR."
+msgid "Switch an HDR display to HDR for pictures that have HDR information, such as Ultra HDR photos from phones. It stays in HDR for the rest of the slideshow. A slideshow with videos in it isn't shown in HDR, as the display would change mode at every video. Moving photos don't play their clip while it's in HDR."
 msgstr ""
 
 #. Label of setting "Pictures -> Slideshow -> Show date and time metadata on screen"
