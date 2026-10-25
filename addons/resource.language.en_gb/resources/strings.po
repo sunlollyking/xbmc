@@ -19684,7 +19684,7 @@ msgctxt "#35309"
 msgid "Rewind"
 msgstr ""
 
-#. Label of the Manual action in the game OSD
+#. Label of the Manual button in the game OSD, which shows the game's instruction booklet
 #: addons/skin.estuary/xml/GameOSD.xml
 msgctxt "#35310"
 msgid "Manual"
