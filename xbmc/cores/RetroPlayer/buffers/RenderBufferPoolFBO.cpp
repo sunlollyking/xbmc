@@ -355,6 +355,10 @@ bool CRenderBufferPoolFBO::ReadCapture(IRenderBuffer* buffer,
   if (m_clientFrameDepth == 0 || m_clientThread != std::this_thread::get_id() || !buffer)
     return false;
 
+  // A stream handing over from hardware to software publishes the other pool's buffers
+  if (buffer->GetPool() != this)
+    return false;
+
   auto* capture = static_cast<CRenderBufferFBO*>(buffer);
   auto resourcesLock = capture->Lock();
   if (!capture->IsCapture() || capture->GetCurrentFramebuffer() == 0)
