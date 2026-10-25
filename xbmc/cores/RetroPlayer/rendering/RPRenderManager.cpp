@@ -26,8 +26,6 @@
 #include "cores/RetroPlayer/guicontrols/GUIGameControl.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPBaseRenderer.h"
-#include "cores/RetroPlayer/savestates/ISavestate.h"
-#include "cores/RetroPlayer/savestates/SavestateDatabase.h"
 #include "cores/RetroPlayer/streams/RetroPlayerVideo.h"
 #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h"
 #include "filesystem/File.h"
@@ -118,11 +116,6 @@ void CRPRenderManager::Deinitialize()
   if (m_hdrOutput)
     SetHdrOutput(false);
 
-  // Wait for savestate tasks
-  for (std::future<void>& task : m_savestateThreads)
-    task.wait();
-  m_savestateThreads.clear();
-
   DestroyContext();
 
   for (auto& pixelScalerMap : m_scalers)
@@ -152,13 +145,6 @@ void CRPRenderManager::Deinitialize()
     pending.buffer->Release();
   }
   m_pendingBuffers.clear();
-
-  for (auto& [savestatePath, renderBuffers] : m_savestateBuffers)
-  {
-    for (auto renderBuffer : renderBuffers)
-      renderBuffer->Release();
-  }
-  m_savestateBuffers.clear();
 
   // Renderers may still hold GPU resources, so defer cleanup to the rendering
   // or destructor thread
@@ -886,20 +872,8 @@ void CRPRenderManager::RenderControl(bool bClear,
   if (!renderer)
     return;
 
-  IRenderBuffer* renderBuffer = nullptr;
-
-  // Get render buffer for external pixels, if requested
-  const std::string& pixelPath = renderer->GetRenderSettings().VideoSettings().GetPixels();
-  if (!pixelPath.empty())
-  {
-    renderBuffer = GetRenderBufferForSavestate(pixelPath, renderer->GetBufferPool());
-  }
-  else
-  {
-    // Get a render buffer for the renderer
-    renderBuffer = GetRenderBuffer(renderer->GetBufferPool());
-  }
-
+  // Get a render buffer for the renderer
+  IRenderBuffer* renderBuffer = GetRenderBuffer(renderer->GetBufferPool());
   if (renderBuffer == nullptr)
     return;
 
@@ -1029,7 +1003,6 @@ std::shared_ptr<CRPBaseRenderer> CRPRenderManager::GetRendererForSettings(
     renderer->SetStretchMode(effectiveRenderSettings.VideoSettings().GetRenderStretchMode());
     renderer->SetRenderRotation(effectiveRenderSettings.VideoSettings().GetRenderRotation());
     renderer->SetShaderPreset(effectiveRenderSettings.VideoSettings().GetShaderPreset());
-    renderer->SetPixels(effectiveRenderSettings.VideoSettings().GetPixels());
   }
 
   return renderer;
@@ -1142,39 +1115,6 @@ IRenderBuffer* CRPRenderManager::GetRenderBuffer(IRenderBufferPool* bufferPool)
   {
     renderBuffer = *it;
     renderBuffer->Acquire();
-  }
-
-  return renderBuffer;
-}
-
-IRenderBuffer* CRPRenderManager::GetRenderBufferForSavestate(const std::string& savestatePath,
-                                                             const IRenderBufferPool* bufferPool)
-{
-  IRenderBuffer* renderBuffer = nullptr;
-
-  std::unique_lock lock(m_bufferMutex);
-
-  // Check to see if we have a buffers for the specified path
-  auto it = m_savestateBuffers.find(savestatePath);
-  if (it != m_savestateBuffers.end())
-  {
-    // Get a render buffer belonging to the specified pool
-    const std::vector<IRenderBuffer*>& renderBuffers = it->second;
-
-    auto it2 = std::ranges::find_if(renderBuffers, [bufferPool](IRenderBuffer* buffer)
-                                    { return buffer->GetPool() == bufferPool; });
-
-    if (it2 != renderBuffers.end())
-    {
-      renderBuffer = *it2;
-      renderBuffer->Acquire();
-    }
-  }
-  else
-  {
-    // The path isn't loaded, mark it as seen and load asynchronously
-    m_savestateBuffers[savestatePath] = {};
-    LoadVideoFrameAsync(savestatePath);
   }
 
   return renderBuffer;
@@ -1299,8 +1239,6 @@ CRenderVideoSettings CRPRenderManager::GetEffectiveSettings(
     if (settings->HasRotation())
       effectiveSettings.SetRenderRotation(
           settings->GetSettings().VideoSettings().GetRenderRotation());
-    if (settings->HasPixels())
-      effectiveSettings.SetPixels(settings->GetSettings().VideoSettings().GetPixels());
   }
 
   // Sanitize settings
@@ -1314,21 +1252,28 @@ CRenderVideoSettings CRPRenderManager::GetEffectiveSettings(
 
 void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath, const VideoFrame& frame)
 {
-  // Get a suitable render buffer for capturing the video data, or use the
-  // cached frame if a readable buffer can't be found
+  // The frame captured with the savestate, so that the thumbnail shows the
+  // moment it was taken. A hardware-rendered game has no other frame in system
+  // memory; otherwise a readable buffer on screen, or the cached frame if there
+  // isn't one.
   IRenderBuffer* renderBuffer = nullptr;
   std::vector<uint8_t> cachedFrame;
 
-  if (IsHardwareRendering())
+  for (const auto& buffer : frame)
   {
-    // Only the copy read back when the savestate was taken is in system memory
-    if (frame.empty())
-      return;
-    renderBuffer = frame.front().get();
-    renderBuffer->Acquire();
+    if (buffer->GetMemoryAccess() != DataAccess::WRITE_ONLY)
+    {
+      renderBuffer = buffer.get();
+      renderBuffer->Acquire();
+      break;
+    }
   }
-  else
+  if (renderBuffer == nullptr)
+  {
+    if (IsHardwareRendering())
+      return;
     GetVideoFrame(renderBuffer, cachedFrame);
+  }
 
   // Video frame properties
   AVPixelFormat sourceFormat = AV_PIX_FMT_NONE;
@@ -1401,31 +1346,6 @@ void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath, const Vid
   FreeVideoFrame(renderBuffer, std::move(cachedFrame));
 }
 
-void CRPRenderManager::CacheVideoFrame(const std::string& savestatePath)
-{
-  // The game client renders into these buffers itself, and there is only ever
-  // one. Holding a reference to it for a savestate would starve the client of
-  // the framebuffer it is drawing the next frame into.
-  if (IsHardwareRendering())
-    return;
-
-  std::unique_lock lock(m_bufferMutex);
-
-  // Get the render buffers for this savestate path
-  std::vector<IRenderBuffer*>& savestateBuffers = m_savestateBuffers[savestatePath];
-
-  // Release old buffers
-  for (IRenderBuffer* renderBuffer : savestateBuffers)
-    renderBuffer->Release();
-
-  // Save buffers
-  savestateBuffers = m_renderBuffers;
-
-  // Acquire new buffers
-  for (IRenderBuffer* renderBuffer : savestateBuffers)
-    renderBuffer->Acquire();
-}
-
 bool CRPRenderManager::TryCaptureVideoFrame(VideoFrame& frame)
 {
   if (!frame.empty())
@@ -1476,118 +1396,6 @@ bool CRPRenderManager::ReadHardwareFrame(VideoFrame& frame)
   return true;
 }
 
-void CRPRenderManager::CacheVideoFrame(const std::string& savestatePath, const VideoFrame& frame)
-{
-  if (IsHardwareRendering())
-    return;
-
-  std::unique_lock lock(m_bufferMutex);
-  auto& buffers = m_savestateBuffers[savestatePath];
-  for (IRenderBuffer* buffer : buffers)
-    buffer->Release();
-  buffers.clear();
-  for (const auto& buffer : frame)
-  {
-    buffer->Acquire();
-    buffers.push_back(buffer.get());
-  }
-}
-
-void CRPRenderManager::SaveVideoFrame(const std::string& savestatePath,
-                                      ISavestate& savestate,
-                                      const VideoFrame& frame)
-{
-  // A hardware-rendered savestate carries the game's state but no video frame,
-  // so it restores without a preview of the moment it was taken
-  if (IsHardwareRendering())
-    return;
-
-  // Get a suitable render buffer for capturing the video data, or use the
-  // cached frame if a readable buffer can't be found
-  IRenderBuffer* readableBuffer = nullptr;
-  std::vector<uint8_t> cachedFrame;
-
-  for (const auto& buffer : frame)
-  {
-    if (buffer->GetMemoryAccess() != DataAccess::WRITE_ONLY)
-    {
-      readableBuffer = buffer.get();
-      readableBuffer->Acquire();
-      break;
-    }
-  }
-  if (!readableBuffer)
-    GetVideoFrame(readableBuffer, cachedFrame);
-
-  // Video frame properties
-  AVPixelFormat targetFormat = AV_PIX_FMT_NONE;
-  unsigned int width = 0;
-  unsigned int height = 0;
-  float displayAspectRatio = 0.0f;
-  unsigned int rotationCCW = 0;
-  size_t sourceSize = 0;
-  const uint8_t* sourceData = nullptr;
-
-  if (readableBuffer != nullptr)
-  {
-    targetFormat = readableBuffer->GetFormat();
-    width = readableBuffer->GetWidth();
-    height = readableBuffer->GetHeight();
-    displayAspectRatio = readableBuffer->GetDisplayAspectRatio();
-    rotationCCW = readableBuffer->GetRotation();
-    sourceSize = readableBuffer->GetFrameSize();
-    sourceData = readableBuffer->GetMemory();
-  }
-  else if (!cachedFrame.empty())
-  {
-    targetFormat = m_format;
-    width = m_cachedWidth;
-    height = m_cachedHeight;
-    displayAspectRatio = m_cachedDisplayAspectRatio;
-    rotationCCW = m_cachedRotationCCW;
-    sourceSize = m_cachedFrame.size();
-    sourceData = m_cachedFrame.data();
-  }
-
-  if (targetFormat == AV_PIX_FMT_NONE)
-  {
-    CLog::Log(LOGERROR, "Failed to get a video frame for savestate video frame");
-  }
-  else
-  {
-    // Serialize video stream properties
-    savestate.SetPixelFormat(targetFormat);
-    savestate.SetNominalWidth(m_nominalWidth);
-    savestate.SetNominalHeight(m_nominalHeight);
-    savestate.SetNominalDisplayAspectRatio(m_nominalDisplayAspectRatio);
-    savestate.SetMaxWidth(m_maxWidth);
-    savestate.SetMaxHeight(m_maxHeight);
-
-    // Serialize video frame properties
-    savestate.SetVideoWidth(width);
-    savestate.SetVideoHeight(height);
-    savestate.SetDisplayAspectRatio(displayAspectRatio);
-    savestate.SetRotationDegCCW(rotationCCW);
-    uint8_t* const targetData = savestate.GetVideoBuffer(sourceSize);
-    std::memcpy(targetData, sourceData, sourceSize);
-  }
-
-  FreeVideoFrame(readableBuffer, std::move(cachedFrame));
-}
-
-void CRPRenderManager::ClearVideoFrame(const std::string& savestatePath)
-{
-  std::unique_lock lock(m_bufferMutex);
-
-  auto it = m_savestateBuffers.find(savestatePath);
-  if (it != m_savestateBuffers.end())
-  {
-    for (auto renderBuffer : it->second)
-      renderBuffer->Release();
-    m_savestateBuffers.erase(it);
-  }
-}
-
 void CRPRenderManager::GetVideoFrame(IRenderBuffer*& readableBuffer,
                                      std::vector<uint8_t>& cachedFrame)
 {
@@ -1629,82 +1437,3 @@ void CRPRenderManager::FreeVideoFrame(IRenderBuffer* readableBuffer,
   }
 }
 
-void CRPRenderManager::LoadVideoFrameAsync(const std::string& savestatePath)
-{
-  // Prune any finished loader threads
-  m_savestateThreads.erase(std::remove_if(m_savestateThreads.begin(), m_savestateThreads.end(),
-                                          [](std::future<void>& task) {
-                                            return task.wait_for(std::chrono::seconds::zero()) ==
-                                                   std::future_status::ready;
-                                          }),
-                           m_savestateThreads.end());
-
-  // Load the video data from the savestate asynchronously
-  std::future<void> task = std::async(std::launch::async, [this, savestatePath]()
-                                      { LoadVideoFrameSync(savestatePath); });
-
-  m_savestateThreads.emplace_back(std::move(task));
-}
-
-void CRPRenderManager::LoadVideoFrameSync(const std::string& savestatePath)
-{
-  // Savestates taken while the client renders on the GPU hold no video frame,
-  // and the only buffer to load one into is the one the client is drawing to
-  if (IsHardwareRendering())
-    return;
-
-  if (!XFILE::CFile::Exists(savestatePath))
-  {
-    CLog::Log(LOGERROR, "Failed to load savestate: doesn't exist at path {}",
-              CURL::GetRedacted(savestatePath));
-    return;
-  }
-
-  std::unique_ptr<ISavestate> savestate = CSavestateDatabase::AllocateSavestate();
-  CSavestateDatabase db;
-  if (!db.GetSavestate(savestatePath, *savestate))
-    return;
-
-  if (!savestate->PrepareVideoData())
-  {
-    CLog::Log(LOGERROR, "RetroPlayer[SAVE]: Failed to prepare video data");
-    return;
-  }
-
-  // Load video data
-  const AVPixelFormat format = savestate->GetPixelFormat();
-  const uint8_t* data = savestate->GetVideoData();
-  const size_t size = savestate->GetVideoSize();
-  const unsigned int width = savestate->GetVideoWidth();
-  const unsigned int height = savestate->GetVideoHeight();
-  const unsigned int rotationCCW = savestate->GetRotationDegCCW();
-
-  // Validate parameters
-  if (format == AV_PIX_FMT_NONE || data == nullptr || size == 0 || width == 0 || height == 0)
-  {
-    CLog::Log(LOGERROR, "Invalid video data: format {}, data {}, size {}, width {}, height {}",
-              static_cast<long int>(format), static_cast<const void*>(data), size, width, height);
-    return;
-  }
-
-  // Copy frame to render buffers
-  std::vector<IRenderBuffer*> renderBuffers;
-  for (auto* bufferPool : m_processInfo.GetBufferManager().GetBufferPools())
-  {
-    IRenderBuffer* newBuffer = bufferPool->GetBuffer(width, height);
-    if (newBuffer == nullptr)
-    {
-      CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Unable to get render buffer for savestate");
-      continue;
-    }
-
-    CopyFrame(newBuffer, format, data, size, width, height);
-    newBuffer->SetRotation(rotationCCW);
-
-    renderBuffers.emplace_back(newBuffer);
-  }
-
-  // Save render buffers
-  std::unique_lock lock(m_bufferMutex);
-  m_savestateBuffers[savestatePath] = std::move(renderBuffers);
-}

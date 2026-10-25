@@ -70,7 +70,6 @@ public:
   void SetStretchMode(STRETCHMODE stretchMode);
   void SetRenderRotation(unsigned int rotationDegCCW);
   void SetShaderPreset(const std::string& presetPath);
-  void SetPixels(const std::string& pixelPath);
 
   /*!
    * \brief Draw the game inside a bezel's window, where the bezel frames it well

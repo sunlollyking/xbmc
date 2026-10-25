@@ -164,11 +164,6 @@ void CRPBaseRenderer::SetShaderPreset(const std::string& presetPath)
   }
 }
 
-void CRPBaseRenderer::SetPixels(const std::string& pixelPath)
-{
-  m_renderSettings.VideoSettings().SetPixels(pixelPath);
-}
-
 void CRPBaseRenderer::ManageRenderArea(const IRenderBuffer& renderBuffer)
 {
   // Get texture parameters

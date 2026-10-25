@@ -297,7 +297,6 @@ std::string CReversiblePlayback::CreateSavestate(bool autosave, const std::strin
   snapshot->captureUs = 0;
   snapshot->path = GetSavestatePath(autosave, savestatePath, snapshot->created);
   const std::string savePath = snapshot->path;
-  m_renderManager.CacheVideoFrame(savePath);
   m_saveWorker->Submit(snapshot);
   return savePath;
 }
@@ -387,9 +386,6 @@ bool CReversiblePlayback::CommitSavestate(const Snapshot& snapshot)
   savestate->SetGameClientID(m_gameClientId);
   savestate->SetGameClientVersion(m_gameClientVersion);
 
-  if (!snapshot.video.empty())
-    m_renderManager.CacheVideoFrame(savePath, snapshot.video);
-  m_renderManager.SaveVideoFrame(savePath, *savestate, snapshot.video);
   savestate->Finalize();
   bool success;
   {

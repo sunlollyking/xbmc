@@ -20,7 +20,6 @@ extern "C"
 }
 
 #include <atomic>
-#include <future>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -43,7 +42,6 @@ class CRPProcessInfo;
 class IGUIRenderSettings;
 class IRenderBuffer;
 class IRenderBufferPool;
-class ISavestate;
 struct VideoStreamBuffer;
 
 /*!
@@ -158,16 +156,15 @@ public:
 
   // Savestate functions
   using VideoFrame = std::vector<std::shared_ptr<IRenderBuffer>>;
-  void SaveThumbnail(const std::string& thumbnailPath, const VideoFrame& frame);
-
-  // Savestate functions
-  void CacheVideoFrame(const std::string& savestatePath);
   bool TryCaptureVideoFrame(VideoFrame& frame);
-  void CacheVideoFrame(const std::string& savestatePath, const VideoFrame& frame);
-  void SaveVideoFrame(const std::string& savestatePath,
-                      ISavestate& savestate,
-                      const VideoFrame& frame = {});
-  void ClearVideoFrame(const std::string& savestatePath);
+
+  /*!
+   * \brief Save a thumbnail of a savestate
+   *
+   * \param frame The frame captured with the savestate, or empty to use the
+   *        frame on screen
+   */
+  void SaveThumbnail(const std::string& thumbnailPath, const VideoFrame& frame = {});
 
 private:
   /*!
@@ -208,12 +205,6 @@ private:
    * \brief Get a render buffer belonging to the specified pool
    */
   IRenderBuffer* GetRenderBuffer(IRenderBufferPool* bufferPool);
-
-  /*!
-   * \brief Get a render buffer containing pixels from the specified savestate
-   */
-  IRenderBuffer* GetRenderBufferForSavestate(const std::string& savestatePath,
-                                             const IRenderBufferPool* bufferPool);
 
   /*!
    * \brief Create a render buffer for the specified pool from a cached frame
@@ -282,8 +273,6 @@ private:
   bool ReadHardwareFrame(VideoFrame& frame);
   void GetVideoFrame(IRenderBuffer*& readableBuffer, std::vector<uint8_t>& cachedFrame);
   void FreeVideoFrame(IRenderBuffer* readableBuffer, std::vector<uint8_t> cachedFrame);
-  void LoadVideoFrameAsync(const std::string& savestatePath);
-  void LoadVideoFrameSync(const std::string& savestatePath);
 
   // Construction parameters
   CRPProcessInfo& m_processInfo;
@@ -368,9 +357,6 @@ private:
   unsigned int m_cachedHeight = 0;
   float m_cachedDisplayAspectRatio{0.0f}; // 0.0f means square pixels
   unsigned int m_cachedRotationCCW{0};
-  std::map<std::string, std::vector<IRenderBuffer*>>
-      m_savestateBuffers; // Render buffers for savestates
-  std::vector<std::future<void>> m_savestateThreads;
   struct BezelLoad
   {
     std::mutex mutex;
