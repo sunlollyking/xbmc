@@ -214,6 +214,9 @@
           },
           "Sources": {
             "$ref": "Optional.Boolean"
+          },
+          "Files": {
+            "$ref": "Optional.Boolean"
           }
         }
       }

@@ -1439,7 +1439,7 @@ extern "C"
   //============================================================================
   /// @brief **What an achievement means for finishing the game**
   ///
-  /// Since game API 8.6.0.
+  /// Since game API 8.5.0.
   ///
   typedef enum GAME_RC_ACHIEVEMENT_TYPE
   {
@@ -1460,7 +1460,7 @@ extern "C"
   /// @brief **One achievement set of the loaded game**
   ///
   /// The game's own set comes first, followed by any subsets such as bonus
-  /// sets. Since game API 8.6.0.
+  /// sets. Since game API 8.5.0.
   ///
   typedef struct game_rc_achievement_set
   {
@@ -1477,7 +1477,7 @@ extern "C"
   //============================================================================
   /// @brief **The set and type of one achievement**
   ///
-  /// Since game API 8.6.0.
+  /// Since game API 8.5.0.
   ///
   typedef struct game_rc_achievement_details
   {
@@ -1495,7 +1495,7 @@ extern "C"
   /// @brief **Payload of @ref AddonToKodiFuncTable_Game::RCOnAchievementSets**
   ///
   /// Kept apart from @ref game_rc_game_loaded so that its achievements keep the
-  /// layout older versions of Kodi read them with. Since game API 8.6.0.
+  /// layout older versions of Kodi read them with. Since game API 8.5.0.
   ///
   typedef struct game_rc_achievement_sets
   {
@@ -1736,7 +1736,7 @@ extern "C"
      * @brief Tell Kodi the loaded game's achievement sets, and which set and
      * type each of its achievements has.
      *
-     * Call it after RCOnGameLoaded(). Since game API 8.6.0.
+     * Call it after RCOnGameLoaded(). Since game API 8.5.0.
      */
     void (*RCOnAchievementSets)(KODI_HANDLE kodiInstance, const game_rc_achievement_sets* data);
   } AddonToKodiFuncTable_Game;
@@ -1811,11 +1811,8 @@ extern "C"
     GAME_ERROR(__cdecl* DeserializeAchievements)
     (const struct AddonInstance_Game*, const uint8_t*, size_t);
     void(__cdecl* FreeString)(const AddonInstance_Game*, char*);
-
-    // Entries added since 8.2.0 go last, so an add-on built against an older
-    // version still fills in the ones before them where Kodi looks for them
-    GAME_ERROR(__cdecl* RunFrameSpeculative)(const struct AddonInstance_Game*);
     GAME_ERROR(__cdecl* RCSetAchievementSetEnabled)(const AddonInstance_Game*, unsigned int, bool);
+    GAME_ERROR(__cdecl* RunFrameSpeculative)(const struct AddonInstance_Game*);
     GAME_ERROR(__cdecl* SerializeSpeculative)(const struct AddonInstance_Game*, uint8_t*, size_t);
     GAME_ERROR(__cdecl* DeserializeSpeculative)(const struct AddonInstance_Game*,
                                                 const uint8_t*,

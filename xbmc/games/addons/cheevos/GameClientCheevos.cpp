@@ -226,8 +226,28 @@ void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
 
   NotifyDialogs();
 
+  m_startupToast.reset();
   if (achievementState.totalAchievements == 0)
     return;
+
+  // Kodi's texture cache resolves remote URLs; an empty path falls back to
+  // the default icon
+  m_startupToast =
+      StartupToast{SafeString(data.icon_url), !gameTitle.empty() ? gameTitle : Localize(35264)};
+
+  // A set the player turned off is turned off again once the client reports
+  // its sets, which takes it out of the totals
+  if (!CServiceBroker::GetGameServices().GameSettings().HasDisabledAchievementSets() ||
+      !ReportsAchievementSets())
+    QueueStartupToast();
+}
+
+void CGameClientCheevos::QueueStartupToast()
+{
+  if (!m_startupToast)
+    return;
+
+  const AchievementState state = CServiceBroker::GetGameServices().AchievementRuntime().GetState();
 
   // RetroAchievements asks for the mode to be shown as a game starts. The mode
   // is settled by now: resuming a save state has already dropped it to casual.
@@ -235,15 +255,12 @@ void CGameClientCheevos::OnGameLoaded(const game_rc_game_loaded& data)
   // "Hardcore mode: {0:d} of {1:d} achievements unlocked" or
   // "{0:d} of {1:d} achievements unlocked"
   const bool hardcore = m_hardcoreEnabled;
-  const std::string description =
-      StringUtils::Format(Localize(hardcore ? 35703 : 35284), achievementState.unlockedAchievements,
-                          achievementState.totalAchievements);
+  const std::string description = StringUtils::Format(
+      Localize(hardcore ? 35703 : 35284), state.unlockedAchievements, state.totalAchievements);
 
-  // Kodi's texture cache resolves remote URLs; an empty path falls back to
-  // the default icon
-  CGUIDialogKaiToast::QueueNotification(
-      SafeString(data.icon_url), !gameTitle.empty() ? gameTitle : Localize(35264), description,
-      TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+  CGUIDialogKaiToast::QueueNotification(m_startupToast->icon, m_startupToast->title, description,
+                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+  m_startupToast.reset();
 }
 
 void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data)
@@ -261,6 +278,10 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   // The add-on carries no timestamp, so the date is "now" - formatted like the
   // dates from the achievement list, so a fresh unlock isn't styled differently.
   const CDateTime unlockedDate = CDateTime::GetCurrentDateTime();
+
+  const AchievementState previous = runtime.GetState();
+  const auto before = std::ranges::find(previous.achievements, data.id, &AchievementInfo::id);
+  const bool earnedBefore = before != previous.achievements.end() && before->earned;
 
   bool newlyEarned = false;
   const AchievementState state =
@@ -292,7 +313,9 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
                                         !title.empty() ? title : SafeString(data.description),
                                         TOAST_DISPLAY_TIME_MS, true, TOAST_MESSAGE_TIME_MS);
 
-  if (!newlyEarned)
+  // Beating a set counts achievements earned in either mode, so a hardcore
+  // unlock of one already earned can't beat it
+  if (!newlyEarned || earnedBefore)
     return;
 
   // Beaten by this unlock: the last progression achievement, or the first win
@@ -324,8 +347,9 @@ void CGameClientCheevos::OnAchievementSets(const game_rc_achievement_sets& data)
   const CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
 
   std::vector<AchievementSet> sets;
-  const size_t setCount =
-      data.sets != nullptr ? std::min(static_cast<size_t>(data.set_count), MAX_ACHIEVEMENT_SETS) : 0;
+  const size_t setCount = data.sets != nullptr
+                              ? std::min(static_cast<size_t>(data.set_count), MAX_ACHIEVEMENT_SETS)
+                              : 0;
   sets.reserve(setCount);
   for (size_t i = 0; i < setCount; ++i)
   {
@@ -380,6 +404,7 @@ void CGameClientCheevos::OnAchievementSets(const game_rc_achievement_sets& data)
                                    { return OnAchievementSetToggled(setId, enabled); });
 
   NotifyDialogs();
+  QueueStartupToast();
 }
 
 bool CGameClientCheevos::OnAchievementSetToggled(unsigned int setId, bool enabled)
@@ -788,11 +813,19 @@ void CGameClientCheevos::DropHardcore()
                                         Localize(35306));
 }
 
+bool CGameClientCheevos::ReportsAchievementSets() const
+{
+  std::unique_lock lock(m_clientAccess);
+
+  // Left unset by a client older than game API 8.5.0
+  return m_struct.toAddon->RCSetAchievementSetEnabled != nullptr;
+}
+
 bool CGameClientCheevos::SetAchievementSetEnabled(unsigned int setId, bool enabled)
 {
   std::unique_lock lock(m_clientAccess);
 
-  // Left unset by a client older than game API 8.6.0
+  // Left unset by a client older than game API 8.5.0
   if (m_struct.toAddon->RCSetAchievementSetEnabled == nullptr)
     return false;
 

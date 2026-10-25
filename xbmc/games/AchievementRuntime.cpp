@@ -150,8 +150,8 @@ bool CAchievementRuntime::SetAchievementSetEnabled(unsigned int setId, bool enab
             std::ranges::find(m_state.achievements, achievementId, &AchievementInfo::id);
         return achievement != m_state.achievements.end() && achievement->setId == setId;
       };
-      std::erase_if(m_state.challenges,
-                    [&inSet](const AchievementChallenge& challenge) { return inSet(challenge.id); });
+      std::erase_if(m_state.challenges, [&inSet](const AchievementChallenge& challenge)
+                    { return inSet(challenge.id); });
       std::erase_if(m_state.progressIndicators,
                     [&inSet](const AchievementProgressIndicator& indicator)
                     { return inSet(indicator.id); });

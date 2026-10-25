@@ -11,6 +11,7 @@
 #include "utils/Observer.h"
 
 #include <atomic>
+#include <optional>
 #include <string>
 
 class CCriticalSection;
@@ -183,6 +184,11 @@ private:
   bool SetEncoreModeEnabled(bool enabled);
 
   /*!
+   * \brief Whether the client reports a game's achievement sets
+   */
+  bool ReportsAchievementSets() const;
+
+  /*!
    * \brief Tell the client to turn an achievement set on or off
    */
   bool SetAchievementSetEnabled(unsigned int setId, bool enabled);
@@ -193,6 +199,17 @@ private:
    * The game's own set stays on: only subsets can be turned off.
    */
   bool OnAchievementSetToggled(unsigned int setId, bool enabled);
+
+  /*!
+   * \brief Show the game's achievement totals, if the toast is waiting
+   */
+  void QueueStartupToast();
+
+  struct StartupToast
+  {
+    std::string icon;
+    std::string title;
+  };
 
   CGameClient& m_gameClient;
   AddonInstance_Game& m_struct;
@@ -215,6 +232,10 @@ private:
   //! Whether this game left hardcore, refused or resumed from a save state. It
   //! stays casual until the player turns the setting off and on again.
   std::atomic<bool> m_hardcoreLeft{false};
+
+  //! The game-start toast until it is shown. Only touched on the add-on's
+  //! thread.
+  std::optional<StartupToast> m_startupToast;
 
   //! Whether this instance is registered with the game settings. Only touched
   //! on Kodi's thread, either side of a game.

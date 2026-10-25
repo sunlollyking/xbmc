@@ -602,7 +602,7 @@ void CDialogGameAchievements::RefreshList()
   // "Achievements - Chrono Trigger (74% complete)"
   // "Main Set" for the game's own set, which RetroAchievements leaves untitled
   std::string setTitle = state.gameTitle;
-  if (shownSet == &state.sets.front())
+  if (shownSet != nullptr && shownSet == &state.sets.front())
     setTitle = Localize(35715);
   else if (shownSet != nullptr && !shownSet->title.empty())
     setTitle = shownSet->title;
@@ -635,7 +635,6 @@ void CDialogGameAchievements::RefreshList()
         beatenProgress.progressionEarned + (beatenProgress.winEarned > 0 ? 1 : 0);
     beaten = StringUtils::Format(Localize(35713), earned, needed);
   }
-
 
   SetProperty("Header", header);
   SetProperty("Achievements.GameTitle", title);
