@@ -193,6 +193,12 @@ if(ENABLE_UPNP)
                       UPnPFile.h)
 endif()
 
+if(CORE_SYSTEM_NAME STREQUAL wasm)
+  list(APPEND SOURCES wasm/XhrFile.cpp)
+  list(APPEND HEADERS wasm/XhrFile.h
+                      wasm/XhrHttpClient.h)
+endif()
+
 core_add_library(filesystem)
 if(ENABLE_STATIC_LIBS AND ENABLE_UPNP)
   target_link_libraries(filesystem PRIVATE upnp)

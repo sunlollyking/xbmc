@@ -12,6 +12,7 @@
 #include "RenderContext.h"
 #include "RenderSettings.h"
 #include "RenderTranslator.h"
+#include "RenderUtils.h"
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "cores/RetroPlayer/buffers/IRenderBuffer.h"
@@ -456,6 +457,12 @@ bool CRPRenderManager::Create(unsigned int width, unsigned int height)
   {
     m_hwBufferWidth = width;
     m_hwBufferHeight = height;
+    {
+      std::unique_lock framebufferLock(m_framebufferMutex);
+      m_framebuffer = m_hwRenderBuffer->GetCurrentFramebuffer();
+      m_framebufferWidth = width;
+      m_framebufferHeight = height;
+    }
     CLog::Log(LOGDEBUG, "RetroPlayer[RENDER]: Allocated a {}x{} framebuffer for the game client",
               width, height);
   }
@@ -481,6 +488,11 @@ void CRPRenderManager::ReleaseHwRenderBuffer()
                     return true;
                   });
   }
+  {
+    std::unique_lock framebufferLock(m_framebufferMutex);
+    m_framebuffer = 0;
+    m_framebufferWidth = m_framebufferHeight = 0;
+  }
   m_hwRenderBuffer->Release();
   m_hwRenderBuffer = nullptr;
   m_hwBufferWidth = m_hwBufferHeight = 0;
@@ -490,7 +502,21 @@ void CRPRenderManager::ReleaseHwRenderBuffer()
 
 uintptr_t CRPRenderManager::GetCurrentFramebuffer(unsigned int width, unsigned int height)
 {
-  std::unique_lock lock(m_hwMutex);
+  std::unique_lock lock(m_hwMutex, std::try_to_lock);
+  if (!lock.owns_lock())
+  {
+    // A client can ask from a thread of its own while a call into it holds the
+    // lock and waits for that thread, as PPSSPP's emulation thread does.
+    // Growing the framebuffer needs the context that call has current, but one
+    // already large enough is answered as is.
+    {
+      std::unique_lock framebufferLock(m_framebufferMutex);
+      if (m_framebuffer != 0 && width != 0 && height != 0 && width <= m_framebufferWidth &&
+          height <= m_framebufferHeight)
+        return m_framebuffer;
+    }
+    lock.lock();
+  }
   if (!m_hwRenderBuffer || width == 0 || height == 0)
     return 0;
   if ((width > m_hwBufferWidth || height > m_hwBufferHeight) && !Create(width, height))
@@ -1015,7 +1041,10 @@ void CRPRenderManager::CreateRenderBuffer(IRenderBufferPool* bufferPool)
     IRenderBuffer* renderBuffer =
         CreateFromCache(m_cachedFrame, m_cachedWidth, m_cachedHeight, bufferPool, m_bufferMutex);
     if (renderBuffer != nullptr)
+    {
+      renderBuffer->SetDisplayAspectRatio(m_cachedDisplayAspectRatio);
       m_renderBuffers.emplace_back(renderBuffer);
+    }
   }
 }
 
@@ -1151,6 +1180,7 @@ void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath)
   size_t sourceSize = 0;
   unsigned int width = 0;
   unsigned int height = 0;
+  float displayAspectRatio = 0.0f;
   unsigned int rotationCCW = 0;
 
   if (renderBuffer != nullptr)
@@ -1160,15 +1190,17 @@ void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath)
     sourceSize = renderBuffer->GetFrameSize();
     width = renderBuffer->GetWidth();
     height = renderBuffer->GetHeight();
+    displayAspectRatio = renderBuffer->GetDisplayAspectRatio();
     rotationCCW = renderBuffer->GetRotation();
   }
   else if (!cachedFrame.empty())
   {
     sourceFormat = m_format;
-    sourceData = m_cachedFrame.data();
-    sourceSize = m_cachedFrame.size();
+    sourceData = cachedFrame.data();
+    sourceSize = cachedFrame.size();
     width = m_cachedWidth;
     height = m_cachedHeight;
+    displayAspectRatio = m_cachedDisplayAspectRatio;
     rotationCCW = m_cachedRotationCCW;
   }
 
@@ -1183,9 +1215,11 @@ void CRPRenderManager::SaveThumbnail(const std::string& thumbnailPath)
 
   const int stride = CRenderTranslator::TranslateWidthToBytes(width, sourceFormat);
 
-  unsigned int scaleWidth = 400;
-  unsigned int scaleHeight = 220;
-  CPicture::GetScale(width, height, scaleWidth, scaleHeight);
+  // Scale to the shape the frame is shown at, so non-square pixels aren't stretched
+  unsigned int scaleWidth = 444;
+  unsigned int scaleHeight = 250;
+  CPicture::GetScale(CRenderUtils::GetDisplayWidth(width, height, displayAspectRatio), height,
+                     scaleWidth, scaleHeight);
 
   const int bytesPerPixel = 4;
   std::vector<uint8_t> scaledImage(scaleWidth * scaleHeight * bytesPerPixel);

@@ -25,13 +25,15 @@ enum AnnouncementFlag
   Input = 0x080,
   PVR = 0x100,
   Other = 0x200,
-  GameLibrary = 0x1000,
   Info = 0x400,
-  Sources = 0x800
+  Sources = 0x800,
+  Files = 0x1000,
+  GameLibrary = 0x2000
 };
 
-const auto ANNOUNCE_ALL = (Player | Playlist | GUI | System | VideoLibrary | AudioLibrary | GameLibrary |
-                           Application | Input | ANNOUNCEMENT::PVR | Other | Info | Sources);
+const auto ANNOUNCE_ALL =
+    (Player | Playlist | GUI | System | VideoLibrary | AudioLibrary | Application | Input |
+     ANNOUNCEMENT::PVR | Other | Info | Sources | Files | GameLibrary);
 
 /*!
     \brief Returns a string representation for the
@@ -69,6 +71,8 @@ inline const char* AnnouncementFlagToString(const AnnouncementFlag& notification
       return "Info";
     case Sources:
       return "Sources";
+    case Files:
+      return "Files";
     default:
       return "Unknown";
   }
