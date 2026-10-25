@@ -1385,12 +1385,14 @@ bool CRPRenderManager::ReadHardwareFrame(VideoFrame& frame)
       read = m_hwBufferPool->ReadCapture(published, pixels);
     EndClientFrame();
   }
+  const float displayAspectRatio = published->GetDisplayAspectRatio();
   published->Release();
 
   if (!read || pixels.stride <= 0)
     return false;
 
   auto* buffer = new CReadbackRenderBuffer(std::move(pixels));
+  buffer->SetDisplayAspectRatio(displayAspectRatio);
   buffer->Acquire();
   frame.emplace_back(buffer, [](IRenderBuffer* acquired) { acquired->Release(); });
   return true;
