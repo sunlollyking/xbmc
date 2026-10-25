@@ -78,7 +78,7 @@ bool CGUIWindowGames::OnMessage(CGUIMessage& message)
     }
     case GUI_MSG_WINDOW_INIT:
     {
-      m_rootDir.AllowNonLocalSources(true); //! @todo
+      m_rootDir.AllowNonLocalSources(true);
 
       // Is this the first time the window is opened?
       const std::string& destination = message.GetStringParam();
@@ -100,7 +100,6 @@ bool CGUIWindowGames::OnMessage(CGUIMessage& message)
           message.SetStringParam(CMediaSourceSettings::GetInstance().GetDefaultSource(MediaSection::GAMES));
       }
 
-      //! @todo
       m_dlgProgress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(
           WINDOW_DIALOG_PROGRESS);
 

@@ -11,6 +11,8 @@
 #include "VideoLayerBridge.h"
 #include "drm/DRMObject.h"
 #include "drm/DRMUtils.h"
+#include "messaging/ApplicationMessenger.h"
+#include "settings/lib/ISettingCallback.h"
 #include "threads/CriticalSection.h"
 #include "threads/SystemClock.h"
 #include "utils/DisplayInfo.h"
@@ -35,7 +37,7 @@ namespace WINDOWING
 namespace GBM
 {
 
-class CWinSystemGbm : public CWinSystemBase
+class CWinSystemGbm : public CWinSystemBase, public ISettingCallback
 {
 public:
   CWinSystemGbm();
@@ -53,6 +55,8 @@ public:
 
   bool CanDoWindowed() override { return false; }
   void UpdateResolutions() override;
+
+  void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
 
   bool UseLimitedColor() override;
 
@@ -101,6 +105,9 @@ protected:
 
 private:
   void UpdateContentType();
+  static void ApplyLimitGuiSize(void* userptr);
+
+  KODI::MESSAGING::ThreadMessageCallback m_limitGuiSizeCallback{ApplyLimitGuiSize, this};
 
   CDRMPropertyBlob m_hdrBlob;
   KODI::UTILS::Eotf m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;

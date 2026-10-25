@@ -11,7 +11,7 @@
 #include "AudioLibrary.h"
 #include "FileItemList.h"
 #include "FileOperations.h"
-#include "games/tags/GameInfoTag.h"
+#include "PVREpgFields.h"
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "VideoLibrary.h"
@@ -19,6 +19,7 @@
 #include "filesystem/Directory.h"
 #include "imagefiles/ImageFileURL.h"
 #include "games/GameThumbLoader.h"
+#include "games/tags/GameInfoTag.h"
 #include "music/MusicThumbLoader.h"
 #include "music/tags/MusicInfoTag.h"
 #include "pictures/PictureInfoTag.h"
@@ -76,16 +77,7 @@ bool CFileItemHandler::GetField(const std::string& field,
       if (field == "cast")
       {
         // string -> Video.Cast
-        const std::vector<std::string> actors =
-            StringUtils::Split(info[field].asString(), EPG_STRING_TOKEN_SEPARATOR);
-
-        result[field] = CVariant(CVariant::VariantTypeArray);
-        for (const auto& actor : actors)
-        {
-          CVariant actorVar;
-          actorVar["name"] = actor;
-          result[field].push_back(actorVar);
-        }
+        result[field] = TranslateEpgCast(info[field].asString());
         return true;
       }
       else if (field == "director" || field == "writer")
