@@ -15,6 +15,7 @@
 #include <memory>
 #include <optional>
 
+class CAction;
 class CFileItemList;
 class CGUIMessage;
 class CGUIViewControl;
@@ -40,6 +41,7 @@ public:
 
   // Implementation of CGUIControl via CGUIDialog
   bool OnMessage(CGUIMessage& message) override;
+  bool OnAction(const CAction& action) override;
 
 protected:
   // Implementation of CGUIWindow via CGUIDialog
@@ -70,9 +72,22 @@ private:
    */
   void OnHardcoreToggled();
 
+  /*!
+   * \brief Show the next or previous achievement set, wrapping around
+   */
+  void SelectSet(int step);
+
+  /*!
+   * \brief Turn the shown set on or off
+   */
+  void OnSetToggled();
+
   // Dialog parameters
   std::unique_ptr<CFileItemList> m_items;
   std::unique_ptr<CGUIViewControl> m_viewControl;
+
+  //! The set being shown, or 0 for every achievement when the add-on named none
+  unsigned int m_setId{0};
 };
 } // namespace GAME
 } // namespace KODI

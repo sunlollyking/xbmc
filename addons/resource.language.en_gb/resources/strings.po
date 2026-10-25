@@ -19145,17 +19145,7 @@ msgctxt "#35216"
 msgid "Support add-ons"
 msgstr ""
 
-#. Dialog text asking user to overwrite their savestate file
-#: xbmc/cores/RetroPlayer/RetroPlayer.cpp"
-msgctxt "#35217"
-msgid "The savestate can only be loaded with \"{0:s}\". Erase savestate and continue?"
-msgstr ""
-
-#. Button to erase the savestate
-#: xbmc/cores/RetroPlayer/RetroPlayer.cpp"
-msgctxt "#35218"
-msgid "Erase savestate"
-msgstr ""
+#empty strings from id 35217 to 35218
 
 #. Error dialog text when trying to play a game and the game's files aren't found.
 #: xbmc/games/GameClient.cpp
@@ -19677,7 +19667,13 @@ msgctxt "#35309"
 msgid "Rewind"
 msgstr ""
 
-#empty strings from id 35310 to 35319
+#. Label of the Manual button in the game OSD, which shows the game's instruction booklet
+#: addons/skin.estuary/xml/GameOSD.xml
+msgctxt "#35310"
+msgid "Manual"
+msgstr ""
+
+#empty strings from id 35311 to 35319
 
 #. Label of the Cheats button in the game OSD, heading of the cheats dialog, and
 #. of the cheats group in settings
@@ -20074,7 +20070,47 @@ msgctxt "#35703"
 msgid "Hardcore mode: {0:d} of {1:d} achievements unlocked"
 msgstr ""
 
-#empty strings from id 35704 to 35999
+#empty strings from id 35704 to 35709
+
+#. Marks a locked achievement that can be missed for good
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35710"
+msgid "Missable"
+msgstr ""
+
+#. Button that picks which of a game's achievement sets is shown
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35711"
+msgid "Achievement set"
+msgstr ""
+
+#. An achievement set whose progression and win achievements are all earned
+#: xbmc/games/addons/cheevos/GameClientCheevos.cpp
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35712"
+msgid "Beaten"
+msgstr ""
+
+#. How close an achievement set is to being beaten, {0:d} earned of {1:d} needed
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+#, c++-format
+msgctxt "#35713"
+msgid "{0:d} of {1:d} to beat"
+msgstr ""
+
+#. An achievement set the player turned off
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35714"
+msgid "Turned off"
+msgstr ""
+
+#. The game's own achievement set, as opposed to its subsets
+#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+msgctxt "#35715"
+msgid "Main Set"
+msgstr ""
+
+#empty strings from id 35716 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
@@ -25265,7 +25301,19 @@ msgctxt "#39217"
 msgid "Best"
 msgstr ""
 
-#empty strings from id 39218 to 39899
+#. Title of the setting that chooses if the Dolby Vision extensions is used
+#: system/settings/settings.xml
+msgctxt "#39218"
+msgid "Use Dolby Vision extensions"
+msgstr ""
+
+#. Help text for setting "Dolby Vision extensions" of label #39218
+#: system/settings/settings.xml
+msgctxt "#39219"
+msgid "Use the system Dolby Vision extensions to correctly display Dolby Vision profile 5, 7 (excludes FEL reconstruction), 8 and 10 video."
+msgstr ""
+
+#empty strings from id 39220 to 39899
 
 #. List formatting: pattern used to join a list of exactly two items, e.g. "A and B"
 #. STR_LIST_AND_TWO
@@ -25799,7 +25847,19 @@ msgctxt "#40230"
 msgid "Turn on to show individual versions in the movies view, turn off to group them"
 msgstr ""
 
-#empty strings from id 40231 to 40399
+#. Setting to retrieve art not cached yet when the video library is exported
+#: system/settings/settings.xml
+msgctxt "#40231"
+msgid "Retrieve all art during export"
+msgstr ""
+
+#. Help for the retrieve all art during export setting
+#: system/settings/settings.xml
+msgctxt "#40232"
+msgid "When exporting the library with images, retrieve art that isn't cached yet. Turn off to only export art that is already cached."
+msgstr ""
+
+#empty strings from id 40233 to 40399
 
 # Video versions
 

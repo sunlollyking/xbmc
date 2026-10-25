@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "GameClientCallbacks.h"
+#include "GameClientFastForward.h"
 #include "GameClientInGameSaves.h"
 #include "GameClientProperties.h"
 #include "GameClientTranslator.h"
@@ -20,8 +21,6 @@
 #include "addons/BinaryAddonCache.h"
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/FileDirectoryFactory.h"
@@ -39,7 +38,6 @@
 #include "guilib/WindowIDs.h"
 #include "input/actions/Action.h"
 #include "input/actions/ActionIDs.h"
-#include "jobs/JobManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "resources/LocalizeStrings.h"
@@ -113,10 +111,6 @@ bool CopyWhole(const std::string& from, const std::string& to)
   return false;
 }
 
-//! The speed a client gets when it asks to fast-forward and leaves the speed to
-//! Kodi. The game loop goes no faster than the client can run frames.
-constexpr double CLIENT_FAST_FORWARD_SPEED = 16.0;
-
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 constexpr const char* GAME_PROPERTY_LIBRETRO_CORE = "libretro_core";
@@ -178,7 +172,8 @@ std::string NormalizeExtension(const std::string& strExtension)
 CGameClient::CGameClient(const ADDON::AddonInfoPtr& addonInfo)
   : CAddonDll(addonInfo, ADDON::AddonType::GAMEDLL),
     m_subsystems(CGameClientSubsystem::CreateSubsystems(*this, *m_ifc.game, m_critSection)),
-    m_bIsPlaying(false)
+    m_bIsPlaying(false),
+    m_fastForward(std::make_unique<CGameClientFastForward>())
 {
   using namespace ADDON;
 
@@ -305,6 +300,7 @@ bool CGameClient::Initialize(void)
   m_ifc.game->toKodi->RCOnLeaderboardScoreboard = cb_rc_on_leaderboard_scoreboard;
   m_ifc.game->toKodi->RCOnReset = cb_rc_on_reset;
   m_ifc.game->toKodi->RCOnSubsetCompleted = cb_rc_on_subset_completed;
+  m_ifc.game->toKodi->RCOnAchievementSets = cb_rc_on_achievement_sets;
 
   memset(m_ifc.game->toAddon, 0, sizeof(KodiToAddonFuncTable_Game));
 
@@ -913,6 +909,7 @@ void CGameClient::CloseFile()
     m_gamePath.clear();
     m_serializeSize = 0;
     m_input = nullptr;
+    m_fastForward->Reset();
 
     Input().Stop();
 
@@ -1393,41 +1390,16 @@ double CGameClient::cb_get_playback_speed(KODI_HANDLE kodiInstance)
   if (!gameClient)
     return 0.0;
 
-  return gameClient->m_playbackSpeed;
+  return gameClient->m_fastForward->ClientSpeed(gameClient->m_playbackSpeed);
 }
 
 void CGameClient::cb_set_fast_forwarding(KODI_HANDLE kodiInstance, bool fastForward, double ratio)
 {
   CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
-  if (gameClient == nullptr)
+  if (!gameClient)
     return;
 
-  double from;
-  double to;
-  if (fastForward)
-  {
-    from = 1.0;
-    to = ratio > 1.0 ? ratio : CLIENT_FAST_FORWARD_SPEED;
-    gameClient->m_fastForwardSpeed = to;
-  }
-  else
-  {
-    from = gameClient->m_fastForwardSpeed.exchange(0.0);
-    to = 1.0;
-    if (from == 0.0)
-      return;
-  }
-
-  // The call comes from inside a frame, and changing speed waits on the game loop
-  CServiceBroker::GetJobManager()->Submit(
-      [from, to]()
-      {
-        const auto appPlayer =
-            CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-        if (appPlayer && appPlayer->IsPlayingGame() &&
-            static_cast<double>(appPlayer->GetPlaySpeed()) == from)
-          appPlayer->SetPlaySpeed(static_cast<float>(to));
-      });
+  gameClient->m_fastForward->Request(fastForward, ratio, gameClient->m_playbackSpeed);
 }
 
 void CGameClient::cb_set_game_timing(KODI_HANDLE kodiInstance, const game_system_timing* timingInfo)
@@ -1759,6 +1731,16 @@ void CGameClient::cb_rc_on_subset_completed(KODI_HANDLE kodiInstance, const char
     return;
 
   gameClient->Cheevos().OnSubsetCompleted(title != nullptr ? title : "");
+}
+
+void CGameClient::cb_rc_on_achievement_sets(KODI_HANDLE kodiInstance,
+                                            const game_rc_achievement_sets* data)
+{
+  CGameClient* gameClient = static_cast<CGameClient*>(kodiInstance);
+  if (gameClient == nullptr || data == nullptr)
+    return;
+
+  gameClient->Cheevos().OnAchievementSets(*data);
 }
 
 std::pair<std::string, std::string> CGameClient::ParseLibretroName(const std::string& addonName)

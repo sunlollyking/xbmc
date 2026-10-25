@@ -1303,9 +1303,12 @@ TEST_F(TestGameClientHardwareRendering, RunaheadStopsPlaybackWhenTheRealFrameIsL
 
 TEST_F(TestGameClientHardwareRendering, DevKitLeavesSpeculativeFramesToNewerKodi)
 {
+  // An 8.5 Kodi's table ends before the entry
   {
+    DevKitInstance addon(m_client->Streams(), "8.5.0");
     EXPECT_FALSE(addon.InstalledSpeculativeFrames());
   }
+  DevKitInstance addon(m_client->Streams(), "8.6.0");
   EXPECT_TRUE(addon.InstalledSpeculativeFrames());
 }
 
