@@ -47,6 +47,14 @@ uint64_t MonotonicToHostCounter(uint64_t ns)
   const uint64_t now = static_cast<uint64_t>(ts.tv_sec) * 1000000000ULL + ts.tv_nsec;
   return CurrentHostCounter() - (now - ns);
 }
+
+uint32_t GetCrtcId(CWinSystemBase* winSystem)
+{
+  auto winSystemGbm = dynamic_cast<KODI::WINDOWING::GBM::CWinSystemGbm*>(winSystem);
+  const auto drm = winSystemGbm ? winSystemGbm->GetDrm() : nullptr;
+  const auto crtc = drm ? drm->GetCrtc() : nullptr;
+  return crtc ? crtc->GetCrtcId() : 0;
+}
 } // namespace
 
 CVideoSyncGbm::CVideoSyncGbm(CVideoReferenceClock* clock)
@@ -111,6 +119,7 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
   CLog::Log(LOGDEBUG, "CVideoSyncGbm::{}: started {}", __FUNCTION__, m_fd);
 
   bool failing = false;
+  bool rebound = false;
   while (!stopEvent.Signaled() && !m_abort)
   {
     uint64_t sequence = 0, ns = 0;
@@ -119,13 +128,23 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
     if (s != 0)
     {
       // Vblank is off while the CRTC is reconfigured, as when the output
-      // switches to HDR, so wait for it to come back
+      // switches to HDR, so wait for it to come back. The modeset may also
+      // have moved the output to another CRTC.
       if (!failing)
         CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: drmCrtcGetSequence failed ({}), waiting",
                   __FUNCTION__, s);
       failing = true;
       if (stopEvent.Wait(std::chrono::milliseconds(100)))
         break;
+
+      const uint32_t crtcId = GetCrtcId(m_winSystem);
+      if (crtcId != 0 && crtcId != m_crtcId)
+      {
+        CLog::Log(LOGINFO, "CVideoSyncGbm::{}: following the output to crtc {}", __FUNCTION__,
+                  crtcId);
+        m_crtcId = crtcId;
+        rebound = true;
+      }
       continue;
     }
 
@@ -133,6 +152,14 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
     {
       CLog::Log(LOGINFO, "CVideoSyncGbm::{}: drmCrtcGetSequence works again", __FUNCTION__);
       failing = false;
+    }
+
+    // Another CRTC counts its own vblanks, so start counting from here
+    if (rebound)
+    {
+      m_sequence = sequence;
+      rebound = false;
+      continue;
     }
 
     if (sequence == m_sequence)
