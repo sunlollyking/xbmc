@@ -19,6 +19,7 @@
 
 #include <assert.h>
 #include <chrono>
+#include <optional>
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
@@ -48,13 +49,8 @@ uint64_t MonotonicToHostCounter(uint64_t ns)
   return CurrentHostCounter() - (now - ns);
 }
 
-uint32_t GetCrtcId(CWinSystemBase* winSystem)
-{
-  auto winSystemGbm = dynamic_cast<KODI::WINDOWING::GBM::CWinSystemGbm*>(winSystem);
-  const auto drm = winSystemGbm ? winSystemGbm->GetDrm() : nullptr;
-  const auto crtc = drm ? drm->GetCrtc() : nullptr;
-  return crtc ? crtc->GetCrtcId() : 0;
-}
+// Vblank comes back within this once a modeset is done
+constexpr auto MAX_VBLANK_WAIT = std::chrono::seconds(2);
 } // namespace
 
 CVideoSyncGbm::CVideoSyncGbm(CVideoReferenceClock* clock)
@@ -118,8 +114,7 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
   }
   CLog::Log(LOGDEBUG, "CVideoSyncGbm::{}: started {}", __FUNCTION__, m_fd);
 
-  bool failing = false;
-  bool rebound = false;
+  std::optional<std::chrono::steady_clock::time_point> failingSince;
   while (!stopEvent.Signaled() && !m_abort)
   {
     uint64_t sequence = 0, ns = 0;
@@ -128,38 +123,30 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
     if (s != 0)
     {
       // Vblank is off while the CRTC is reconfigured, as when the output
-      // switches to HDR, so wait for it to come back. The modeset may also
-      // have moved the output to another CRTC.
-      if (!failing)
+      // switches to HDR, so wait for it to come back. If it doesn't, Setup()
+      // runs again and finds the CRTC the output moved to, if there is one.
+      const auto now = std::chrono::steady_clock::now();
+      if (!failingSince)
+      {
         CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: drmCrtcGetSequence failed ({}), waiting",
                   __FUNCTION__, s);
-      failing = true;
+        failingSince = now;
+      }
+      else if (now - *failingSince >= MAX_VBLANK_WAIT)
+      {
+        CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: drmCrtcGetSequence still failing ({})",
+                  __FUNCTION__, s);
+        break;
+      }
       if (stopEvent.Wait(std::chrono::milliseconds(100)))
         break;
-
-      const uint32_t crtcId = GetCrtcId(m_winSystem);
-      if (crtcId != 0 && crtcId != m_crtcId)
-      {
-        CLog::Log(LOGINFO, "CVideoSyncGbm::{}: following the output to crtc {}", __FUNCTION__,
-                  crtcId);
-        m_crtcId = crtcId;
-        rebound = true;
-      }
       continue;
     }
 
-    if (failing)
+    if (failingSince)
     {
       CLog::Log(LOGINFO, "CVideoSyncGbm::{}: drmCrtcGetSequence works again", __FUNCTION__);
-      failing = false;
-    }
-
-    // Another CRTC counts its own vblanks, so start counting from here
-    if (rebound)
-    {
-      m_sequence = sequence;
-      rebound = false;
-      continue;
+      failingSince.reset();
     }
 
     if (sequence == m_sequence)
