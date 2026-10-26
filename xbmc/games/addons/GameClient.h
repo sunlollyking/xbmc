@@ -290,6 +290,15 @@ private:
   std::string ExtractFolder(const std::string& archivePath);
 
   /*!
+   * \brief A playlist of every disk of a library game, for a client that swaps
+   *        disks through one
+   *
+   * \return The playlist's local path, or empty if the game has one disk or
+   *         the client can't play them all
+   */
+  std::string GetDiskPlaylist(const std::string& gamePath);
+
+  /*!
    * \brief A copy of an arcade set under the name the client knows it by
    *
    * A client finds a set by its short name, so a set kept under another name
