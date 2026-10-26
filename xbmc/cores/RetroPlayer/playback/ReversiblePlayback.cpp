@@ -315,7 +315,7 @@ void CReversiblePlayback::CaptureMetadata(Snapshot& snapshot)
   {
     if (m_gameClient->SupportsDiscControl())
     {
-      m_gameClient->Discs().RefreshDiscStateLive();
+      m_gameClient->Discs().RefreshDiscState();
       snapshot.discState = m_gameClient->Discs().GetDiscsForSnapshot().GetState();
     }
     m_gameClient->SerializeAchievementState(snapshot.achievements);
@@ -830,7 +830,7 @@ void CReversiblePlayback::AddFrame(const uint8_t* runaheadState /* = nullptr */)
       uint32_t discStateId = 0;
       if (m_gameClient->SupportsDiscControl())
       {
-        m_gameClient->Discs().RefreshDiscStateLive();
+        m_gameClient->Discs().RefreshDiscState();
         discStateId = m_discStateHistory.Intern(m_gameClient->Discs().GetDiscsForSnapshot());
       }
       m_memoryStream->SubmitFrame(discStateId, m_totalFrameCount + 1);
