@@ -18,6 +18,7 @@
 #include "windowing/gbm/WinSystemGbm.h"
 
 #include <assert.h>
+#include <chrono>
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
@@ -109,6 +110,7 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
   }
   CLog::Log(LOGDEBUG, "CVideoSyncGbm::{}: started {}", __FUNCTION__, m_fd);
 
+  bool failing = false;
   while (!stopEvent.Signaled() && !m_abort)
   {
     uint64_t sequence = 0, ns = 0;
@@ -116,8 +118,21 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
     int s = drmCrtcGetSequence(m_fd, m_crtcId, &sequence, &ns);
     if (s != 0)
     {
-      CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: drmCrtcGetSequence failed ({})", __FUNCTION__, s);
-      break;
+      // Vblank is off while the CRTC is reconfigured, as when the output
+      // switches to HDR, so wait for it to come back
+      if (!failing)
+        CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: drmCrtcGetSequence failed ({}), waiting",
+                  __FUNCTION__, s);
+      failing = true;
+      if (stopEvent.Wait(std::chrono::milliseconds(100)))
+        break;
+      continue;
+    }
+
+    if (failing)
+    {
+      CLog::Log(LOGINFO, "CVideoSyncGbm::{}: drmCrtcGetSequence works again", __FUNCTION__);
+      failing = false;
     }
 
     if (sequence == m_sequence)
