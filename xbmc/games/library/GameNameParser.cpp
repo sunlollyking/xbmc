@@ -15,9 +15,11 @@
 #include "games/library/naming/TosecNaming.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/URIUtils.h"
 
 #include <algorithm>
 #include <cctype>
+#include <map>
 #include <optional>
 #include <utility>
 
@@ -505,4 +507,36 @@ bool CGameNameParser::SameCompany(std::string_view a, std::string_view b)
   const std::string joinedB = StringUtils::Join(wordsB, "");
   return std::min(joinedA.size(), joinedB.size()) >= 4 &&
          (joinedA.find(joinedB) != std::string::npos || joinedB.find(joinedA) != std::string::npos);
+}
+
+std::vector<std::string> CGameNameParser::DiscSet(const std::string& launched,
+                                                   const std::vector<ReleaseFile>& files)
+{
+  std::map<int, std::vector<std::string>> discs;
+  int launchedDisc = 0;
+  for (const ReleaseFile& file : files)
+  {
+    int disc = Parse(URIUtils::GetFileName(file.path)).disc;
+    if (disc == 0)
+      disc = file.disc;
+    if (file.path == launched)
+      launchedDisc = disc;
+    if (disc > 0)
+      discs[disc].emplace_back(file.path);
+  }
+  if (launchedDisc == 0 || discs.size() < 2)
+    return {};
+
+  const std::string launchedName = URIUtils::GetFileName(launched);
+  std::vector<std::string> set;
+  for (const auto& [disc, candidates] : discs)
+  {
+    if (disc == launchedDisc)
+      set.emplace_back(launched);
+    else
+      set.emplace_back(*std::ranges::max_element(
+          candidates, {}, [&launchedName](const std::string& path)
+          { return StringUtils::CompareFuzzy(URIUtils::GetFileName(path), launchedName); }));
+  }
+  return set;
 }

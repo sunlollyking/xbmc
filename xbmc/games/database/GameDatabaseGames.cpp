@@ -15,6 +15,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "games/library/GameAgeRatings.h"
+#include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -334,12 +335,10 @@ std::string CGameDatabase::GetLastScraped(int idGame)
 
 std::vector<std::string> CGameDatabase::GetDiscsForFile(const std::string& path)
 {
-  std::vector<std::string> discs;
+  std::vector<CGameNameParser::ReleaseFile> files;
 
   try
   {
-    // Every file of the release this one belongs to, in the order a set is
-    // numbered in its names
     const std::string sql = PrepareSQL(
         "SELECT p.strPath, f.strFilename, f.discNumber FROM files f JOIN path p ON p.idPath = "
         "f.idPath WHERE f.idRelease = (SELECT f2.idRelease FROM files f2 JOIN path p2 ON "
@@ -358,7 +357,7 @@ std::vector<std::string> CGameDatabase::GetDiscsForFile(const std::string& path)
                                                                   ".m3u"};
         const std::string extension = StringUtils::ToLower(URIUtils::GetExtension(file));
         if (std::ranges::find(notADisc, extension) == notADisc.end())
-          discs.emplace_back(file);
+          files.push_back({file, m_pDS->fv(2).get_asInt()});
         m_pDS->next();
       }
       m_pDS->close();
@@ -369,7 +368,7 @@ std::vector<std::string> CGameDatabase::GetDiscsForFile(const std::string& path)
     CLog::Log(LOGERROR, "GAME: Failed to read the discs of {}", path);
   }
 
-  return discs.size() > 1 ? discs : std::vector<std::string>{};
+  return CGameNameParser::DiscSet(path, files);
 }
 
 void CGameDatabase::LoadAgeRatings(int idGame, CGameInfoTag& details)

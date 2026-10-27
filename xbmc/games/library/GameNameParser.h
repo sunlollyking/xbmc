@@ -69,6 +69,27 @@ public:
    */
   static ParsedGameName Parse(std::string_view fileName, bool hasExtension = true);
 
+  //! A file of a release, with the disc number the library gave it
+  struct ReleaseFile
+  {
+    std::string path;
+    int disc = 0;
+  };
+
+  /*!
+   * \brief The discs of a set, one file each, for a file launched from it
+   *
+   * A release can hold alternate dumps of one disc as well as the discs of a
+   * set, so a file's disc comes from its name where the name says, and from the
+   * library's count only where it doesn't. Each disc keeps the file named most
+   * like the launched one, so a set is never two dumps of the same disc.
+   *
+   * \return The set in disc order, or nothing if the launched file isn't one of
+   *         two or more discs
+   */
+  static std::vector<std::string> DiscSet(const std::string& launched,
+                                          const std::vector<ReleaseFile>& files);
+
   /*!
    * \brief Turn a WHDLoad install name into something a catalogue can match
    *
