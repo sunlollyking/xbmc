@@ -226,6 +226,8 @@ public:
    * A game of several discs is one game in the library, so the disc manager is
    * handed the whole set rather than the one file that was launched. Empty
    * where the game has a single disc or is not in the library.
+   *
+   * \sa CGameNameParser::DiscSet()
    */
   std::vector<std::string> GetDiscsForFile(const std::string& path);
   bool GetPlatform(int idPlatform, PlatformInfo& platform);

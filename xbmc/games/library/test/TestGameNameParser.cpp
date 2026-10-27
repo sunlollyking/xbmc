@@ -384,3 +384,46 @@ TEST(TestGameNameParser, RestoresTheArticleOfATosecTitle)
   EXPECT_EQ(CGameNameParser::Parse("Legend of TOSEC, The (1986)(Publisher).adf").displayTitle,
             "The Legend of TOSEC");
 }
+
+TEST(TestGameNameParser, LeavesAlternateDumpsOfOneTapeOutOfADiscSet)
+{
+  const std::string folder = "/games/c64/";
+  const std::string launched = folder + "Rick Dangerous (1989)(Firebird)[o][l Cyberload].tap";
+  EXPECT_TRUE(CGameNameParser::DiscSet(
+                  launched, {{folder + "Rick Dangerous (1989)(Firebird)[a][l Cyberload].tap", 0},
+                             {launched, 0}})
+                  .empty());
+}
+
+TEST(TestGameNameParser, MakesADiscSetOfTheLaunchedDump)
+{
+  const std::string folder = "/games/c64/";
+  const std::string sideAa = folder + "Rick Dangerous II (1990)(Microstyle)(Side A)[a][l Cyberload].tap";
+  const std::string sideAo = folder + "Rick Dangerous II (1990)(Microstyle)(Side A)[o][l Cyberload].tap";
+  const std::string sideBa = folder + "Rick Dangerous II (1990)(Microstyle)(Side B)[a][l Cyberload].tap";
+  const std::string sideBo = folder + "Rick Dangerous II (1990)(Microstyle)(Side B)[o][l Cyberload].tap";
+
+  // The numbers the library gave say nothing here; the names do
+  const std::vector<CGameNameParser::ReleaseFile> files{
+      {sideAo, 0}, {sideAa, 1}, {sideBo, 2}, {sideBa, 3}};
+  EXPECT_EQ(CGameNameParser::DiscSet(sideAo, files), (std::vector<std::string>{sideAo, sideBo}));
+  EXPECT_EQ(CGameNameParser::DiscSet(sideBa, files), (std::vector<std::string>{sideAa, sideBa}));
+}
+
+TEST(TestGameNameParser, TakesADiscSetInOrderFromAnyDisc)
+{
+  const std::string disc1 = "/games/psx/Game (USA) (Disc 1).cue";
+  const std::string disc2 = "/games/psx/Game (USA) (Disc 2).cue";
+  EXPECT_EQ(CGameNameParser::DiscSet(disc2, {{disc2, 2}, {disc1, 1}}),
+            (std::vector<std::string>{disc1, disc2}));
+}
+
+TEST(TestGameNameParser, CountsADiscSetWhoseNamesDontSay)
+{
+  const std::string first = "/games/amiga/Game.adf";
+  const std::string second = "/games/amiga/Game data.adf";
+  EXPECT_EQ(CGameNameParser::DiscSet(first, {{first, 1}, {second, 2}}),
+            (std::vector<std::string>{first, second}));
+  // A file that isn't a numbered disc isn't part of a set
+  EXPECT_TRUE(CGameNameParser::DiscSet(first, {{first, 0}, {second, 2}}).empty());
+}
