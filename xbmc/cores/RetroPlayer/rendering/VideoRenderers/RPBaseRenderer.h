@@ -104,6 +104,17 @@ public:
    */
   bool IsBezelShown() const { return m_bezelShown; }
 
+  /*!
+   * \brief Record that the renderer was asked for in the current frame
+   */
+  void SetUsed();
+
+  /*!
+   * \brief Check if the renderer wasn't asked for in the last frame, so it can
+   * be released
+   */
+  bool IsUnused() const;
+
 protected:
   // Protected renderer interface
   virtual bool ConfigureInternal() { return true; }
@@ -165,6 +176,7 @@ private:
 
   uint64_t m_renderFrameCount = 0;
   uint64_t m_lastRender = 0;
+  uint64_t m_lastUse = 0;
 };
 } // namespace RETRO
 } // namespace KODI
