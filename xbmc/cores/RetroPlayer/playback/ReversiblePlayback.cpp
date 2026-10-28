@@ -393,8 +393,7 @@ bool CReversiblePlayback::CommitSavestate(const Snapshot& snapshot)
     success = m_savestateDatabase->AddSavestate(savePath, m_gamePath, *savestate);
   }
   if (success)
-    m_renderManager.SaveThumbnail(CSavestateDatabase::MakeThumbnailPath(savePath),
-                                  snapshot.video);
+    m_renderManager.SaveThumbnail(CSavestateDatabase::MakeThumbnailPath(savePath), snapshot.video);
   else
     CLog::Log(LOGERROR, "RetroPlayer[SAVE]: Failed to write savestate");
   m_guiMessenger.RefreshSavestates(savePath, savestate.get());

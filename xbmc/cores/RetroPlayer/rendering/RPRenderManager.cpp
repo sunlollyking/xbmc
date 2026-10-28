@@ -15,7 +15,6 @@
 #include "RenderTranslator.h"
 #include "RenderUtils.h"
 #include "ServiceBroker.h"
-#include "URL.h"
 #include "cores/RetroPlayer/buffers/BaseRenderBuffer.h"
 #include "cores/RetroPlayer/buffers/IRenderBuffer.h"
 #include "cores/RetroPlayer/buffers/IRenderBufferPool.h"
@@ -28,7 +27,6 @@
 #include "cores/RetroPlayer/rendering/VideoRenderers/RPBaseRenderer.h"
 #include "cores/RetroPlayer/streams/RetroPlayerVideo.h"
 #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h"
-#include "filesystem/File.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "guilib/GUIComponent.h"
@@ -1438,4 +1436,3 @@ void CRPRenderManager::FreeVideoFrame(IRenderBuffer* readableBuffer,
     m_cachedFrame = std::move(cachedFrame);
   }
 }
-
