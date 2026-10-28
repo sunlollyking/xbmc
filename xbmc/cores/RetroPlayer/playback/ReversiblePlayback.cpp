@@ -58,10 +58,6 @@ bool HardcoreRestrictionsApply(GAME::CGameClient& gameClient)
   return gameClient.Cheevos().IsHardcoreActive();
 }
 
-// Every run-ahead frame takes one state and puts it back, so the cost follows
-// the state size. States up to 1 MB were measured holding full speed three
-// frames ahead; an 11.5 MB state fell below full speed at one.
-constexpr size_t MAX_RUNAHEAD_STATE_SIZE = 2 * 1024 * 1024;
 } // namespace
 
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
@@ -630,22 +626,8 @@ unsigned int CReversiblePlayback::PrepareRunahead()
     return 0;
   }
 
-  const size_t memorySize = m_gameClient->GetSerializeSize();
-  if (memorySize == 0)
+  if (m_gameClient->GetSerializeSize() == 0)
     return 0;
-
-  // Refused rather than attempted, because a client that cannot keep up just
-  // runs slowly, which looks like a broken emulator
-  if (memorySize > MAX_RUNAHEAD_STATE_SIZE)
-  {
-    if (m_runaheadStatus != RunaheadStatus::StateTooLarge)
-    {
-      m_runaheadStatus = RunaheadStatus::StateTooLarge;
-      CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Run-ahead held off: state is {} bytes, limit is {}",
-                memorySize, MAX_RUNAHEAD_STATE_SIZE);
-    }
-    return 0;
-  }
 
   return frames;
 }

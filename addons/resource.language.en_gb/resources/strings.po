@@ -20043,7 +20043,7 @@ msgstr ""
 #. Help text for setting "Enable run-ahead" of label #35378
 #: system/settings/settings.xml
 msgctxt "#35379"
-msgid "Make games respond sooner to the controller by running the emulator ahead and showing a frame from the future. The emulator runs once more for every frame ahead, so this suits 8-bit and 16-bit systems. Emulators with large save states are left alone."
+msgid "Make games respond sooner to the controller by running the emulator ahead and showing a frame from the future. The emulator runs once more for every frame ahead, so this suits 8-bit and 16-bit systems. Systems with large save states, such as the PlayStation, may slow down."
 msgstr ""
 
 #. Setting for how many frames to run ahead
@@ -20055,7 +20055,7 @@ msgstr ""
 #. Help text for setting "Frames to run ahead" of label #35380
 #: system/settings/settings.xml
 msgctxt "#35381"
-msgid "Each frame removes one frame of delay, as long as the game has that much delay to remove. Start at one, and raise it only if the game still responds late."
+msgid "Each frame removes one frame of delay, as long as the game has that much delay to remove. Going further skips the first frames of each move instead. Start at one, and raise it only if the game still responds late."
 msgstr ""
 
 #. Format for the run-ahead frames slider, e.g. "2 frames"

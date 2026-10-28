@@ -171,7 +171,6 @@ private:
   {
     Ready,
     Failed,
-    StateTooLarge,
     Unsupported,
     NotDeterministic,
     AudioOffFrameThread,
