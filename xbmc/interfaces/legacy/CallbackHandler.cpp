@@ -33,7 +33,11 @@ namespace XBMCAddon
   //********************************************************************
 
   static CCriticalSection critSection;
-  static CallbackQueue g_callQueue;
+
+  // Never destroyed. Messages for a script that has stopped can be left at
+  // exit, and destroying one can destroy its handler, which then removes its
+  // messages from a queue that is itself being destroyed.
+  static CallbackQueue& g_callQueue = *new CallbackQueue;
 
   void RetardedAsyncCallbackHandler::invokeCallback(Callback* cb)
   {
