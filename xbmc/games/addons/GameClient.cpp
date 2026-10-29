@@ -94,6 +94,15 @@ std::string ExtractedFolder(const std::string& archive)
   return URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, name + "-" + hash) + "/";
 }
 
+//! A name to write a file under until it is complete, which no file in an
+//! archive can share. Kept short, as the file's own name can already be
+//! close to the filesystem's limit.
+std::string PartialName(const std::string& target)
+{
+  return URIUtils::AddFileToFolder(URIUtils::GetDirectory(target),
+                                   StringUtils::CreateUUID() + ".partial");
+}
+
 //! Write a disk playlist, leaving one that already says the same alone
 bool WritePlaylist(const std::string& playlist, const std::vector<std::string>& entries)
 {
@@ -105,7 +114,7 @@ bool WritePlaylist(const std::string& playlist, const std::vector<std::string>& 
   if (XFILE::CFile().LoadFile(playlist, current) < 0 ||
       std::string(current.begin(), current.end()) != content)
   {
-    const std::string partial = playlist + ".tmp";
+    const std::string partial = PartialName(playlist);
     XFILE::CFile file;
     const bool written =
         file.OpenForWrite(partial, true) &&
@@ -129,7 +138,7 @@ bool IsSafeName(const std::string& name)
 // interrupted is never taken for a complete one on a later start
 bool CopyWhole(const std::string& from, const std::string& to)
 {
-  const std::string partial = to + ".tmp";
+  const std::string partial = PartialName(to);
   if (XFILE::CFile::Copy(from, partial) && XFILE::CFile::Rename(partial, to))
     return true;
 
