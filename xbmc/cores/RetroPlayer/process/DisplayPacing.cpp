@@ -72,8 +72,11 @@ void CDisplayPacing::OnFrameTaken(Clock::time_point when, bool newFrame)
                 "RetroPlayer[PACING]: {} of the last {} refreshes had no new frame (margin "
                 "{:.1f} ms)",
                 m_missedRefreshes, m_pacedRefreshes, m_marginNs.load() / 1e6);
-    CLog::Log(LOGDEBUG, "RetroPlayer[PACING]: Running at {:.3f}% speed, sound drift correction {:+.3f}%",
-              PlaybackRate() * 100.0, DriftCorrection() * 100.0);
+    CLog::Log(LOGDEBUG,
+              "RetroPlayer[PACING]: Running at {:.3f}% speed, sound drift correction {:+.3f}%, "
+              "sound delay {:.1f} ms (holding {:.1f} ms)",
+              PlaybackRate() * 100.0, DriftCorrection() * 100.0, m_soundDelaySecs.load() * 1000.0,
+              m_soundHeldSecs.load() * 1000.0);
     m_pacedRefreshes = 0;
     m_missedRefreshes = 0;
   }

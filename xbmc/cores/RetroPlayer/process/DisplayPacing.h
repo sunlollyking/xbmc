@@ -127,6 +127,16 @@ public:
   void SetDriftCorrection(double correction) { m_driftCorrection.store(correction); }
 
   /*!
+   * \brief For the log: the sound's delay, as the drift correction sees it, and
+   * the delay it holds, in seconds
+   */
+  void SetSoundDelay(double delaySecs, double heldSecs)
+  {
+    m_soundDelaySecs.store(delaySecs);
+    m_soundHeldSecs.store(heldSecs);
+  }
+
+  /*!
    * \brief Whether the game is running in step with the screen, which every
    * refresh should then show a new frame of
    */
@@ -149,6 +159,8 @@ private:
   std::atomic<int64_t> m_lastTakeNs{0};
   std::atomic<double> m_playbackRate{1.0};
   std::atomic<double> m_driftCorrection{0.0};
+  std::atomic<double> m_soundDelaySecs{0.0};
+  std::atomic<double> m_soundHeldSecs{0.0};
 };
 } // namespace RETRO
 } // namespace KODI

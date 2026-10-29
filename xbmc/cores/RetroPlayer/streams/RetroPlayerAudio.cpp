@@ -32,13 +32,14 @@ const double MAX_DELAY = 0.3; // seconds
 // Smaller changes in the resample ratio than this aren't passed to the sound
 const double MIN_RATIO_CHANGE = 0.00001;
 
-// How much of the game's sound is kept queued above the sink's own latency.
 // The game's clock and the sound card's never quite agree, and the difference
-// builds up until the delay is too high and the sound is flushed. Speeding the
-// sound up or down by a fraction of a percent keeps the queue here instead.
-const double TARGET_QUEUE = 0.02; // seconds
+// builds up in the delay until the sound is flushed or the sink runs dry. Once
+// the delay has settled after the sound starts, speeding the sound up or down
+// by a fraction of a percent holds it there.
+const double SETTLE_TIME = 5.0; // seconds of sound
+const double DRIFT_RANGE = 0.02; // seconds off the held delay for the full correction
 const double MAX_DRIFT_CORRECTION = 0.005;
-const double QUEUE_SMOOTHING = 1.0; // seconds
+const double DELAY_SMOOTHING = 1.0; // seconds
 
 // How long to stay quiet between log lines.
 const std::chrono::seconds DROP_LOG_INTERVAL{10};
@@ -110,7 +111,8 @@ bool CRetroPlayerAudio::OpenStream(const StreamProperties& properties)
   // Resampling follows the game's speed and corrects drift
   m_pAudioStream = audioEngine->MakeStream(audioFormat, AESTREAM_FORCE_RESAMPLE);
   m_resampleRatio = 1.0;
-  m_queuedSecs = 0.0;
+  m_settledSecs = 0.0;
+  m_maxDelay = 0.0;
   m_playingDelay = 0.0;
   m_framesToSkip = 0;
 
@@ -153,8 +155,8 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       const double delaySecs = m_pAudioStream->GetDelay();
 
       // What the sink and the engine hold, which the delay never falls below.
-      // Sinks differ by hundreds of milliseconds, so the queue's target and
-      // the flush are measured from here.
+      // Sinks differ by hundreds of milliseconds, so the flush is measured
+      // from here.
       const double floorSecs = std::max(0.0, delaySecs - m_pAudioStream->GetCacheTime());
 
       const size_t frameSize = m_pAudioStream->GetChannelCount() *
@@ -188,14 +190,15 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       {
         m_pAudioStream->Flush();
         m_resampleRatio = 1.0;
-        m_queuedSecs = 0.0;
+        m_settledSecs = 0.0;
         skipFrames = 0;
         m_framesToSkip = 0;
         CLog::Log(LOGDEBUG, "RetroPlayer[AUDIO]: Audio delay ({:0.2f} ms) is too high - flushing",
                   delaySecs * 1000);
       }
 
-      UpdateResampleRatio(frameCount / sampleRate, delaySecs - floorSecs);
+      UpdateResampleRatio(frameCount / sampleRate, delaySecs);
+      m_processInfo.GetDisplayPacing().SetSoundDelay(m_smoothedDelay, m_heldDelay);
 
       const unsigned int accepted =
           m_pAudioStream->AddData(&audioPacket.data, skipFrames, frameCount - skipFrames, nullptr);
@@ -224,7 +227,7 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
   }
 }
 
-void CRetroPlayerAudio::UpdateResampleRatio(double packetSecs, double queuedSecs)
+void CRetroPlayerAudio::UpdateResampleRatio(double packetSecs, double delaySecs)
 {
   double correction = 0.0;
 
@@ -232,9 +235,31 @@ void CRetroPlayerAudio::UpdateResampleRatio(double packetSecs, double queuedSecs
   // delay back down
   if (m_framesToSkip == 0)
   {
-    m_queuedSecs += std::min(1.0, packetSecs / QUEUE_SMOOTHING) * (queuedSecs - m_queuedSecs);
-    correction = std::clamp((TARGET_QUEUE - m_queuedSecs) / TARGET_QUEUE * MAX_DRIFT_CORRECTION,
-                            -MAX_DRIFT_CORRECTION, MAX_DRIFT_CORRECTION);
+    // A new sink has a delay of its own
+    const double maxDelay = m_pAudioStream->GetMaxDelay();
+    if (maxDelay != m_maxDelay)
+    {
+      m_maxDelay = maxDelay;
+      m_settledSecs = 0.0;
+    }
+
+    // The whole delay is held, not just the stream's share: the engine passes
+    // sound to the sink a period at a time, so drift can build up on either
+    // side of the stream
+    if (m_settledSecs == 0.0)
+      m_smoothedDelay = delaySecs;
+    m_smoothedDelay += std::min(1.0, packetSecs / DELAY_SMOOTHING) * (delaySecs - m_smoothedDelay);
+
+    if (m_settledSecs < SETTLE_TIME)
+    {
+      m_settledSecs += packetSecs;
+      m_heldDelay = m_smoothedDelay;
+    }
+    else
+    {
+      correction = std::clamp((m_heldDelay - m_smoothedDelay) / DRIFT_RANGE * MAX_DRIFT_CORRECTION,
+                              -MAX_DRIFT_CORRECTION, MAX_DRIFT_CORRECTION);
+    }
   }
 
   // The correction is the only adjustment, made around the ratio that follows
