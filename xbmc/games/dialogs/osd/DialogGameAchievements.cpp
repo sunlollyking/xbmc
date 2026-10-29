@@ -517,6 +517,11 @@ void CDialogGameAchievements::RefreshList()
     if (achievement.earnedHardcore)
       item->SetProperty(ACHIEVEMENT_HARDCORE, true);
 
+    // A corner shows only so many indicators, and the player can turn them off
+    if (std::ranges::any_of(state.challenges, [&achievement](const AchievementChallenge& challenge)
+                            { return challenge.id == achievement.id; }))
+      item->SetProperty(ACHIEVEMENT_ATTEMPTING, true);
+
     // Earned or not, so the player can see what beating the game took
     if (achievement.type == AchievementType::PROGRESSION)
       item->SetProperty(ACHIEVEMENT_PROGRESSION, true);
