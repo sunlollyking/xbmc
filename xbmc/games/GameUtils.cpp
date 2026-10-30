@@ -140,7 +140,7 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
     }
     else
     {
-      OpenInsideArchive(item);
+      OpenInsideArchive(item, GetRememberedGameClient(item.GetPath()));
 
       if (!CGUIDialogSelectSavestate::ShowAndGetSavestate(item.GetDynPath(), savestatePath))
         return false;
@@ -216,6 +216,12 @@ bool CGameUtils::FillInGameClient(CFileItem& item, std::string& savestatePath)
         }
       }
     }
+  }
+  else
+  {
+    // An emulator chosen before playing, as by RunAddon() or an add-on's list
+    // item, is given an archived game the same way
+    OpenInsideArchive(item, item.GetGameInfoTag()->GetGameClient());
   }
 
   const std::string gameClient = item.GetGameInfoTag()->GetGameClient();
@@ -545,7 +551,7 @@ bool CGameUtils::ChooseAndSetDefaultVideoFilter(const CFileItem& item)
   return true;
 }
 
-void CGameUtils::OpenInsideArchive(CFileItem& item)
+void CGameUtils::OpenInsideArchive(CFileItem& item, const std::string& gameClient)
 {
   const std::string archivePath = item.GetDynPath();
   CFileItem contents(archivePath, false);
@@ -554,7 +560,6 @@ void CGameUtils::OpenInsideArchive(CFileItem& item)
 
   // Arcade sets are archives by design, and an emulator that asks for the
   // archive is given it whole
-  const std::string gameClient = GetRememberedGameClient(item.GetPath());
   if (!gameClient.empty())
   {
     GameClientVector candidates;
@@ -597,8 +602,8 @@ void CGameUtils::OpenInsideArchive(CFileItem& item)
 
     if (games.size() > 1)
     {
-      // Several disks of one game, for the emulator the platform remembers:
-      // start at the first, and the rest are found beside it
+      // Several disks of one game, for the emulator it plays with: start at
+      // the first, and the rest are found beside it
       const std::string extension = URIUtils::GetExtension(games.front());
       if (gameClient.empty() ||
           !std::ranges::all_of(games, [&extension](const std::string& game)

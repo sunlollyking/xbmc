@@ -149,10 +149,12 @@ private:
   static std::string GetRememberedGameClient(const std::string& path);
 
   /*!
-   * \brief Point an archived game at the one game file inside it, unless its
-   *        remembered emulator opens the archive itself
+   * \brief Point an archived game at the one game file inside it, unless the
+   *        emulator it plays with opens the archive itself
+   *
+   * \param gameClient The emulator chosen to play the game, if one has been
    */
-  static void OpenInsideArchive(CFileItem& item);
+  static void OpenInsideArchive(CFileItem& item, const std::string& gameClient);
 
   /*!
    * \brief Whether the game's remembered emulator would open it, but can't
