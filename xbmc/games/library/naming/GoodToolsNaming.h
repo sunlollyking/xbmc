@@ -34,7 +34,7 @@ namespace GOODTOOLS
 //! The standard codes, written in brackets
 enum class FlagType
 {
-  ALTERNATE, // [a]
+  ALTERNATE_DUMP, // [a]
   BAD_DUMP, // [b]
   FIXED, // [f]
   HACK, // [h]
@@ -50,7 +50,7 @@ enum class FlagType
 //! "[a1]", "[h2]", "[T+Ger1.00_Translator]"
 struct Flag
 {
-  FlagType type{FlagType::ALTERNATE};
+  FlagType type{FlagType::ALTERNATE_DUMP};
   int number{0}; // [a1] is the first alternate; 0 where none is written
   std::string language; // a translation's language, ISO 639-1
 };

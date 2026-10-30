@@ -169,7 +169,7 @@ constexpr auto dumpFlags = std::to_array<std::pair<std::string_view, DumpFlagTyp
     {"u", DumpFlagType::UNDER_DUMP},
     {"v", DumpFlagType::VIRUS},
     {"b", DumpFlagType::BAD_DUMP},
-    {"a", DumpFlagType::ALTERNATE},
+    {"a", DumpFlagType::ALTERNATE_DUMP},
     {"!", DumpFlagType::VERIFIED},
 });
 
@@ -341,7 +341,7 @@ std::optional<DumpFlag> ReadDumpFlag(std::string_view flag)
 }
 
 // The fields after the publisher, in the order the convention writes them
-enum class Field
+enum class FlagField
 {
   SYSTEM,
   VIDEO,
@@ -351,41 +351,41 @@ enum class Field
   STATUS,
   MEDIA,
 };
-constexpr size_t FIELD_COUNT = static_cast<size_t>(Field::MEDIA) + 1;
+constexpr size_t FIELD_COUNT = static_cast<size_t>(FlagField::MEDIA) + 1;
 
-bool ReadField(Field field, std::string_view text, Name& name)
+bool ReadField(FlagField field, std::string_view text, Name& name)
 {
   switch (field)
   {
-    case Field::SYSTEM:
+    case FlagField::SYSTEM:
       if (!Contains(systems, text))
         return false;
       name.system = text;
       return true;
-    case Field::VIDEO:
+    case FlagField::VIDEO:
       if (!Contains(videos, text))
         return false;
       name.video = text;
       return true;
-    case Field::COUNTRY:
+    case FlagField::COUNTRY:
       return ReadCountries(text, name.countries);
-    case Field::LANGUAGE:
+    case FlagField::LANGUAGE:
       return ReadLanguages(text, name);
-    case Field::COPYRIGHT:
+    case FlagField::COPYRIGHT:
       if (const Copyright* copyright = Find(copyrights, text))
       {
         name.copyright = *copyright;
         return true;
       }
       return false;
-    case Field::STATUS:
+    case FlagField::STATUS:
       if (const DevelopmentStatus* status = Find(statuses, text))
       {
         name.status = *status;
         return true;
       }
       return false;
-    case Field::MEDIA:
+    case FlagField::MEDIA:
       return ReadMedia(text, name.media);
   }
   return false;
@@ -491,7 +491,7 @@ std::optional<Name> CTosecNaming::Parse(std::string_view text)
     Name probe;
     bool isField = false;
     for (size_t i = 0; i < FIELD_COUNT && !isField; ++i)
-      isField = ReadField(static_cast<Field>(i), field, probe);
+      isField = ReadField(static_cast<FlagField>(i), field, probe);
 
     if (const Demo* demo = Find(demos, field))
       name.demo = *demo;
@@ -509,8 +509,9 @@ std::optional<Name> CTosecNaming::Parse(std::string_view text)
   // "Il Faut Fuir Thesee (1984)(Fr)(Disk 1 of 1 Side A)"
   size_t g = date + 1;
   Name probe;
-  if (g < groups.size() && groups[g].closed && !ReadField(Field::COUNTRY, groups[g].text, probe) &&
-      !ReadField(Field::LANGUAGE, groups[g].text, probe))
+  if (g < groups.size() && groups[g].closed &&
+      !ReadField(FlagField::COUNTRY, groups[g].text, probe) &&
+      !ReadField(FlagField::LANGUAGE, groups[g].text, probe))
   {
     if (groups[g].text != "-")
     {
@@ -547,7 +548,7 @@ std::optional<Name> CTosecNaming::Parse(std::string_view text)
     bool taken = false;
     for (size_t i = 0; i < read.size() && !taken; ++i)
     {
-      if (!read[i] && ReadField(static_cast<Field>(i), field, name))
+      if (!read[i] && ReadField(static_cast<FlagField>(i), field, name))
         read[i] = taken = true;
     }
     if (taken)

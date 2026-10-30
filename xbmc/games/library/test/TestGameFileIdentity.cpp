@@ -111,15 +111,17 @@ TEST(TestGameFileIdentity, StoresEachEmulatorsNameForAnArcadeSet)
   EXPECT_TRUE(RomsetsFromString("").empty());
 }
 
-TEST(TestGameFileIdentity, KnowsAZipOfOneFileInAFolderByItsDirectory)
+TEST(TestGameFileIdentity, HashesAGameFiledInAFolderInsideAnArchive)
 {
   // nested.zip holds one file, under a folder as a merged arcade set files a
-  // clone's chips. Only the zip's directory says what it is.
+  // clone's chips. An archive without a zip's directory, such as a 7z, only
+  // knows it by hashing it.
   GameFile file;
   ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/nested.zip"),
                                           file, MediaFormat::CARTRIDGE));
 
   EXPECT_EQ(file.crc32, "f5765659");
+  EXPECT_EQ(file.md5, "c8c67df7a396d5cd4b341a7c96692f7b");
   EXPECT_EQ(file.size, 45U);
   EXPECT_TRUE(file.members.empty());
 }
@@ -192,6 +194,16 @@ TEST(TestGameFileIdentity, ReadsTheGameCodeOfAnArchivedDsCartridge)
                                           file, MediaFormat::CARTRIDGE));
 
   EXPECT_EQ(file.serial, "VFSV");
+}
+
+TEST(TestGameFileIdentity, ReadsTheSerialOfADiscArchivedInAFolder)
+{
+  // disc-folder.zip holds disc.zip's files under a folder
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(
+      XBMC_REF_FILE_PATH("xbmc/games/library/test/disc-folder.zip"), file, MediaFormat::DISC));
+
+  EXPECT_EQ(file.serial, "SLUS01234");
 }
 
 TEST(TestGameFileIdentity, ReadsAQuotedGdiTrack)

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <cstddef>
 #include <string_view>
 
 namespace KODI
@@ -24,21 +23,14 @@ namespace GAME
  *
  *   2797 Kimi no Yusha (JP)
  *   0414 My Pet Hotel (EU)(M2)
+ *
+ * The number stays in the title, since one name can't tell it from a title
+ * that starts with a number, "2002 FIFA World Cup (US)".
  */
 class CSceneNaming
 {
 public:
   CSceneNaming() = delete;
-
-  /*!
-   * \brief How much of the name is the release number and the space after it
-   *
-   * Its region and its lack of a date tell it from a title that starts with
-   * a number, "1943 Kai (Japan)" or TOSEC's "1942 (1986)(Elite)(GB)".
-   *
-   * \return The length to remove, or 0 if the name isn't numbered
-   */
-  static size_t ReleaseNumberLength(std::string_view name);
 
   /*!
    * \brief The region a code names, or empty

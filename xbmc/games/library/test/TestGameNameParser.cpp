@@ -29,6 +29,13 @@ TEST(TestGameNameParser, ReadsANoIntroName)
   EXPECT_TRUE(parsed.unknownTags.empty());
 }
 
+TEST(TestGameNameParser, DropsBothExtensionsOfACompressedTarArchive)
+{
+  EXPECT_EQ(CGameNameParser::Parse("Game (USA).tar.gz").title, "Game");
+  EXPECT_EQ(CGameNameParser::Parse("Game (USA).tar.xz").title, "Game");
+  EXPECT_EQ(CGameNameParser::Parse("Game (USA).TAR.BZ2").title, "Game");
+}
+
 TEST(TestGameNameParser, ReadsARedumpDiscAndItsStatus)
 {
   const ParsedGameName parsed =
@@ -257,14 +264,6 @@ TEST(TestGameNameParser, RestoresAnArticleTheSetsMove)
   EXPECT_EQ(CGameNameParser::DisplayTitle("Genio de las Palabras, El"), "El Genio de las Palabras");
 }
 
-TEST(TestGameNameParser, DropsAScenesReleaseNumber)
-{
-  EXPECT_EQ(CGameNameParser::Parse("2797 Kimi no Yusha (JP).zip").title, "Kimi no Yusha");
-  EXPECT_EQ(CGameNameParser::Parse("4737 Super Robot Taisen OG Saga (JP).zip").title,
-            "Super Robot Taisen OG Saga");
-  EXPECT_EQ(CGameNameParser::Parse("0414 My Pet Hotel (EU)(M2).zip").title, "My Pet Hotel");
-}
-
 TEST(TestGameNameParser, KeepsATitleThatStartsWithANumber)
 {
   EXPECT_EQ(CGameNameParser::Parse("1943 Kai (Japan).zip").title, "1943 Kai");
@@ -276,6 +275,9 @@ TEST(TestGameNameParser, KeepsATitleThatStartsWithANumber)
   EXPECT_EQ(CGameNameParser::Parse("1943 Kai (1991)(Namco)(JP).pce").title, "1943 Kai");
   EXPECT_EQ(CGameNameParser::Parse("2010 - The Graphic Action Game.col").title,
             "2010 - The Graphic Action Game");
+  EXPECT_EQ(CGameNameParser::Parse("1942 (US).zip").title, "1942");
+  EXPECT_EQ(CGameNameParser::Parse("1943 Kai (JP).zip").title, "1943 Kai");
+  EXPECT_EQ(CGameNameParser::Parse("2002 FIFA World Cup (US).zip").title, "2002 FIFA World Cup");
 }
 
 TEST(TestGameNameParser, KeepsTheDotsInAFoldersName)
