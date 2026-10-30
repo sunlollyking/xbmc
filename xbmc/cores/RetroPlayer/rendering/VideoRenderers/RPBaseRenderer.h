@@ -70,7 +70,6 @@ public:
   void SetStretchMode(STRETCHMODE stretchMode);
   void SetRenderRotation(unsigned int rotationDegCCW);
   void SetShaderPreset(const std::string& presetPath);
-  void SetPixels(const std::string& pixelPath);
 
   /*!
    * \brief Draw the game inside a bezel's window, where the bezel frames it well
@@ -122,11 +121,6 @@ protected:
 
   bool m_bShadersNeedUpdate = true;
   bool m_bUseShaderPreset = false;
-
-  // Last reported geometry, so the log carries changes rather than every frame
-  CRect m_lastLoggedDestRect;
-  CRect m_lastLoggedFullDestRect;
-  STRETCHMODE m_lastLoggedStretchMode{static_cast<STRETCHMODE>(-1)};
 
 private:
   /*!
