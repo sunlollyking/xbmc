@@ -24,6 +24,7 @@
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
+#include "interfaces/AnnouncementManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
@@ -86,6 +87,15 @@ constexpr std::array<std::pair<const char*, int>, 18> ART_TYPES = {{
 std::string Localize(int id)
 {
   return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(id);
+}
+
+//! Lists built from the library, such as rows on the home screen, rebuild on this
+void AnnounceUpdate(int idGame)
+{
+  CVariant data;
+  data["id"] = idGame;
+  data["type"] = "game";
+  CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::GameLibrary, "OnUpdate", data);
 }
 } // namespace
 
@@ -435,6 +445,8 @@ void CGUIDialogGameInfo::OnChooseArt()
     m_item->SetArt(slot, chosen);
   }
 
+  AnnounceUpdate(idGame);
+
   CGUIMessage update(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_ITEM, 0, m_item);
   CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(update);
   CGUIMessage refresh(GUI_MSG_REFRESH_LIST, GetID(), 0);
@@ -464,6 +476,7 @@ void CGUIDialogGameInfo::OnFavourite()
   {
     tag->SetFavourite(!tag->IsFavourite());
     UpdateButtons();
+    AnnounceUpdate(tag->GetDatabaseId());
   }
 }
 
@@ -489,18 +502,22 @@ void CGUIDialogGameInfo::OnPlayState()
   // The button moves to the next state, the way a watched flag is toggled but
   // with the middle state a game needs
   const int idGame = tag->GetDatabaseId();
+  bool changed = false;
   switch (PlayState(*tag))
   {
     case PlayStateValue::NOT_STARTED:
-      if (db.SetPlayCount(idGame, 1))
+      changed = db.SetPlayCount(idGame, 1);
+      if (changed)
         tag->SetPlayCount(1);
       break;
     case PlayStateValue::IN_PROGRESS:
-      if (db.SetCompleted(idGame, true))
+      changed = db.SetCompleted(idGame, true);
+      if (changed)
         tag->SetCompleted(true);
       break;
     case PlayStateValue::COMPLETED:
-      if (db.SetCompleted(idGame, false) && db.SetPlayCount(idGame, 0))
+      changed = db.SetCompleted(idGame, false) && db.SetPlayCount(idGame, 0);
+      if (changed)
       {
         tag->SetCompleted(false);
         tag->SetPlayCount(0);
@@ -509,6 +526,8 @@ void CGUIDialogGameInfo::OnPlayState()
   }
 
   UpdateButtons();
+  if (changed)
+    AnnounceUpdate(idGame);
 }
 
 void CGUIDialogGameInfo::OnUserRating()
@@ -536,7 +555,10 @@ void CGUIDialogGameInfo::OnUserRating()
   const int rating = select->GetSelectedItem();
   CGameDatabase db;
   if (db.Open() && db.SetUserRating(tag->GetDatabaseId(), rating))
+  {
     tag->SetUserRating(rating);
+    AnnounceUpdate(tag->GetDatabaseId());
+  }
 }
 
 void CGUIDialogGameInfo::OnGameClient()
