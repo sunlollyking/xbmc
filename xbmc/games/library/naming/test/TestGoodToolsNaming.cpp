@@ -28,7 +28,7 @@ TEST(TestGoodToolsNaming, ReadsAFlag)
 {
   EXPECT_EQ(CGoodToolsNaming::ParseFlag("!")->type, FlagType::VERIFIED);
   EXPECT_EQ(CGoodToolsNaming::ParseFlag("!p")->type, FlagType::PENDING);
-  EXPECT_EQ(CGoodToolsNaming::ParseFlag("a")->type, FlagType::ALTERNATE);
+  EXPECT_EQ(CGoodToolsNaming::ParseFlag("a")->type, FlagType::ALTERNATE_DUMP);
   EXPECT_EQ(CGoodToolsNaming::ParseFlag("h2")->number, 2);
   EXPECT_EQ(CGoodToolsNaming::ParseFlag("t1")->type, FlagType::TRAINED);
   EXPECT_FALSE(CGoodToolsNaming::ParseFlag("FD").has_value());

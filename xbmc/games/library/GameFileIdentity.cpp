@@ -78,6 +78,48 @@ bool HasExtension(const std::string& path, const auto& extensions)
   return std::ranges::any_of(extensions, [&ext](const char* e) { return ext == e; });
 }
 
+// A folder inside an archive, listed the way CGameFileIdentity::ArchiveFiles()
+// lists the archive
+bool ListArchiveFolder(const std::string& folder, CFileItemList& items)
+{
+  return XFILE::CDirectory::GetDirectory(
+      folder, items, "", XFILE::DIR_FLAG_NO_FILE_DIRS | XFILE::DIR_FLAG_NO_FILE_INFO);
+}
+
+// The cue sheet or GDI file among an archive's files. A disc packed with its
+// folder keeps it below the top.
+std::string FindSheet(const CFileItemList& items)
+{
+  for (const auto& item : items)
+  {
+    if (!item->IsFolder() && HasExtension(item->GetPath(), sheetExtensions))
+      return item->GetPath();
+  }
+  for (const auto& item : items)
+  {
+    CFileItemList inner;
+    if (item->IsFolder() && ListArchiveFolder(item->GetPath(), inner))
+    {
+      if (std::string sheet = FindSheet(inner); !sheet.empty())
+        return sheet;
+    }
+  }
+  return "";
+}
+
+// An archive's files, with those in its folders
+void AddFiles(const CFileItemList& items, std::vector<std::shared_ptr<CFileItem>>& files)
+{
+  for (const auto& item : items)
+  {
+    CFileItemList inner;
+    if (!item->IsFolder())
+      files.push_back(item);
+    else if (ListArchiveFolder(item->GetPath(), inner))
+      AddFiles(inner, files);
+  }
+}
+
 std::string ReadHead(const std::string& path, size_t bytes)
 {
   XFILE::CFile file;
@@ -337,7 +379,7 @@ bool CGameFileIdentity::HashArchive(const std::string& path, GameFile& file, uin
 {
   // A zip of several files may be an arcade set, which is known by all of them.
   // A zip of one keeps that file's CRC in its directory, which still names it
-  // when it is too large to hash or is filed in a folder.
+  // when it is too large to hash.
   std::vector<ArchiveMember> members;
   if (StringUtils::ToLower(URIUtils::GetExtension(path)) == ".zip")
     ListZip(path, members);
@@ -378,13 +420,14 @@ bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& fil
   if (!ArchiveFiles(path, members))
     return false;
 
+  std::vector<std::shared_ptr<CFileItem>> files;
+  AddFiles(members, files);
+
   std::shared_ptr<CFileItem> best;
   int count = 0;
   bool program = false;
-  for (const auto& member : members)
+  for (const auto& member : files)
   {
-    if (member->IsFolder())
-      continue;
     ++count;
     program = program || HasExtension(member->GetPath(), programExtensions);
     if (!best || member->GetSize() > best->GetSize())
@@ -422,15 +465,8 @@ std::string CGameFileIdentity::ReadArchivedDiscSerial(const std::string& path)
 
   // A cue sheet or GDI file names the data track. Without one, the largest
   // file is the disc image.
-  std::string track;
-  for (const auto& member : members)
-  {
-    if (!member->IsFolder() && HasExtension(member->GetPath(), sheetExtensions))
-    {
-      track = FirstTrack(member->GetPath());
-      break;
-    }
-  }
+  const std::string sheet = FindSheet(members);
+  std::string track = sheet.empty() ? "" : FirstTrack(sheet);
   if (track.empty())
   {
     std::shared_ptr<CFileItem> largest;

@@ -8,10 +8,8 @@
 
 #include "SceneNaming.h"
 
-#include "utils/RegExp.h"
-
 #include <array>
-#include <string>
+#include <string_view>
 #include <utility>
 
 using namespace KODI;
@@ -34,21 +32,6 @@ constexpr auto territories = std::to_array<std::pair<std::string_view, std::stri
     {"US", "US"},
 });
 } // namespace
-
-size_t CSceneNaming::ReleaseNumberLength(std::string_view name)
-{
-  // CRegExp keeps the last match, so each thread needs its own
-  thread_local CRegExp releaseNumber = []
-  {
-    CRegExp re;
-    re.RegComp("^[0-9]{4} +(?=.*\\((?:JP|EU|US|FR|KS|DE|IT|ES|NL|AU)\\))(?!.*\\([0-9]{4}\\))");
-    return re;
-  }();
-
-  if (releaseNumber.RegFind(std::string(name)) < 0)
-    return 0;
-  return static_cast<size_t>(releaseNumber.GetFindLen());
-}
 
 std::optional<GameRegion> CSceneNaming::Region(std::string_view code)
 {
