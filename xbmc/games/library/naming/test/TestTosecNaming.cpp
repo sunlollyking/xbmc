@@ -46,7 +46,7 @@ TEST(TestTosecNaming, ReadsEveryField)
   EXPECT_EQ(name->dumpFlags[0].detail, "PDX");
   EXPECT_EQ(name->dumpFlags[2].type, DumpFlagType::TRANSLATED);
   EXPECT_EQ(name->dumpFlags[2].detail, "fr Translator");
-  EXPECT_EQ(name->dumpFlags[3].type, DumpFlagType::ALTERNATE);
+  EXPECT_EQ(name->dumpFlags[3].type, DumpFlagType::ALTERNATE_DUMP);
   EXPECT_EQ(name->dumpFlags[3].number, 2);
   EXPECT_EQ(name->dumpFlags[4].type, DumpFlagType::VERIFIED);
   EXPECT_EQ(name->moreInfo, (std::vector<std::string>{"aka House of TOSEC"}));

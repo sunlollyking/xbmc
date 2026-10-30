@@ -161,7 +161,7 @@ ParsedGameName FromTosec(const TOSEC::Name& tosec)
       case TOSEC::DumpFlagType::BAD_DUMP:
         out.bad = true;
         break;
-      case TOSEC::DumpFlagType::ALTERNATE:
+      case TOSEC::DumpFlagType::ALTERNATE_DUMP:
         out.alternate = true;
         break;
       case TOSEC::DumpFlagType::VERIFIED:
@@ -335,9 +335,14 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
     if (dot != std::string::npos && name.size() - dot >= 2 && name.size() - dot <= 5 &&
         std::all_of(name.begin() + dot + 1, name.end(),
                     [](char c) { return std::isalnum(static_cast<unsigned char>(c)); }))
+    {
+      const std::string ext = StringUtils::ToLower(name.substr(dot + 1));
       name.erase(dot);
+      // A compressed tar archive has two extensions
+      if ((ext == "gz" || ext == "bz2" || ext == "xz") && StringUtils::EndsWithNoCase(name, ".tar"))
+        name.erase(name.size() - 4);
+    }
   }
-  name.erase(0, CSceneNaming::ReleaseNumberLength(name));
   name = CNeoKobeNaming::RemoveLoadingInstructions(name);
 
   if (const std::optional<TOSEC::Name> tosec = CTosecNaming::Parse(name))
@@ -392,7 +397,7 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
         case GOODTOOLS::FlagType::BAD_DUMP:
           out.bad = true;
           break;
-        case GOODTOOLS::FlagType::ALTERNATE:
+        case GOODTOOLS::FlagType::ALTERNATE_DUMP:
           out.alternate = true;
           break;
         case GOODTOOLS::FlagType::HACK:

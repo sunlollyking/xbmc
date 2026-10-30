@@ -83,7 +83,7 @@ enum class DumpFlagType
   UNDER_DUMP, // [u]
   VIRUS, // [v]
   BAD_DUMP, // [b]
-  ALTERNATE, // [a]
+  ALTERNATE_DUMP, // [a]
   VERIFIED, // [!]
 };
 
@@ -111,7 +111,7 @@ struct Media
 //! "[a2]", "[cr PDX]", "[t +2 Group]", "[tr de-partial Translator]"
 struct DumpFlag
 {
-  DumpFlagType type{DumpFlagType::ALTERNATE};
+  DumpFlagType type{DumpFlagType::ALTERNATE_DUMP};
   int number{1}; // [a2] is the second alternate
   std::string detail; // the rest of the flag: a group, a fix, a translation's language
 };

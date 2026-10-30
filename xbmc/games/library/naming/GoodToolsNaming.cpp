@@ -48,7 +48,7 @@ constexpr auto translationLanguages = std::to_array<std::pair<std::string_view, 
 
 // The standard codes written as a letter and a number: "[a1]", "[h2]"
 constexpr auto numberedFlags = std::to_array<std::pair<char, FlagType>>({
-    {'a', FlagType::ALTERNATE},
+    {'a', FlagType::ALTERNATE_DUMP},
     {'b', FlagType::BAD_DUMP},
     {'f', FlagType::FIXED},
     {'h', FlagType::HACK},
