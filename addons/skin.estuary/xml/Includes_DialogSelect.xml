@@ -1006,11 +1006,8 @@
 						<visible>Control.HasFocus(10813)</visible>
 					</control>
 					<control type="image">
-						<left>40</left>
-						<right>40</right>
-						<top>50</top>
-						<height>4</height>
-						<texture colordiffuse="button_focus">colors/white.png</texture>
+						<description>The category in use, while the filters have focus</description>
+						<texture colordiffuse="button_alt_focus">lists/focus.png</texture>
 						<visible>!Control.HasFocus(10813)</visible>
 					</control>
 					<control type="label">
@@ -1029,6 +1026,14 @@
 				<onup>10813</onup>
 				<scrolltime tween="sine">200</scrolltime>
 				<orientation>horizontal</orientation>
+				<animation type="Conditional" condition="String.IsEqual(Window.Property(categorymove),next)" reversible="false">
+					<effect type="slide" start="240,0" end="0,0" time="200" tween="cubic" easing="out" />
+					<effect type="fade" start="0" end="100" time="200" />
+				</animation>
+				<animation type="Conditional" condition="String.IsEqual(Window.Property(categorymove),previous)" reversible="false">
+					<effect type="slide" start="-240,0" end="0,0" time="200" tween="cubic" easing="out" />
+					<effect type="fade" start="0" end="100" time="200" />
+				</animation>
 				<itemlayout width="480" height="340">
 					<control type="group">
 						<left>18</left>

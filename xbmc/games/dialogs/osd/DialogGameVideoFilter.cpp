@@ -9,6 +9,7 @@
 #include "DialogGameVideoFilter.h"
 
 #include "ServiceBroker.h"
+#include "URL.h"
 #include "addons/AddonInstaller.h"
 #include "addons/AddonManager.h"
 #include "addons/addoninfo/AddonType.h"
@@ -18,13 +19,13 @@
 #include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/GameServices.h"
-#include "games/VideoFilters.h"
 #include "games/dialogs/DialogGameDefines.h"
 #include "guilib/GUIBaseContainer.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
+#include "input/actions/Action.h"
 #include "input/actions/ActionIDs.h"
 #include "jobs/JobManager.h"
 #include "resources/LocalizeStrings.h"
@@ -51,6 +52,27 @@ namespace
 {
 
 constexpr const char* PRESETS_ADDON_NAME = "game.shader.presets";
+constexpr const char* ICON_VIDEO = "";
+
+// Window property telling the skin which way the filters moved to another
+// category: "next" or "previous"
+constexpr const char* PROPERTY_CATEGORY_MOVE = "categorymove";
+
+// Long enough for a skin to slide the new filters in, as Kodi resets an
+// animation whose condition ends before it does
+constexpr auto CATEGORY_MOVE_TIME = 400ms;
+
+struct ScalingMethodProperties
+{
+  int nameIndex;
+  int categoryIndex;
+  RETRO::SCALINGMETHOD scalingMethod;
+};
+
+const std::vector<ScalingMethodProperties> scalingMethods = {
+    {16301, 16296, RETRO::SCALINGMETHOD::NEAREST},
+    {16302, 16297, RETRO::SCALINGMETHOD::LINEAR},
+};
 
 // Helper function
 void GetProperties(const CFileItem& item, std::string& videoFilter)
@@ -68,7 +90,7 @@ std::string GetCategory(const CFileItem& item)
   if (!videoSettings.GetShaderPreset().empty())
     return item.GetLabel2();
 
-  return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(16298); // "Basic"
+  return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(16298); // "Built-in"
 }
 
 } // namespace
@@ -93,6 +115,7 @@ bool CDialogGameVideoFilter::OnMessage(CGUIMessage& message)
     {
       // A tap moves focus on before FrameMove() sees the category it chose
       UpdateCategory();
+      m_choosingCategory = true;
       SET_CONTROL_FOCUS(CONTROL_VIDEO_THUMBS, 0);
       return true;
     }
@@ -101,11 +124,46 @@ bool CDialogGameVideoFilter::OnMessage(CGUIMessage& message)
   return CDialogGameVideoSelect::OnMessage(message);
 }
 
+bool CDialogGameVideoFilter::OnAction(const CAction& action)
+{
+  if ((action.GetID() == ACTION_MOVE_RIGHT && MoveAcrossCategories(true)) ||
+      (action.GetID() == ACTION_MOVE_LEFT && MoveAcrossCategories(false)))
+    return true;
+
+  return CDialogGameVideoSelect::OnAction(action);
+}
+
 void CDialogGameVideoFilter::FrameMove()
 {
+  if (m_categoryMoveDelay > 0)
+  {
+    if (--m_categoryMoveDelay == 0)
+    {
+      SetProperty(PROPERTY_CATEGORY_MOVE, m_categoryMove);
+      m_categoryMoveStart = std::chrono::steady_clock::now();
+    }
+  }
+  else if (!m_categoryMove.empty() &&
+           std::chrono::steady_clock::now() - m_categoryMoveStart >= CATEGORY_MOVE_TIME)
+  {
+    m_categoryMove.clear();
+    SetProperty(PROPERTY_CATEGORY_MOVE, "");
+  }
+
   const CGUIControl* categories = GetControl(CONTROL_VIDEO_CATEGORIES);
+  const CGUIControl* filters = GetControl(CONTROL_VIDEO_THUMBS);
   if (categories != nullptr && categories->HasFocus())
+  {
     UpdateCategory();
+    m_choosingCategory = true;
+  }
+  else if (m_choosingCategory && filters != nullptr && filters->HasFocus())
+  {
+    // Moving down from the categories applies the highlighted filter, which a
+    // refreshed list leaves unapplied
+    m_choosingCategory = false;
+    m_focusedItemIndex = static_cast<unsigned int>(m_shownItems.size());
+  }
 
   CDialogGameVideoSelect::FrameMove();
 }
@@ -126,18 +184,79 @@ void CDialogGameVideoFilter::UpdateCategory()
   }
 }
 
+bool CDialogGameVideoFilter::MoveAcrossCategories(bool forward)
+{
+  if (!HasCategories() || m_categories.size() < 2 || m_shownItems.empty())
+    return false;
+
+  const auto* filters = dynamic_cast<const CGUIBaseContainer*>(GetControl(CONTROL_VIDEO_THUMBS));
+  if (filters == nullptr || !filters->HasFocus())
+    return false;
+
+  const int lastIndex = static_cast<int>(m_shownItems.size()) - 1;
+  if (filters->GetSelectedItem() != (forward ? lastIndex : 0))
+    return false;
+
+  // The last category leads back round to the first
+  const auto categoryCount = static_cast<unsigned int>(m_categories.size());
+  m_categoryIndex = (m_categoryIndex + (forward ? 1 : categoryCount - 1)) % categoryCount;
+
+  CGUIMessage selectCategory(GUI_MSG_ITEM_SELECT, GetID(), CONTROL_VIDEO_CATEGORIES,
+                             m_categoryIndex);
+  OnMessage(selectCategory);
+
+  RefreshList();
+
+  // Carry on from the side the player came in from, applying that filter
+  const unsigned int index = forward ? 0 : static_cast<unsigned int>(m_shownItems.size()) - 1;
+  CGUIMessage selectFilter(GUI_MSG_ITEM_SELECT, GetID(), CONTROL_VIDEO_THUMBS, index);
+  OnMessage(selectFilter);
+  m_focusedItemIndex = static_cast<unsigned int>(m_shownItems.size());
+  OnItemFocus(index);
+
+  AnnounceCategoryMove(forward);
+
+  return true;
+}
+
+void CDialogGameVideoFilter::AnnounceCategoryMove(bool forward)
+{
+  m_categoryMove = forward ? "next" : "previous";
+
+  // Already waiting to tell the skin
+  if (m_categoryMoveDelay > 0)
+    return;
+
+  // During the last move's slide, the property is cleared first, for long
+  // enough that the skin sees it change and starts another
+  if (!GetProperty(PROPERTY_CATEGORY_MOVE).asString().empty())
+  {
+    SetProperty(PROPERTY_CATEGORY_MOVE, "");
+    m_categoryMoveDelay = 2;
+    return;
+  }
+
+  SetProperty(PROPERTY_CATEGORY_MOVE, m_categoryMove);
+  m_categoryMoveStart = std::chrono::steady_clock::now();
+}
+
 void CDialogGameVideoFilter::OnInitWindow()
 {
   CDialogGameVideoSelect::OnInitWindow();
 
   BindCategories();
+
+  // The highlighted filter is the one in use, so when the configured filter
+  // is gone the one highlighted in its place is applied
+  m_focusedItemIndex = static_cast<unsigned int>(m_shownItems.size());
 }
 
 void CDialogGameVideoFilter::PreInit()
 {
   m_items.Clear();
 
-  GetVideoFilters(m_items, m_gameVideoHandle.get());
+  InitScalingMethods();
+  InitVideoFilters();
   InitGetMoreButton();
 
   if (m_items.Size() == 0)
@@ -148,6 +267,136 @@ void CDialogGameVideoFilter::PreInit()
   }
 
   InitCategories();
+}
+
+void CDialogGameVideoFilter::InitScalingMethods()
+{
+  if (m_gameVideoHandle)
+  {
+    for (const auto& scalingMethodProps : scalingMethods)
+    {
+      if (m_gameVideoHandle->SupportsScalingMethod(scalingMethodProps.scalingMethod))
+      {
+        RETRO::CRenderVideoSettings videoSettings;
+        videoSettings.SetScalingMethod(scalingMethodProps.scalingMethod);
+
+        CFileItemPtr item = std::make_shared<CFileItem>(
+            CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
+                scalingMethodProps.nameIndex));
+        item->SetLabel2(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
+            scalingMethodProps.categoryIndex));
+        item->SetProperty("game.videofilter", CVariant{videoSettings.GetVideoFilter()});
+        item->SetArt(ART::TYPE::ICON, ICON_VIDEO);
+        m_items.Add(std::move(item));
+      }
+    }
+  }
+}
+
+namespace
+{
+TiXmlNode* GetFirstChildOfNode(TiXmlNode& node, const char* childName)
+{
+  TiXmlNode* ret{node.FirstChild(childName)};
+  if (ret)
+    return ret->FirstChild();
+
+  return ret;
+}
+} // unnamed namespace
+
+void CDialogGameVideoFilter::InitVideoFilters()
+{
+
+  std::vector<VideoFilterProperties> videoFilters;
+
+  std::string xmlPath;
+  std::unique_ptr<CXBMCTinyXML> xml;
+
+  //! @todo Have the add-on give us the xml as a string (or parse it)
+  std::string xmlFilename;
+#if defined(HAS_GLES)
+  xmlFilename = "ShaderPresetsGLSLP_GLES.xml";
+#elif defined(HAS_GL)
+  xmlFilename = "ShaderPresetsGLSLP.xml";
+#else
+  xmlFilename = "ShaderPresetsHLSLP.xml";
+#endif
+
+  const std::string homeAddonPath = CSpecialProtocol::TranslatePath(
+      URIUtils::AddFileToFolder("special://home", "addons", PRESETS_ADDON_NAME));
+  const std::string systemAddonPath = CSpecialProtocol::TranslatePath(
+      URIUtils::AddFileToFolder("special://xbmc", "addons", PRESETS_ADDON_NAME));
+  const std::string binAddonPath = CSpecialProtocol::TranslatePath(
+      URIUtils::AddFileToFolder("special://xbmcbinaddons", PRESETS_ADDON_NAME));
+
+  for (const auto& basePath : {homeAddonPath, systemAddonPath, binAddonPath})
+  {
+    xmlPath = URIUtils::AddFileToFolder(basePath, "resources", xmlFilename);
+
+    CLog::LogF(LOGDEBUG, "Looking for shader preset XML at {}", CURL::GetRedacted(xmlPath));
+
+    if (XFILE::CFile::Exists(xmlPath))
+    {
+      xml = std::make_unique<CXBMCTinyXML>(xmlPath);
+      if (xml->LoadFile())
+        break;
+
+      CLog::LogF(LOGERROR, "Couldn't load shader presets from XML, {}", CURL::GetRedacted(xmlPath));
+      xml.reset();
+    }
+  }
+
+  if (!xml)
+    return;
+
+  auto root = xml->RootElement();
+  TiXmlNode* child = nullptr;
+
+  while ((child = root->IterateChildren(child)))
+  {
+    VideoFilterProperties videoFilter;
+
+    if (child->FirstChild() == nullptr)
+      continue;
+
+    const TiXmlNode* pathNode{GetFirstChildOfNode(*child, "path")};
+    if (pathNode)
+      videoFilter.path =
+          URIUtils::AddFileToFolder(URIUtils::GetBasePath(xmlPath), pathNode->Value());
+
+    const TiXmlNode* nameNode{GetFirstChildOfNode(*child, "name")};
+    if (nameNode)
+      videoFilter.name = nameNode->Value();
+
+    // Presets named their category "folder" before
+    const TiXmlNode* categoryNode{GetFirstChildOfNode(*child, "category")};
+    if (!categoryNode)
+      categoryNode = GetFirstChildOfNode(*child, "folder");
+    if (categoryNode)
+      videoFilter.category = categoryNode->Value();
+
+    videoFilters.emplace_back(videoFilter);
+  }
+
+  CLog::Log(LOGDEBUG, "Loaded {} shader presets from default XML, {}", videoFilters.size(),
+            CURL::GetRedacted(xmlPath));
+
+  for (const auto& videoFilter : videoFilters)
+  {
+    bool canLoadPreset =
+        CServiceBroker::GetGameServices().VideoShaders().CanLoadPreset(videoFilter.path);
+
+    if (!canLoadPreset)
+      continue;
+
+    auto item{std::make_shared<CFileItem>(videoFilter.name)};
+    item->SetLabel2(videoFilter.category);
+    item->SetProperty("game.videofilter", CVariant{videoFilter.path});
+    item->SetArt(ART::TYPE::ICON, ICON_VIDEO);
+
+    m_items.Add(std::move(item));
+  }
 }
 
 void CDialogGameVideoFilter::InitGetMoreButton()
@@ -290,6 +539,10 @@ void CDialogGameVideoFilter::PostExit()
   m_items.Clear();
   m_shownItems.clear();
   m_categories.clear();
+  m_choosingCategory = false;
+  m_categoryMove.clear();
+  m_categoryMoveDelay = 0;
+  SetProperty(PROPERTY_CATEGORY_MOVE, "");
 }
 
 bool CDialogGameVideoFilter::OnClickAction()

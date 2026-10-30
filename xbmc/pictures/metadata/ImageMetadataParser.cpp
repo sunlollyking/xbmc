@@ -15,6 +15,7 @@
 
 #include <cctype>
 #include <limits>
+#include <new>
 #include <vector>
 
 #if (EXIV2_MAJOR_VERSION == 0) && (EXIV2_MINOR_VERSION < 28)
@@ -29,6 +30,9 @@ using namespace XFILE;
 
 namespace
 {
+// Far more than a real JPEG's metadata, which comes in segments of under 64 KiB
+constexpr size_t MAX_JPEG_HEADER_SIZE = 16 * 1024 * 1024;
+
 /*!
  * \brief Read a JPEG up to its image data, which is everything its metadata can be in.
  * \return The bytes read, or empty if the file isn't a JPEG that can be read this way
@@ -39,26 +43,33 @@ std::vector<uint8_t> ReadJpegHeader(CFile& file)
   if (file.Read(header.data(), 2) != 2 || header[0] != 0xFF || header[1] != 0xD8)
     return {};
 
-  while (true)
+  try
   {
-    // A segment is 0xFF, a marker and a big-endian length that counts itself
-    const size_t start = header.size();
-    header.resize(start + 4);
-    if (file.Read(header.data() + start, 4) != 4 || header[start] != 0xFF)
-      return {};
+    while (true)
+    {
+      // A segment is 0xFF, a marker and a big-endian length that counts itself
+      const size_t start = header.size();
+      header.resize(start + 4);
+      if (file.Read(header.data() + start, 4) != 4 || header[start] != 0xFF)
+        return {};
 
-    const uint8_t marker = header[start + 1];
-    const size_t length = (header[start + 2] << 8) | header[start + 3];
-    if (length < 2)
-      return {};
+      const uint8_t marker = header[start + 1];
+      const size_t length = (header[start + 2] << 8) | header[start + 3];
+      if (length < 2 || start + 2 + length > MAX_JPEG_HEADER_SIZE)
+        return {};
 
-    header.resize(start + 2 + length);
-    if (file.Read(header.data() + start + 4, length - 2) != static_cast<ssize_t>(length - 2))
-      return {};
+      header.resize(start + 2 + length);
+      if (file.Read(header.data() + start + 4, length - 2) != static_cast<ssize_t>(length - 2))
+        return {};
 
-    // The image data follows the start of scan
-    if (marker == 0xDA)
-      return header;
+      // The image data follows the start of scan
+      if (marker == 0xDA)
+        return header;
+    }
+  }
+  catch (const std::bad_alloc&)
+  {
+    return {};
   }
 }
 

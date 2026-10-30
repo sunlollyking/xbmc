@@ -9580,7 +9580,7 @@ msgstr ""
 #. Name of the video filter category that holds the filters without a shader
 #: xbmc/games/dialogs/osd/DialogGameVideoFilter.cpp
 msgctxt "#16298"
-msgid "Basic"
+msgid "Built-in"
 msgstr ""
 
 #empty string with id 16299
