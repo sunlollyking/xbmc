@@ -426,14 +426,26 @@ void CGUIDialogGameInfo::OnChooseArt()
   else if (!freedSlot.empty())
     db.RemoveArtForItem(idGame, KODI::MEDIA::TYPE::GAME, freedSlot);
 
-  // A thumb and a poster that only showed the box front follow it
+  // A thumb and a poster show the box front, or a picture made from it such as a
+  // portrait cut of a wide box, so they follow it. One that differed is kept as
+  // an alternative.
   std::vector<std::string> shown{type};
   if (type == "boxfront")
   {
-    for (const char* follower : {"thumb", "poster"})
+    for (const std::string follower : {"thumb", "poster"})
     {
-      if (stored.contains(follower) && stored.at(follower) == current)
-        shown.emplace_back(follower);
+      if (!stored.contains(follower))
+        continue;
+
+      if (stored.at(follower) != current)
+      {
+        unsigned int next = 1;
+        while (stored.contains(follower + std::to_string(next)))
+          ++next;
+        db.SetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, follower + std::to_string(next),
+                         stored.at(follower));
+      }
+      shown.emplace_back(follower);
     }
   }
   for (const std::string& slot : shown)
