@@ -159,7 +159,7 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       // from here.
       const double floorSecs = std::max(0.0, delaySecs - m_pAudioStream->GetCacheTime());
 
-      const size_t frameSize = m_pAudioStream->GetChannelCount() *
+      const size_t frameSize = static_cast<size_t>(m_pAudioStream->GetChannelCount()) *
                                (CAEUtil::DataFormatToBits(m_pAudioStream->GetDataFormat()) >> 3);
 
       const unsigned int frameCount = static_cast<unsigned int>(audioPacket.size / frameSize);
