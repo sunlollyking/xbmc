@@ -33,16 +33,19 @@ namespace XBMCAddon
   //********************************************************************
 
   static CCriticalSection critSection;
-
-  // Never destroyed. Messages for a script that has stopped can be left at
-  // exit, and destroying one can destroy its handler, which then removes its
-  // messages from a queue that is itself being destroyed.
-  static CallbackQueue& g_callQueue = *new CallbackQueue;
+  static CallbackQueue g_callQueue;
+  static bool g_callQueueClosed = false;
 
   void RetardedAsyncCallbackHandler::invokeCallback(Callback* cb)
   {
     XBMC_TRACE;
     std::unique_lock lock(critSection);
+    if (g_callQueueClosed)
+    {
+      // Nothing runs callbacks any more, so let the callback go
+      AddonClass::Ref<Callback> discard(cb);
+      return;
+    }
     g_callQueue.push_back(new AsyncCallbackMessage(cb,this));
   }
 
@@ -124,6 +127,19 @@ namespace XBMCAddon
       else // if we're not in the right thread for this callback...
         ++iter;
     }
+  }
+
+  void RetardedAsyncCallbackHandler::clearAllPendingCalls()
+  {
+    XBMC_TRACE;
+    CallbackQueue pending;
+    {
+      std::unique_lock lock(critSection);
+      g_callQueueClosed = true;
+      pending.swap(g_callQueue);
+    }
+    // Released here, outside the lock and the queue: releasing a message can
+    // release its handler, which then removes its messages from the queue.
   }
 
   void RetardedAsyncCallbackHandler::clearPendingCalls(void* userData)
