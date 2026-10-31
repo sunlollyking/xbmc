@@ -10,6 +10,7 @@
 
 #include "GameLibraryTypes.h"
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -26,7 +27,7 @@ struct ParsedGameName
 {
   std::string title; // as written, tags removed: "Legend of Zelda, The"
   std::string displayTitle; // article restored: "The Legend of Zelda"
-  std::vector<std::string> regions; // full names, e.g. "USA", "Europe"
+  std::vector<GameRegion> regions;
   std::vector<std::string> languages; // lower-case ISO 639-1
   std::string revision;
   ReleaseStatus status{ReleaseStatus::RETAIL};
@@ -69,6 +70,27 @@ public:
    */
   static ParsedGameName Parse(std::string_view fileName, bool hasExtension = true);
 
+  //! A file of a release, with the disc number the library gave it
+  struct ReleaseFile
+  {
+    std::string path;
+    int disc = 0;
+  };
+
+  /*!
+   * \brief The discs of a set, one file each, for a file launched from it
+   *
+   * A release can hold alternate dumps of one disc as well as the discs of a
+   * set, so a file's disc comes from its name where the name says, and from the
+   * library's count only where it doesn't. Each disc keeps the file named most
+   * like the launched one, so a set is never two dumps of the same disc.
+   *
+   * \return The set in disc order, or nothing if the launched file isn't one of
+   *         two or more discs
+   */
+  static std::vector<std::string> DiscSet(const std::string& launched,
+                                          const std::vector<ReleaseFile>& files);
+
   /*!
    * \brief Turn a WHDLoad install name into something a catalogue can match
    *
@@ -107,12 +129,20 @@ public:
   static std::string DisplayTitle(std::string_view title);
 
   /*!
-   * \brief The region a file name's tag names, written in full, or empty
+   * \brief The region a code or name from any of the conventions names, or nothing
    *
-   * "USA", "Europe", "Japan", "World" and the rest, as No-Intro writes them,
-   * whatever spelling or abbreviation the tag used.
+   * "USA", "Europe", "US", "EU", "U", in any case. A region the source
+   * doesn't know, "Unknown", is an empty one.
    */
-  static std::string RegionName(std::string_view region);
+  static std::optional<GameRegion> Region(std::string_view region);
+
+  /*!
+   * \brief A region's name for a listing
+   *
+   * As No-Intro writes it where it names the region, "USA" or "Europe", else
+   * the BCP 47 registry's English description, else the market's own word.
+   */
+  static std::string RegionName(const GameRegion& region);
 };
 } // namespace GAME
 } // namespace KODI

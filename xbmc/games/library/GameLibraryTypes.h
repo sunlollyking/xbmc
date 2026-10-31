@@ -8,14 +8,57 @@
 
 #pragma once
 
+#include "language/Territory.h"
+
 #include <cstdint>
+#include <map>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace KODI
 {
 namespace GAME
 {
+/*!
+ * \brief Settings the library reads
+ */
+constexpr const char* SETTING_GAMELIBRARY_SHOWDERIVEDGAMES = "gamelibrary.showderivedgames";
+constexpr const char* SETTING_GAMELIBRARY_TITLESTYLE = "gamelibrary.titlestyle";
+
+//! \brief Which of a game's names to show; the order matches settings.xml
+enum class TitleStyle
+{
+  CATALOGUE = 0,
+  ORIGINAL = 1,
+  ON_DISK = 2,
+};
+constexpr const char* SETTING_GAMELIBRARY_REGION = "gamelibrary.region";
+constexpr const char* SETTING_GAMELIBRARY_REGION_DEFAULT = "150";
+constexpr const char* SETTING_GAMELIBRARY_AGERATINGBOARD = "gamelibrary.ageratingboard";
+//! The boards after the preferred one, in the order their classifications are shown
+constexpr const char* AGERATINGBOARDS_ORDER = "PEGI,BBFC,ESRB,USK,CERO,ACB,GRAC,CLASS_IND";
+constexpr const char* SETTING_GAMELIBRARY_PREFERRETAIL = "gamelibrary.preferretail";
+constexpr const char* SETTING_GAMELIBRARY_PREFERNEWESTREVISION = "gamelibrary.prefernewestrevision";
+constexpr const char* SETTING_GAMELIBRARY_PREFERVERIFIED = "gamelibrary.preferverified";
+
+/*!
+ * \ingroup games
+ * \brief What kind of machine a platform is
+ */
+enum class PlatformType
+{
+  UNKNOWN,
+  CONSOLE,
+  HANDHELD,
+  COMPUTER,
+  ARCADE,
+  PINBALL,
+  VIRTUAL,
+  OTHER,
+};
+
 /*!
  * \ingroup games
  * \brief What a platform's games are distributed on
@@ -30,6 +73,25 @@ enum class MediaFormat
   CARD,
   DOWNLOAD,
   OTHER,
+};
+
+/*!
+ * \ingroup games
+ * \brief What kind of work a game is
+ *
+ * Fan translations are releases of the original game, so they are not a
+ * category. Hacks and homebrew are their own games, linked to the game they
+ * derive from where there is one.
+ */
+enum class GameCategory
+{
+  RETAIL,
+  HACK,
+  HOMEBREW,
+  DEMO,
+  BIOS,
+  APPLICATION,
+  NONGAME, // an arcade cabinet that is not a video game: casino, fruit, mechanical
 };
 
 /*!
@@ -64,6 +126,159 @@ enum class Licence
 
 /*!
  * \ingroup games
+ * \brief How trustworthy a dump is
+ */
+enum class DumpStatus
+{
+  UNKNOWN,
+  GOOD,
+  BAD,
+  VERIFIED,
+};
+
+/*!
+ * \ingroup games
+ * \brief How a file was identified as a game
+ *
+ * Kept with the game so a match that was not exact can be found and reviewed.
+ */
+enum class MatchMethod
+{
+  NONE,
+  HASH,
+  SERIAL,
+  SIDECAR,
+  GAMELIST,
+  NAME,
+  MANUAL,
+};
+
+/*!
+ * \ingroup games
+ * \brief Where a release was sold, as its file name gives it
+ *
+ * A country or area is a territory: "US", or "150" for Europe as UN M.49
+ * codes it. A market no territory names exactly keeps the convention's own
+ * word: No-Intro's "World" is the three big release markets, not every
+ * country, and its "Scandinavia" isn't Northern Europe.
+ */
+struct GameRegion
+{
+  LANGUAGE::CTerritory territory;
+  std::string market;
+
+  //! \brief A region from a territory's code, or a market's name when territory is empty
+  static GameRegion Make(std::string_view territory, std::string_view market = {})
+  {
+    return {LANGUAGE::CTerritory::FromCode(territory), std::string(market)};
+  }
+
+  //! \brief The territory's code, or the market's name
+  std::string ToString() const
+  {
+    return territory.ToString().empty() ? market : territory.ToString();
+  }
+
+  //! \brief The region ToString() gave
+  static GameRegion FromString(std::string_view text)
+  {
+    GameRegion region{LANGUAGE::CTerritory::FromCode(text), {}};
+    if (region.territory.ToString().empty())
+      region.market = text;
+    return region;
+  }
+
+  bool IsEmpty() const { return territory.ToString().empty() && market.empty(); }
+
+  bool operator==(const GameRegion& other) const = default;
+};
+
+/*!
+ * \ingroup games
+ * \brief Translate between the enums above and the lower-case words stored
+ *        in the database and sidecar files
+ *
+ * The words are the contract: a database or NFO written by one version must
+ * read in the next, so a word is never renamed once shipped. Unknown words
+ * translate to the first enumerator.
+ */
+class CGameLibraryTypes
+{
+public:
+  static std::string_view ToString(PlatformType type);
+  static PlatformType PlatformTypeFromString(std::string_view type);
+
+  static std::string_view ToString(MediaFormat format);
+  static MediaFormat MediaFormatFromString(std::string_view format);
+
+  static std::string_view ToString(GameCategory category);
+  static GameCategory GameCategoryFromString(std::string_view category);
+
+  static std::string_view ToString(ReleaseStatus status);
+  static ReleaseStatus ReleaseStatusFromString(std::string_view status);
+
+  static std::string_view ToString(Licence licence);
+  static Licence LicenceFromString(std::string_view licence);
+
+  static std::string_view ToString(DumpStatus status);
+  static DumpStatus DumpStatusFromString(std::string_view status);
+
+  static std::string_view ToString(MatchMethod method);
+  static MatchMethod MatchMethodFromString(std::string_view method);
+
+  /*!
+   * \brief The key two titles are compared on to decide they are one game
+   *
+   * Case, punctuation, whitespace and a leading article are all ignored, so
+   * "The Legend of Zelda", "Legend of Zelda, The" and "legend-of-zelda" share
+   * a key. The key is stored beside the title and never shown.
+   */
+  static std::string TitleKey(std::string_view title);
+
+  //! \brief The string id naming a category, for a listing to show
+  static int CategoryLabel(GameCategory category);
+
+  //! \brief The string id naming a release status, or 0 for a retail release
+  static int ReleaseStatusLabel(ReleaseStatus status);
+
+  //! \brief The string id naming a licence, or 0 for a licensed release
+  static int LicenceLabel(Licence licence);
+
+  /*!
+   * \brief The string a machine's kind and its medium go by on screen
+   */
+  static int PlatformTypeLabel(PlatformType type);
+  static int MediaFormatLabel(MediaFormat format);
+};
+
+/*!
+ * \ingroup games
+ * \brief A score from one source, on that source's own scale
+ */
+struct GameRating
+{
+  float rating{0.0f};
+  float max{10.0f};
+  int votes{0};
+};
+
+/*!
+ * \ingroup games
+ * \brief A classification from one ratings board
+ */
+struct GameAgeRating
+{
+  std::string board; // e.g. "ESRB", "PEGI", "CERO"
+  std::string value; // e.g. "E", "12", "A"
+  std::string descriptors; // e.g. "Mild Violence"
+};
+
+/*!
+ * \ingroup games
+ * \brief One file on disk belonging to a release
+ */
+/*!
+ * \ingroup games
  * \brief One file inside a zip, as the zip's own directory describes it
  */
 struct ArchiveMember
@@ -75,17 +290,101 @@ struct ArchiveMember
 
 /*!
  * \ingroup games
- * \brief One file on disk belonging to a release
+ * \brief An emulator that holds an arcade set exactly, and its name for the set
+ *
+ * Emulators find a set by its short name, and their romset lists do not always
+ * agree on it.
  */
+struct EmulatorRomset
+{
+  std::string gameClient;
+  std::string romset;
+  std::vector<std::string> required; // sets the emulator needs beside it: parent, then BIOS
+};
+
+/*!
+ * \brief The emulators holding an arcade set, as stored: "client=romset+parent+bios;..."
+ */
+std::string RomsetsToString(const std::vector<EmulatorRomset>& romsets);
+std::vector<EmulatorRomset> RomsetsFromString(std::string_view text);
+
 struct GameFile
 {
+  int id{-1};
   std::string path;
   uint64_t size{0};
   std::string crc32;
   std::string md5;
+  std::string sha1;
   std::string sha256; // not computed yet
   std::string serial;
-  std::vector<ArchiveMember> members; // a zip's files, when it holds more than one
+  std::string raHash; // the RetroAchievements hash, when the platform has one
+  int disc{0}; // 1-based for multi-disc releases, 0 otherwise
+  std::vector<EmulatorRomset> romsets; // arcade sets only, best emulator first
+  std::vector<ArchiveMember> members; // read while scanning to identify the file; not stored
+  int playCount{0};
+  std::string lastPlayed;
+  std::string dateAdded;
+};
+
+/*!
+ * \ingroup games
+ * \brief One distinct dump of a game
+ *
+ * A game's regional versions, revisions and pre-release builds are each a
+ * release. One of a game's releases is the default, and is what plays and
+ * what the game's own art and title come from.
+ */
+struct GameRelease
+{
+  int id{-1};
+  std::string title; // the title as this release names it
+  std::vector<GameRegion> regions; // most specific first
+  std::vector<std::string> languages; // lower-case ISO 639-1 codes
+  std::string revision; // "Rev 1", "v1.1", empty for the first release
+  ReleaseStatus status{ReleaseStatus::RETAIL};
+  Licence licence{Licence::LICENSED};
+  bool alternate{false};
+  std::string edition; // "Mod" for a hack, "Fan Translation", or empty
+  DumpStatus dump{DumpStatus::UNKNOWN};
+  std::string releaseDate;
+  std::string serial;
+  std::string notes;
+  bool isDefault{false};
+  std::vector<GameFile> files;
+};
+
+/*!
+ * \ingroup games
+ * \brief Everything known about a platform
+ *
+ * A row of the platform table, or an entry in the bundled catalogue before it
+ * has been added to the database.
+ */
+struct PlatformInfo
+{
+  int id{-1};
+  std::string slug; // stable identifier, e.g. "megadrive"
+  std::string name;
+  std::string sortName;
+  std::string manufacturer;
+  PlatformType type{PlatformType::UNKNOWN};
+  MediaFormat media{MediaFormat::UNKNOWN};
+  std::string family; // slug of the platform this one extends, e.g. "megadrive" for Sega CD
+  int released{0};
+  int discontinued{0};
+  std::string overview;
+  std::vector<std::string> extensions; // lower case, no leading dot
+  std::vector<std::string> aliases;
+  std::map<std::string, std::string> providerIds; // provider name -> that provider's id
+  std::string defaultGameClient;
+  std::string defaultVideoFilter;
+  std::string defaultStretchMode; // RetroPlayer's identifier, or empty for none
+  std::optional<unsigned int> defaultRotationDegCCW;
+  std::optional<bool> defaultBezelEnabled;
+  std::string dateAdded;
+  std::string lastScraped;
+  int gameCount{0};
 };
 } // namespace GAME
 } // namespace KODI

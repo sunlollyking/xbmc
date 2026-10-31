@@ -24,6 +24,7 @@ inline constexpr char EPISODES[] = "episodes";
 inline constexpr char EVENTS[] = "events";
 inline constexpr char FAVOURITES[] = "favourites";
 inline constexpr char FILES[] = "files";
+inline constexpr char GAMES[] = "games";
 inline constexpr char GENRES[] = "genres";
 inline constexpr char IMAGES[] = "images";
 inline constexpr char MIXED[] = "mixed";

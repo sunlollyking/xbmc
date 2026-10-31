@@ -1,4 +1,9 @@
-set(SOURCES TestGameFileIdentity.cpp
-            TestGameNameParser.cpp)
+set(SOURCES TestGameAgeRatings.cpp
+            TestGameArtPath.cpp
+            TestGameFileIdentity.cpp
+            TestGameLibraryTypes.cpp
+            TestGameNameParser.cpp
+            TestReleasePolicy.cpp
+)
 
 core_add_test_library(test_games_library)

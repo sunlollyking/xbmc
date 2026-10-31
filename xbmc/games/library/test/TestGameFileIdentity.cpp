@@ -15,6 +15,7 @@
 
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -87,6 +88,29 @@ TEST(TestGameFileIdentity, ListsEveryFileOfAnArcadeSet)
   EXPECT_EQ(file.members[2].crc32, "01281d6c");
 }
 
+TEST(TestGameFileIdentity, StoresEachEmulatorsNameForAnArcadeSet)
+{
+  const std::vector<EmulatorRomset> romsets{
+      {"game.libretro.fbneo", "aodk", {}},
+      {"game.libretro.mame2003_plus", "kof95h", {"kof95", "neogeo"}}};
+  const std::string stored = RomsetsToString(romsets);
+  EXPECT_EQ(stored, "game.libretro.fbneo=aodk;game.libretro.mame2003_plus=kof95h+kof95+neogeo");
+
+  const std::vector<EmulatorRomset> read = RomsetsFromString(stored);
+  ASSERT_EQ(read.size(), 2U);
+  EXPECT_EQ(read[1].gameClient, "game.libretro.mame2003_plus");
+  EXPECT_EQ(read[1].romset, "kof95h");
+  EXPECT_EQ(read[1].required, (std::vector<std::string>{"kof95", "neogeo"}));
+  EXPECT_TRUE(read[0].required.empty());
+
+  // A set no emulator holds exactly keeps its name alone
+  const std::vector<EmulatorRomset> nameOnly = RomsetsFromString("=aodk");
+  ASSERT_EQ(nameOnly.size(), 1U);
+  EXPECT_TRUE(nameOnly[0].gameClient.empty());
+  EXPECT_EQ(nameOnly[0].romset, "aodk");
+  EXPECT_TRUE(RomsetsFromString("").empty());
+}
+
 TEST(TestGameFileIdentity, HashesAGameFiledInAFolderInsideAnArchive)
 {
   // nested.zip holds one file, under a folder as a merged arcade set files a
@@ -130,6 +154,46 @@ TEST(TestGameFileIdentity, ReadsTheSerialOfAnArchivedDisc)
                                           file, MediaFormat::DISC));
 
   EXPECT_EQ(file.serial, "SLUS01234");
+}
+
+TEST(TestGameFileIdentity, ReadsTheSerialOfAnArchivedPspDisc)
+{
+  // psp.zip holds one disc image and no cue sheet
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/psp.zip"),
+                                          file, MediaFormat::DISC));
+
+  EXPECT_EQ(file.serial, "ULUS10080");
+}
+
+TEST(TestGameFileIdentity, ReadsADsCartridgesGameCode)
+{
+  for (const auto& [code, expected] :
+       {std::pair<std::string, std::string>{"VFSV", "VFSV"}, {"####", ""}})
+  {
+    XFILE::CFile* rom = XBMC_CREATETEMPFILE(".nds");
+    ASSERT_NE(rom, nullptr);
+    std::string header(0x200, '\0');
+    header.replace(0x0C, 4, code);
+    ASSERT_EQ(rom->Write(header.data(), header.size()), static_cast<ssize_t>(header.size()));
+    rom->Flush();
+
+    GameFile file;
+    EXPECT_TRUE(CGameFileIdentity::Identify(XBMC_TEMPFILEPATH(rom), file, MediaFormat::CARTRIDGE));
+    EXPECT_EQ(file.serial, expected) << code;
+    EXPECT_FALSE(file.crc32.empty());
+
+    XBMC_DELETETEMPFILE(rom);
+  }
+}
+
+TEST(TestGameFileIdentity, ReadsTheGameCodeOfAnArchivedDsCartridge)
+{
+  GameFile file;
+  ASSERT_TRUE(CGameFileIdentity::Identify(XBMC_REF_FILE_PATH("xbmc/games/library/test/ds.zip"),
+                                          file, MediaFormat::CARTRIDGE));
+
+  EXPECT_EQ(file.serial, "VFSV");
 }
 
 TEST(TestGameFileIdentity, ReadsTheSerialOfADiscArchivedInAFolder)

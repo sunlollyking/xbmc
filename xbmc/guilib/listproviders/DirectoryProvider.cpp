@@ -65,8 +65,8 @@ public:
   explicit CSubscriber(ISubscriberCallback& invalidate) : m_callback(invalidate)
   {
     CServiceBroker::GetAnnouncementManager()->AddAnnouncer(
-        this, ANNOUNCEMENT::VideoLibrary | ANNOUNCEMENT::AudioLibrary | ANNOUNCEMENT::Player |
-                  ANNOUNCEMENT::GUI);
+        this, ANNOUNCEMENT::VideoLibrary | ANNOUNCEMENT::AudioLibrary | ANNOUNCEMENT::GameLibrary |
+                  ANNOUNCEMENT::Player | ANNOUNCEMENT::GUI);
   }
   ~CSubscriber() override { CServiceBroker::GetAnnouncementManager()->RemoveAnnouncer(this); }
 
@@ -91,6 +91,9 @@ private:
       return;
 
     if (flag & ANNOUNCEMENT::AudioLibrary && OnEventPublished(Topic::AUDIO_LIBRARY))
+      return;
+
+    if (flag & ANNOUNCEMENT::GameLibrary && OnEventPublished(Topic::GAME_LIBRARY))
       return;
 
     if (flag & ANNOUNCEMENT::Player)
@@ -333,6 +336,11 @@ public:
     {
       InitThumbLoader<CPVRThumbLoader>(PVR);
       return m_thumbloaders[PVR];
+    }
+    if (item->HasGameInfoTag())
+    {
+      InitThumbLoader<CProgramThumbLoader>(GAME);
+      return m_thumbloaders[GAME];
     }
     InitThumbLoader<CProgramThumbLoader>(PROGRAM);
     return m_thumbloaders[PROGRAM];
@@ -626,6 +634,9 @@ bool CDirectoryProvider::OnEventPublished(Topic topic /*= Topic::UNSPECIFIED*/)
     case Topic::AUDIO_LIBRARY:
       // We don't need to do anything if there are no fitting items.
       return std::ranges::find(m_itemTypes, InfoTagType::AUDIO) == m_itemTypes.cend();
+    case Topic::GAME_LIBRARY:
+      // We don't need to do anything if there are no fitting items.
+      return std::ranges::find(m_itemTypes, InfoTagType::GAME) == m_itemTypes.cend();
   }
   m_updateState = UpdateState::INVALIDATED;
   return true;
@@ -669,6 +680,11 @@ bool CDirectoryProvider::OnClick(const std::shared_ptr<CGUIListItem>& item)
     if (proc.ProcessDefaultAction())
       return true;
   }
+
+  // A game follows the games library's select action, as it does in the Games window
+  if (targetItem->HasGameInfoTag() && !targetItem->IsFolder() &&
+      KODI::GAME::CGameUtils::OnSelect(targetItem))
+    return true;
 
   // exec the execute string for the original (!) item
   CFileItem fileItem{*std::static_pointer_cast<CFileItem>(item)};

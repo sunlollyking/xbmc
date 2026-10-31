@@ -19,6 +19,7 @@ set(SOURCES AddonsExecuteAddon.cpp
             SettingsOperations.cpp
             SystemOperations.cpp
             TextureOperations.cpp
+            GameLibrary.cpp
             VideoLibrary.cpp
             VideoLibrarySetSourceContent.cpp
             XBMCOperations.cpp)
@@ -48,6 +49,7 @@ set(HEADERS AddonsExecuteAddon.h
             SettingsOperations.h
             SystemOperations.h
             TextureOperations.h
+            GameLibrary.h
             VideoLibrary.h
             VideoLibrarySetSourceContent.h
             XBMCOperations.h)

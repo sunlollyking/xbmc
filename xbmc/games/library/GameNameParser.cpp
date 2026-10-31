@@ -13,11 +13,14 @@
 #include "games/library/naming/NoIntroNaming.h"
 #include "games/library/naming/SceneNaming.h"
 #include "games/library/naming/TosecNaming.h"
+#include "language/i18n/Bcp47Registry/SubTagRegistryManager.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/URIUtils.h"
 
 #include <algorithm>
 #include <cctype>
+#include <map>
 #include <optional>
 #include <utility>
 
@@ -43,30 +46,32 @@ std::vector<std::string> SplitTrim(const std::string& s, char sep)
 // A region as the conventions write it outside a TOSEC name. GoodTools gives
 // the country first, and only there is a lone letter a country: Redump's
 // "(Disc 1) (R)" isn't Russia.
-std::string_view RegionOf(std::string_view part, bool firstTag)
+std::optional<GameRegion> RegionOf(std::string_view part, bool firstTag)
 {
-  if (std::string_view name = CNoIntroNaming::RegionName(part); !name.empty())
-    return name;
-  if (std::string_view name = CSceneNaming::RegionName(part); !name.empty())
-    return name;
+  if (std::optional<GameRegion> region = CNoIntroNaming::Region(part))
+    return region;
+  if (std::optional<GameRegion> region = CSceneNaming::Region(part))
+    return region;
   if (firstTag)
-    return CGoodToolsNaming::CountryName(part);
-  return {};
+    return CGoodToolsNaming::Region(part);
+  return std::nullopt;
 }
 
+// A region the set doesn't know, "(Unknown)", is read but names none
 bool AllRegions(const std::vector<std::string>& parts,
                 bool firstTag,
-                std::vector<std::string>& names)
+                std::vector<GameRegion>& regions)
 {
-  names.clear();
+  regions.clear();
   for (const std::string& p : parts)
   {
-    const std::string_view name = RegionOf(p, firstTag);
-    if (name.empty())
+    std::optional<GameRegion> region = RegionOf(p, firstTag);
+    if (!region)
       return false;
-    names.emplace_back(name);
+    if (!region->IsEmpty())
+      regions.emplace_back(std::move(*region));
   }
-  return !names.empty();
+  return !parts.empty();
 }
 
 bool AllLanguages(const std::vector<std::string>& parts, std::vector<std::string>& codes)
@@ -102,7 +107,10 @@ ParsedGameName FromTosec(const TOSEC::Name& tosec)
   out.year = tosec.date.year;
   out.publisher = StringUtils::Join(tosec.publishers, " - ");
   for (const std::string& country : tosec.countries)
-    out.regions.emplace_back(CTosecNaming::CountryName(country));
+  {
+    if (std::optional<GameRegion> region = CTosecNaming::Region(country))
+      out.regions.emplace_back(std::move(*region));
+  }
   out.languages = tosec.languages;
 
   if (tosec.demo != TOSEC::Demo::NONE)
@@ -210,19 +218,34 @@ std::vector<std::string> CompanyWords(std::string_view company)
 }
 } // namespace
 
-std::string CGameNameParser::RegionName(std::string_view region)
+std::optional<GameRegion> CGameNameParser::Region(std::string_view region)
 {
   std::string upper(region);
   StringUtils::ToUpper(upper);
-  for (std::string_view name :
-       {CNoIntroNaming::RegionName(region), CTosecNaming::CountryName(upper),
-        CSceneNaming::RegionName(upper), CGoodToolsNaming::CountryName(region),
-        CGoodToolsNaming::CountryName(upper)})
+  for (std::optional<GameRegion> found :
+       {CNoIntroNaming::Region(region), CTosecNaming::Region(upper), CSceneNaming::Region(upper),
+        CGoodToolsNaming::Region(region), CGoodToolsNaming::Region(upper)})
   {
-    if (!name.empty())
-      return std::string(name);
+    if (found)
+      return found;
   }
-  return "";
+  return std::nullopt;
+}
+
+std::string CGameNameParser::RegionName(const GameRegion& region)
+{
+  if (const std::string_view name = CNoIntroNaming::Name(region); !name.empty())
+    return std::string(name);
+  if (const std::string& code = region.territory.ToString(); !code.empty())
+  {
+    using LANGUAGE::I18N::CSubTagRegistryManager;
+    const auto subtag =
+        CSubTagRegistryManager::GetInstance().GetRegionSubTags().Lookup(StringUtils::ToLower(code));
+    if (subtag && !subtag->m_descriptions.empty())
+      return subtag->m_descriptions.front();
+    return code;
+  }
+  return region.market;
 }
 
 std::string CGameNameParser::DisplayTitle(std::string_view title)
@@ -423,12 +446,13 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
     const bool first = std::exchange(firstTag, false);
     const std::vector<std::string> parts = SplitTrim(tag, ',');
 
-    std::vector<std::string> values;
-    if (AllRegions(parts, first, values))
+    std::vector<GameRegion> regions;
+    if (AllRegions(parts, first, regions))
     {
-      out.regions.insert(out.regions.end(), values.begin(), values.end());
+      out.regions.insert(out.regions.end(), regions.begin(), regions.end());
       continue;
     }
+    std::vector<std::string> values;
     if (AllLanguages(parts, values))
     {
       out.languages.insert(out.languages.end(), values.begin(), values.end());
@@ -510,4 +534,36 @@ bool CGameNameParser::SameCompany(std::string_view a, std::string_view b)
   const std::string joinedB = StringUtils::Join(wordsB, "");
   return std::min(joinedA.size(), joinedB.size()) >= 4 &&
          (joinedA.find(joinedB) != std::string::npos || joinedB.find(joinedA) != std::string::npos);
+}
+
+std::vector<std::string> CGameNameParser::DiscSet(const std::string& launched,
+                                                   const std::vector<ReleaseFile>& files)
+{
+  std::map<int, std::vector<std::string>> discs;
+  int launchedDisc = 0;
+  for (const ReleaseFile& file : files)
+  {
+    int disc = Parse(URIUtils::GetFileName(file.path)).disc;
+    if (disc == 0)
+      disc = file.disc;
+    if (file.path == launched)
+      launchedDisc = disc;
+    if (disc > 0)
+      discs[disc].emplace_back(file.path);
+  }
+  if (launchedDisc == 0 || discs.size() < 2)
+    return {};
+
+  const std::string launchedName = URIUtils::GetFileName(launched);
+  std::vector<std::string> set;
+  for (const auto& [disc, candidates] : discs)
+  {
+    if (disc == launchedDisc)
+      set.emplace_back(launched);
+    else
+      set.emplace_back(*std::ranges::max_element(
+          candidates, {}, [&launchedName](const std::string& path)
+          { return StringUtils::CompareFuzzy(URIUtils::GetFileName(path), launchedName); }));
+  }
+  return set;
 }

@@ -1431,6 +1431,14 @@ bool CUtil::IsInPlaylistsFolder(const std::string& path, KODI::MEDIA::MediaSecti
                              { return URIUtils::PathHasParent(path, folder); });
 }
 
+std::string CUtil::GamePlaylistsLocation()
+{
+  const std::string path =
+      CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(
+          CSettings::SETTING_SYSTEM_PLAYLISTSPATH);
+  return URIUtils::AddFileToFolder(path, "games");
+}
+
 void CUtil::DeleteMusicDatabaseDirectoryCache()
 {
   CUtil::DeleteDirectoryCache("mdb-");

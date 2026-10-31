@@ -285,7 +285,8 @@ bool CDirectory::GetDirectory(const CURL& url,
     //  Should any of the files we read be treated as a directory?
     //  Disable for database folders, as they already contain the extracted items
     if (!(hints.flags & DIR_FLAG_NO_FILE_DIRS) && !MUSIC::IsMusicDb(items) &&
-        !VIDEO::IsVideoDb(items) && !PLAYLIST::IsSmartPlayList(items))
+        !VIDEO::IsVideoDb(items) && !PLAYLIST::IsSmartPlayList(items) &&
+        !URIUtils::IsProtocol(items.GetPath(), "gamedb"))
       FilterFileDirectories(items, hints.mask);
 
     // Correct items for path substitution

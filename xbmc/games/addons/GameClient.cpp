@@ -34,6 +34,7 @@
 #include "games/addons/input/GameClientInput.h"
 #include "games/addons/streams/GameClientStreams.h"
 #include "games/addons/streams/IGameClientStream.h"
+#include "games/database/GameDatabase.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
 #include "input/actions/Action.h"
@@ -75,6 +76,7 @@ namespace
 //! files. Copies are kept and never overwritten, because a disk-based game
 //! saves onto its own disks.
 constexpr const char* EXTRACTED_GAMES_FOLDER = "special://profile/games/extracted/";
+constexpr const char* DISK_PLAYLISTS_FOLDER = "special://profile/games/disksets/";
 
 /*!
  * \brief The folder an archive's games are copied to
@@ -90,6 +92,30 @@ std::string ExtractedFolder(const std::string& archive)
   const std::string hash =
       KODI::UTILITY::CDigest::Calculate(KODI::UTILITY::CDigest::Type::MD5, archive).substr(0, 8);
   return URIUtils::AddFileToFolder(EXTRACTED_GAMES_FOLDER, name + "-" + hash) + "/";
+}
+
+//! Write a disk playlist, leaving one that already says the same alone
+bool WritePlaylist(const std::string& playlist, const std::vector<std::string>& entries)
+{
+  // A playlist is replaced only through a complete copy written aside, so a
+  // failed write never leaves a partial one. Rename can't replace a file on
+  // every platform, so an outdated playlist is removed first.
+  const std::string content = StringUtils::Join(entries, "\n") + "\n";
+  std::vector<uint8_t> current;
+  if (XFILE::CFile().LoadFile(playlist, current) < 0 ||
+      std::string(current.begin(), current.end()) != content)
+  {
+    const std::string partial = playlist + ".tmp";
+    XFILE::CFile file;
+    const bool written =
+        file.OpenForWrite(partial, true) &&
+        file.Write(content.data(), content.size()) == static_cast<ssize_t>(content.size());
+    file.Close();
+    if (!written || (XFILE::CFile::Exists(playlist) && !XFILE::CFile::Delete(playlist)) ||
+        !XFILE::CFile::Rename(partial, playlist))
+      XFILE::CFile::Delete(partial);
+  }
+  return XFILE::CFile::Exists(playlist);
 }
 
 //! Whether a name read from an archive stays inside the folder it is copied to
@@ -386,6 +412,35 @@ bool CGameClient::OpenFile(const CFileItem& file,
       // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
       MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
       return false;
+    }
+  }
+
+  // A library game of several disks is handed over as a playlist of them all,
+  // so the client can swap to the others
+  if (path == translatedUrl.Get() && IsExtensionValid(".m3u") &&
+      !URIUtils::HasExtension(path, ".m3u|.cue|.gdi"))
+  {
+    const std::string playlist = GetDiskPlaylist(file.GetDynPath());
+    if (!playlist.empty())
+      path = playlist;
+  }
+
+  if (const std::string romset = file.GetProperty("game.romset").asString(); !romset.empty())
+  {
+    std::string name = URIUtils::GetFileName(path);
+    URIUtils::RemoveExtension(name);
+    const std::vector<std::string> companions =
+        StringUtils::Split(file.GetProperty("game.romset.companions").asString(), ';');
+    if (name != romset || !companions.empty())
+    {
+      path = PresentAsRomset(path, romset, companions);
+      if (path.empty())
+      {
+        // "Failed to play game"
+        // "This game can only be played directly from a hard drive or partition. Compressed files must be extracted."
+        MESSAGING::HELPERS::ShowOKDialogText(CVariant{35210}, CVariant{35214});
+        return false;
+      }
     }
   }
 
@@ -763,6 +818,30 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
     names.push_back(name);
   }
 
+  // A disc's sheet names its tracks, which are kept beside it in the archive
+  if (URIUtils::HasExtension(archivedPath, ".cue|.gdi"))
+  {
+    CFileItemList tracks;
+    if (!XFILE::CDirectory::GetDirectory(URIUtils::GetDirectory(archivedPath), tracks, "",
+                                         XFILE::DIR_FLAG_DEFAULTS))
+      return "";
+
+    for (const auto& track : tracks)
+    {
+      const std::string name = URIUtils::GetFileName(track->GetPath());
+      if (track->IsFolder() || URIUtils::HasExtension(name, ".cue|.gdi"))
+        continue;
+      if (!IsSafeName(name))
+        return "";
+      const std::string target = URIUtils::AddFileToFolder(folder, name);
+      if (!XFILE::CFile::Exists(target) && !CopyWhole(track->GetPath(), target))
+      {
+        CLog::Log(LOGERROR, "GameClient: Failed to extract {}", CURL::GetRedacted(track->GetPath()));
+        return "";
+      }
+    }
+  }
+
   std::string game = URIUtils::AddFileToFolder(folder, names.front());
 
   // A playlist lets the emulator swap to the other disks
@@ -772,32 +851,94 @@ std::string CGameClient::ExtractGame(const std::string& archivedPath)
     URIUtils::RemoveExtension(playlist);
     playlist += ".m3u";
 
-    // A playlist is replaced only through a complete copy written aside, so a
-    // failed write never leaves a partial one. Rename can't replace a file on
-    // every platform, so an outdated playlist is removed first.
-    const std::string content = StringUtils::Join(names, "\n") + "\n";
-    std::vector<uint8_t> current;
-    if (XFILE::CFile().LoadFile(playlist, current) < 0 ||
-        std::string(current.begin(), current.end()) != content)
-    {
-      const std::string partial = playlist + ".tmp";
-      XFILE::CFile file;
-      const bool written =
-          file.OpenForWrite(partial, true) &&
-          file.Write(content.data(), content.size()) == static_cast<ssize_t>(content.size());
-      file.Close();
-      if (!written || (XFILE::CFile::Exists(playlist) && !XFILE::CFile::Delete(playlist)) ||
-          !XFILE::CFile::Rename(partial, playlist))
-        XFILE::CFile::Delete(partial);
-    }
-
-    if (XFILE::CFile::Exists(playlist))
+    if (WritePlaylist(playlist, names))
       game = playlist;
   }
 
   CLog::Log(LOGDEBUG, "GameClient: Playing {} from its extracted copy", CURL::GetRedacted(game));
 
   return CSpecialProtocol::TranslatePath(game);
+}
+
+std::string CGameClient::GetDiskPlaylist(const std::string& gamePath)
+{
+  std::vector<std::string> disks;
+  {
+    CGameDatabase db;
+    if (!db.Open())
+      return "";
+    disks = db.GetDiscsForFile(gamePath);
+  }
+
+  std::vector<std::string> entries;
+  for (const std::string& disk : disks)
+  {
+    if (!IsExtensionValid(URIUtils::GetExtension(disk)))
+      continue;
+    // A client without VFS reads only what the system can open
+    if (!m_bSupportsVFS && !CURL(disk).GetProtocol().empty())
+      return "";
+    entries.emplace_back(CSpecialProtocol::TranslatePath(disk));
+  }
+  if (entries.size() < 2)
+    return "";
+
+  if (!XFILE::CDirectory::Exists(DISK_PLAYLISTS_FOLDER) &&
+      !XFILE::CDirectory::Create(DISK_PLAYLISTS_FOLDER))
+    return "";
+
+  // Named like an extracted copy, so it stays the same and the client's state
+  // for the game is found again
+  std::string name = URIUtils::GetFileName(gamePath);
+  URIUtils::RemoveExtension(name);
+  const std::string hash =
+      KODI::UTILITY::CDigest::Calculate(KODI::UTILITY::CDigest::Type::MD5, gamePath).substr(0, 8);
+  const std::string playlist =
+      URIUtils::AddFileToFolder(DISK_PLAYLISTS_FOLDER, name + "-" + hash + ".m3u");
+
+  if (!WritePlaylist(playlist, entries))
+    return "";
+
+  CLog::Log(LOGDEBUG, "GameClient: Playing {} as a set of {} disks",
+            CURL::GetRedacted(gamePath), entries.size());
+  return CSpecialProtocol::TranslatePath(playlist);
+}
+
+std::string CGameClient::PresentAsRomset(const std::string& path,
+                                         const std::string& romset,
+                                         const std::vector<std::string>& companions)
+{
+  if (!IsSafeName(romset))
+    return "";
+
+  const std::string folder = ExtractedFolder(path);
+  if (!XFILE::CDirectory::Exists(folder) && !XFILE::CDirectory::Create(folder))
+    return "";
+
+  const std::string target =
+      URIUtils::AddFileToFolder(folder, romset + URIUtils::GetExtension(path));
+  if (!XFILE::CFile::Exists(target) && !CopyWhole(path, target))
+  {
+    CLog::Log(LOGERROR, "GameClient: Failed to copy {} as {}", CURL::GetRedacted(path), romset);
+    return "";
+  }
+
+  // Each companion arrives as "set=path"
+  for (const std::string& companion : companions)
+  {
+    const size_t equals = companion.find('=');
+    if (equals == std::string::npos || !IsSafeName(companion.substr(0, equals)))
+      continue;
+    const std::string from = companion.substr(equals + 1);
+    const std::string beside = URIUtils::AddFileToFolder(folder, companion.substr(0, equals) +
+                                                                     URIUtils::GetExtension(from));
+    if (!XFILE::CFile::Exists(beside) && !CopyWhole(from, beside))
+      CLog::Log(LOGWARNING, "GameClient: Failed to place {} beside {}", CURL::GetRedacted(from),
+                romset);
+  }
+
+  CLog::Log(LOGDEBUG, "GameClient: Playing {} as {}", CURL::GetRedacted(path), romset);
+  return CSpecialProtocol::TranslatePath(target);
 }
 
 std::string CGameClient::ExtractFolder(const std::string& archivePath)

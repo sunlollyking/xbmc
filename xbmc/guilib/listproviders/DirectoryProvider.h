@@ -30,6 +30,7 @@ enum class InfoTagType
   PICTURE,
   PROGRAM,
   PVR,
+  GAME,
 };
 
 class ISubscriberCallback
@@ -40,6 +41,7 @@ public:
     UNSPECIFIED,
     VIDEO_LIBRARY,
     AUDIO_LIBRARY,
+    GAME_LIBRARY,
     PLAYER,
   };
   virtual ~ISubscriberCallback() = default;
