@@ -107,7 +107,7 @@ enum class ReleaseStatus
   DEMO,
   ALPHA,
   KIOSK,
-  DEBUG,
+  DEBUG_BUILD,
   PROGRAM,
 };
 

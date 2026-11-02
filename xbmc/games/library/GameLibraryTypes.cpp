@@ -84,7 +84,7 @@ constexpr Words<ReleaseStatus, 9> releaseStatuses{{
     {ReleaseStatus::DEMO, "demo"},
     {ReleaseStatus::ALPHA, "alpha"},
     {ReleaseStatus::KIOSK, "kiosk"},
-    {ReleaseStatus::DEBUG, "debug"},
+    {ReleaseStatus::DEBUG_BUILD, "debug"},
     {ReleaseStatus::PROGRAM, "program"},
 }};
 
@@ -246,7 +246,7 @@ int CGameLibraryTypes::ReleaseStatusLabel(ReleaseStatus status)
       return 35755; // "Alpha"
     case ReleaseStatus::KIOSK:
       return 35756; // "Kiosk"
-    case ReleaseStatus::DEBUG:
+    case ReleaseStatus::DEBUG_BUILD:
       return 35757; // "Debug"
     case ReleaseStatus::PROGRAM:
       return 35597; // "BIOS"

@@ -8,6 +8,7 @@
 
 #include "GameNameParser.h"
 
+#include "URL.h"
 #include "games/library/naming/GoodToolsNaming.h"
 #include "games/library/naming/NeoKobeNaming.h"
 #include "games/library/naming/NoIntroNaming.h"
@@ -507,6 +508,16 @@ ParsedGameName CGameNameParser::Parse(std::string_view fileName, bool hasExtensi
   out.title = title;
   out.displayTitle = DisplayTitle(title);
   return out;
+}
+
+ParsedGameName CGameNameParser::ParsePath(const std::string& path)
+{
+  const CURL url(path);
+  if (URIUtils::HasParentInHostname(url) && url.GetFileName().empty())
+    return ParsePath(url.GetHostName());
+
+  return Parse(URIUtils::IsURL(path) ? URIUtils::GetDecodedFileName(path)
+                                     : URIUtils::GetFileName(path));
 }
 
 std::vector<std::string> CGameNameParser::Credits(const ParsedGameName& name)
