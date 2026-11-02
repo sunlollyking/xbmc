@@ -141,6 +141,7 @@ private:
   bool PlayVideo();
   bool PlayMotion();
   void EndMotion();
+  void CloseMotionClip();
   bool IsShowingVideo() const;
   std::string GetMotionClip(const CFileItem& item) const;
   void SetHdrOutput(bool hdr);
@@ -177,6 +178,7 @@ private:
   bool m_bPlayingVideo;
   int m_iVideoSlide = -1;
   bool m_bPlayingMotion = false;
+  std::string m_motionClip;
   int m_iMotionSlide = -1;
   mutable CCriticalSection m_motionClipsSection;
   std::map<std::string, std::string, std::less<>> m_motionClips; // picture path -> clip path

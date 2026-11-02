@@ -102,6 +102,24 @@ TEST(TestMotionPhoto, MotionPhoto)
   }
 }
 
+TEST(TestMotionPhoto, MotionPhotoWithItemElements)
+{
+  // As ExifTool writes the directory back after an edit
+  const std::string xmp =
+      "<rdf:Description><GCamera:MotionPhoto>1</GCamera:MotionPhoto><Container:Directory>"
+      "<rdf:Seq><rdf:li rdf:parseType=\"Resource\"><Container:Item rdf:parseType=\"Resource\">"
+      "<Item:Length>5</Item:Length><Item:Mime>image/jpeg</Item:Mime>"
+      "<Item:Semantic>Primary</Item:Semantic></Container:Item></rdf:li>"
+      "<rdf:li rdf:parseType=\"Resource\"><Container:Item rdf:parseType=\"Resource\">"
+      "<Item:Length>" +
+      std::to_string(CLIP.size()) +
+      "</Item:Length><Item:Mime>video/mp4</Item:Mime>"
+      "<Item:Semantic>MotionPhoto</Item:Semantic></Container:Item></rdf:li></rdf:Seq>"
+      "</Container:Directory></rdf:Description>";
+  EXPECT_EQ(Extract(MakeJpeg(xmp, CLIP)), CLIP);
+  PICTURE::ClearMotionPhotoClips();
+}
+
 TEST(TestMotionPhoto, MicroVideo)
 {
   const std::string xmp =

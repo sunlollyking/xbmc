@@ -262,6 +262,9 @@ void CShaderPreset::DisposeShaders()
 
 void CShaderPreset::ReleaseTextures()
 {
+  for (const auto& shader : m_pShaders)
+    shader->ReleaseTextureReferences();
+
   DisposeShaderTextures();
   for (const auto& lut : m_luts)
     lut->ReleaseTexture();

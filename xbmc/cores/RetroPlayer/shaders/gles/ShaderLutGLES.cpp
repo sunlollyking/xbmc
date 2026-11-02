@@ -43,8 +43,14 @@ CTexture* CShaderLutGLES::GetTexture()
 {
   if (m_released)
   {
+    // Loading binds the LUT on the active unit, where the caller may have bound its source
+    GLint boundTexture = 0;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
+
     m_texture = CreateLUTTexture(m_lut);
     m_released = false;
+
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(boundTexture));
   }
 
   return m_texture.get();

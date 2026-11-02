@@ -76,6 +76,16 @@ std::unique_ptr<CRenderBezel> CRenderBezel::Load(const std::string& url,
     return {};
   }
 
+  // The window is found from the alpha of 32-bit pixels, and an image resource's packed
+  // artwork can have fewer channels
+  const KD_TEX_FMT format = texture->GetTextureFormat();
+  if ((format != KD_TEX_FMT_SDR_RGBA8 && format != KD_TEX_FMT_SDR_BGRA8) ||
+      texture->GetSwizzle() != KD_TEX_SWIZ_RGBA)
+  {
+    CLog::Log(LOGINFO, "RetroPlayer[RENDER]: Bezel isn't in 32-bit RGBA, not showing it");
+    return {};
+  }
+
   CRect window;
   if (!FindWindow(texture->GetPixels(), texture->GetWidth(), texture->GetHeight(),
                   texture->GetPitch(), window))

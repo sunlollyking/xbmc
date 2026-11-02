@@ -259,11 +259,7 @@ bool CGUIWindowSlideShow::IsPlaying() const
 
 void CGUIWindowSlideShow::Reset()
 {
-  if (m_bPlayingMotion)
-  {
-    const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-    appPlayer->ClosePlayer();
-  }
+  CloseMotionClip();
   m_bSlideShow = false;
   m_bShuffled = false;
   m_bPause = false;
@@ -321,11 +317,8 @@ void CGUIWindowSlideShow::OnDeinitWindow(int nextWindowID)
   if (m_bPlayingMotion)
   {
     // The clip is part of the photo, so it ends with the slideshow
-    const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-    appPlayer->ClosePlayer();
-    m_bPlayingMotion = false;
-    m_bPlayingVideo = false;
-    m_iVideoSlide = -1;
+    CloseMotionClip();
+    EndMotion();
   }
 
   if (nextWindowID != WINDOW_FULLSCREEN_VIDEO &&
@@ -1057,7 +1050,7 @@ bool CGUIWindowSlideShow::OnAction(const CAction &action)
       // A running slideshow shows moving photos as stills
       if (m_bPlayingMotion)
       {
-        CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>()->ClosePlayer();
+        CloseMotionClip();
         EndMotion();
       }
       m_bSlideShow = true;
@@ -1402,6 +1395,7 @@ bool CGUIWindowSlideShow::PlayMotion()
             m_slides.at(m_iCurrentSlide)->GetPath());
   m_bPlayingVideo = true;
   m_bPlayingMotion = true;
+  m_motionClip = clip;
   m_iVideoSlide = m_iCurrentSlide;
   // The clip is part of the photo, so it mustn't switch the display mode like a film
   const bool startWindowed = CMediaSettings::GetInstance().DoesMediaStartWindowed();
@@ -1416,9 +1410,17 @@ bool CGUIWindowSlideShow::PlayMotion()
 void CGUIWindowSlideShow::EndMotion()
 {
   m_bPlayingMotion = false;
+  m_motionClip.clear();
   m_bPlayingVideo = false;
   m_iVideoSlide = -1;
   MarkDirtyRegion();
+}
+
+void CGUIWindowSlideShow::CloseMotionClip()
+{
+  // Another video can take over the player without the clip being stopped first
+  if (m_bPlayingMotion && g_application.CurrentFile() == m_motionClip)
+    CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>()->ClosePlayer();
 }
 
 bool CGUIWindowSlideShow::IsShowingVideo() const

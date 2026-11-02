@@ -89,12 +89,21 @@ std::vector<ContainerItem> GetContainerItems(std::string_view xmp)
   std::vector<ContainerItem> items;
 
   constexpr std::string_view itemTag = "<Container:Item";
+  constexpr std::string_view itemEndTag = "</Container:Item>";
   for (size_t start = xmp.find(itemTag); start != std::string_view::npos;
        start = xmp.find(itemTag, start + itemTag.size()))
   {
-    const size_t end = xmp.find('>', start);
+    size_t end = xmp.find('>', start);
     if (end == std::string_view::npos)
       break;
+
+    // An item's fields are attributes of its tag, or child elements once an editor such as
+    // ExifTool has rewritten the XMP
+    if (xmp[end - 1] != '/')
+    {
+      if (const size_t close = xmp.find(itemEndTag, end); close != std::string_view::npos)
+        end = close;
+    }
 
     const std::string_view item = xmp.substr(start, end - start);
     items.push_back({std::string(GetValue(item, "Item:Semantic")),

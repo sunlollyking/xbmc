@@ -426,6 +426,10 @@ static int PlayerControl(const std::vector<std::string>& params)
   }
   else if (paramlow == "bezel")
   {
+    // The current game settings are only filled in once a game is opened
+    if (!appPlayer->IsPlayingGame())
+      return 0;
+
     CGameSettings& gameSettings = CMediaSettings::GetInstance().GetCurrentGameSettings();
     gameSettings.SetBezelEnabled(!gameSettings.BezelEnabled());
 
