@@ -20924,7 +20924,25 @@ msgctxt "#35715"
 msgid "Main Set"
 msgstr ""
 
-#empty strings from id 35716 to 35725
+#. Label of a setting in Settings > Games > General
+#: system/settings/settings.xml
+msgctxt "#35716"
+msgid "Replace file names with game titles"
+msgstr ""
+
+#. Help text for setting "Replace file names with game titles" of label #35716
+#: system/settings/settings.xml
+msgctxt "#35717"
+msgid "Show each game by the title read from its file name instead of the file name itself."
+msgstr ""
+
+#. Marks an achievement being attempted in the list of a game's achievements
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35718"
+msgid "Attempt active"
+msgstr ""
+
+#empty strings from id 35719 to 35725
 
 #. Label of the context menu item that sets the video filter for a game or folder
 #: xbmc/games/windows/GUIWindowGames.cpp

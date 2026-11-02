@@ -927,6 +927,9 @@ bool CVideoPlayer::OpenInputStream()
     throw std::runtime_error("m_pInputStream reference count is greater than 1");
   m_pInputStream.reset();
 
+  // Flushes keep disc menu overlays, and the closed input stream can no longer remove them
+  m_overlayContainer.Clear();
+
   CLog::Log(LOGINFO, "Creating InputStream");
 
   m_pInputStream = CDVDFactoryInputStream::CreateInputStream(this, m_item, true);
@@ -3036,9 +3039,10 @@ void CVideoPlayer::OnExit()
   CloseStream(m_CurrentAudioID3, !m_bAbortRequest);
   // the generalization principle was abused for subtitle player. actually it is not a stream player like
   // video and audio. subtitle player does not run on its own thread, hence waitForBuffers makes
-  // no sense here. waitForBuffers is abused to clear overlay container (false clears container)
+  // no sense here. waitForBuffers is abused to clear subtitle overlays (false clears them)
   // subtitles are added from video player. after video player has finished, overlays have to be cleared.
-  CloseStream(m_CurrentSubtitle, false);  // clear overlay container
+  CloseStream(m_CurrentSubtitle, false);
+  m_overlayContainer.Clear();
 
   CServiceBroker::GetWinSystem()->UnregisterRenderLoop(this);
 
@@ -4138,8 +4142,10 @@ void CVideoPlayer::SetEnableStream(CCurrentStream& current, bool isEnabled)
   if (m_pDemuxer && STREAM_SOURCE_MASK(current.source) == STREAM_SOURCE_DEMUX &&
       m_SelectionStreams.Contains(current.type, current.source, current.demuxerId, current.id))
   {
-    m_pDemuxer->EnableStream(current.demuxerId, current.id, isEnabled);
-    current.demuxDisabled = !isEnabled;
+    // Only a demuxer that really supports it stops delivering a disabled stream. Others
+    // (e.g. ffmpeg) ignore the request and keep delivering, so there is nothing to reopen later.
+    if (m_pDemuxer->EnableStream(current.demuxerId, current.id, isEnabled))
+      current.demuxDisabled = !isEnabled;
   }
 }
 
@@ -4889,6 +4895,11 @@ int CVideoPlayer::OnDiscNavResult(void* pData, int iMessage)
         m_dvd.state = DVDSTATE_NORMAL;
         m_dvd.iDVDStillTime = 0ms;
         CLog::Log(LOGDEBUG, "BD_EVENT_MENU - libbluray leave menu (DVDSTATE_NORMAL)");
+      }
+      else
+      {
+        // The disc may open a menu itself, so close the player controls as ShowVideoMenu does
+        CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::Player, "OnMenu");
       }
       break;
     case BD_EVENT_PLAYLIST_STOP:

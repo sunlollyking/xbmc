@@ -92,6 +92,14 @@ public:
                                           const std::vector<ReleaseFile>& files);
 
   /*!
+   * \brief Read a game file's name from its path
+   *
+   * A zip holding one compressed game is listed as the zip's root, so it is
+   * read by the zip's name.
+   */
+  static ParsedGameName ParsePath(const std::string& path);
+
+  /*!
    * \brief Turn a WHDLoad install name into something a catalogue can match
    *
    * Amiga collections are named for the WHDLoad slave rather than the game:
