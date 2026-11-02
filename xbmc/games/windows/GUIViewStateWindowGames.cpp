@@ -10,6 +10,7 @@
 
 #include "FileItem.h"
 #include "FileItemList.h"
+#include "ServiceBroker.h"
 #include "games/GameUtils.h"
 #include "guilib/WindowIDs.h"
 #include "playlists/PlayListFileItemClassify.h"
@@ -17,6 +18,8 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "settings/MediaSourceSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "view/ViewState.h"
@@ -43,8 +46,14 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   }
   else
   {
+    const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+    AddSortMethod(SortBy::LABEL,
+                  settings->GetBool(CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING)
+                      ? SortAttributeIgnoreArticle
+                      : SortAttributeNone,
+                  551, LABEL_MASKS("%L", "%I", "%L", "")); // Label, Size | Label, empty
     AddSortMethod(SortBy::FILE, 561,
-                  LABEL_MASKS("%F", "%I", "%L", "")); // Filename, Size | Label, empty
+                  LABEL_MASKS("%L", "%I", "%L", "")); // Label, Size | Label, empty
     AddSortMethod(SortBy::SIZE, 553,
                   LABEL_MASKS("%L", "%I", "%L", "%I")); // Filename, Size | Label, Size
 
@@ -82,6 +91,9 @@ std::vector<CMediaSource>& CGUIViewStateWindowGames::GetSources()
 
 void CGUIViewStateWindowGames::SaveViewState()
 {
+  // The root lists sources by name, so its state isn't the default for game folders
   SaveViewToDb(m_items.GetPath(), WINDOW_GAMES,
-               CViewStateSettings::GetInstance().Get(VIEW::STATE::GAMES));
+               m_items.IsVirtualDirectoryRoot()
+                   ? nullptr
+                   : CViewStateSettings::GetInstance().Get(VIEW::STATE::GAMES));
 }
