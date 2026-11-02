@@ -231,6 +231,10 @@ private:
   //! callbacks read it on the add-on's thread while loading and closing a game
   //! write it on Kodi's.
   std::atomic<bool> m_encoreModeEnabled{false};
+
+  //! The encore setting as last seen, so a change made during a game is
+  //! announced once. Atomic for the same reason as m_hardcoreEnabled.
+  std::atomic<bool> m_encoreSetting{false};
   //! The leaderboard whose tracker was last logged, or 0 for none. Atomic
   //! because the tracker arrives on the add-on's thread and a game closing
   //! clears it on Kodi's.

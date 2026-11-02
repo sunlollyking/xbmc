@@ -131,9 +131,17 @@ void CGameClientCheevos::Notify(const Observable& obs, const ObservableMessage m
   if (msg != ObservableMessageSettingsChanged)
     return;
 
+  CGameSettings& gameSettings = CServiceBroker::GetGameServices().GameSettings();
+
   // Only hardcore is applied as it changes. Encore is read as a game is
-  // identified, and SendCredentials() sends it with the next one.
-  const bool setting = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+  // identified, and SendCredentials() sends it with the next one, so the
+  // player is told it waits for that.
+  const bool encore = gameSettings.GetAchievementsEncore();
+  if (m_encoreSetting.exchange(encore) != encore)
+    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35303),
+                                          Localize(35766));
+
+  const bool setting = gameSettings.GetAchievementsHardcore();
 
   // Turning the setting off and on again asks the client afresh. Any other
   // change leaves a game that left hardcore where it is.
@@ -869,6 +877,7 @@ void CGameClientCheevos::ObserveSettings()
   if (m_observingSettings)
     return;
 
+  m_encoreSetting = CServiceBroker::GetGameServices().GameSettings().GetAchievementsEncore();
   CServiceBroker::GetGameServices().GameSettings().RegisterObserver(this);
   m_observingSettings = true;
 }

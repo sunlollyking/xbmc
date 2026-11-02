@@ -35,7 +35,25 @@ bool CShaderLutGLES::Create(const ShaderLut& lut)
   }
 
   m_texture = std::move(lutTexture);
+  m_lut = lut;
   return true;
+}
+
+CTexture* CShaderLutGLES::GetTexture()
+{
+  if (m_released)
+  {
+    m_texture = CreateLUTTexture(m_lut);
+    m_released = false;
+  }
+
+  return m_texture.get();
+}
+
+void CShaderLutGLES::ReleaseTexture()
+{
+  m_texture.reset();
+  m_released = true;
 }
 
 std::unique_ptr<CTexture> CShaderLutGLES::CreateLUTTexture(const ShaderLut& lut)

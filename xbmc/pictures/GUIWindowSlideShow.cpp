@@ -611,7 +611,7 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
         (float)res.iHeight * m_fZoom,
         maxWidth, maxHeight);
       m_pBackgroundLoader->LoadPic(m_iCurrentPic, m_iCurrentSlide, picturePath, maxWidth, maxHeight,
-                                   !IsVideo(*item), m_showHdr && !IsVideo(*item));
+                                   !IsVideo(*item) && !m_hdrOutput, m_showHdr && !IsVideo(*item));
       m_iLastFailedNextSlide = -1;
       m_bLoadNextPic = false;
     }
@@ -642,7 +642,8 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
                      (float)res.iHeight * m_fZoom,
                      maxWidth, maxHeight);
       m_pBackgroundLoader->LoadPic(1 - m_iCurrentPic, m_iNextSlide, picturePath, maxWidth,
-                                   maxHeight, !IsVideo(*item), m_showHdr && !IsVideo(*item));
+                                   maxHeight, !IsVideo(*item) && !m_hdrOutput,
+                                   m_showHdr && !IsVideo(*item));
     }
   }
 

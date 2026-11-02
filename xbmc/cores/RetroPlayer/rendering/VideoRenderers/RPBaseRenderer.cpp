@@ -90,11 +90,24 @@ bool CRPBaseRenderer::IsVisible() const
 void CRPBaseRenderer::SetUsed()
 {
   m_lastUse = m_renderFrameCount;
+  m_texturesReleased = false;
 }
 
 bool CRPBaseRenderer::IsUnused() const
 {
   return m_renderFrameCount > m_lastUse + VISIBLE_DURATION_FRAME_COUNT;
+}
+
+void CRPBaseRenderer::ReleaseTextures()
+{
+  if (m_texturesReleased)
+    return;
+
+  Flush();
+  if (m_shaderPreset)
+    m_shaderPreset->ReleaseTextures();
+
+  m_texturesReleased = true;
 }
 
 IRenderBuffer* CRPBaseRenderer::GetRenderBuffer() const

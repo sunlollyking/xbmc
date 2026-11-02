@@ -143,5 +143,9 @@ void CGUIViewStateWindowGames::SaveViewState()
   const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb")
                               ? VIEW::STATE::GAMES_LIBRARY
                               : VIEW::STATE::GAMES;
-  SaveViewToDb(m_items.GetPath(), WINDOW_GAMES, CViewStateSettings::GetInstance().Get(viewState));
+  // The root lists sources by name, so its state isn't the default for game folders
+  SaveViewToDb(m_items.GetPath(), WINDOW_GAMES,
+               m_items.IsVirtualDirectoryRoot()
+                   ? nullptr
+                   : CViewStateSettings::GetInstance().Get(viewState));
 }

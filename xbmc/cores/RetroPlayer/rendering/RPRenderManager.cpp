@@ -629,19 +629,6 @@ void CRPRenderManager::FrameMove()
       std::unique_lock<std::mutex> lock{m_oldRenderersMutex};
       for (auto& renderer : m_renderers)
         renderer->FrameMove();
-
-      // Release renderers nothing draws any more, such as a filter preview that
-      // has scrolled off screen
-      for (auto it = m_renderers.begin(); it != m_renderers.end();)
-      {
-        if ((*it)->IsUnused())
-        {
-          m_oldRenderers.insert(*it);
-          it = m_renderers.erase(it);
-        }
-        else
-          ++it;
-      }
     }
 
     UpdateHdrOutput();
@@ -652,6 +639,15 @@ void CRPRenderManager::FlushRendered()
 {
   for (IRenderBufferPool* pool : m_processInfo.GetBufferManager().GetBufferPools())
     pool->FlushRendered();
+}
+
+void CRPRenderManager::ReleaseUnusedTextures()
+{
+  for (const auto& renderer : m_renderers)
+  {
+    if (renderer->IsUnused())
+      renderer->ReleaseTextures();
+  }
 }
 
 void CRPRenderManager::CheckFlush()
@@ -742,6 +738,7 @@ void CRPRenderManager::RenderWindow(bool bClear,
   {
     std::unique_lock<std::mutex> lock{m_oldRenderersMutex};
     m_oldRenderers.clear();
+    ReleaseUnusedTextures();
   }
 
   // Get a renderer for the fullscreen window
@@ -876,6 +873,7 @@ void CRPRenderManager::RenderControl(bool bClear,
   {
     std::unique_lock<std::mutex> lock{m_oldRenderersMutex};
     m_oldRenderers.clear();
+    ReleaseUnusedTextures();
   }
 
   // Get a renderer for the control

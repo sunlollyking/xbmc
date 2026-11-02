@@ -334,9 +334,11 @@ TEST_F(TestRPRenderManager, ResetDuringRendererLookup)
   ExpectVideoBuffer();
 }
 
-TEST_F(TestRPRenderManager, UnusedRendererIsReleased)
+TEST_F(TestRPRenderManager, UnusedRendererReleasesItsTextures)
 {
   auto& manager = m_environment.Renderer();
+  unsigned int rendererFlushes = 0;
+  m_pool->onRendererFlush = [&rendererFlushes] { ++rendererFlushes; };
   Start();
 
   for (unsigned int frame = 0; frame < 120; ++frame)
@@ -345,14 +347,15 @@ TEST_F(TestRPRenderManager, UnusedRendererIsReleased)
     RenderControl();
   }
   EXPECT_EQ(m_pool->rendererCreates, 1);
-  EXPECT_EQ(m_pool->rendererDestroys, 0);
+  EXPECT_EQ(rendererFlushes, 0);
 
-  // A frame without it
+  // A frame without it releases its textures, and the same renderer draws again
   manager.FrameMove();
   manager.FrameMove();
   RenderControl();
-  EXPECT_EQ(m_pool->rendererDestroys, 1);
-  EXPECT_EQ(m_pool->rendererCreates, 2);
+  EXPECT_EQ(rendererFlushes, 1);
+  EXPECT_EQ(m_pool->rendererCreates, 1);
+  EXPECT_EQ(m_pool->rendererDestroys, 0);
 }
 
 TEST_F(TestRPRenderManager, SoftwareCallsDoNotBindPools)

@@ -21188,7 +21188,13 @@ msgctxt "#35765"
 msgid "Unrated"
 msgstr ""
 
-#empty strings from id 35766 to 35999
+#. Shown when Encore mode is switched on or off during a game
+#: xbmc/games/addons/cheevos/GameClientCheevos.cpp
+msgctxt "#35766"
+msgid "Applies the next time you load the game."
+msgstr ""
+
+#empty strings from id 35767 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

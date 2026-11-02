@@ -258,6 +258,7 @@ private:
   std::shared_ptr<CRenderBezel> GetBezel();
 
   void CheckFlush();
+  void ReleaseUnusedTextures();
   void DestroyContextInternal();
 
   /*!
