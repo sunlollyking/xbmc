@@ -207,8 +207,8 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
   // The screen's refresh rate follows its vblanks, whether or not videos are
   // synced to the display
   m_displayClock = std::make_unique<CVideoReferenceClock>(true);
-  m_processInfo->GetDisplayPacing().SetRefreshRateSource(
-      [clock = m_displayClock.get()] { return clock->GetRefreshRate(); });
+  m_processInfo->GetDisplayPacing().SetRefreshRateSource([clock = m_displayClock.get()]
+                                                         { return clock->GetRefreshRate(); });
   m_processInfo->GetDisplayPacing().SetEnabled(
       m_gameServices.GameSettings().SyncPlaybackToDisplay());
   m_processInfo->GetDisplayPacing().SetMaxRateDifference(
@@ -323,6 +323,8 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
       m_gameClient->Unload();
     m_gameClient.reset();
     m_streamManager.reset();
+    m_processInfo->GetDisplayPacing().SetRefreshRateSource({});
+    m_displayClock.reset();
   }
 
   return bSuccess;

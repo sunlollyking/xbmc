@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "language/Territory.h"
+
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -105,7 +107,7 @@ enum class ReleaseStatus
   DEMO,
   ALPHA,
   KIOSK,
-  DEBUG,
+  DEBUG_BUILD,
   PROGRAM,
 };
 
@@ -149,6 +151,37 @@ enum class MatchMethod
   GAMELIST,
   NAME,
   MANUAL,
+};
+
+/*!
+ * \ingroup games
+ * \brief Where a release was sold, as its file name gives it
+ *
+ * A country or area is a territory: "US", or "150" for Europe as UN M.49
+ * codes it. A market no territory names exactly keeps the convention's own
+ * word: No-Intro's "World" is the three big release markets, not every
+ * country, and its "Scandinavia" isn't Northern Europe.
+ */
+struct GameRegion
+{
+  LANGUAGE::CTerritory territory;
+  std::string market;
+
+  //! \brief A region from a territory's code, or a market's name when territory is empty
+  static GameRegion Make(std::string_view territory, std::string_view market = {})
+  {
+    return {LANGUAGE::CTerritory::FromCode(territory), std::string(market)};
+  }
+
+  //! \brief The territory's code, or the market's name
+  std::string ToString() const
+  {
+    return territory.ToString().empty() ? market : territory.ToString();
+  }
+
+  bool IsEmpty() const { return territory.ToString().empty() && market.empty(); }
+
+  bool operator==(const GameRegion& other) const = default;
 };
 
 /*!

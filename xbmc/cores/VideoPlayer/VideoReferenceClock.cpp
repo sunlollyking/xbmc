@@ -49,7 +49,7 @@ CVideoReferenceClock::~CVideoReferenceClock()
 void CVideoReferenceClock::Start()
 {
   if ((m_alwaysRun || CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-                         CSettings::SETTING_VIDEOPLAYER_USEDISPLAYASCLOCK)) &&
+                          CSettings::SETTING_VIDEOPLAYER_USEDISPLAYASCLOCK)) &&
       !IsRunning())
     Create();
 }

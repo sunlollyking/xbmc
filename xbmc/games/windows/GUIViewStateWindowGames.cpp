@@ -10,6 +10,7 @@
 
 #include "FileItem.h"
 #include "FileItemList.h"
+#include "ServiceBroker.h"
 #include "games/GameUtils.h"
 #include "games/library/GameDbUrl.h"
 #include "guilib/WindowIDs.h"
@@ -18,6 +19,8 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "settings/MediaSourceSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "view/ViewState.h"
@@ -98,8 +101,10 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   }
   else
   {
-    AddSortMethod(SortBy::FILE, 561, LABEL_MASKS("%F", "%I", "%L", ""),
-                  byTitle); // Filename, Size | Label, empty
+    AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%L", "%I", "%L", ""),
+                  byTitle); // Label, Size | Label, empty
+    AddSortMethod(SortBy::FILE, 561,
+                  LABEL_MASKS("%L", "%I", "%L", "")); // Label, Size | Label, empty
     AddSortMethod(SortBy::SIZE, 553,
                   LABEL_MASKS("%L", "%I", "%L", "%I")); // Filename, Size | Label, Size
 

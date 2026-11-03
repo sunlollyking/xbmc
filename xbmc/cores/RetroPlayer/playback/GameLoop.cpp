@@ -106,6 +106,7 @@ void CGameLoop::Process(void)
   {
     if (m_quiesceRequested.load())
     {
+      StopPacing();
       m_quiescedEvent.Set();
       m_sleepEvent.Wait(PAUSE_SLEEP);
       continue;
@@ -126,6 +127,8 @@ void CGameLoop::Process(void)
     // If the game is paused, wait before checking again
     if (m_loopSpeedFactor == 0.0)
     {
+      StopPacing();
+
       // Wait for a long duration if paused
       m_sleepEvent.Wait(PAUSE_SLEEP);
     }

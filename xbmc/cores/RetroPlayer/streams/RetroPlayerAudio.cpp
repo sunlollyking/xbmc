@@ -189,6 +189,7 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
       if (delaySecs > floorSecs + MAX_DELAY)
       {
         m_pAudioStream->Flush();
+        // The flush puts the stream back to its own rate
         m_resampleRatio = 1.0;
         m_settledSecs = 0.0;
         skipFrames = 0;

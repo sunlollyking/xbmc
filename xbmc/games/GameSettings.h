@@ -41,6 +41,7 @@ public:
   void SetShowOSDHelp(bool bShow);
   void ToggleGames();
   bool AutosaveEnabled();
+  bool ReplaceLabels();
   bool RewindEnabled();
   unsigned int MaxRewindTimeSec();
   bool RunaheadEnabled() const;

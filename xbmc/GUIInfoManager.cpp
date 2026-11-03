@@ -11644,7 +11644,9 @@ int CGUIInfoManager::TranslateSingleString(const std::string& strCondition, bool
           uint32_t place = 0;
           const auto [end, error] =
               std::from_chars(param.data(), param.data() + param.size(), place);
-          if (error != std::errc{} || end != param.data() + param.size() || place == 0)
+          // CGUIInfo keeps flags in the top 8 bits of its data
+          if (error != std::errc{} || end != param.data() + param.size() || place == 0 ||
+              place >= (1u << 24))
             return 0;
 
           return AddMultiInfo(CGUIInfo(i.val, place));

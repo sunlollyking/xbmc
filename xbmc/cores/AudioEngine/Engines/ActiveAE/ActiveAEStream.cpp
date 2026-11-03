@@ -476,7 +476,7 @@ void CActiveAEStream::Flush()
     m_currentBuffer = NULL;
     m_leftoverBytes = 0;
     m_activeAE->FlushStream(this);
-    // Flushing puts the engine's resample ratio back to 1.0
+    // The engine resets the ratio on a flush, so a request for the old one has to get through
     m_streamResampleRatio = 1.0;
     m_streamIsFlushed = true;
   }
