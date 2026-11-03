@@ -20,6 +20,7 @@
 #include "dialogs/GUIDialogProgress.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
+#include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/GameDatabaseDirectory.h"
@@ -36,8 +37,10 @@
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
 #include "input/actions/ActionIDs.h"
+#include "interfaces/AnnouncementManager.h"
 #include "media/MediaLockState.h"
 #include "messaging/ApplicationMessenger.h"
+#include "messaging/helpers/DialogOKHelper.h"
 #include "playlists/PlayListFileItemClassify.h"
 #include "playlists/PlayListTypes.h"
 #include "resources/LocalizeStrings.h"
@@ -289,9 +292,16 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
           buttons.Add(CONTEXT_BUTTON_SCAN, 35540); // "Scan to library"
       }
 
-      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-              CSettings::SETTING_FILELISTS_ALLOWFILEDELETION) &&
-          !item->IsReadOnly())
+      // A library game is taken out of the library, as a film is; deleting or
+      // renaming its file would leave the library pointing at nothing
+      if (item->HasProperty("gameid") && !item->HasProperty("releaseid"))
+      {
+        buttons.Add(CONTEXT_BUTTON_DELETE, 646); // "Remove from library"
+      }
+      else if (!item->HasProperty("releaseid") &&
+               CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+                   CSettings::SETTING_FILELISTS_ALLOWFILEDELETION) &&
+               !item->IsReadOnly())
       {
         buttons.Add(CONTEXT_BUTTON_DELETE, 117);
         buttons.Add(CONTEXT_BUTTON_RENAME, 118);
@@ -392,7 +402,10 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
         return true;
       }
       case CONTEXT_BUTTON_DELETE:
-        OnDeleteItem(itemNumber);
+        if (item->HasProperty("gameid"))
+          OnRemoveFromLibrary(itemNumber);
+        else
+          OnDeleteItem(itemNumber);
         return true;
       case CONTEXT_BUTTON_RENAME:
         OnRenameItem(itemNumber);
@@ -595,6 +608,36 @@ void CGUIWindowGames::OnItemInfo(int itemNumber)
     if (item->IsPlugin() || item->IsScript())
       CGUIDialogAddonInfo::ShowForItem(item);
   }
+}
+
+void CGUIWindowGames::OnRemoveFromLibrary(int itemNumber)
+{
+  CFileItemPtr item = m_vecItems->Get(itemNumber);
+  if (!item)
+    return;
+
+  if (CGameLibraryQueue::GetInstance().IsRunning())
+  {
+    MESSAGING::HELPERS::ShowOKDialogText(CVariant{257}, CVariant{14057});
+    return;
+  }
+
+  const std::string question = StringUtils::Format(
+      CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(433), item->GetLabel());
+  if (!CGUIDialogYesNo::ShowAndGetInput(CVariant{646}, CVariant{question}))
+    return;
+
+  const int idGame = static_cast<int>(item->GetProperty("gameid").asInteger());
+  CGameDatabase db;
+  if (!db.Open() || !db.DeleteGame(idGame))
+    return;
+
+  CVariant data;
+  data["id"] = idGame;
+  data["type"] = "game";
+  CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::GameLibrary, "OnRemove", data);
+
+  Refresh(true);
 }
 
 void CGUIWindowGames::ChooseVersionAndPlay(int idGame)
