@@ -57,6 +57,16 @@ using namespace GAME;
 
 namespace
 {
+// The library keeps a release's regions by name, "USA" or "Europe"
+std::vector<std::string> RegionNames(const std::vector<GameRegion>& regions)
+{
+  std::vector<std::string> names;
+  names.reserve(regions.size());
+  for (const GameRegion& region : regions)
+    names.emplace_back(CGameNameParser::RegionName(region));
+  return names;
+}
+
 // Containers and sheets every platform may use, beside its own extensions
 constexpr std::array<const char*, 8> commonExtensions{"zip", "7z", "cue", "gdi", "m3u",
                                                       "chd", "iso", "bin"};
@@ -594,7 +604,7 @@ void CGameInfoScanner::FillRequest(const Entry& entry,
   request.serial = identity.serial;
   request.raHash = identity.raHash;
   request.size = identity.size;
-  request.regions = parsed.regions;
+  request.regions = RegionNames(parsed.regions);
   request.preferredRegions = PolicyFromSettings().GetRegionPriority();
   request.languages = parsed.languages;
   request.year = parsed.year;
@@ -1279,7 +1289,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
 
   GameRelease release;
   release.title = parsed.title;
-  release.regions = parsed.regions;
+  release.regions = RegionNames(parsed.regions);
   release.languages = parsed.languages;
   if (!parsed.translation.empty())
     release.languages.emplace_back(parsed.translation);
