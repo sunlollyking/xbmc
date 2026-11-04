@@ -252,6 +252,9 @@ public:
    * \brief The string a machine's kind and its medium go by on screen
    */
   static int PlatformTypeLabel(PlatformType type);
+
+  //! \brief Whether a word names what a related game can be to another
+  static bool IsRelationKind(std::string_view kind);
   static int MediaFormatLabel(MediaFormat format);
 };
 
@@ -275,6 +278,18 @@ struct GameAgeRating
   std::string board; // e.g. "ESRB", "PEGI", "CERO"
   std::string value; // e.g. "E", "12", "A"
   std::string descriptors; // e.g. "Mild Violence"
+};
+
+/*!
+ * \ingroup games
+ * \brief Another game a catalogue relates to this one, and what it is to it
+ */
+struct GameRelation
+{
+  std::string kind; // "remake", "remaster", "port", "dlc", "expansion" or "original"
+  std::string title;
+
+  bool operator==(const GameRelation&) const = default;
 };
 
 /*!

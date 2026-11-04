@@ -124,6 +124,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "series": "Sonic the Hedgehog",
   "tags": [],
   "similar": ["Sonic the Hedgehog 3"],
+  "related": [{"kind": "port", "title": "Sonic the Hedgehog 2 (8-bit)"}],
   "players": {"min": 1, "max": 2},
   "coop": true,
   "coopplayers": 2,
@@ -151,7 +152,9 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
 Every key is optional except `version` and `title`. `timetobeat` is how long
 players take, in seconds: `main` for the main story, `extras` for that and what
 is around it, `complete` for everything. `similar` names
-games like this one, matched by title to the games in the library.
+games like this one, matched by title to the games in the library, and
+`related` the games that are something to it: a `remake`, `remaster`, `port`,
+`dlc` or `expansion` of it, or the `original` an add-on belongs to.
 `coopplayers` is how many can play
 together in co-op on one machine; `dropin` says a player can join or leave at
 any time, and `splitscreen` that players share one screen split between them.

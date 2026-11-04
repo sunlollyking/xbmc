@@ -266,6 +266,16 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
                                   "titleKey FROM game_link WHERE idGame = %i AND kind = 'similar')",
                                   idGame, idGame));
   }
+  if (const CVariant* v = option("relatedto"))
+  {
+    // Both ways: what this game names, and the games that name this one
+    const int idGame = static_cast<int>(v->asInteger());
+    filter.AppendWhere(PrepareSQL(
+        "game_view.idGame <> %i AND (game_view.titleKey IN (SELECT titleKey FROM game_link WHERE "
+        "idGame = %i AND kind <> 'similar') OR game_view.idGame IN (SELECT idGame FROM game_link "
+        "WHERE kind <> 'similar' AND titleKey = (SELECT titleKey FROM game WHERE idGame = %i)))",
+        idGame, idGame, idGame));
+  }
   if (const CVariant* v = option("seriesid"))
     filter.AppendWhere(PrepareSQL("game_view.idSeries = %i", static_cast<int>(v->asInteger())));
   if (const CVariant* v = option("year"))

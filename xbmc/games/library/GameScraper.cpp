@@ -525,6 +525,18 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetTags(Strings(payload["tags"]));
   if (payload.isMember("similar"))
     details.SetSimilar(Strings(payload["similar"]));
+  if (payload["related"].isArray())
+  {
+    std::vector<GameRelation> related;
+    for (auto it = payload["related"].begin_array(); it != payload["related"].end_array(); ++it)
+    {
+      const std::string kind = (*it)["kind"].asString();
+      const std::string relatedTitle = (*it)["title"].asString();
+      if (CGameLibraryTypes::IsRelationKind(kind) && !relatedTitle.empty())
+        related.push_back({kind, relatedTitle});
+    }
+    details.SetRelated(related);
+  }
   if (payload["players"].isObject())
   {
     details.SetPlayers(static_cast<int>(payload["players"]["min"].asInteger()),

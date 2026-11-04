@@ -5183,6 +5183,7 @@
         "seriesid",
         "tags",
         "similar",
+        "related",
         "players",
         "playersmin",
         "playersmax",
@@ -5360,6 +5361,22 @@
           "type": "string"
         },
         "description": "Games like this one, by name"
+      },
+      "related": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["remake", "remaster", "port", "dlc", "expansion", "original"]
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Remakes, ports, add-ons and the like of this game, by name"
       },
       "players": {
         "type": "integer"
