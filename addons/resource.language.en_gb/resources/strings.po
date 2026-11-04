@@ -21225,7 +21225,30 @@ msgctxt "#35777"
 msgid "100%: {0:s}"
 msgstr ""
 
-#empty strings from id 35778 to 35999
+#. The run of games a game belongs to, such as Mario Kart
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35778"
+msgid "Series"
+msgstr ""
+
+#. Description of the list of game series
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35779"
+msgid "Games grouped by the series they belong to, in the order they came out."
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35780"
+msgid "Show a series as one entry"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#35781"
+msgid "Games of the same series, such as Mario Kart, show as one entry in the list of titles, as movies in a set do. Open it to see the games."
+msgstr ""
+
+#empty strings from id 35782 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

@@ -141,8 +141,8 @@ JSONRPC_STATUS CGameLibrary::GetGames(const std::string& method,
   if (!url.FromString(base))
     return InternalError;
 
-  for (const char* key : {"genreid", "developerid", "publisherid", "collectionid", "tagid", "year",
-                          "players"})
+  for (const char* key : {"genreid", "developerid", "publisherid", "collectionid", "seriesid",
+                          "tagid", "year", "players"})
   {
     if (filter.isMember(key))
       url.AddOption(key, static_cast<int>(filter[key].asInteger()));

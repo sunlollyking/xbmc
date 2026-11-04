@@ -234,6 +234,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   written.SetDevelopers({"Team Kodi", "Someone Else"});
   written.SetPublishers({"Nobody"});
   written.SetCollections({"Test Bros."});
+  written.SetSeries("Test Bros.");
   written.SetTags({"verified"});
   written.SetPlayers(1, 4);
   written.SetCoop(true);
@@ -266,6 +267,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   EXPECT_EQ(read.GetDevelopers(), written.GetDevelopers());
   EXPECT_EQ(read.GetPublishers(), written.GetPublishers());
   EXPECT_EQ(read.GetCollections(), written.GetCollections());
+  EXPECT_EQ(read.GetSeries(), "Test Bros.");
   EXPECT_EQ(read.GetTags(), written.GetTags());
   EXPECT_EQ(read.GetPlayersMin(), 1);
   EXPECT_EQ(read.GetPlayersMax(), 4);

@@ -59,7 +59,9 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   {
     if (items.GetContent() == "games" || items.GetContent() == "releases")
     {
-      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y"), byTitle); // Title, Year
+      // A series folded into the titles sorts among them, as a movie set does
+      const auto titles = static_cast<SortAttribute>(byTitle | SortAttributeIgnoreFolders);
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y"), titles); // Title, Year
       AddSortMethod(SortBy::YEAR, 562, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
       AddSortMethod(SortBy::RATING, 563, LABEL_MASKS("%T", "%R", "%T", "%R"));
       AddSortMethod(SortBy::USER_RATING, 38018, LABEL_MASKS("%T", "%r", "%T", "%r"));
@@ -97,6 +99,8 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
         SetSortMethod(SortBy::TIME, SortOrder::DESCENDING);
       else if (list == "recentlyadded")
         SetSortMethod(SortBy::DATE_ADDED, SortOrder::DESCENDING);
+      else if (url.HasOption("seriesid"))
+        SetSortMethod(SortBy::YEAR, SortOrder::ASCENDING);
     }
   }
   else

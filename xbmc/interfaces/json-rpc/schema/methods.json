@@ -5574,6 +5574,16 @@
           {
             "type": "object",
             "properties": {
+              "seriesid": {
+                "$ref": "Library.Id",
+                "required": true
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
               "tagid": {
                 "$ref": "Library.Id",
                 "required": true
@@ -5851,6 +5861,46 @@
           "required": true
         },
         "collections": {
+          "type": "array",
+          "items": {
+            "$ref": "Library.Details.Genre"
+          }
+        }
+      }
+    }
+  },
+  "GameLibrary.GetSeries": {
+    "type": "method",
+    "description": "Retrieve the series in the library, each with its game count",
+    "transport": "Response",
+    "permission": "ReadData",
+    "params": [
+      {
+        "name": "platformid",
+        "$ref": "Library.Id",
+        "description": "Limit to one platform"
+      },
+      {
+        "name": "properties",
+        "$ref": "Library.Fields.Genre"
+      },
+      {
+        "name": "limits",
+        "$ref": "List.Limits"
+      },
+      {
+        "name": "sort",
+        "$ref": "List.Sort"
+      }
+    ],
+    "returns": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "List.LimitsReturned",
+          "required": true
+        },
+        "series": {
           "type": "array",
           "items": {
             "$ref": "Library.Details.Genre"

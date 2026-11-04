@@ -179,6 +179,7 @@ JsonRpcMethodMap CJSONServiceDescription::m_methodMaps[] = {
   { "GameLibrary.GetDevelopers",                    CGameLibrary::GetFacet },
   { "GameLibrary.GetPublishers",                    CGameLibrary::GetFacet },
   { "GameLibrary.GetCollections",                   CGameLibrary::GetFacet },
+  { "GameLibrary.GetSeries",                        CGameLibrary::GetFacet },
   { "GameLibrary.GetTags",                          CGameLibrary::GetFacet },
   { "GameLibrary.GetYears",                         CGameLibrary::GetFacet },
   { "GameLibrary.GetRegions",                       CGameLibrary::GetFacet },

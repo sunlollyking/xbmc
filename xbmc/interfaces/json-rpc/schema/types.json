@@ -5179,6 +5179,8 @@
         "publishers",
         "genres",
         "collections",
+        "series",
+        "seriesid",
         "tags",
         "players",
         "playersmin",
@@ -5336,6 +5338,13 @@
       },
       "collections": {
         "$ref": "Array.String"
+      },
+      "series": {
+        "type": "string",
+        "description": "The run of games this one belongs to, such as Mario Kart"
+      },
+      "seriesid": {
+        "$ref": "Library.Id"
       },
       "tags": {
         "$ref": "Array.String"

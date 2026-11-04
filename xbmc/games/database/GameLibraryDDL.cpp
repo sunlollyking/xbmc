@@ -115,7 +115,8 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "beaten bool, "
                   "timeToBeatMain integer, "
                   "timeToBeatExtras integer, "
-                  "timeToBeatComplete integer)");
+                  "timeToBeatComplete integer, "
+                  "idSeries integer)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -228,6 +229,7 @@ void CGameLibraryDDL::CreateIndexes(CDatabase& db)
   db.ExecuteQuery("CREATE INDEX ix_game_4 ON game (idPlatform, year)");
   db.ExecuteQuery("CREATE INDEX ix_game_5 ON game (dateAdded)");
   db.ExecuteQuery("CREATE INDEX ix_game_6 ON game (idPlatform, titleKey(255))");
+  db.ExecuteQuery("CREATE INDEX ix_game_7 ON game (idSeries)");
 
   db.ExecuteQuery("CREATE INDEX ix_release_1 ON gamerelease (idGame)");
 
@@ -296,7 +298,8 @@ void CGameLibraryDDL::CreateViews(CDatabase& db)
       "r.idRelease WHERE r.idGame = game.idGame) AS playTime, "
       "df.idFile AS idFile, "
       "df.strFilename AS strFilename, "
-      "dp.strPath AS strPath "
+      "dp.strPath AS strPath, "
+      "series.name AS seriesName "
       "FROM game "
       "JOIN platform ON platform.idPlatform = game.idPlatform "
       "LEFT JOIN gamerelease rel ON rel.idRelease = game.idDefaultRelease "
@@ -304,7 +307,8 @@ void CGameLibraryDDL::CreateViews(CDatabase& db)
       "game.idDefaultRelease ORDER BY f.discNumber, f.idFile LIMIT 1) "
       "LEFT JOIN path dp ON dp.idPath = df.idPath "
       "LEFT JOIN rating ON rating.rating_id = game.idDefaultRating "
-      "LEFT JOIN uniqueid ON uniqueid.uniqueid_id = game.idDefaultUniqueId");
+      "LEFT JOIN uniqueid ON uniqueid.uniqueid_id = game.idDefaultUniqueId "
+      "LEFT JOIN collection series ON series.idCollection = game.idSeries");
 
   // A release with the game and platform it belongs to and its first file
   db.ExecuteQuery(
@@ -358,6 +362,7 @@ void CGameLibraryDDL::CreateTriggers(CDatabase& db)
 
   db.ExecuteQuery("CREATE TRIGGER delete_collection AFTER DELETE ON collection FOR EACH ROW BEGIN "
                   "DELETE FROM collection_link WHERE idCollection = old.idCollection; "
+                  "UPDATE game SET idSeries = NULL WHERE idSeries = old.idCollection; "
                   "DELETE FROM art WHERE media_id = old.idCollection AND media_type "
                   "= 'gamecollection'; "
                   "DELETE FROM uniqueid WHERE media_id = old.idCollection AND media_type "
@@ -427,6 +432,14 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN timeToBeatComplete integer");
     db.ExecuteQuery("UPDATE game SET beaten = completed, timeToBeatMain = 0, timeToBeatExtras = 0, "
                     "timeToBeatComplete = 0");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
+  }
+
+  // 12: the series a game belongs to, one of its collections. The game view
+  // lists the game's columns and names the series, so it is rebuilt too.
+  if (version < 12)
+  {
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN idSeries integer");
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
 }

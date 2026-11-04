@@ -106,6 +106,10 @@
 							<param name="info" value="ListItem.Genre" />
 						</include>
 						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35778]" />
+							<param name="info" value="ListItem.Property(series)" />
+						</include>
+						<include content="GameInfoFact">
 							<param name="label" value="$LOCALIZE[35525]" />
 							<param name="info" value="ListItem.Players" />
 						</include>
@@ -120,6 +124,7 @@
 						<include content="GameInfoFact">
 							<param name="label" value="$LOCALIZE[35543]" />
 							<param name="info" value="ListItem.ReleaseCount" />
+							<param name="visible" value="Integer.IsGreater(ListItem.ReleaseCount,1)" />
 						</include>
 						<control type="group">
 							<height>31</height>
@@ -370,6 +375,12 @@
 						<param name="icon" value="icons/infodialogs/versions.png" />
 						<param name="label" value="$LOCALIZE[35543]" />
 						<param name="visible" value="Integer.IsGreater(ListItem.ReleaseCount,1)" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="18" />
+						<param name="icon" value="icons/infodialogs/set.png" />
+						<param name="label" value="$LOCALIZE[35778]" />
+						<param name="visible" value="!String.IsEmpty(ListItem.Property(seriesid))" />
 					</include>
 					<include content="InfoDialogButton">
 						<param name="id" value="16" />
