@@ -120,7 +120,8 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "highScores text, "
                   "dropIn bool, "
                   "splitScreen bool, "
-                  "coopPlayers integer)");
+                  "coopPlayers integer, "
+                  "languages text)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -479,4 +480,12 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   // 15: games a catalogue names for this one, such as games like it
   if (version < 15)
     CreateGameLinkTable(db);
+
+  // 16: the languages a game can be played in. The game view lists the game's
+  // columns, so it is rebuilt too.
+  if (version < 16)
+  {
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN languages text");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
+  }
 }

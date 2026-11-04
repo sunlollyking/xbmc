@@ -1,5 +1,6 @@
 set(SOURCES TestGameArt.cpp
             TestGameAgeContent.cpp
+            TestGameLanguages.cpp
             TestGameManual.cpp
             TestGameSeries.cpp
             TestGameThumbLoader.cpp

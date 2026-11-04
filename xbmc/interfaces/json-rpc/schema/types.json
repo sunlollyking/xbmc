@@ -5184,6 +5184,7 @@
         "tags",
         "similar",
         "related",
+        "languagesupport",
         "players",
         "playersmin",
         "playersmax",
@@ -5377,6 +5378,27 @@
           }
         },
         "description": "Remakes, ports, add-ons and the like of this game, by name"
+      },
+      "languagesupport": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "language": {
+              "type": "string"
+            },
+            "audio": {
+              "type": "boolean"
+            },
+            "subtitles": {
+              "type": "boolean"
+            },
+            "interface": {
+              "type": "boolean"
+            }
+          }
+        },
+        "description": "The languages the game can be played in: spoken, subtitled or in its menus"
       },
       "players": {
         "type": "integer"

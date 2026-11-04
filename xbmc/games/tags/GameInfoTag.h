@@ -191,6 +191,10 @@ public:
   //! \brief Remakes, ports, add-ons and the like of this game, by name
   const std::vector<GameRelation>& GetRelated() const { return m_related; }
   void SetRelated(const std::vector<GameRelation>& related) { m_related = related; }
+
+  //! \brief The languages the game can be played in, and how
+  const std::vector<GameLanguage>& GetLanguages() const { return m_languages; }
+  void SetLanguages(const std::vector<GameLanguage>& languages) { m_languages = languages; }
   ///@}
 
   /*!
@@ -407,6 +411,7 @@ private:
   std::vector<std::string> m_tags;
   std::vector<std::string> m_similar;
   std::vector<GameRelation> m_related;
+  std::vector<GameLanguage> m_languages;
 
   // Play facts
   int m_playersMin;

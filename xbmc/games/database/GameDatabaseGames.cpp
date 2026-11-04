@@ -159,6 +159,8 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
       m_pDS->exec(PrepareSQL("INSERT INTO game_link (idGame, kind, title, titleKey) VALUES (%i, "
                              "'similar', '%s', '%s')",
                              idGame, title.c_str(), CGameLibraryTypes::TitleKey(title).c_str()));
+    m_pDS->exec(PrepareSQL("UPDATE game SET languages = '%s' WHERE idGame = %i",
+                           SerializeLanguages(details.GetLanguages()).c_str(), idGame));
     m_pDS->exec(PrepareSQL(
         "UPDATE game SET dropIn = %i, splitScreen = %i, coopPlayers = %i WHERE idGame = %i",
         details.IsDropIn() ? 1 : 0, details.IsSplitScreen() ? 1 : 0, details.GetCoopPlayers(),
@@ -563,6 +565,7 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   details.SetDropIn(record->at(GAMEDB_DROP_IN).get_asBool());
   details.SetSplitScreen(record->at(GAMEDB_SPLIT_SCREEN).get_asBool());
   details.SetCoopPlayers(record->at(GAMEDB_COOP_PLAYERS).get_asInt());
+  details.SetLanguages(DeserializeLanguages(record->at(GAMEDB_LANGUAGES).get_asString()));
   details.SetCategory(
       CGameLibraryTypes::GameCategoryFromString(record->at(GAMEDB_CATEGORY).get_asString()));
   details.SetParentGameId(record->at(GAMEDB_PARENT_GAME_ID).get_asInt());
