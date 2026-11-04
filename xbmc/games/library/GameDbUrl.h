@@ -37,6 +37,7 @@ enum class GameDbNode
   DEVELOPERS,
   PUBLISHERS,
   COLLECTIONS,
+  SERIES,
   TAGS,
   REGIONS,
   PLAYERS,
@@ -59,8 +60,8 @@ enum class GameDbNode
  *   gamedb://[platforms/<id>/]<list>/
  *   gamedb://collections/<id>/
  *
- * A facet is genres, years, developers, publishers, collections, tags,
- * regions, players, ageratings or categories, and choosing a value lists the
+ * A facet is genres, years, developers, publishers, collections, series,
+ * tags, regions, players, ageratings or categories, and choosing a value lists the
  * games that have it. A list is a ready-made selection: recentlyadded,
  * recentlyplayed, neverplayed, favourites, beaten, completed, multiplayer, coop,
  * achievements, inprogress, hacks or homebrew.
@@ -96,6 +97,12 @@ public:
   bool HasPlatform() const { return HasOption("platformid"); }
 
   /*!
+   * \brief Whether the URL lists every title, unfiltered: titles/ at the root
+   *        or under a platform
+   */
+  bool IsTitles() const { return m_titles && !HasOption("xsp") && !HasOption("filter"); }
+
+  /*!
    * \brief The facets a node offers, in display order
    */
   static const std::vector<std::string_view>& GetFacetNames();
@@ -123,6 +130,7 @@ private:
   GameDbNode m_node{GameDbNode::NONE};
   std::string m_itemType;
   std::string m_list;
+  bool m_titles{false};
 };
 } // namespace GAME
 } // namespace KODI

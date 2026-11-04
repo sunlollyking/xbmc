@@ -128,6 +128,48 @@ std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& releas
   return StringUtils::Join(parts, " \u00b7 ");
 }
 
+/*!
+ * \brief Give an item a game's pictures, with the stand-ins a game with no
+ *        cover or backdrop is drawn with
+ */
+void SetGameArt(CFileItem& item, const KODI::ART::Artwork& art)
+{
+  item.SetArt(art);
+
+  // Skins draw their backdrop from fanart, and games almost never have
+  // any: of this library's 30,000, a couple of hundred do. Nearly all of
+  // them have a picture of themselves running, though, which is the same
+  // thing for this purpose. Declared as a fallback rather than written
+  // in, so nothing here claims to be fanart that isn't.
+  if (art.find("fanart") == art.end())
+  {
+    for (const char* type : {"screenshot", "titlescreen"})
+    {
+      if (art.find(type) != art.end())
+      {
+        item.SetArtFallback("fanart", type);
+        break;
+      }
+    }
+  }
+
+  // The same stand-ins the thumb loader gives a game with no cover, so a
+  // widget shows it as the library window does
+  if (art.find("poster") == art.end() && art.find("boxfront") != art.end())
+    item.SetArtFallback("poster", "boxfront");
+  if (art.find("thumb") == art.end())
+  {
+    for (const char* type : {"boxfront", "clearlogo", "titlescreen", "screenshot"})
+    {
+      if (art.find(type) != art.end())
+      {
+        item.SetArtFallback("thumb", type);
+        break;
+      }
+    }
+  }
+}
+
 //! A time to beat in whole hours, or in minutes under an hour
 std::string TimeToBeatLabel(int seconds)
 {
@@ -216,6 +258,8 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendWhere(
         PrepareSQL("collection_link.idCollection = %i", static_cast<int>(v->asInteger())));
   }
+  if (const CVariant* v = option("seriesid"))
+    filter.AppendWhere(PrepareSQL("game_view.idSeries = %i", static_cast<int>(v->asInteger())));
   if (const CVariant* v = option("year"))
     filter.AppendWhere(PrepareSQL("game_view.year = %i", static_cast<int>(v->asInteger())));
   if (const CVariant* v = option("players"))
@@ -471,6 +515,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
         item->SetOverlayImage(CGUIListItem::ICON_OVERLAY_WATCHED);
       }
       SetCompletionProperties(*item, game);
+      SetSeriesProperties(*item, game);
       if (game.GetPlayTime() > 0)
         item->SetProperty("playtime", StringUtils::SecondsToTimeString(game.GetPlayTime(),
                                                                        TIME_FORMAT_HH_MM));
@@ -499,41 +544,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
         if (found == art.end())
           continue;
 
-        item->SetArt(found->second);
-
-        // Skins draw their backdrop from fanart, and games almost never have
-        // any: of this library's 30,000, a couple of hundred do. Nearly all of
-        // them have a picture of themselves running, though, which is the same
-        // thing for this purpose. Declared as a fallback rather than written
-        // in, so nothing here claims to be fanart that isn't.
-        if (found->second.find("fanart") == found->second.end())
-        {
-          for (const char* type : {"screenshot", "titlescreen"})
-          {
-            if (found->second.find(type) != found->second.end())
-            {
-              item->SetArtFallback("fanart", type);
-              break;
-            }
-          }
-        }
-
-        // The same stand-ins the thumb loader gives a game with no cover, so a
-        // widget shows it as the library window does
-        if (found->second.find("poster") == found->second.end() &&
-            found->second.find("boxfront") != found->second.end())
-          item->SetArtFallback("poster", "boxfront");
-        if (found->second.find("thumb") == found->second.end())
-        {
-          for (const char* type : {"boxfront", "clearlogo", "titlescreen", "screenshot"})
-          {
-            if (found->second.find(type) != found->second.end())
-            {
-              item->SetArtFallback("thumb", type);
-              break;
-            }
-          }
-        }
+        SetGameArt(*item, found->second);
       }
     }
 
@@ -579,6 +590,157 @@ void CGameDatabase::SetCompletionProperties(CFileItem& item, const CGameInfoTag&
   SetTimeToBeatProperties(item, game.GetTimeToBeat());
 }
 
+void CGameDatabase::SetSeriesProperties(CFileItem& item, const CGameInfoTag& game)
+{
+  item.ClearProperty("series");
+  item.ClearProperty("seriesid");
+  if (game.GetSeriesId() > 0 && !game.GetSeries().empty())
+  {
+    item.SetProperty("series", game.GetSeries());
+    item.SetProperty("seriesid", game.GetSeriesId());
+  }
+}
+
+namespace
+{
+//! Where a series opens: within the platform the list was scoped to, if any
+std::string SeriesPath(const CGameDbUrl& url, int idSeries)
+{
+  std::string path = "gamedb://";
+  if (CVariant platformId; url.GetOption("platformid", platformId))
+    path += "platforms/" + std::to_string(platformId.asInteger()) + "/";
+  return path + "series/" + std::to_string(idSeries) + "/";
+}
+
+std::shared_ptr<CFileItem> SeriesItem(const std::string& name,
+                                      const std::string& path,
+                                      int idSeries,
+                                      int count)
+{
+  auto item = std::make_shared<CFileItem>(name);
+  item->SetPath(path);
+  item->SetFolder(true);
+  item->SetLabelPreformatted(true);
+  item->SetLabel2(std::to_string(count));
+  item->SetProperty("gamecount", count);
+  item->SetProperty("seriesid", idSeries);
+  return item;
+}
+} // namespace
+
+bool CGameDatabase::GetSeriesNav(const std::string& baseDir, CFileItemList& items)
+{
+  try
+  {
+    CGameDbUrl url;
+    if (!url.FromString(baseDir))
+      return false;
+
+    Filter scope;
+    SortDescription sorting;
+    if (!GetFilter(url, scope, sorting))
+      return false;
+
+    // Every game in scope that is in a series, earliest first, so each series
+    // is counted and pictured by its first game
+    const std::string sql =
+        "SELECT game_view.idSeries, game_view.seriesName, game_view.idGame FROM game_view " +
+        scope.join + " WHERE game_view.idSeries > 0" +
+        (scope.where.empty() ? "" : " AND " + scope.where) +
+        " ORDER BY game_view.year = 0, game_view.year, game_view.releaseDate, game_view.idGame";
+
+    struct Series
+    {
+      std::string name;
+      int firstGame{-1};
+      int count{0};
+    };
+    std::vector<int> order;
+    std::map<int, Series> series;
+    if (m_pDS->query(sql))
+    {
+      while (!m_pDS->eof())
+      {
+        const int id = m_pDS->fv(0).get_asInt();
+        const auto [it, added] = series.try_emplace(id);
+        if (added)
+        {
+          it->second.name = m_pDS->fv(1).get_asString();
+          it->second.firstGame = m_pDS->fv(2).get_asInt();
+          order.emplace_back(id);
+        }
+        ++it->second.count;
+        m_pDS->next();
+      }
+      m_pDS->close();
+    }
+
+    std::vector<int> firstGames;
+    firstGames.reserve(order.size());
+    for (const int id : order)
+      firstGames.emplace_back(series[id].firstGame);
+    std::map<int, KODI::ART::Artwork> art;
+    GetArtForItems(firstGames, KODI::MEDIA::TYPE::GAME, art);
+
+    for (const int id : order)
+    {
+      const Series& entry = series[id];
+      const auto item = SeriesItem(entry.name, SeriesPath(url, id), id, entry.count);
+      if (const auto found = art.find(entry.firstGame); found != art.end())
+        SetGameArt(*item, found->second);
+      items.Add(item);
+    }
+
+    items.SetContent("series");
+    return true;
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: Failed to list {}", baseDir);
+  }
+  return false;
+}
+
+void CGameDatabase::FoldSeries(const CGameDbUrl& url, CFileItemList& items)
+{
+  std::map<int, std::vector<std::shared_ptr<CFileItem>>> bySeries;
+  for (const auto& item : items)
+  {
+    if (item->HasGameInfoTag() && item->GetGameInfoTag()->GetSeriesId() > 0)
+      bySeries[item->GetGameInfoTag()->GetSeriesId()].emplace_back(item);
+  }
+
+  for (const auto& [id, games] : bySeries)
+  {
+    if (games.size() < 2)
+      continue;
+
+    // Pictured by the first game of the series, as its box would stand on a shelf
+    const auto first =
+        std::ranges::min_element(games,
+                                 [](const auto& a, const auto& b)
+                                 {
+                                   const unsigned int yearA = a->GetGameInfoTag()->GetYear();
+                                   const unsigned int yearB = b->GetGameInfoTag()->GetYear();
+                                   if ((yearA == 0) != (yearB == 0))
+                                     return yearB == 0;
+                                   return yearA < yearB;
+                                 });
+
+    const auto series = SeriesItem((*first)->GetGameInfoTag()->GetSeries(), SeriesPath(url, id), id,
+                                   static_cast<int>(games.size()));
+    for (const char* type : {"poster", "thumb", "fanart", "clearlogo", "banner", "boxfront"})
+    {
+      if (const std::string& picture = (*first)->GetArt(type); !picture.empty())
+        series->SetArt(type, picture);
+    }
+
+    for (const auto& game : games)
+      items.Remove(game.get());
+    items.Add(series);
+  }
+}
+
 bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items)
 {
   try
@@ -586,6 +748,9 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
     CGameDbUrl url;
     if (!url.FromString(baseDir))
       return false;
+
+    if (url.GetNode() == GameDbNode::SERIES)
+      return GetSeriesNav(baseDir, items);
 
     // The scope every facet is counted within
     Filter scope;

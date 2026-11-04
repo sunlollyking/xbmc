@@ -168,6 +168,18 @@ public:
   const std::vector<std::string>& GetCollections() const { return m_collections; }
   void SetCollections(const std::vector<std::string>& collections) { m_collections = collections; }
 
+  /*!
+   * \brief The run of games this one belongs to, like "Mario Kart", or empty
+   *
+   * One of the game's collections; a franchise such as "Mario" is wider.
+   */
+  const std::string& GetSeries() const { return m_strSeries; }
+  void SetSeries(const std::string& series) { m_strSeries = series; }
+
+  //! \brief The library's id for the series, or -1
+  int GetSeriesId() const { return m_seriesId; }
+  void SetSeriesId(int id) { m_seriesId = id; }
+
   const std::vector<std::string>& GetTags() const { return m_tags; }
   void SetTags(const std::vector<std::string>& tags) { m_tags = tags; }
   ///@}
@@ -365,6 +377,8 @@ private:
   std::vector<std::string> m_developers;
   std::vector<std::string> m_publishers;
   std::vector<std::string> m_collections;
+  std::string m_strSeries;
+  int m_seriesId{-1};
   std::vector<std::string> m_tags;
 
   // Play facts

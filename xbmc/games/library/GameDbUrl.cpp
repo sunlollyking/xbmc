@@ -20,7 +20,7 @@ using namespace GAME;
 
 namespace
 {
-constexpr std::array<std::pair<GameDbNode, std::string_view>, 14> nodeSegments{{
+constexpr std::array<std::pair<GameDbNode, std::string_view>, 15> nodeSegments{{
     {GameDbNode::PLATFORMS, "platforms"},
     {GameDbNode::GAMES, "titles"},
     {GameDbNode::RELEASES, "releases"},
@@ -29,6 +29,7 @@ constexpr std::array<std::pair<GameDbNode, std::string_view>, 14> nodeSegments{{
     {GameDbNode::DEVELOPERS, "developers"},
     {GameDbNode::PUBLISHERS, "publishers"},
     {GameDbNode::COLLECTIONS, "collections"},
+    {GameDbNode::SERIES, "series"},
     {GameDbNode::TAGS, "tags"},
     {GameDbNode::REGIONS, "regions"},
     {GameDbNode::PLAYERS, "players"},
@@ -38,12 +39,13 @@ constexpr std::array<std::pair<GameDbNode, std::string_view>, 14> nodeSegments{{
 }};
 
 // A facet's segment, and the option its chosen value becomes
-constexpr std::array<std::pair<std::string_view, std::string_view>, 10> facetOptions{{
+constexpr std::array<std::pair<std::string_view, std::string_view>, 11> facetOptions{{
     {"genres", "genreid"},
     {"years", "year"},
     {"developers", "developerid"},
     {"publishers", "publisherid"},
     {"collections", "collectionid"},
+    {"series", "seriesid"},
     {"tags", "tagid"},
     {"regions", "region"},
     {"players", "players"},
@@ -52,8 +54,8 @@ constexpr std::array<std::pair<std::string_view, std::string_view>, 10> facetOpt
 }};
 
 const std::vector<std::string_view> facetNames{
-    "genres",  "years",   "developers", "publishers", "collections",
-    "tags",    "regions", "players",    "ageratings", "categories",
+    "genres", "years",   "developers", "publishers", "collections", "series",
+    "tags",   "regions", "players",    "ageratings", "categories",
 };
 
 const std::vector<std::string_view> listNames{
@@ -128,6 +130,7 @@ bool CGameDbUrl::parse()
   m_node = GameDbNode::OVERVIEW;
   m_itemType = "overview";
   m_list.clear();
+  m_titles = false;
 
   // Whatever the path carries as a query, a smart playlist among it
   AddOptions(m_url.GetOptions());
@@ -169,9 +172,11 @@ bool CGameDbUrl::parse()
   {
     m_node = GameDbNode::GAMES;
     m_itemType = "games";
+    m_titles = true;
     ++i;
     if (i < segments.size())
     {
+      m_titles = false;
       if (!StringUtils::IsNaturalNumber(segments[i]))
         return false;
       AddOption("gameid", std::stoi(segments[i]));

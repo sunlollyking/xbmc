@@ -26,6 +26,7 @@ namespace GAME
  */
 constexpr const char* SETTING_GAMELIBRARY_SHOWDERIVEDGAMES = "gamelibrary.showderivedgames";
 constexpr const char* SETTING_GAMELIBRARY_TITLESTYLE = "gamelibrary.titlestyle";
+constexpr const char* SETTING_GAMELIBRARY_GROUPSERIES = "gamelibrary.groupseries";
 
 //! \brief Which of a game's names to show; the order matches settings.xml
 enum class TitleStyle

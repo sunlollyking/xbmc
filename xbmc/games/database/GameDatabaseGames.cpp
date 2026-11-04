@@ -78,7 +78,12 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
     const std::string genres = StringUtils::Join(details.GetGenres(), LIST_SEPARATOR);
     const std::string developers = StringUtils::Join(details.GetDevelopers(), LIST_SEPARATOR);
     const std::string publishers = StringUtils::Join(details.GetPublishers(), LIST_SEPARATOR);
-    const std::string collections = StringUtils::Join(details.GetCollections(), LIST_SEPARATOR);
+    // A series is one of the game's collections, so browsing collections finds it too
+    std::vector<std::string> collectionNames = details.GetCollections();
+    if (!details.GetSeries().empty() &&
+        std::ranges::find(collectionNames, details.GetSeries()) == collectionNames.end())
+      collectionNames.emplace_back(details.GetSeries());
+    const std::string collections = StringUtils::Join(collectionNames, LIST_SEPARATOR);
 
     if (idGame > 0)
     {
@@ -142,7 +147,10 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
     SetLinks("publisher_link", "idCompany", "company", "idCompany", idGame,
              details.GetPublishers());
     SetLinks("collection_link", "idCollection", "collection", "idCollection", idGame,
-             details.GetCollections());
+             collectionNames);
+    m_pDS->exec(PrepareSQL("UPDATE game SET idSeries = (SELECT idCollection FROM collection WHERE "
+                           "name = '%s') WHERE idGame = %i",
+                           details.GetSeries().c_str(), idGame));
 
     SetRatingsForGame(idGame, details);
     SetUniqueIdsForGame(idGame, details);
@@ -564,6 +572,11 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   details.SetDevelopers(SplitList(record->at(GAMEDB_DEVELOPERS).get_asString()));
   details.SetPublishers(SplitList(record->at(GAMEDB_PUBLISHERS).get_asString()));
   details.SetCollections(SplitList(record->at(GAMEDB_COLLECTIONS).get_asString()));
+  if (record->at(GAMEDB_SERIES_ID).get_asInt() > 0)
+  {
+    details.SetSeries(record->at(GAMEDB_SERIES_NAME).get_asString());
+    details.SetSeriesId(record->at(GAMEDB_SERIES_ID).get_asInt());
+  }
 
   details.SetPlatformSlug(record->at(GAMEDB_PLATFORM_SLUG).get_asString());
   details.SetPlatform(record->at(GAMEDB_PLATFORM_NAME).get_asString());

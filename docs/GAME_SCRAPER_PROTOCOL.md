@@ -121,6 +121,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "publishers": ["Sega"],
   "genres": ["Platform"],
   "collections": ["Sonic the Hedgehog"],
+  "series": "Sonic the Hedgehog",
   "tags": [],
   "players": {"min": 1, "max": 2},
   "coop": true,
@@ -145,7 +146,9 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
 
 Every key is optional except `version` and `title`. `timetobeat` is how long
 players take, in seconds: `main` for the main story, `extras` for that and what
-is around it, `complete` for everything. Words for `category`,
+is around it, `complete` for everything. `series` is the run of games this one
+belongs to, such as Mario Kart, where `collections` may also name wider
+groupings, such as the Mario franchise. Words for `category`,
 `status` and `licence` are the ones in `GameLibraryTypes.cpp`:
 category `retail|hack|homebrew|demo|bios|application`; status
 `retail|beta|proto|sample|demo|alpha|kiosk|debug|program`; licence

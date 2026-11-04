@@ -519,6 +519,8 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetGenres(Strings(payload["genres"]));
   if (payload.isMember("collections"))
     details.SetCollections(Strings(payload["collections"]));
+  if (payload.isMember("series"))
+    details.SetSeries(payload["series"].asString());
   if (payload.isMember("tags"))
     details.SetTags(Strings(payload["tags"]));
   if (payload["players"].isObject())

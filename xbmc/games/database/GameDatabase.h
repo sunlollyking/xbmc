@@ -286,6 +286,21 @@ public:
   bool GetFacetNav(const std::string& baseDir, CFileItemList& items);
 
   /*!
+   * \brief List the series in a path's scope, each pictured by its first game
+   */
+  bool GetSeriesNav(const std::string& baseDir, CFileItemList& items);
+
+  /*!
+   * \brief Fold the games of each series into one entry, as movies fold into
+   *        their sets
+   *
+   * A series with one game in the list is left as the game.
+   *
+   * \param url The list the games came from, which the entries stay within
+   */
+  static void FoldSeries(const CGameDbUrl& url, CFileItemList& items);
+
+  /*!
    * \brief The releases of a game, as items that play
    */
   bool GetReleasesNav(const std::string& baseDir, CFileItemList& items);
@@ -385,6 +400,9 @@ public:
    * are known.
    */
   static void SetCompletionProperties(CFileItem& item, const CGameInfoTag& game);
+
+  //! \brief Put a game's series, "series" and "seriesid", on its item
+  static void SetSeriesProperties(CFileItem& item, const CGameInfoTag& game);
   bool SetUserRating(int idGame, int rating);
 
   /*!
@@ -438,7 +456,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 11; }
+  int GetSchemaVersion() const override { return 12; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

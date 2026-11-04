@@ -10,22 +10,23 @@
 
 #include "FileItem.h"
 #include "FileItemList.h"
+#include "ServiceBroker.h"
 #include "URL.h"
 #include "games/database/GameDatabase.h"
 #include "games/library/GameDbUrl.h"
 #include "games/tags/GameInfoTag.h"
 #include "media/MediaType.h"
-#include "utils/SortUtils.h"
-#include "ServiceBroker.h"
 #include "resources/LocalizeStrings.h"
 #include "resources/ResourcesComponent.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
+#include "utils/SortUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
-#include <cctype>
-
 #include <array>
+#include <cctype>
 #include <utility>
 
 using namespace KODI::GAME;
@@ -41,13 +42,14 @@ struct OverviewChild
   int description;
 };
 
-constexpr std::array<OverviewChild, 25> overviewChildren{{
+constexpr std::array<OverviewChild, 26> overviewChildren{{
     {"titles", 35544, 35640},
     {"genres", 135, 35641},
     {"years", 652, 35642},
     {"developers", 35521, 35643},
     {"publishers", 35522, 35644},
     {"collections", 35523, 35645},
+    {"series", 35778, 35779},
     {"tags", 20459, 35646},
     {"regions", 35524, 35647},
     {"players", 35525, 35648},
@@ -209,7 +211,14 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
     case GameDbNode::PLATFORMS:
       return db.GetPlatformsNav(path, items);
     case GameDbNode::GAMES:
-      return db.GetGamesNav(path, items, SortDescription());
+    {
+      if (!db.GetGamesNav(path, items, SortDescription()))
+        return false;
+      const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+      if (dbUrl.IsTitles() && settings && settings->GetBool(SETTING_GAMELIBRARY_GROUPSERIES))
+        CGameDatabase::FoldSeries(dbUrl, items);
+      return true;
+    }
     case GameDbNode::RELEASES:
       return db.GetReleasesNav(path, items);
     case GameDbNode::ART:
@@ -248,6 +257,7 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
     case GameDbNode::DEVELOPERS:
     case GameDbNode::PUBLISHERS:
     case GameDbNode::COLLECTIONS:
+    case GameDbNode::SERIES:
     case GameDbNode::TAGS:
     case GameDbNode::REGIONS:
     case GameDbNode::PLAYERS:

@@ -1889,10 +1889,11 @@
 		</definition>
 	</include>
 	<include name="GameInfoFact">
+		<param name="visible">true</param>
 		<definition>
 			<control type="group">
 				<height>31</height>
-				<visible>!String.IsEmpty($PARAM[info])</visible>
+				<visible>!String.IsEmpty($PARAM[info]) + $PARAM[visible]</visible>
 				<control type="label">
 					<width>260</width>
 					<height>31</height>

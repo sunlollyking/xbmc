@@ -80,6 +80,9 @@ private:
   //! \brief Every picture the library holds for this game, one to look at
   void OnArtwork();
 
+  //! \brief Open the series the game belongs to in the Games window
+  void OnSeries();
+
   /*!
    * \brief Choose which of a kind of picture the game shows
    *

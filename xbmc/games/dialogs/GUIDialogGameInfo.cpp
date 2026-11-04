@@ -54,6 +54,7 @@ constexpr int CONTROL_BTN_PLAY_STATE = 13;
 constexpr int CONTROL_BTN_GAME_CLIENT = 14;
 constexpr int CONTROL_BTN_VIDEO_FILTER = 15;
 constexpr int CONTROL_BTN_ARTWORK = 16;
+constexpr int CONTROL_BTN_SERIES = 18;
 
 /*!
  * \brief The pictures a game has, in the order a person would look at them
@@ -143,6 +144,7 @@ void CGUIDialogGameInfo::Reload()
     *m_item->GetGameInfoTag() = tag;
     CGameDatabase::SetAgeProperties(*m_item, CGameAgeRatings::AgeOf(tag.GetAgeRatings()));
     CGameDatabase::SetCompletionProperties(*m_item, tag);
+    CGameDatabase::SetSeriesProperties(*m_item, tag);
     KODI::ART::Artwork art;
     if (db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     {
@@ -222,6 +224,9 @@ bool CGUIDialogGameInfo::OnMessage(CGUIMessage& message)
           return true;
         case CONTROL_BTN_ARTWORK:
           OnArtwork();
+          return true;
+        case CONTROL_BTN_SERIES:
+          OnSeries();
           return true;
         case CONTROL_BTN_CHOOSE_ART:
           OnChooseArt();
@@ -502,6 +507,17 @@ CGUIDialogGameInfo::PlayStateValue CGUIDialogGameInfo::PlayState(const CGameInfo
   if (tag.GetPlayCount() > 0)
     return PlayStateValue::IN_PROGRESS;
   return PlayStateValue::NOT_STARTED;
+}
+
+void CGUIDialogGameInfo::OnSeries()
+{
+  if (!m_item || !m_item->HasGameInfoTag() || m_item->GetGameInfoTag()->GetSeriesId() <= 0)
+    return;
+
+  const std::string path =
+      "gamedb://series/" + std::to_string(m_item->GetGameInfoTag()->GetSeriesId()) + "/";
+  Close();
+  CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAMES, path);
 }
 
 void CGUIDialogGameInfo::OnPlayState()
