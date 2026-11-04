@@ -210,14 +210,14 @@
 							<textcolor>grey</textcolor>
 							<label>$INFO[ListItem.Property(playtime),$LOCALIZE[35671] ,]</label>
 						</control>
-						<control type="label">
+						<control type="textbox">
 							<top>250</top>
 							<width>340</width>
-							<height>40</height>
+							<height>72</height>
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>grey</textcolor>
-							<label>$INFO[ListItem.Mpaa]</label>
+							<label>$INFO[ListItem.Mpaa]$INFO[ListItem.Property(ageratingcontent),[CR],]</label>
 						</control>
 					</control>
 				</control>

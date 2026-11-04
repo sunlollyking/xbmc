@@ -166,6 +166,7 @@ enum class Field
   BEATEN,
   DROP_IN,
   SPLIT_SCREEN,
+  AGE_CONTENT,
   MAX
 };
 
