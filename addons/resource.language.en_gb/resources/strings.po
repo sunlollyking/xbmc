@@ -21356,7 +21356,37 @@ msgctxt "#35799"
 msgid "Games by how they're played: alone, together, or against each other."
 msgstr ""
 
-#empty strings from id 35800 to 35999
+#. The list of games people look at most
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35800"
+msgid "Popular"
+msgstr ""
+
+#. Description of the list of games people look at most
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35801"
+msgid "Your games that people look at most on IGDB, the most popular first."
+msgstr ""
+
+#. The list of games most people want to play
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35802"
+msgid "Most wanted"
+msgstr ""
+
+#. Description of the list of games most people want to play
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35803"
+msgid "Your games that the most people on IGDB want to play."
+msgstr ""
+
+#. Sort method: in the order of how popular games are
+#: xbmc/games/windows/GUIViewStateWindowGames.cpp
+msgctxt "#35804"
+msgid "Popularity"
+msgstr ""
+
+#empty strings from id 35805 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

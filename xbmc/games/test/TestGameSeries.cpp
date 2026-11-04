@@ -57,6 +57,15 @@ TEST(TestGameSeries, OnlyTheTitlesListFolds)
   EXPECT_FALSE(Url("gamedb://titles/?relatedto=12").IsTitles());
 }
 
+TEST(TestGameSeries, PopularityIsAList)
+{
+  EXPECT_EQ(Url("gamedb://popular/").GetList(), "popular");
+  EXPECT_EQ(Url("gamedb://platforms/3/mostwanted/").GetList(), "mostwanted");
+  EXPECT_EQ(GamePopularity::Valid(-1.0), 0.0);
+  EXPECT_EQ(GamePopularity::Valid(std::nan("")), 0.0);
+  EXPECT_EQ(GamePopularity::Valid(0.25), 0.25);
+}
+
 TEST(TestGameSeries, ModesAreAFacet)
 {
   EXPECT_EQ(Url("gamedb://modes/").GetNode(), GameDbNode::MODES);

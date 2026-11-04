@@ -121,7 +121,9 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "dropIn bool, "
                   "splitScreen bool, "
                   "coopPlayers integer, "
-                  "languages text)");
+                  "languages text, "
+                  "popularity float, "
+                  "wantToPlay float)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -495,4 +497,13 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   // 17: the ways a game can be played, such as single player or split screen
   if (version < 17)
     CreateLookupTable(db, "gamemode", "idGameMode");
+
+  // 18: how much interest IGDB records in a game. The game view lists the
+  // game's columns, so it is rebuilt too.
+  if (version < 18)
+  {
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN popularity float");
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN wantToPlay float");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
+  }
 }

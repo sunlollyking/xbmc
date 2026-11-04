@@ -1639,6 +1639,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       tag.SetLanguages(existing.GetLanguages());
     if (tag.GetModes().empty())
       tag.SetModes(existing.GetModes());
+    if (tag.GetPopularity().IsEmpty())
+      tag.SetPopularity(existing.GetPopularity());
 
     // Tags can be put on a game by hand, so a refresh keeps those -- but it
     // must not throw away the ones the scrape just found, which is what

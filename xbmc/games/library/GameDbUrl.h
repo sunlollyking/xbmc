@@ -65,7 +65,7 @@ enum class GameDbNode
  * modes, tags, regions, players, ageratings or categories, and choosing a value lists the
  * games that have it. A list is a ready-made selection: recentlyadded,
  * recentlyplayed, neverplayed, favourites, beaten, completed, multiplayer, coop, couchcoop,
- * englishimports, achievements, inprogress, hacks or homebrew.
+ * englishimports, popular, mostwanted, achievements, inprogress, hacks or homebrew.
  *
  * Parsing turns every path segment into a URL option (platformid, gameid,
  * genreid, year, ...) so that one filter builder serves every node, and the

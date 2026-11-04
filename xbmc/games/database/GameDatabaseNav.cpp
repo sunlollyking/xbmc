@@ -334,6 +334,18 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendOrder("game_view.playTime DESC");
     filter.limit = PrepareSQL("%i", RECENT_LIMIT);
   }
+  else if (list == "popular")
+  {
+    filter.AppendWhere("game_view.popularity > 0");
+    filter.AppendOrder("game_view.popularity DESC");
+    filter.limit = PrepareSQL("%i", RECENT_LIMIT);
+  }
+  else if (list == "mostwanted")
+  {
+    filter.AppendWhere("game_view.wantToPlay > 0");
+    filter.AppendOrder("game_view.wantToPlay DESC");
+    filter.limit = PrepareSQL("%i", RECENT_LIMIT);
+  }
   else if (list == "neverplayed")
     filter.AppendWhere("game_view.playCount = 0");
   else if (list == "favourites")
@@ -478,6 +490,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
     // Shared across the listing so that each folder is read once, not once per
     // game that lives in it
     CManualIndex manuals;
+    const bool ranked = url.GetList() == "popular" || url.GetList() == "mostwanted";
     for (const auto& result : results)
     {
       const auto row = static_cast<unsigned int>(result.at(Field::ROW).asInteger());
@@ -562,6 +575,10 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
                                                                        TIME_FORMAT_HH_MM));
       if (game.GetAchievementsEarned() > 0)
         item->SetProperty("achievementsearned", game.GetAchievementsEarned());
+      // Kept in IGDB's order, which no field of the game sorts by, the way a
+      // playlist keeps its own
+      if (ranked)
+        item->SetProgramCount(items.Size());
       item->SetLabelPreformatted(true);
 
       items.Add(item);

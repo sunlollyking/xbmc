@@ -72,6 +72,7 @@ void CGameInfoTag::Reset()
   m_category = GameCategory::RETAIL;
   m_parentGameId = -1;
   m_timeToBeat = {};
+  m_popularity = {};
   m_strSeries.clear();
   m_seriesId = -1;
 
@@ -153,6 +154,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_category = tag.m_category;
     m_parentGameId = tag.m_parentGameId;
     m_timeToBeat = tag.m_timeToBeat;
+    m_popularity = tag.m_popularity;
 
     m_ratings = tag.m_ratings;
     m_strDefaultRating = tag.m_strDefaultRating;
@@ -209,11 +211,12 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_playersMin == tag.m_playersMin && m_playersMax == tag.m_playersMax &&
          m_coop == tag.m_coop && m_dropIn == tag.m_dropIn && m_splitScreen == tag.m_splitScreen &&
          m_coopPlayers == tag.m_coopPlayers && m_category == tag.m_category &&
-         m_timeToBeat == tag.m_timeToBeat && m_uniqueIds == tag.m_uniqueIds &&
-         m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
-         m_strLastPlayed == tag.m_strLastPlayed && m_userRating == tag.m_userRating &&
-         m_favourite == tag.m_favourite && m_completed == tag.m_completed &&
-         m_beaten == tag.m_beaten && m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
+         m_timeToBeat == tag.m_timeToBeat && m_popularity == tag.m_popularity &&
+         m_uniqueIds == tag.m_uniqueIds && m_playCount == tag.m_playCount &&
+         m_playTime == tag.m_playTime && m_strLastPlayed == tag.m_strLastPlayed &&
+         m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
+         m_completed == tag.m_completed && m_beaten == tag.m_beaten &&
+         m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
          m_strAgeRating == tag.m_strAgeRating;
 }
 
@@ -410,6 +413,8 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_timeToBeat.main;
     ar << m_timeToBeat.extras;
     ar << m_timeToBeat.complete;
+    ar << m_popularity.visits;
+    ar << m_popularity.wantToPlay;
     ar << static_cast<int>(m_ratings.size());
     for (const auto& [type, rating] : m_ratings)
     {
@@ -525,6 +530,8 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_timeToBeat.main;
     ar >> m_timeToBeat.extras;
     ar >> m_timeToBeat.complete;
+    ar >> m_popularity.visits;
+    ar >> m_popularity.wantToPlay;
     int count = 0;
     ar >> count;
     m_ratings.clear();
@@ -648,6 +655,8 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["timetobeat"]["main"] = m_timeToBeat.main;
   value["timetobeat"]["extras"] = m_timeToBeat.extras;
   value["timetobeat"]["complete"] = m_timeToBeat.complete;
+  value["popularity"]["visits"] = m_popularity.visits;
+  value["popularity"]["wanttoplay"] = m_popularity.wantToPlay;
   value["category"] = std::string(CGameLibraryTypes::ToString(m_category));
   value["matchedby"] = std::string(CGameLibraryTypes::ToString(m_matchMethod));
 
@@ -905,6 +914,15 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
       timeToBeat->SetAttribute("complete", m_timeToBeat.complete);
   }
 
+  if (!m_popularity.IsEmpty())
+  {
+    tinyxml2::XMLElement* popularity = AddChild(game, "popularity", "");
+    if (m_popularity.visits > 0.0)
+      popularity->SetAttribute("visits", m_popularity.visits);
+    if (m_popularity.wantToPlay > 0.0)
+      popularity->SetAttribute("wanttoplay", m_popularity.wantToPlay);
+  }
+
   if (m_category != GameCategory::RETAIL)
     XMLUtils::SetString(game, "category", std::string(CGameLibraryTypes::ToString(m_category)));
 
@@ -1069,6 +1087,18 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
       return GameTimeToBeat::Valid(value);
     };
     m_timeToBeat = {seconds("main"), seconds("extras"), seconds("complete")};
+  }
+
+  if (const tinyxml2::XMLElement* popularity = element->FirstChildElement("popularity");
+      popularity != nullptr)
+  {
+    const auto value = [popularity](const char* name)
+    {
+      double number = 0.0;
+      popularity->QueryDoubleAttribute(name, &number);
+      return GamePopularity::Valid(number);
+    };
+    m_popularity = {value("visits"), value("wanttoplay")};
   }
 
   if (const std::string value = ChildText(element, "category"); !value.empty())
