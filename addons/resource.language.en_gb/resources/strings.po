@@ -21320,7 +21320,31 @@ msgctxt "#35793"
 msgid "Related"
 msgstr ""
 
-#empty strings from id 35794 to 35999
+#. A language a game is spoken in but not written in, e.g. "Japanese (spoken)"
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35794"
+msgid "{0:s} (spoken)"
+msgstr ""
+
+#. A language a game is written in but not spoken in, e.g. "French (text)"
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35795"
+msgid "{0:s} (text)"
+msgstr ""
+
+#. The list of games from the far east that can be played in English
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35796"
+msgid "Imports in English"
+msgstr ""
+
+#. Description of the list of games from the far east that can be played in English
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35797"
+msgid "Games from Japan and the rest of East Asia whose own release is in English."
+msgstr ""
+
+#empty strings from id 35798 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

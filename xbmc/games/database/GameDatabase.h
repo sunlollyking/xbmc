@@ -437,6 +437,18 @@ public:
    */
   static void SetAgeContentProperties(CFileItem& item, const CGameInfoTag& game);
 
+  /*!
+   * \brief Put the languages a game can be played in on its item, "languagesupport",
+   *        e.g. "English, Japanese (spoken)"
+   */
+  static void SetLanguageProperties(CFileItem& item, const CGameInfoTag& game);
+
+  //! \brief The languages a game can be played in as JSON, for the library to keep
+  static std::string SerializeLanguages(const std::vector<GameLanguage>& languages);
+
+  //! \brief Languages kept by SerializeLanguages()
+  static std::vector<GameLanguage> DeserializeLanguages(const std::string& json);
+
   bool SetUserRating(int idGame, int rating);
 
   /*!
@@ -490,7 +502,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 15; }
+  int GetSchemaVersion() const override { return 16; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

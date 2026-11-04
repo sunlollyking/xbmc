@@ -282,6 +282,20 @@ struct GameAgeRating
 
 /*!
  * \ingroup games
+ * \brief A language a game can be played in, and how
+ */
+struct GameLanguage
+{
+  std::string language; // its name, e.g. "English"
+  bool audio{false}; // spoken
+  bool subtitles{false};
+  bool interface{false}; // in the menus
+
+  bool operator==(const GameLanguage&) const = default;
+};
+
+/*!
+ * \ingroup games
  * \brief Another game a catalogue relates to this one, and what it is to it
  */
 struct GameRelation

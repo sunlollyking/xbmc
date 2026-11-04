@@ -26,6 +26,8 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/DatabaseUtils.h"
+#include "utils/JSONVariantParser.h"
+#include "utils/JSONVariantWriter.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/TimeFormat.h"
@@ -338,6 +340,16 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendWhere("game_view.playersMax >= 2");
   else if (list == "coop")
     filter.AppendWhere("game_view.coop = 1");
+  else if (list == "englishimports")
+  {
+    // A game from the far east whose own dump says it's in English, as No-Intro
+    // marks one: Japan (En,Ja)
+    filter.AppendWhere(
+        "EXISTS (SELECT 1 FROM gamerelease r JOIN release_region rr ON rr.idRelease = r.idRelease "
+        "JOIN region ON region.idRegion = rr.idRegion WHERE r.idGame = game_view.idGame AND "
+        "region.code IN ('JP', 'KR', 'CN', 'TW', 'HK', '030') AND (r.languages = 'en' OR "
+        "r.languages LIKE 'en,%' OR r.languages LIKE '%,en' OR r.languages LIKE '%,en,%'))");
+  }
   else if (list == "couchcoop")
     filter.AppendWhere("(game_view.coop = 1 OR game_view.dropIn = 1 OR game_view.splitScreen = 1)");
   else if (list == "achievements")
@@ -538,6 +550,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       SetSeriesProperties(*item, game);
       SetHighScoreProperties(*item, game);
       SetCoopProperties(*item, game);
+      SetLanguageProperties(*item, game);
       if (game.GetPlayTime() > 0)
         item->SetProperty("playtime", StringUtils::SecondsToTimeString(game.GetPlayTime(),
                                                                        TIME_FORMAT_HH_MM));
@@ -621,6 +634,66 @@ void CGameDatabase::SetSeriesProperties(CFileItem& item, const CGameInfoTag& gam
     item.SetProperty("series", game.GetSeries());
     item.SetProperty("seriesid", game.GetSeriesId());
   }
+}
+
+void CGameDatabase::SetLanguageProperties(CFileItem& item, const CGameInfoTag& game)
+{
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+  std::vector<std::string> names;
+  for (const GameLanguage& language : game.GetLanguages())
+  {
+    const bool text = language.subtitles || language.interface;
+    if (language.audio && !text)
+      names.emplace_back(
+          StringUtils::Format(strings.Get(35794), language.language)); // "{0:s} (spoken)"
+    else if (text && !language.audio)
+      names.emplace_back(
+          StringUtils::Format(strings.Get(35795), language.language)); // "{0:s} (text)"
+    else
+      names.emplace_back(language.language);
+  }
+
+  item.ClearProperty("languagesupport");
+  if (!names.empty())
+    item.SetProperty("languagesupport", StringUtils::Join(names, ", "));
+}
+
+std::string CGameDatabase::SerializeLanguages(const std::vector<GameLanguage>& languages)
+{
+  if (languages.empty())
+    return "";
+
+  CVariant value(CVariant::VariantTypeArray);
+  for (const GameLanguage& language : languages)
+  {
+    CVariant entry;
+    entry["language"] = language.language;
+    entry["audio"] = language.audio;
+    entry["subtitles"] = language.subtitles;
+    entry["interface"] = language.interface;
+    value.push_back(entry);
+  }
+  std::string json;
+  return CJSONVariantWriter::Write(value, json, true) ? json : "";
+}
+
+std::vector<GameLanguage> CGameDatabase::DeserializeLanguages(const std::string& json)
+{
+  std::vector<GameLanguage> languages;
+  CVariant value;
+  if (json.empty() || !CJSONVariantParser::Parse(json, value) || !value.isArray())
+    return languages;
+
+  for (auto it = value.begin_array(); it != value.end_array() && languages.size() < 100; ++it)
+  {
+    GameLanguage language{(*it)["language"].asString().substr(0, 64)};
+    language.audio = (*it)["audio"].asBoolean();
+    language.subtitles = (*it)["subtitles"].asBoolean();
+    language.interface = (*it)["interface"].asBoolean();
+    if (!language.language.empty())
+      languages.emplace_back(std::move(language));
+  }
+  return languages;
 }
 
 void CGameDatabase::SetAgeContentProperties(CFileItem& item, const CGameInfoTag& game)

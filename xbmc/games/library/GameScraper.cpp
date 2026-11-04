@@ -525,6 +525,21 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetTags(Strings(payload["tags"]));
   if (payload.isMember("similar"))
     details.SetSimilar(Strings(payload["similar"]));
+  if (payload["languagesupport"].isArray())
+  {
+    std::vector<GameLanguage> languages;
+    for (auto it = payload["languagesupport"].begin_array();
+         it != payload["languagesupport"].end_array(); ++it)
+    {
+      GameLanguage language{(*it)["language"].asString()};
+      language.audio = (*it)["audio"].asBoolean();
+      language.subtitles = (*it)["subtitles"].asBoolean();
+      language.interface = (*it)["interface"].asBoolean();
+      if (!language.language.empty())
+        languages.emplace_back(std::move(language));
+    }
+    details.SetLanguages(languages);
+  }
   if (payload["related"].isArray())
   {
     std::vector<GameRelation> related;

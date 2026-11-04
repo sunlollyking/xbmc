@@ -60,6 +60,7 @@ void CGameInfoTag::Reset()
   m_tags.clear();
   m_similar.clear();
   m_related.clear();
+  m_languages.clear();
 
   m_playersMin = 0;
   m_playersMax = 0;
@@ -139,6 +140,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_tags = tag.m_tags;
     m_similar = tag.m_similar;
     m_related = tag.m_related;
+    m_languages = tag.m_languages;
 
     m_playersMin = tag.m_playersMin;
     m_playersMax = tag.m_playersMax;
@@ -201,15 +203,15 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_developers == tag.m_developers && m_publishers == tag.m_publishers &&
          m_collections == tag.m_collections && m_strSeries == tag.m_strSeries &&
          m_seriesId == tag.m_seriesId && m_tags == tag.m_tags && m_similar == tag.m_similar &&
-         m_related == tag.m_related && m_playersMin == tag.m_playersMin &&
-         m_playersMax == tag.m_playersMax && m_coop == tag.m_coop && m_dropIn == tag.m_dropIn &&
-         m_splitScreen == tag.m_splitScreen && m_coopPlayers == tag.m_coopPlayers &&
-         m_category == tag.m_category && m_timeToBeat == tag.m_timeToBeat &&
-         m_uniqueIds == tag.m_uniqueIds && m_playCount == tag.m_playCount &&
-         m_playTime == tag.m_playTime && m_strLastPlayed == tag.m_strLastPlayed &&
-         m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
-         m_completed == tag.m_completed && m_beaten == tag.m_beaten &&
-         m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
+         m_related == tag.m_related && m_languages == tag.m_languages &&
+         m_playersMin == tag.m_playersMin && m_playersMax == tag.m_playersMax &&
+         m_coop == tag.m_coop && m_dropIn == tag.m_dropIn && m_splitScreen == tag.m_splitScreen &&
+         m_coopPlayers == tag.m_coopPlayers && m_category == tag.m_category &&
+         m_timeToBeat == tag.m_timeToBeat && m_uniqueIds == tag.m_uniqueIds &&
+         m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
+         m_strLastPlayed == tag.m_strLastPlayed && m_userRating == tag.m_userRating &&
+         m_favourite == tag.m_favourite && m_completed == tag.m_completed &&
+         m_beaten == tag.m_beaten && m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
          m_strAgeRating == tag.m_strAgeRating;
 }
 
@@ -386,6 +388,14 @@ void CGameInfoTag::Archive(CArchive& ar)
       ar << relation.kind;
       ar << relation.title;
     }
+    ar << static_cast<int>(m_languages.size());
+    for (const GameLanguage& language : m_languages)
+    {
+      ar << language.language;
+      ar << language.audio;
+      ar << language.subtitles;
+      ar << language.interface;
+    }
     ar << m_playersMin;
     ar << m_playersMax;
     ar << m_coop;
@@ -488,6 +498,16 @@ void CGameInfoTag::Archive(CArchive& ar)
     {
       ar >> relation.kind;
       ar >> relation.title;
+    }
+    int languages = 0;
+    ar >> languages;
+    m_languages.assign(static_cast<size_t>(std::max(languages, 0)), {});
+    for (GameLanguage& language : m_languages)
+    {
+      ar >> language.language;
+      ar >> language.audio;
+      ar >> language.subtitles;
+      ar >> language.interface;
     }
     ar >> m_playersMin;
     ar >> m_playersMax;
@@ -595,6 +615,16 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["seriesid"] = m_seriesId;
   value["tags"] = m_tags;
   value["similar"] = m_similar;
+  value["languagesupport"] = CVariant(CVariant::VariantTypeArray);
+  for (const GameLanguage& language : m_languages)
+  {
+    CVariant entry;
+    entry["language"] = language.language;
+    entry["audio"] = language.audio;
+    entry["subtitles"] = language.subtitles;
+    entry["interface"] = language.interface;
+    value["languagesupport"].push_back(entry);
+  }
   value["related"] = CVariant(CVariant::VariantTypeArray);
   for (const GameRelation& relation : m_related)
   {
@@ -829,6 +859,16 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
   XMLUtils::SetStringArray(game, "similar", m_similar);
   for (const GameRelation& relation : m_related)
     AddChild(game, "related", relation.title)->SetAttribute("kind", relation.kind.c_str());
+  for (const GameLanguage& language : m_languages)
+  {
+    tinyxml2::XMLElement* element = AddChild(game, "language", language.language);
+    if (language.audio)
+      element->SetAttribute("audio", true);
+    if (language.subtitles)
+      element->SetAttribute("subtitles", true);
+    if (language.interface)
+      element->SetAttribute("interface", true);
+  }
 
   if (m_playersMin > 0 || m_playersMax > 0 || m_coop || m_dropIn || m_splitScreen ||
       m_coopPlayers > 0)
@@ -978,6 +1018,17 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
     m_tags = std::move(values);
   if (std::vector<std::string> values = ChildTexts(element, "similar"); !values.empty())
     m_similar = std::move(values);
+  for (const tinyxml2::XMLElement* child = element->FirstChildElement("language"); child != nullptr;
+       child = child->NextSiblingElement("language"))
+  {
+    if (child->GetText() == nullptr)
+      continue;
+    GameLanguage language{child->GetText()};
+    child->QueryBoolAttribute("audio", &language.audio);
+    child->QueryBoolAttribute("subtitles", &language.subtitles);
+    child->QueryBoolAttribute("interface", &language.interface);
+    m_languages.emplace_back(std::move(language));
+  }
   for (const tinyxml2::XMLElement* child = element->FirstChildElement("related"); child != nullptr;
        child = child->NextSiblingElement("related"))
   {
