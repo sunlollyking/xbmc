@@ -151,6 +151,7 @@ void CGUIDialogGameInfo::Reload()
     CGameDatabase::SetCoopProperties(*m_item, tag);
     CGameDatabase::SetAgeContentProperties(*m_item, tag);
     CGameDatabase::SetLanguageProperties(*m_item, tag);
+    CGameDatabase::SetModeProperties(*m_item, tag);
 
     // Only the games like it that are in the library can be opened
     m_item->ClearProperty("similarcount");

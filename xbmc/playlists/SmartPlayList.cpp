@@ -71,6 +71,7 @@ static const auto fields = std::array{
   TranslateField{ "dropin",            Field::DROP_IN,                    BOOLEAN_FIELD,  nullptr,                              false, 35789 },
   TranslateField{ "splitscreen",       Field::SPLIT_SCREEN,               BOOLEAN_FIELD,  nullptr,                              false, 35790 },
   TranslateField{ "agecontent",        Field::AGE_CONTENT,                TEXT_FIELD,     nullptr,                              false, 35791 },
+  TranslateField{ "mode",              Field::GAME_MODE,                  TEXT_FIELD,     nullptr,                              false, 35798 },
   TranslateField{ "hasachievements",   Field::HAS_ACHIEVEMENTS,           BOOLEAN_FIELD,  nullptr,                              false, 35534 },
   TranslateField{ "coop",              Field::COOP,                       BOOLEAN_FIELD,  nullptr,                              false, 35533 },
   TranslateField{ "filename",          Field::FILENAME,                   TEXT_FIELD,     nullptr,                              false, 561 },
@@ -497,6 +498,7 @@ std::vector<Field> CSmartPlaylistRule::GetFields(const std::string &type)
         Field::FAVOURITE,  Field::COMPLETED,      Field::HAS_ACHIEVEMENTS,
         Field::COOP,       Field::TIME,           Field::BEATEN,
         Field::DROP_IN,    Field::SPLIT_SCREEN,   Field::AGE_CONTENT,
+        Field::GAME_MODE,
     };
   }
   else if (type == MEDIA::CONTENT::MUSICVIDEOS)
@@ -1093,6 +1095,8 @@ std::string CSmartPlaylistRule::FormatWhereClause(const std::string &negate, con
       query = gameLink("genre_link", "idGenre", "genre");
     else if (m_field == static_cast<int>(Field::TAG))
       query = gameLink("tag_link", "idTag", "tag");
+    else if (m_field == static_cast<int>(Field::GAME_MODE))
+      query = gameLink("gamemode_link", "idGameMode", "gamemode");
     else if (m_field == static_cast<int>(Field::SET))
       query = gameLink("collection_link", "idCollection", "collection");
     else if (m_field == static_cast<int>(Field::DEVELOPER))

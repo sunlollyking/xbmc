@@ -143,6 +143,7 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
   CLog::Log(LOGINFO, "GAME: Creating lookup tables");
   CreateLookupTable(db, "genre", "idGenre");
   CreateLookupTable(db, "tag", "idTag");
+  CreateLookupTable(db, "gamemode", "idGameMode");
   db.ExecuteQuery("CREATE TABLE company (idCompany integer primary key, name text, country text)");
   db.ExecuteQuery("CREATE TABLE developer_link (idCompany integer, idGame integer)");
   db.ExecuteQuery("CREATE TABLE publisher_link (idCompany integer, idGame integer)");
@@ -250,6 +251,7 @@ void CGameLibraryDDL::CreateIndexes(CDatabase& db)
 
   CreateLookupIndexes(db, "genre", "idGenre");
   CreateLookupIndexes(db, "tag", "idTag");
+  CreateLookupIndexes(db, "gamemode", "idGameMode");
   db.ExecuteQuery("CREATE UNIQUE INDEX ix_company_name ON company (name(255))");
   db.ExecuteQuery("CREATE UNIQUE INDEX ix_developer_link_1 ON developer_link (idCompany, idGame)");
   db.ExecuteQuery("CREATE UNIQUE INDEX ix_developer_link_2 ON developer_link (idGame, idCompany)");
@@ -350,6 +352,7 @@ void CGameLibraryDDL::CreateTriggers(CDatabase& db)
                   "DELETE FROM publisher_link WHERE idGame = old.idGame; "
                   "DELETE FROM collection_link WHERE idGame = old.idGame; "
                   "DELETE FROM game_link WHERE idGame = old.idGame; "
+                  "DELETE FROM gamemode_link WHERE idGame = old.idGame; "
                   "DELETE FROM art WHERE media_id = old.idGame AND media_type = 'game'; "
                   "DELETE FROM rating WHERE media_id = old.idGame AND media_type = 'game'; "
                   "DELETE FROM agerating WHERE media_id = old.idGame AND media_type "
@@ -488,4 +491,8 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN languages text");
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
+
+  // 17: the ways a game can be played, such as single player or split screen
+  if (version < 17)
+    CreateLookupTable(db, "gamemode", "idGameMode");
 }

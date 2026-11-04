@@ -167,6 +167,7 @@ enum class Field
   DROP_IN,
   SPLIT_SCREEN,
   AGE_CONTENT,
+  GAME_MODE,
   MAX
 };
 

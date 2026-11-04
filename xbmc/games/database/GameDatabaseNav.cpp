@@ -238,6 +238,12 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendJoin("JOIN genre_link ON genre_link.idGame = game_view.idGame");
     filter.AppendWhere(PrepareSQL("genre_link.idGenre = %i", static_cast<int>(v->asInteger())));
   }
+  if (const CVariant* v = option("modeid"))
+  {
+    filter.AppendJoin("JOIN gamemode_link ON gamemode_link.idGame = game_view.idGame");
+    filter.AppendWhere(
+        PrepareSQL("gamemode_link.idGameMode = %i", static_cast<int>(v->asInteger())));
+  }
   if (const CVariant* v = option("tagid"))
   {
     filter.AppendJoin("JOIN tag_link ON tag_link.idGame = game_view.idGame");
@@ -636,6 +642,13 @@ void CGameDatabase::SetSeriesProperties(CFileItem& item, const CGameInfoTag& gam
   }
 }
 
+void CGameDatabase::SetModeProperties(CFileItem& item, const CGameInfoTag& game)
+{
+  item.ClearProperty("modes");
+  if (!game.GetModes().empty())
+    item.SetProperty("modes", StringUtils::Join(game.GetModes(), ", "));
+}
+
 void CGameDatabase::SetLanguageProperties(CFileItem& item, const CGameInfoTag& game)
 {
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
@@ -929,6 +942,13 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
               "AS n FROM genre JOIN genre_link ON genre_link.idGenre = genre.idGenre JOIN "
               "game_view ON game_view.idGame = genre_link.idGame " +
               join + where + " GROUP BY genre.idGenre, genre.name ORDER BY genre.name";
+        break;
+      case GameDbNode::MODES:
+        sql = "SELECT gamemode.idGameMode AS id, gamemode.name AS label, COUNT(DISTINCT "
+              "game_view.idGame) AS n FROM gamemode JOIN gamemode_link ON "
+              "gamemode_link.idGameMode = gamemode.idGameMode JOIN game_view ON game_view.idGame = "
+              "gamemode_link.idGame " +
+              join + where + " GROUP BY gamemode.idGameMode, gamemode.name ORDER BY gamemode.name";
         break;
       case GameDbNode::TAGS:
         sql = "SELECT tag.idTag AS id, tag.name AS label, COUNT(DISTINCT game_view.idGame) AS n "

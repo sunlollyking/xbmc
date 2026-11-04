@@ -185,6 +185,10 @@ public:
   void SetTags(const std::vector<std::string>& tags) { m_tags = tags; }
 
   //! \brief Games like this one, by name, as a catalogue suggests them
+  //! \brief How the game can be played, e.g. "Single player", "Split screen"
+  const std::vector<std::string>& GetModes() const { return m_modes; }
+  void SetModes(const std::vector<std::string>& modes) { m_modes = modes; }
+
   const std::vector<std::string>& GetSimilar() const { return m_similar; }
   void SetSimilar(const std::vector<std::string>& similar) { m_similar = similar; }
 
@@ -410,6 +414,7 @@ private:
   int m_seriesId{-1};
   std::vector<std::string> m_tags;
   std::vector<std::string> m_similar;
+  std::vector<std::string> m_modes;
   std::vector<GameRelation> m_related;
   std::vector<GameLanguage> m_languages;
 

@@ -21344,7 +21344,19 @@ msgctxt "#35797"
 msgid "Games from Japan and the rest of East Asia whose own release is in English."
 msgstr ""
 
-#empty strings from id 35798 to 35999
+#. The ways a game can be played, such as single player or split screen
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35798"
+msgid "Modes"
+msgstr ""
+
+#. Description of the list of the ways games can be played
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35799"
+msgid "Games by how they're played: alone, together, or against each other."
+msgstr ""
+
+#empty strings from id 35800 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

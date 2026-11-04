@@ -124,6 +124,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "series": "Sonic the Hedgehog",
   "tags": [],
   "similar": ["Sonic the Hedgehog 3"],
+  "modes": ["Single player", "Co-operative"],
   "related": [{"kind": "port", "title": "Sonic the Hedgehog 2 (8-bit)"}],
   "languagesupport": [{"language": "English", "audio": false, "subtitles": false, "interface": true}],
   "players": {"min": 1, "max": 2},
@@ -156,6 +157,7 @@ is around it, `complete` for everything. `similar` names
 games like this one, matched by title to the games in the library, and
 `related` the games that are something to it: a `remake`, `remaster`, `port`,
 `dlc` or `expansion` of it, or the `original` an add-on belongs to.
+`modes` are the ways the game can be played, to browse by.
 `languagesupport` lists the languages the game can be played in: spoken
 (`audio`), subtitled, or in its menus (`interface`).
 `coopplayers` is how many can play

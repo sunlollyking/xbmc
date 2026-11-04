@@ -57,6 +57,14 @@ TEST(TestGameSeries, OnlyTheTitlesListFolds)
   EXPECT_FALSE(Url("gamedb://titles/?relatedto=12").IsTitles());
 }
 
+TEST(TestGameSeries, ModesAreAFacet)
+{
+  EXPECT_EQ(Url("gamedb://modes/").GetNode(), GameDbNode::MODES);
+  CVariant id;
+  ASSERT_TRUE(Url("gamedb://modes/3/").GetOption("modeid", id));
+  EXPECT_EQ(id.asInteger(), 3);
+}
+
 TEST(TestGameSeries, ASeriesIsAFacet)
 {
   const CGameDbUrl list = Url("gamedb://series/");

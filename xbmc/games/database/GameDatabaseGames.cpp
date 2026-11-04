@@ -143,6 +143,7 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
 
     SetLinks("genre_link", "idGenre", "genre", "idGenre", idGame, details.GetGenres());
     SetLinks("tag_link", "idTag", "tag", "idTag", idGame, details.GetTags());
+    SetLinks("gamemode_link", "idGameMode", "gamemode", "idGameMode", idGame, details.GetModes());
     SetLinks("developer_link", "idCompany", "company", "idCompany", idGame,
              details.GetDevelopers());
     SetLinks("publisher_link", "idCompany", "company", "idCompany", idGame,
@@ -650,6 +651,7 @@ bool CGameDatabase::GetGameInfo(int idGame, CGameInfoTag& details)
     LoadUniqueIds(idGame, details);
     LoadAgeRatings(idGame, details);
     details.SetTags(GetLinkNames("tag_link", "idTag", "tag", "idTag", idGame));
+    details.SetModes(GetLinkNames("gamemode_link", "idGameMode", "gamemode", "idGameMode", idGame));
 
     std::vector<std::string> similar;
     if (m_pDS->query(PrepareSQL(
@@ -1021,6 +1023,8 @@ int CGameDatabase::CleanDatabase(const std::set<int>& paths)
 
     m_pDS->exec("DELETE FROM genre WHERE NOT EXISTS (SELECT 1 FROM genre_link WHERE "
                 "genre_link.idGenre = genre.idGenre)");
+    m_pDS->exec("DELETE FROM gamemode WHERE NOT EXISTS (SELECT 1 FROM gamemode_link WHERE "
+                "gamemode_link.idGameMode = gamemode.idGameMode)");
     m_pDS->exec("DELETE FROM tag WHERE NOT EXISTS (SELECT 1 FROM tag_link WHERE tag_link.idTag = "
                 "tag.idTag)");
     m_pDS->exec("DELETE FROM company WHERE NOT EXISTS (SELECT 1 FROM developer_link WHERE "
