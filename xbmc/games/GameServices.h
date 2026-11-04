@@ -88,6 +88,9 @@ public:
   //! \brief Mark the game being played completed in the library, if it is in it
   void MarkPlayingGameCompleted();
 
+  //! \brief Mark the game being played beaten in the library, if it is in it
+  void MarkPlayingGameBeaten();
+
   /*!
    * \brief Translate a feature on a controller into its localized name
    *

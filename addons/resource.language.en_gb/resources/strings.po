@@ -21176,7 +21176,56 @@ msgctxt "#35765"
 msgid "Unrated"
 msgstr ""
 
-#empty strings from id 35766 to 35999
+#empty strings from id 35766 to 35769
+
+#. Context menu entry: mark a game as played through
+#: xbmc/games/ContextMenus.h
+msgctxt "#35770"
+msgid "Mark as beaten"
+msgstr ""
+
+#: xbmc/games/ContextMenus.h
+msgctxt "#35771"
+msgid "Mark as not beaten"
+msgstr ""
+
+#. Description of the list of games the player has beaten
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35772"
+msgid "Games you have beaten or completed."
+msgstr ""
+
+#. Label for how long players take to beat a game, followed by the time
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35773"
+msgid "Time to beat"
+msgstr ""
+
+#. How many hours a game takes to beat
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35774"
+msgid "{0:d} h"
+msgstr ""
+
+#. How many minutes a game takes to beat
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35775"
+msgid "{0:d} min"
+msgstr ""
+
+#. How long a game takes to beat, then to complete to 100%, e.g. "12 h · 100%: 30 h"
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35776"
+msgid "{0:s} · 100%: {1:s}"
+msgstr ""
+
+#. How long a game takes to complete to 100%, e.g. "100%: 30 h"
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35777"
+msgid "100%: {0:s}"
+msgstr ""
+
+#empty strings from id 35778 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

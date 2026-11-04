@@ -27,6 +27,18 @@ bool IsLibraryGame(const CFileItem& item)
   return item.HasGameInfoTag() && item.GetGameInfoTag()->HasDatabaseId();
 }
 
+void ShowProgress(const std::shared_ptr<CFileItem>& item)
+{
+  const GAME::CGameInfoTag* tag = item->GetGameInfoTag();
+  item->SetProperty("completed", tag->IsCompleted());
+  item->SetOverlayImage(tag->IsCompleted() ? CGUIListItem::ICON_OVERLAY_WATCHED
+                                           : CGUIListItem::ICON_OVERLAY_NONE);
+  GAME::CGameDatabase::SetCompletionProperties(*item, *tag);
+
+  CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_REFRESH_LIST);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+}
+
 bool SetCompleted(const std::shared_ptr<CFileItem>& item, bool completed)
 {
   GAME::CGameInfoTag* tag = item->GetGameInfoTag();
@@ -36,18 +48,52 @@ bool SetCompleted(const std::shared_ptr<CFileItem>& item, bool completed)
     return false;
 
   tag->SetCompleted(completed);
-  item->SetProperty("completed", completed);
-  item->SetOverlayImage(completed ? CGUIListItem::ICON_OVERLAY_WATCHED
-                                  : CGUIListItem::ICON_OVERLAY_NONE);
+  if (completed)
+    tag->SetBeaten(true);
+  ShowProgress(item);
+  return true;
+}
 
-  CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_REFRESH_LIST);
-  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+bool SetBeaten(const std::shared_ptr<CFileItem>& item, bool beaten)
+{
+  GAME::CGameInfoTag* tag = item->GetGameInfoTag();
+
+  GAME::CGameDatabase db;
+  if (!db.Open() || !db.SetBeaten(tag->GetDatabaseId(), beaten))
+    return false;
+
+  tag->SetBeaten(beaten);
+  if (!beaten)
+    tag->SetCompleted(false);
+  ShowProgress(item);
   return true;
 }
 } // namespace
 
 namespace CONTEXTMENU
 {
+
+bool CGameMarkBeaten::IsVisible(const CFileItem& item) const
+{
+  return IsLibraryGame(item) && !item.GetGameInfoTag()->IsBeaten();
+}
+
+bool CGameMarkBeaten::Execute(const std::shared_ptr<CFileItem>& item) const
+{
+  return SetBeaten(item, true);
+}
+
+bool CGameMarkNotBeaten::IsVisible(const CFileItem& item) const
+{
+  // A completed game is marked not completed first
+  return IsLibraryGame(item) && item.GetGameInfoTag()->IsBeaten() &&
+         !item.GetGameInfoTag()->IsCompleted();
+}
+
+bool CGameMarkNotBeaten::Execute(const std::shared_ptr<CFileItem>& item) const
+{
+  return SetBeaten(item, false);
+}
 
 bool CGameMarkCompleted::IsVisible(const CFileItem& item) const
 {

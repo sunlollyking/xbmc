@@ -142,6 +142,7 @@ void CGUIDialogGameInfo::Reload()
   {
     *m_item->GetGameInfoTag() = tag;
     CGameDatabase::SetAgeProperties(*m_item, CGameAgeRatings::AgeOf(tag.GetAgeRatings()));
+    CGameDatabase::SetCompletionProperties(*m_item, tag);
     KODI::ART::Artwork art;
     if (db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     {
@@ -174,10 +175,10 @@ void CGUIDialogGameInfo::UpdateButtons()
     const CGameInfoTag* tag = m_item->GetGameInfoTag();
     SET_CONTROL_LABEL(CONTROL_BTN_FAVOURITE, tag->IsFavourite() ? 14077 : 14076);
 
-    // Where a video is watched or not, a game is not started, in progress or
-    // finished, and the button says which of the three it is
-    static constexpr std::array<int, 3> stateLabels{35572, 35573, 35574};
-    static constexpr std::array<const char*, 3> stateNames{"notstarted", "inprogress",
+    // Where a video is watched or not, a game is not started, in progress,
+    // beaten or completed, and the button says which it is
+    static constexpr std::array<int, 4> stateLabels{35572, 35573, 35712, 35574};
+    static constexpr std::array<const char*, 4> stateNames{"notstarted", "inprogress", "beaten",
                                                            "completed"};
     const size_t state = static_cast<size_t>(PlayState(*tag));
     SET_CONTROL_LABEL(CONTROL_BTN_PLAY_STATE, stateLabels[state]);
@@ -496,6 +497,8 @@ CGUIDialogGameInfo::PlayStateValue CGUIDialogGameInfo::PlayState(const CGameInfo
 {
   if (tag.IsCompleted())
     return PlayStateValue::COMPLETED;
+  if (tag.IsBeaten())
+    return PlayStateValue::BEATEN;
   if (tag.GetPlayCount() > 0)
     return PlayStateValue::IN_PROGRESS;
   return PlayStateValue::NOT_STARTED;
@@ -523,20 +526,27 @@ void CGUIDialogGameInfo::OnPlayState()
         tag->SetPlayCount(1);
       break;
     case PlayStateValue::IN_PROGRESS:
+      changed = db.SetBeaten(idGame, true);
+      if (changed)
+        tag->SetBeaten(true);
+      break;
+    case PlayStateValue::BEATEN:
       changed = db.SetCompleted(idGame, true);
       if (changed)
         tag->SetCompleted(true);
       break;
     case PlayStateValue::COMPLETED:
-      changed = db.SetCompleted(idGame, false) && db.SetPlayCount(idGame, 0);
+      changed = db.SetBeaten(idGame, false) && db.SetPlayCount(idGame, 0);
       if (changed)
       {
         tag->SetCompleted(false);
+        tag->SetBeaten(false);
         tag->SetPlayCount(0);
       }
       break;
   }
 
+  CGameDatabase::SetCompletionProperties(*m_item, *tag);
   UpdateButtons();
   if (changed)
     AnnounceUpdate(idGame);

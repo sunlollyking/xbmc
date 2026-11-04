@@ -67,6 +67,7 @@ static const auto fields = std::array{
   TranslateField{ "region",            Field::REGION,                     TEXT_FIELD,     nullptr,                              true,  35524 },
   TranslateField{ "favourite",         Field::FAVOURITE,                  BOOLEAN_FIELD,  nullptr,                              false, 1036 },
   TranslateField{ "completed",         Field::COMPLETED,                  BOOLEAN_FIELD,  nullptr,                              false, 35531 },
+  TranslateField{ "beaten",            Field::BEATEN,                     BOOLEAN_FIELD,  nullptr,                              false, 35712 },
   TranslateField{ "hasachievements",   Field::HAS_ACHIEVEMENTS,           BOOLEAN_FIELD,  nullptr,                              false, 35534 },
   TranslateField{ "coop",              Field::COOP,                       BOOLEAN_FIELD,  nullptr,                              false, 35533 },
   TranslateField{ "filename",          Field::FILENAME,                   TEXT_FIELD,     nullptr,                              false, 561 },
@@ -483,13 +484,15 @@ std::vector<Field> CSmartPlaylistRule::GetFields(const std::string &type)
   else if (type == MEDIA::CONTENT::GAMES)
   {
     fields = {
-        Field::TITLE,      Field::ORIGINAL_TITLE, Field::PLOT,        Field::PLATFORM,
-        Field::GENRE,      Field::YEAR,           Field::DEVELOPER,   Field::STUDIO,
-        Field::SET,        Field::TAG,            Field::REGION,      Field::PLAYERS,
-        Field::MPAA,       Field::RATING,         Field::USER_RATING, Field::VOTES,
-        Field::PLAYCOUNT,  Field::LAST_PLAYED,    Field::DATE_ADDED,  Field::FILENAME,
-        Field::PATH,       Field::FAVOURITE,      Field::COMPLETED,   Field::HAS_ACHIEVEMENTS,
-        Field::COOP,       Field::TIME,
+        Field::TITLE,      Field::ORIGINAL_TITLE, Field::PLOT,
+        Field::PLATFORM,   Field::GENRE,          Field::YEAR,
+        Field::DEVELOPER,  Field::STUDIO,         Field::SET,
+        Field::TAG,        Field::REGION,         Field::PLAYERS,
+        Field::MPAA,       Field::RATING,         Field::USER_RATING,
+        Field::VOTES,      Field::PLAYCOUNT,      Field::LAST_PLAYED,
+        Field::DATE_ADDED, Field::FILENAME,       Field::PATH,
+        Field::FAVOURITE,  Field::COMPLETED,      Field::HAS_ACHIEVEMENTS,
+        Field::COOP,       Field::TIME,           Field::BEATEN,
     };
   }
   else if (type == MEDIA::CONTENT::MUSICVIDEOS)
@@ -778,7 +781,8 @@ std::string CSmartPlaylistRule::GetBooleanQuery(const std::string &negate, const
   else if (strType == MEDIA::CONTENT::GAMES)
   {
     if (m_field == static_cast<int>(Field::FAVOURITE) ||
-        m_field == static_cast<int>(Field::COMPLETED) || m_field == static_cast<int>(Field::COOP))
+        m_field == static_cast<int>(Field::COMPLETED) || m_field == static_cast<int>(Field::COOP) ||
+        m_field == static_cast<int>(Field::BEATEN))
       return negate + GetField(m_field, strType);
     if (m_field == static_cast<int>(Field::HAS_ACHIEVEMENTS))
       return negate + " " + GetField(m_field, strType) + " > 0";

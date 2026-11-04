@@ -163,6 +163,7 @@ enum class Field
   COMPLETED,
   HAS_ACHIEVEMENTS,
   COOP,
+  BEATEN,
   MAX
 };
 

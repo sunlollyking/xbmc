@@ -294,6 +294,7 @@ const DatabaseUtils::View* DatabaseUtils::ViewOf(KODI::MEDIA::TYPE mediaType)
       named(Field::REGION,           "game_view.releaseRegions",  KODI::GAME::GAMEDB_RELEASE_REGIONS),
       named(Field::FAVOURITE,        "game_view.favourite"),
       named(Field::COMPLETED,        "game_view.completed"),
+      named(Field::BEATEN,           "game_view.beaten"),
       named(Field::HAS_ACHIEVEMENTS, "game_view.achievementsTotal"),
       named(Field::COOP,             "game_view.coop",            KODI::GAME::GAMEDB_COOP),
       named(Field::SET,              "game_view.collections"),

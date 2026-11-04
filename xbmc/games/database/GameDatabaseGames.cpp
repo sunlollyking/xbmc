@@ -90,18 +90,21 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           "achievementsEarned = %i, "
           "achievementsHardcore = %i, lastUnlock = '%s', matchedBy = '%s', trailer = '%s', "
           "manual = '%s', lastScraped = '%s', genres = '%s', developers = '%s', publishers = "
-          "'%s', collections = '%s', edition = '%s' WHERE idGame = %i",
+          "'%s', collections = '%s', edition = '%s', beaten = %i, timeToBeatMain = %i, "
+          "timeToBeatExtras = %i, timeToBeatComplete = %i WHERE idGame = %i",
           idPlatform, details.GetTitle().c_str(), sortTitle.c_str(), titleKey.c_str(),
           details.GetOriginalTitle().c_str(), details.GetOverview().c_str(),
           details.GetReleaseDate().c_str(), static_cast<int>(details.GetYear()),
           details.GetPlayersMin(), details.GetPlayersMax(), details.IsCoop() ? 1 : 0,
           category.c_str(), details.GetParentGameId(), details.GetUserRating(),
-          details.IsFavourite() ? 1 : 0, details.IsCompleted() ? 1 : 0,
-          details.IsHidden() ? 1 : 0, details.GetAchievementsTotal(), details.GetAchievementsEarned(),
+          details.IsFavourite() ? 1 : 0, details.IsCompleted() ? 1 : 0, details.IsHidden() ? 1 : 0,
+          details.GetAchievementsTotal(), details.GetAchievementsEarned(),
           details.GetAchievementsHardcore(), details.GetLastUnlock().c_str(), matchedBy.c_str(),
           details.GetTrailer().c_str(), details.GetManual().c_str(),
           details.GetLastScraped().c_str(), genres.c_str(), developers.c_str(), publishers.c_str(),
-          collections.c_str(), details.GetEdition().c_str(), idGame));
+          collections.c_str(), details.GetEdition().c_str(), details.IsBeaten() ? 1 : 0,
+          details.GetTimeToBeat().main, details.GetTimeToBeat().extras,
+          details.GetTimeToBeat().complete, idGame));
     }
     else
     {
@@ -112,21 +115,23 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
           "idDefaultRelease, idDefaultRating, idDefaultUniqueId, userRating, favourite, "
           "completed, hidden, achievementsTotal, achievementsEarned, achievementsHardcore, "
           "lastUnlock, matchedBy, trailer, manual, lastScraped, dateAdded, genres, developers, "
-          "publishers, collections, edition) VALUES (%i, '%s', '%s', '%s', '%s', '%s', '%s', %i, "
-          "%i, %i, %i, '%s', %i, -1, -1, -1, %i, %i, %i, %i, %i, %i, %i, '%s', '%s', '%s', '%s', "
-          "'%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+          "publishers, collections, edition, beaten, timeToBeatMain, timeToBeatExtras, "
+          "timeToBeatComplete) VALUES (%i, '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i, %i, "
+          "'%s', %i, -1, -1, -1, %i, %i, %i, %i, %i, %i, %i, '%s', '%s', '%s', '%s', '%s', '%s', "
+          "'%s', '%s', '%s', '%s', '%s', %i, %i, %i, %i)",
           idPlatform, details.GetTitle().c_str(), sortTitle.c_str(), titleKey.c_str(),
           details.GetOriginalTitle().c_str(), details.GetOverview().c_str(),
           details.GetReleaseDate().c_str(), static_cast<int>(details.GetYear()),
           details.GetPlayersMin(), details.GetPlayersMax(), details.IsCoop() ? 1 : 0,
           category.c_str(), details.GetParentGameId(), details.GetUserRating(),
-          details.IsFavourite() ? 1 : 0, details.IsCompleted() ? 1 : 0,
-          details.IsHidden() ? 1 : 0, details.GetAchievementsTotal(),
-          details.GetAchievementsEarned(), details.GetAchievementsHardcore(),
-          details.GetLastUnlock().c_str(), matchedBy.c_str(),
+          details.IsFavourite() ? 1 : 0, details.IsCompleted() ? 1 : 0, details.IsHidden() ? 1 : 0,
+          details.GetAchievementsTotal(), details.GetAchievementsEarned(),
+          details.GetAchievementsHardcore(), details.GetLastUnlock().c_str(), matchedBy.c_str(),
           details.GetTrailer().c_str(), details.GetManual().c_str(),
           details.GetLastScraped().c_str(), dateAdded.c_str(), genres.c_str(), developers.c_str(),
-          publishers.c_str(), collections.c_str(), details.GetEdition().c_str()));
+          publishers.c_str(), collections.c_str(), details.GetEdition().c_str(),
+          details.IsBeaten() ? 1 : 0, details.GetTimeToBeat().main, details.GetTimeToBeat().extras,
+          details.GetTimeToBeat().complete));
       idGame = static_cast<int>(m_pDS->lastinsertid());
     }
 
@@ -539,6 +544,10 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   details.SetUserRating(record->at(GAMEDB_USER_RATING).get_asInt());
   details.SetFavourite(record->at(GAMEDB_FAVOURITE).get_asBool());
   details.SetCompleted(record->at(GAMEDB_COMPLETED).get_asBool());
+  details.SetBeaten(record->at(GAMEDB_BEATEN).get_asBool());
+  details.SetTimeToBeat({record->at(GAMEDB_TIME_TO_BEAT_MAIN).get_asInt(),
+                         record->at(GAMEDB_TIME_TO_BEAT_EXTRAS).get_asInt(),
+                         record->at(GAMEDB_TIME_TO_BEAT_COMPLETE).get_asInt()});
   details.SetHidden(record->at(GAMEDB_HIDDEN).get_asBool());
   details.SetLastScraped(record->at(GAMEDB_LAST_SCRAPED).get_asString());
   details.SetAchievements(record->at(GAMEDB_ACHIEVEMENTS_TOTAL).get_asInt(),
@@ -812,8 +821,18 @@ int CGameDatabase::SetAchievementProgress(const std::string& source,
 
 bool CGameDatabase::SetCompleted(int idGame, bool completed)
 {
-  return ExecuteQuery(PrepareSQL("UPDATE game SET completed = %i WHERE idGame = %i",
-                                 completed ? 1 : 0, idGame));
+  if (completed)
+    return ExecuteQuery(
+        PrepareSQL("UPDATE game SET completed = 1, beaten = 1 WHERE idGame = %i", idGame));
+  return ExecuteQuery(PrepareSQL("UPDATE game SET completed = 0 WHERE idGame = %i", idGame));
+}
+
+bool CGameDatabase::SetBeaten(int idGame, bool beaten)
+{
+  if (beaten)
+    return ExecuteQuery(PrepareSQL("UPDATE game SET beaten = 1 WHERE idGame = %i", idGame));
+  return ExecuteQuery(
+      PrepareSQL("UPDATE game SET beaten = 0, completed = 0 WHERE idGame = %i", idGame));
 }
 
 bool CGameDatabase::SetUserRating(int idGame, int rating)

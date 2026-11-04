@@ -192,6 +192,9 @@ public:
 
   int GetParentGameId() const { return m_parentGameId; }
   void SetParentGameId(int id) { m_parentGameId = id; }
+
+  const GameTimeToBeat& GetTimeToBeat() const { return m_timeToBeat; }
+  void SetTimeToBeat(const GameTimeToBeat& timeToBeat) { m_timeToBeat = timeToBeat; }
   ///@}
 
   /*!
@@ -291,6 +294,10 @@ public:
   bool IsCompleted() const { return m_completed; }
   void SetCompleted(bool completed) { m_completed = completed; }
 
+  //! \brief Whether the game has been beaten, which a completed game always has
+  bool IsBeaten() const { return m_beaten || m_completed; }
+  void SetBeaten(bool beaten) { m_beaten = beaten; }
+
   int GetAchievementsTotal() const { return m_achievementsTotal; }
   int GetAchievementsEarned() const { return m_achievementsEarned; }
   int GetAchievementsHardcore() const { return m_achievementsHardcore; }
@@ -366,6 +373,7 @@ private:
   bool m_coop;
   GameCategory m_category;
   int m_parentGameId;
+  GameTimeToBeat m_timeToBeat;
 
   // Ratings and identifiers
   std::map<std::string, GameRating> m_ratings;
@@ -390,6 +398,7 @@ private:
   bool m_hidden{false};
   std::string m_strLastScraped;
   bool m_completed;
+  bool m_beaten{false};
   int m_achievementsTotal;
   int m_achievementsEarned;
   int m_achievementsHardcore;

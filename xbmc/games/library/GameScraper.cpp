@@ -528,6 +528,13 @@ bool CGameScraper::ReadDetails(const std::string& id,
   }
   if (payload.isMember("coop"))
     details.SetCoop(payload["coop"].asBoolean());
+  if (payload["timetobeat"].isObject())
+  {
+    const CVariant& times = payload["timetobeat"];
+    const auto seconds = [&times](const char* key)
+    { return GameTimeToBeat::Valid(times[key].asInteger()); };
+    details.SetTimeToBeat({seconds("main"), seconds("extras"), seconds("complete")});
+  }
   if (payload.isMember("category"))
     details.SetCategory(CGameLibraryTypes::GameCategoryFromString(payload["category"].asString()));
   if (payload.isMember("edition"))

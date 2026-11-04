@@ -282,6 +282,52 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   EXPECT_EQ(read.GetAchievementsHardcore(), 1);
 }
 
+TEST(TestGameInfoTagLoader, BeatenAndTimeToBeatAreReadBack)
+{
+  //
+  // Spec: a game beaten but not completed stays that way, and how long it takes
+  // to beat survives the trip
+  //
+
+  CGameInfoTag written;
+  written.SetTitle("Super Test Bros.");
+  written.SetBeaten(true);
+  written.SetTimeToBeat({7200, 9000, 14400});
+
+  CNFOFixture fixture;
+  CFileItem item(fixture.Path("beaten.n64"), false);
+  ASSERT_TRUE(CGameInfoTagLoader::Save(item, written));
+
+  CGameInfoTag read;
+  ASSERT_TRUE(CGameInfoTagLoader::Load(item, read));
+
+  EXPECT_TRUE(read.IsBeaten());
+  EXPECT_FALSE(read.IsCompleted());
+  EXPECT_EQ(read.GetTimeToBeat(), written.GetTimeToBeat());
+}
+
+TEST(TestGameInfoTagLoader, ATimeToBeatThatCannotBeRightIsLeftOut)
+{
+  //
+  // Spec: a time that is negative, or longer than any game takes, is dropped
+  // rather than shown
+  //
+
+  CNFOFixture fixture;
+  const std::string game = fixture.Path("times.n64");
+  fixture.Write("times.nfo", R"(<game>
+  <title>Super Test Bros.</title>
+  <timetobeat main="-5" extras="9000" complete="999999999"/>
+</game>)");
+
+  CGameInfoTag tag;
+  ASSERT_TRUE(CGameInfoTagLoader::Load(CFileItem(game, false), tag));
+
+  EXPECT_EQ(tag.GetTimeToBeat().main, 0);
+  EXPECT_EQ(tag.GetTimeToBeat().extras, 9000);
+  EXPECT_EQ(tag.GetTimeToBeat().complete, 0);
+}
+
 TEST(TestGameInfoTagLoader, WritingLeavesOutWhatTheGameDoesNotHave)
 {
   //
@@ -307,4 +353,6 @@ TEST(TestGameInfoTagLoader, WritingLeavesOutWhatTheGameDoesNotHave)
   EXPECT_EQ(contents.find("<year>"), std::string::npos);
   EXPECT_EQ(contents.find("<favourite>"), std::string::npos);
   EXPECT_EQ(contents.find("<achievements"), std::string::npos);
+  EXPECT_EQ(contents.find("<beaten>"), std::string::npos);
+  EXPECT_EQ(contents.find("<timetobeat"), std::string::npos);
 }

@@ -248,11 +248,12 @@ void CGameClientCheevos::QueueStartupToast()
 
 void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data)
 {
-  OnAchievementTriggered(data, CServiceBroker::GetGameServices().AchievementRuntime(),
-                         m_encoreModeEnabled);
+  if (OnAchievementTriggered(data, CServiceBroker::GetGameServices().AchievementRuntime(),
+                             m_encoreModeEnabled))
+    CServiceBroker::GetGameServices().MarkPlayingGameBeaten();
 }
 
-void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data,
+bool CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data,
                                                 CAchievementRuntime& runtime,
                                                 bool encoreModeEnabled)
 {
@@ -276,7 +277,7 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   {
     CLog::Log(LOGDEBUG, "CGameClientCheevos: achievement {} \"{}\" was already earned", data.id,
               title);
-    return;
+    return false;
   }
 
   CLog::Log(LOGINFO, "CGameClientCheevos: earned achievement {} \"{}\" ({} points){}", data.id,
@@ -292,20 +293,20 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
                                         TOAST_DISPLAY_TIME_MS, true, TOAST_MESSAGE_TIME_MS);
 
   if (!newlyEarned)
-    return;
+    return false;
 
   // Beaten by this unlock: the last progression achievement, or the first win
   // once there are none left to earn
   const auto achievement = std::ranges::find(state.achievements, data.id, &AchievementInfo::id);
   if (achievement == state.achievements.end())
-    return;
+    return false;
 
   const BeatenProgress beaten = state.GetBeatenProgress(achievement->setId);
   const bool newlyBeaten =
       beaten.IsBeaten() && (achievement->type == AchievementType::PROGRESSION ||
                             (achievement->type == AchievementType::WIN && beaten.winEarned == 1));
   if (!newlyBeaten)
-    return;
+    return false;
 
   const auto set = std::ranges::find(state.sets, achievement->setId, &AchievementSet::id);
   const std::string setTitle =
@@ -316,6 +317,9 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   // "Beaten"
   CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35712), setTitle,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+
+  // A subset is a challenge of its own; only the game's own set beats the game
+  return state.sets.empty() || state.sets.front().id == achievement->setId;
 }
 
 void CGameClientCheevos::OnAchievementSets(const game_rc_achievement_sets& data)

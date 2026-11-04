@@ -5184,6 +5184,7 @@
         "playersmin",
         "playersmax",
         "coop",
+        "timetobeat",
         "category",
         "rating",
         "votes",
@@ -5194,11 +5195,13 @@
         "releasecount",
         "releases",
         "playcount",
+        "playtime",
         "lastplayed",
         "dateadded",
         "userrating",
         "favourite",
         "completed",
+        "beaten",
         "achievementstotal",
         "achievementsearned",
         "achievementshardcore",
@@ -5349,6 +5352,21 @@
       "coop": {
         "type": "boolean"
       },
+      "timetobeat": {
+        "type": "object",
+        "description": "How long players take to beat the game, in seconds, or 0 where unknown",
+        "properties": {
+          "main": {
+            "type": "integer"
+          },
+          "extras": {
+            "type": "integer"
+          },
+          "complete": {
+            "type": "integer"
+          }
+        }
+      },
       "category": {
         "type": "string"
       },
@@ -5385,6 +5403,10 @@
       "playcount": {
         "type": "integer"
       },
+      "playtime": {
+        "type": "integer",
+        "description": "How long the game has been played for, in seconds"
+      },
       "lastplayed": {
         "type": "string"
       },
@@ -5399,6 +5421,10 @@
       },
       "completed": {
         "type": "boolean"
+      },
+      "beaten": {
+        "type": "boolean",
+        "description": "Whether the game has been beaten, which a completed game always has"
       },
       "achievementstotal": {
         "type": "integer"

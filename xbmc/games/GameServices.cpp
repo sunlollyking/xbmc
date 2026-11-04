@@ -135,3 +135,17 @@ void CGameServices::MarkPlayingGameCompleted()
   if (CGameDatabase library; library.Open())
     library.SetCompletedForFile(gamePath);
 }
+
+void CGameServices::MarkPlayingGameBeaten()
+{
+  std::string gamePath;
+  {
+    std::lock_guard lock(m_playSessionMutex);
+    gamePath = m_playSessionPath;
+  }
+  if (gamePath.empty())
+    return;
+
+  if (CGameDatabase library; library.Open())
+    library.SetBeatenForFile(gamePath);
+}

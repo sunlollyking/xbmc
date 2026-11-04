@@ -321,6 +321,7 @@
 	</variable>
 	<variable name="GamePlayStateColourVar">
 		<value condition="String.IsEqual(Window(gameinformation).Property(playstate),completed)">FF66BB6A</value>
+		<value condition="String.IsEqual(Window(gameinformation).Property(playstate),beaten)">FF42A5F5</value>
 		<value condition="String.IsEqual(Window(gameinformation).Property(playstate),inprogress)">FFFFB300</value>
 		<value>D0FFFFFF</value>
 	</variable>

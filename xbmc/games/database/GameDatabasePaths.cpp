@@ -444,8 +444,20 @@ bool CGameDatabase::SetCompletedForFile(const std::string& fileNameAndPath)
   if (idFile <= 0)
     return false;
 
-  return ExecuteQuery(PrepareSQL("UPDATE game SET completed = 1 WHERE idGame = (SELECT r.idGame FROM "
-                                 "files f JOIN gamerelease r ON r.idRelease = f.idRelease WHERE "
-                                 "f.idFile = %i)",
-                                 idFile));
+  return ExecuteQuery(PrepareSQL(
+      "UPDATE game SET completed = 1, beaten = 1 WHERE idGame = (SELECT r.idGame FROM files f "
+      "JOIN gamerelease r ON r.idRelease = f.idRelease WHERE f.idFile = %i)",
+      idFile));
+}
+
+bool CGameDatabase::SetBeatenForFile(const std::string& fileNameAndPath)
+{
+  const int idFile = GetFileId(fileNameAndPath);
+  if (idFile <= 0)
+    return false;
+
+  return ExecuteQuery(PrepareSQL(
+      "UPDATE game SET beaten = 1 WHERE idGame = (SELECT r.idGame FROM files f JOIN gamerelease r "
+      "ON r.idRelease = f.idRelease WHERE f.idFile = %i)",
+      idFile));
 }

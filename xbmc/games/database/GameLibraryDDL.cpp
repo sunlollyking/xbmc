@@ -111,7 +111,11 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "developers text, "
                   "publishers text, "
                   "collections text, "
-                  "edition text)");
+                  "edition text, "
+                  "beaten bool, "
+                  "timeToBeatMain integer, "
+                  "timeToBeatExtras integer, "
+                  "timeToBeatComplete integer)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -410,5 +414,19 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
     db.ExecuteQuery("ALTER TABLE platform ADD COLUMN defaultRotation integer");
     db.ExecuteQuery("ALTER TABLE platform ADD COLUMN defaultBezel integer");
     db.ExecuteQuery("DROP VIEW IF EXISTS platform_view");
+  }
+
+  // 11: whether a game has been beaten, which every completed game has been,
+  // and how long players take to beat it. The game view lists the game's
+  // columns, so it is rebuilt too.
+  if (version < 11)
+  {
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN beaten bool");
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN timeToBeatMain integer");
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN timeToBeatExtras integer");
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN timeToBeatComplete integer");
+    db.ExecuteQuery("UPDATE game SET beaten = completed, timeToBeatMain = 0, timeToBeatExtras = 0, "
+                    "timeToBeatComplete = 0");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
 }

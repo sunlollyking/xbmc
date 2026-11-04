@@ -60,7 +60,8 @@ public:
   //@{
   void OnGameLoaded(const game_rc_game_loaded& data);
   void OnAchievementTriggered(const game_rc_achievement_triggered& data);
-  static void OnAchievementTriggered(const game_rc_achievement_triggered& data,
+  //! \return True if the unlock beat the game's own achievement set
+  static bool OnAchievementTriggered(const game_rc_achievement_triggered& data,
                                      CAchievementRuntime& runtime,
                                      bool encoreModeEnabled);
   void OnGameCompleted(const std::string& title, bool hardcore);

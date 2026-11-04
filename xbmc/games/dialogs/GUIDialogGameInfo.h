@@ -65,12 +65,13 @@ private:
   void OnRefresh();
   void OnReleases();
   void OnFavourite();
-  //! \brief The three states a game is in, as a video is watched or not
+  //! \brief How far a game has been played through, as a video is watched or not
   enum class PlayStateValue
   {
     NOT_STARTED = 0,
     IN_PROGRESS = 1,
-    COMPLETED = 2,
+    BEATEN = 2,
+    COMPLETED = 3,
   };
 
   static PlayStateValue PlayState(const CGameInfoTag& tag);

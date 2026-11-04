@@ -5635,6 +5635,7 @@
                   "recentlyplayed",
                   "neverplayed",
                   "favourites",
+                  "beaten",
                   "completed",
                   "multiplayer",
                   "coop",
@@ -5995,6 +5996,10 @@
       },
       {
         "name": "favourite",
+        "$ref": "Optional.Boolean"
+      },
+      {
+        "name": "beaten",
         "$ref": "Optional.Boolean"
       },
       {

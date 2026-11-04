@@ -1607,6 +1607,7 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     tag.SetUserRating(existing.GetUserRating());
     tag.SetFavourite(existing.IsFavourite());
     tag.SetCompleted(existing.IsCompleted());
+    tag.SetBeaten(existing.IsBeaten());
     tag.SetDateAdded(existing.GetDateAdded());
     tag.SetAchievements(existing.GetAchievementsTotal(), existing.GetAchievementsEarned(),
                         existing.GetAchievementsHardcore());
@@ -1626,6 +1627,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       tag.SetPublishers(existing.GetPublishers());
     if (tag.GetGenres().empty())
       tag.SetGenres(existing.GetGenres());
+    if (tag.GetTimeToBeat().IsEmpty())
+      tag.SetTimeToBeat(existing.GetTimeToBeat());
 
     // Tags can be put on a game by hand, so a refresh keeps those -- but it
     // must not throw away the ones the scrape just found, which is what
