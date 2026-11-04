@@ -406,6 +406,12 @@
 						<param name="visible" value="!String.IsEmpty(ListItem.Property(relatedcount))" />
 					</include>
 					<include content="InfoDialogButton">
+						<param name="id" value="22" />
+						<param name="icon" value="icons/infodialogs/director.png" />
+						<param name="label" value="$LOCALIZE[35806]" />
+						<param name="visible" value="!String.IsEmpty(ListItem.Property(charactercount))" />
+					</include>
+					<include content="InfoDialogButton">
 						<param name="id" value="18" />
 						<param name="icon" value="icons/infodialogs/set.png" />
 						<param name="label" value="$LOCALIZE[35778]" />

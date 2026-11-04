@@ -21392,7 +21392,20 @@ msgctxt "#35805"
 msgid "Spin-off"
 msgstr ""
 
-#empty strings from id 35806 to 35999
+#. Who appears in games, browsed by character
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35806"
+msgid "Characters"
+msgstr ""
+
+#. Description of the list of the characters in the library's games
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35807"
+msgid "Who appears in your games. Choose one to see every game they're in."
+msgstr ""
+
+#empty strings from id 35808 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

@@ -244,6 +244,12 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendWhere(
         PrepareSQL("gamemode_link.idGameMode = %i", static_cast<int>(v->asInteger())));
   }
+  if (const CVariant* v = option("characterid"))
+  {
+    filter.AppendJoin("JOIN gamecharacter_link ON gamecharacter_link.idGame = game_view.idGame");
+    filter.AppendWhere(
+        PrepareSQL("gamecharacter_link.idCharacter = %i", static_cast<int>(v->asInteger())));
+  }
   if (const CVariant* v = option("tagid"))
   {
     filter.AppendJoin("JOIN tag_link ON tag_link.idGame = game_view.idGame");
@@ -951,11 +957,26 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
     if (url.GetNode() == GameDbNode::SERIES)
       return GetSeriesNav(baseDir, items);
 
+    // A game's own characters, each counted and opened across every game they're in
+    CGameDbUrl scopeUrl{url};
+    int characterGame = -1;
+    if (url.GetNode() == GameDbNode::CHARACTERS && url.HasOption("gameid"))
+    {
+      CVariant gameId;
+      url.GetOption("gameid", gameId);
+      characterGame = static_cast<int>(gameId.asInteger());
+      scopeUrl.RemoveOption("gameid");
+    }
+
     // The scope every facet is counted within
     Filter scope;
     SortDescription sorting;
-    if (!GetFilter(url, scope, sorting))
+    if (!GetFilter(scopeUrl, scope, sorting))
       return false;
+    if (characterGame > 0)
+      scope.AppendWhere(PrepareSQL("gamecharacter.idCharacter IN (SELECT idCharacter FROM "
+                                   "gamecharacter_link WHERE idGame = %i)",
+                                   characterGame));
     const std::string where = scope.where.empty() ? "" : " WHERE " + scope.where;
     const std::string join = scope.join;
 
@@ -975,6 +996,16 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
               "gamemode_link.idGameMode = gamemode.idGameMode JOIN game_view ON game_view.idGame = "
               "gamemode_link.idGame " +
               join + where + " GROUP BY gamemode.idGameMode, gamemode.name ORDER BY gamemode.name";
+        break;
+      case GameDbNode::CHARACTERS:
+        sql = "SELECT gamecharacter.idCharacter AS id, gamecharacter.name AS label, "
+              "gamecharacter.thumb AS thumb, COUNT(DISTINCT game_view.idGame) AS n FROM "
+              "gamecharacter JOIN gamecharacter_link ON gamecharacter_link.idCharacter = "
+              "gamecharacter.idCharacter JOIN game_view ON game_view.idGame = "
+              "gamecharacter_link.idGame " +
+              join + where +
+              " GROUP BY gamecharacter.idCharacter, gamecharacter.name, gamecharacter.thumb "
+              "ORDER BY gamecharacter.name";
         break;
       case GameDbNode::TAGS:
         sql = "SELECT tag.idTag AS id, tag.name AS label, COUNT(DISTINCT game_view.idGame) AS n "
@@ -1041,7 +1072,7 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
         return false;
     }
 
-    std::string base = baseDir;
+    std::string base = characterGame > 0 ? scopeUrl.ToString() : baseDir;
     URIUtils::AddSlashAtEnd(base);
 
     // Skins pick the icon for a genre folder by its type, and a game facet has
@@ -1050,6 +1081,7 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
     const bool isGenre = url.GetNode() == GameDbNode::GENRES;
 
     const bool isAge = url.GetNode() == GameDbNode::AGERATINGS;
+    const bool isCharacter = url.GetNode() == GameDbNode::CHARACTERS;
 
     if (m_pDS->query(sql))
     {
@@ -1073,6 +1105,12 @@ bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items
           item->SetProperty("DBType", "genre");
         if (isAge)
           SetAgeProperties(*item, m_pDS->fv("id").get_asInt());
+        if (isCharacter)
+        {
+          const std::string thumb = m_pDS->fv("thumb").get_asString();
+          if (!thumb.empty())
+            item->SetArt("thumb", thumb);
+        }
         items.Add(item);
         m_pDS->next();
       }

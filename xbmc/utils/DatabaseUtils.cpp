@@ -299,6 +299,7 @@ const DatabaseUtils::View* DatabaseUtils::ViewOf(KODI::MEDIA::TYPE mediaType)
       named(Field::SPLIT_SCREEN,     "game_view.splitScreen"),
       named(Field::AGE_CONTENT,      "game_view.idGame"),
       named(Field::GAME_MODE,        "game_view.idGame"),
+      named(Field::GAME_CHARACTER,   "game_view.idGame"),
       named(Field::HAS_ACHIEVEMENTS, "game_view.achievementsTotal"),
       named(Field::COOP,             "game_view.coop",            KODI::GAME::GAMEDB_COOP),
       named(Field::SET,              "game_view.collections"),

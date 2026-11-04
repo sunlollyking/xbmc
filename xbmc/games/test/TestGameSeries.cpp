@@ -57,6 +57,15 @@ TEST(TestGameSeries, OnlyTheTitlesListFolds)
   EXPECT_FALSE(Url("gamedb://titles/?relatedto=12").IsTitles());
 }
 
+TEST(TestGameSeries, CharactersAreAFacet)
+{
+  EXPECT_EQ(Url("gamedb://characters/").GetNode(), GameDbNode::CHARACTERS);
+  CVariant id;
+  ASSERT_TRUE(Url("gamedb://characters/9/").GetOption("characterid", id));
+  EXPECT_EQ(id.asInteger(), 9);
+  EXPECT_TRUE(Url("gamedb://characters/?gameid=4").HasOption("gameid"));
+}
+
 TEST(TestGameSeries, PopularityIsAList)
 {
   EXPECT_EQ(Url("gamedb://popular/").GetList(), "popular");

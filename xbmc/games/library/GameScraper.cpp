@@ -583,6 +583,20 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetPopularity({GamePopularity::Valid(popularity["visits"].asDouble()),
                            GamePopularity::Valid(popularity["wanttoplay"].asDouble())});
   }
+  if (payload["characters"].isArray())
+  {
+    std::vector<GameCharacter> characters;
+    const CVariant& list = payload["characters"];
+    for (auto it = list.begin_array();
+         it != list.end_array() && characters.size() < GameCharacter::MAX_PER_GAME; ++it)
+    {
+      std::string name = (*it)["name"].asString();
+      StringUtils::Trim(name);
+      if (!name.empty())
+        characters.push_back({name, (*it)["thumb"].asString()});
+    }
+    details.SetCharacters(characters);
+  }
   if (payload.isMember("category"))
     details.SetCategory(CGameLibraryTypes::GameCategoryFromString(payload["category"].asString()));
   if (payload.isMember("edition"))

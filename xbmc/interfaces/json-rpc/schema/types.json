@@ -5186,6 +5186,7 @@
         "modes",
         "popularity",
         "spinoff",
+        "characters",
         "related",
         "languagesupport",
         "players",
@@ -5388,6 +5389,21 @@
       "spinoff": {
         "type": "boolean",
         "description": "Whether the game is a spin-off of its series rather than one of its main games"
+      },
+      "characters": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "thumb": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Who appears in the game, with a picture of each where there is one"
       },
       "related": {
         "type": "array",

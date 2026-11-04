@@ -147,6 +147,7 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
   CreateLookupTable(db, "genre", "idGenre");
   CreateLookupTable(db, "tag", "idTag");
   CreateLookupTable(db, "gamemode", "idGameMode");
+  CreateCharacterTables(db);
   db.ExecuteQuery("CREATE TABLE company (idCompany integer primary key, name text, country text)");
   db.ExecuteQuery("CREATE TABLE developer_link (idCompany integer, idGame integer)");
   db.ExecuteQuery("CREATE TABLE publisher_link (idCompany integer, idGame integer)");
@@ -196,6 +197,14 @@ void CGameLibraryDDL::CreateGameLinkTable(CDatabase& db)
   // Other games a catalogue names for this one, by title, matched to the
   // library by title key when they're shown
   db.ExecuteQuery("CREATE TABLE game_link (idGame integer, kind text, title text, titleKey text)");
+}
+
+void CGameLibraryDDL::CreateCharacterTables(CDatabase& db)
+{
+  // A lookup like genre's, with a picture of each character
+  db.ExecuteQuery(
+      "CREATE TABLE gamecharacter (idCharacter integer primary key, name text, thumb text)");
+  db.ExecuteQuery("CREATE TABLE gamecharacter_link (idCharacter integer, idGame integer)");
 }
 
 void CGameLibraryDDL::CreateLookupTable(CDatabase& db, const char* table, const char* idColumn)
@@ -255,6 +264,7 @@ void CGameLibraryDDL::CreateIndexes(CDatabase& db)
   CreateLookupIndexes(db, "genre", "idGenre");
   CreateLookupIndexes(db, "tag", "idTag");
   CreateLookupIndexes(db, "gamemode", "idGameMode");
+  CreateLookupIndexes(db, "gamecharacter", "idCharacter");
   db.ExecuteQuery("CREATE UNIQUE INDEX ix_company_name ON company (name(255))");
   db.ExecuteQuery("CREATE UNIQUE INDEX ix_developer_link_1 ON developer_link (idCompany, idGame)");
   db.ExecuteQuery("CREATE UNIQUE INDEX ix_developer_link_2 ON developer_link (idGame, idCompany)");
@@ -356,6 +366,7 @@ void CGameLibraryDDL::CreateTriggers(CDatabase& db)
                   "DELETE FROM collection_link WHERE idGame = old.idGame; "
                   "DELETE FROM game_link WHERE idGame = old.idGame; "
                   "DELETE FROM gamemode_link WHERE idGame = old.idGame; "
+                  "DELETE FROM gamecharacter_link WHERE idGame = old.idGame; "
                   "DELETE FROM art WHERE media_id = old.idGame AND media_type = 'game'; "
                   "DELETE FROM rating WHERE media_id = old.idGame AND media_type = 'game'; "
                   "DELETE FROM agerating WHERE media_id = old.idGame AND media_type "
@@ -515,4 +526,8 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN spinoff bool");
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
+
+  // 20: who appears in a game
+  if (version < 20)
+    CreateCharacterTables(db);
 }
