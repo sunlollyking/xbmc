@@ -1631,6 +1631,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       tag.SetTimeToBeat(existing.GetTimeToBeat());
     if (tag.GetSeries().empty())
       tag.SetSeries(existing.GetSeries());
+    if (tag.GetSimilar().empty())
+      tag.SetSimilar(existing.GetSimilar());
 
     // Tags can be put on a game by hand, so a refresh keeps those -- but it
     // must not throw away the ones the scrape just found, which is what

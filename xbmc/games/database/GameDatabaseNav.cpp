@@ -259,6 +259,13 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendWhere(
         PrepareSQL("collection_link.idCollection = %i", static_cast<int>(v->asInteger())));
   }
+  if (const CVariant* v = option("similarto"))
+  {
+    const int idGame = static_cast<int>(v->asInteger());
+    filter.AppendWhere(PrepareSQL("game_view.idGame <> %i AND game_view.titleKey IN (SELECT "
+                                  "titleKey FROM game_link WHERE idGame = %i AND kind = 'similar')",
+                                  idGame, idGame));
+  }
   if (const CVariant* v = option("seriesid"))
     filter.AppendWhere(PrepareSQL("game_view.idSeries = %i", static_cast<int>(v->asInteger())));
   if (const CVariant* v = option("year"))
@@ -786,6 +793,29 @@ void CGameDatabase::FoldSeries(const CGameDbUrl& url, CFileItemList& items)
       items.Remove(game.get());
     items.Add(series);
   }
+}
+
+int CGameDatabase::CountGames(const std::string& baseDir)
+{
+  try
+  {
+    CGameDbUrl url;
+    Filter filter;
+    SortDescription sorting;
+    if (!url.FromString(baseDir) || !GetFilter(url, filter, sorting))
+      return 0;
+
+    std::string sql;
+    if (!CDatabase::BuildSQL("SELECT COUNT(DISTINCT game_view.idGame) FROM game_view ", filter,
+                             sql))
+      return 0;
+    return GetSingleValueInt(sql, *m_pDS);
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: Failed to count {}", baseDir);
+  }
+  return 0;
 }
 
 bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items)

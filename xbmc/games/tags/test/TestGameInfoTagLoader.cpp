@@ -236,6 +236,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   written.SetCollections({"Test Bros."});
   written.SetSeries("Test Bros.");
   written.SetTags({"verified"});
+  written.SetSimilar({"Test Bros. 2", "Test Land"});
   written.SetPlayers(1, 4);
   written.SetCoop(true);
   written.SetCoopPlayers(2);
@@ -272,6 +273,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   EXPECT_EQ(read.GetCollections(), written.GetCollections());
   EXPECT_EQ(read.GetSeries(), "Test Bros.");
   EXPECT_EQ(read.GetTags(), written.GetTags());
+  EXPECT_EQ(read.GetSimilar(), written.GetSimilar());
   EXPECT_EQ(read.GetPlayersMin(), 1);
   EXPECT_EQ(read.GetPlayersMax(), 4);
   EXPECT_TRUE(read.IsCoop());

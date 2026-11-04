@@ -123,6 +123,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "collections": ["Sonic the Hedgehog"],
   "series": "Sonic the Hedgehog",
   "tags": [],
+  "similar": ["Sonic the Hedgehog 3"],
   "players": {"min": 1, "max": 2},
   "coop": true,
   "coopplayers": 2,
@@ -149,7 +150,9 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
 
 Every key is optional except `version` and `title`. `timetobeat` is how long
 players take, in seconds: `main` for the main story, `extras` for that and what
-is around it, `complete` for everything. `coopplayers` is how many can play
+is around it, `complete` for everything. `similar` names
+games like this one, matched by title to the games in the library.
+`coopplayers` is how many can play
 together in co-op on one machine; `dropin` says a player can join or leave at
 any time, and `splitscreen` that players share one screen split between them.
 `series` is the run of games this one

@@ -53,6 +53,7 @@ TEST(TestGameSeries, OnlyTheTitlesListFolds)
   EXPECT_FALSE(Url("gamedb://recentlyadded/").IsTitles());
   EXPECT_FALSE(Url("gamedb://series/7/").IsTitles());
   EXPECT_FALSE(Url("gamedb://titles/?xsp=%7B%7D").IsTitles());
+  EXPECT_FALSE(Url("gamedb://titles/?similarto=12").IsTitles());
 }
 
 TEST(TestGameSeries, ASeriesIsAFacet)

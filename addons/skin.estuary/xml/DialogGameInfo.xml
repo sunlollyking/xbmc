@@ -394,6 +394,12 @@
 						<param name="visible" value="!String.IsEmpty(ListItem.Property(highscores))" />
 					</include>
 					<include content="InfoDialogButton">
+						<param name="id" value="20" />
+						<param name="icon" value="icons/infodialogs/similar.png" />
+						<param name="label" value="$LOCALIZE[35792]" />
+						<param name="visible" value="!String.IsEmpty(ListItem.Property(similarcount))" />
+					</include>
+					<include content="InfoDialogButton">
 						<param name="id" value="18" />
 						<param name="icon" value="icons/infodialogs/set.png" />
 						<param name="label" value="$LOCALIZE[35778]" />

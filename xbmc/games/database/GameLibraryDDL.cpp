@@ -152,6 +152,7 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "overview text, "
                   "type text)");
   db.ExecuteQuery("CREATE TABLE collection_link (idCollection integer, idGame integer)");
+  CreateGameLinkTable(db);
   db.ExecuteQuery("CREATE TABLE region (idRegion integer primary key, code text, name text)");
   db.ExecuteQuery("CREATE TABLE release_region (idRegion integer, idRelease integer)");
 
@@ -183,6 +184,13 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "media_type text, "
                   "type text, "
                   "value text)");
+}
+
+void CGameLibraryDDL::CreateGameLinkTable(CDatabase& db)
+{
+  // Other games a catalogue names for this one, by title, matched to the
+  // library by title key when they're shown
+  db.ExecuteQuery("CREATE TABLE game_link (idGame integer, kind text, title text, titleKey text)");
 }
 
 void CGameLibraryDDL::CreateLookupTable(CDatabase& db, const char* table, const char* idColumn)
@@ -236,6 +244,8 @@ void CGameLibraryDDL::CreateIndexes(CDatabase& db)
   db.ExecuteQuery("CREATE INDEX ix_game_7 ON game (idSeries)");
 
   db.ExecuteQuery("CREATE INDEX ix_release_1 ON gamerelease (idGame)");
+  db.ExecuteQuery("CREATE INDEX ix_game_link_1 ON game_link (idGame, kind(20))");
+  db.ExecuteQuery("CREATE INDEX ix_game_link_2 ON game_link (titleKey(255), kind(20))");
 
   CreateLookupIndexes(db, "genre", "idGenre");
   CreateLookupIndexes(db, "tag", "idTag");
@@ -338,6 +348,7 @@ void CGameLibraryDDL::CreateTriggers(CDatabase& db)
                   "DELETE FROM developer_link WHERE idGame = old.idGame; "
                   "DELETE FROM publisher_link WHERE idGame = old.idGame; "
                   "DELETE FROM collection_link WHERE idGame = old.idGame; "
+                  "DELETE FROM game_link WHERE idGame = old.idGame; "
                   "DELETE FROM art WHERE media_id = old.idGame AND media_type = 'game'; "
                   "DELETE FROM rating WHERE media_id = old.idGame AND media_type = 'game'; "
                   "DELETE FROM agerating WHERE media_id = old.idGame AND media_type "
@@ -464,4 +475,8 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN coopPlayers integer");
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
+
+  // 15: games a catalogue names for this one, such as games like it
+  if (version < 15)
+    CreateGameLinkTable(db);
 }

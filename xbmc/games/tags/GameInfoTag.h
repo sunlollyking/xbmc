@@ -183,6 +183,10 @@ public:
 
   const std::vector<std::string>& GetTags() const { return m_tags; }
   void SetTags(const std::vector<std::string>& tags) { m_tags = tags; }
+
+  //! \brief Games like this one, by name, as a catalogue suggests them
+  const std::vector<std::string>& GetSimilar() const { return m_similar; }
+  void SetSimilar(const std::vector<std::string>& similar) { m_similar = similar; }
   ///@}
 
   /*!
@@ -397,6 +401,7 @@ private:
   std::string m_strSeries;
   int m_seriesId{-1};
   std::vector<std::string> m_tags;
+  std::vector<std::string> m_similar;
 
   // Play facts
   int m_playersMin;

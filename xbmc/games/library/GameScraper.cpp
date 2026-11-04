@@ -523,6 +523,8 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetSeries(payload["series"].asString());
   if (payload.isMember("tags"))
     details.SetTags(Strings(payload["tags"]));
+  if (payload.isMember("similar"))
+    details.SetSimilar(Strings(payload["similar"]));
   if (payload["players"].isObject())
   {
     details.SetPlayers(static_cast<int>(payload["players"]["min"].asInteger()),

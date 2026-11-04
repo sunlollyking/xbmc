@@ -100,7 +100,10 @@ public:
    * \brief Whether the URL lists every title, unfiltered: titles/ at the root
    *        or under a platform
    */
-  bool IsTitles() const { return m_titles && !HasOption("xsp") && !HasOption("filter"); }
+  bool IsTitles() const
+  {
+    return m_titles && !HasOption("xsp") && !HasOption("filter") && !HasOption("similarto");
+  }
 
   /*!
    * \brief The facets a node offers, in display order
