@@ -412,7 +412,7 @@ public:
    */
   static void SetCompletionProperties(CFileItem& item, const CGameInfoTag& game);
 
-  //! \brief Put a game's series, "series" and "seriesid", on its item
+  //! \brief Put a game's series, "series", "seriesid" and "spinoff", on its item
   static void SetSeriesProperties(CFileItem& item, const CGameInfoTag& game);
 
   /*!
@@ -505,7 +505,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 18; }
+  int GetSchemaVersion() const override { return 19; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

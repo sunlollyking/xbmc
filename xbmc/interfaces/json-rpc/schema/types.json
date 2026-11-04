@@ -5185,6 +5185,7 @@
         "similar",
         "modes",
         "popularity",
+        "spinoff",
         "related",
         "languagesupport",
         "players",
@@ -5383,6 +5384,10 @@
           }
         },
         "description": "How often the game's page is looked at, and how many want to play it, as IGDB counts them; 0 where unknown"
+      },
+      "spinoff": {
+        "type": "boolean",
+        "description": "Whether the game is a spin-off of its series rather than one of its main games"
       },
       "related": {
         "type": "array",

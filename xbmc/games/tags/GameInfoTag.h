@@ -181,6 +181,10 @@ public:
   int GetSeriesId() const { return m_seriesId; }
   void SetSeriesId(int id) { m_seriesId = id; }
 
+  //! \brief Whether the game is a spin-off of its series rather than one of its main games
+  bool IsSpinoff() const { return m_spinoff; }
+  void SetSpinoff(bool spinoff) { m_spinoff = spinoff; }
+
   const std::vector<std::string>& GetTags() const { return m_tags; }
   void SetTags(const std::vector<std::string>& tags) { m_tags = tags; }
 
@@ -415,6 +419,7 @@ private:
   std::vector<std::string> m_collections;
   std::string m_strSeries;
   int m_seriesId{-1};
+  bool m_spinoff{false};
   std::vector<std::string> m_tags;
   std::vector<std::string> m_similar;
   std::vector<std::string> m_modes;

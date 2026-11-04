@@ -21386,7 +21386,13 @@ msgctxt "#35804"
 msgid "Popularity"
 msgstr ""
 
-#empty strings from id 35805 to 35999
+#. A game spun off from its series rather than one of its main games
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35805"
+msgid "Spin-off"
+msgstr ""
+
+#empty strings from id 35806 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

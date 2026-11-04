@@ -491,6 +491,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
     // game that lives in it
     CManualIndex manuals;
     const bool ranked = url.GetList() == "popular" || url.GetList() == "mostwanted";
+    const bool inSeries = url.HasOption("seriesid");
     for (const auto& result : results)
     {
       const auto row = static_cast<unsigned int>(result.at(Field::ROW).asInteger());
@@ -579,6 +580,9 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       // playlist keeps its own
       if (ranked)
         item->SetProgramCount(items.Size());
+      // A series lists its main games first, then what was spun off from them
+      if (inSeries && game.IsSpinoff())
+        item->SetSpecialSort(SortSpecial::BOTTOM);
       item->SetLabelPreformatted(true);
 
       items.Add(item);
@@ -652,10 +656,15 @@ void CGameDatabase::SetSeriesProperties(CFileItem& item, const CGameInfoTag& gam
 {
   item.ClearProperty("series");
   item.ClearProperty("seriesid");
+  item.ClearProperty("spinoff");
   if (game.GetSeriesId() > 0 && !game.GetSeries().empty())
   {
     item.SetProperty("series", game.GetSeries());
     item.SetProperty("seriesid", game.GetSeriesId());
+    if (game.IsSpinoff())
+      item.SetProperty(
+          "spinoff",
+          CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(35805)); // "Spin-off"
   }
 }
 

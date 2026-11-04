@@ -1630,7 +1630,10 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
     if (tag.GetTimeToBeat().IsEmpty())
       tag.SetTimeToBeat(existing.GetTimeToBeat());
     if (tag.GetSeries().empty())
+    {
       tag.SetSeries(existing.GetSeries());
+      tag.SetSpinoff(existing.IsSpinoff());
+    }
     if (tag.GetSimilar().empty())
       tag.SetSimilar(existing.GetSimilar());
     if (tag.GetRelated().empty())

@@ -171,8 +171,8 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
         details.IsDropIn() ? 1 : 0, details.IsSplitScreen() ? 1 : 0, details.GetCoopPlayers(),
         idGame));
     m_pDS->exec(PrepareSQL("UPDATE game SET idSeries = (SELECT idCollection FROM collection WHERE "
-                           "name = '%s') WHERE idGame = %i",
-                           details.GetSeries().c_str(), idGame));
+                           "name = '%s'), spinoff = %i WHERE idGame = %i",
+                           details.GetSeries().c_str(), details.IsSpinoff() ? 1 : 0, idGame));
 
     SetRatingsForGame(idGame, details);
     SetUniqueIdsForGame(idGame, details);
@@ -606,6 +606,7 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   {
     details.SetSeries(record->at(GAMEDB_SERIES_NAME).get_asString());
     details.SetSeriesId(record->at(GAMEDB_SERIES_ID).get_asInt());
+    details.SetSpinoff(record->at(GAMEDB_SPINOFF).get_asBool());
   }
 
   details.SetPlatformSlug(record->at(GAMEDB_PLATFORM_SLUG).get_asString());

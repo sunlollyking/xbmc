@@ -521,6 +521,8 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetCollections(Strings(payload["collections"]));
   if (payload.isMember("series"))
     details.SetSeries(payload["series"].asString());
+  if (payload.isMember("spinoff"))
+    details.SetSpinoff(payload["spinoff"].asBoolean());
   if (payload.isMember("tags"))
     details.SetTags(Strings(payload["tags"]));
   if (payload.isMember("similar"))

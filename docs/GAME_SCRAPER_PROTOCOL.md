@@ -122,6 +122,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "genres": ["Platform"],
   "collections": ["Sonic the Hedgehog"],
   "series": "Sonic the Hedgehog",
+  "spinoff": false,
   "tags": [],
   "similar": ["Sonic the Hedgehog 3"],
   "modes": ["Single player", "Co-operative"],
@@ -169,7 +170,8 @@ together in co-op on one machine; `dropin` says a player can join or leave at
 any time, and `splitscreen` that players share one screen split between them.
 `series` is the run of games this one
 belongs to, such as Mario Kart, where `collections` may also name wider
-groupings, such as the Mario franchise. Words for `category`,
+groupings, such as the Mario franchise, and `spinoff` says the game was spun off
+from its series rather than being one of its main games. Words for `category`,
 `status` and `licence` are the ones in `GameLibraryTypes.cpp`:
 category `retail|hack|homebrew|demo|bios|application`; status
 `retail|beta|proto|sample|demo|alpha|kiosk|debug|program`; licence
