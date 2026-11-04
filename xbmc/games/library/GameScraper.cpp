@@ -575,6 +575,12 @@ bool CGameScraper::ReadDetails(const std::string& id,
     { return GameTimeToBeat::Valid(times[key].asInteger()); };
     details.SetTimeToBeat({seconds("main"), seconds("extras"), seconds("complete")});
   }
+  if (payload["popularity"].isObject())
+  {
+    const CVariant& popularity = payload["popularity"];
+    details.SetPopularity({GamePopularity::Valid(popularity["visits"].asDouble()),
+                           GamePopularity::Valid(popularity["wanttoplay"].asDouble())});
+  }
   if (payload.isMember("category"))
     details.SetCategory(CGameLibraryTypes::GameCategoryFromString(payload["category"].asString()));
   if (payload.isMember("edition"))

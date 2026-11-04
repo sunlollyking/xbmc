@@ -10,6 +10,7 @@
 
 #include "language/Territory.h"
 
+#include <cmath>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -327,6 +328,24 @@ struct GameTimeToBeat
 
   bool IsEmpty() const { return main <= 0 && extras <= 0 && complete <= 0; }
   bool operator==(const GameTimeToBeat&) const = default;
+};
+
+/*!
+ * \ingroup games
+ * \brief How much interest IGDB records in a game, or 0 where unknown
+ *
+ * The values only mean anything against each other, to rank games by.
+ */
+struct GamePopularity
+{
+  double visits{0.0}; // how often its page is looked at
+  double wantToPlay{0.0}; // how many want to play it
+
+  //! \brief A reported value, or 0 if it is not one
+  static double Valid(double value) { return std::isfinite(value) && value > 0.0 ? value : 0.0; }
+
+  bool IsEmpty() const { return visits <= 0.0 && wantToPlay <= 0.0; }
+  bool operator==(const GamePopularity&) const = default;
 };
 
 /*!

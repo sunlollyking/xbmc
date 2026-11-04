@@ -61,10 +61,10 @@ const std::vector<std::string_view> facetNames{
 };
 
 const std::vector<std::string_view> listNames{
-    "recentlyadded", "recentlyplayed", "continueplaying", "mostplayed",  "neverplayed",
-    "favourites",    "beaten",         "completed",       "multiplayer", "coop",
-    "couchcoop",     "englishimports", "achievements",    "inprogress",  "hacks",
-    "homebrew",      "needsattention",
+    "recentlyadded", "recentlyplayed", "continueplaying", "mostplayed",     "popular",
+    "mostwanted",    "neverplayed",    "favourites",      "beaten",         "completed",
+    "multiplayer",   "coop",           "couchcoop",       "englishimports", "achievements",
+    "inprogress",    "hacks",          "homebrew",        "needsattention",
 };
 
 bool IsList(std::string_view segment)

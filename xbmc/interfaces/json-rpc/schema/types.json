@@ -5184,6 +5184,7 @@
         "tags",
         "similar",
         "modes",
+        "popularity",
         "related",
         "languagesupport",
         "players",
@@ -5370,6 +5371,18 @@
           "type": "string"
         },
         "description": "How the game can be played, such as single player or split screen"
+      },
+      "popularity": {
+        "type": "object",
+        "properties": {
+          "visits": {
+            "type": "number"
+          },
+          "wanttoplay": {
+            "type": "number"
+          }
+        },
+        "description": "How often the game's page is looked at, and how many want to play it, as IGDB counts them; 0 where unknown"
       },
       "related": {
         "type": "array",

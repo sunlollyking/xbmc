@@ -133,6 +133,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "dropin": false,
   "splitscreen": false,
   "timetobeat": {"main": 7200, "extras": 9000, "complete": 14400},
+  "popularity": {"visits": 0.0012, "wanttoplay": 0.0003},
   "category": "retail",
   "ratings": {"libretro": {"rating": 8.5, "max": 10, "votes": 0}},
   "ageratings": [{"board": "ESRB", "value": "E", "descriptors": ""}],
@@ -158,6 +159,9 @@ games like this one, matched by title to the games in the library, and
 `related` the games that are something to it: a `remake`, `remaster`, `port`,
 `dlc` or `expansion` of it, or the `original` an add-on belongs to.
 `modes` are the ways the game can be played, to browse by.
+`popularity` is how often the game's page is looked at (`visits`) and how many
+want to play it (`wanttoplay`), as IGDB counts them; they rank games against
+each other and mean nothing alone.
 `languagesupport` lists the languages the game can be played in: spoken
 (`audio`), subtitled, or in its menus (`interface`).
 `coopplayers` is how many can play

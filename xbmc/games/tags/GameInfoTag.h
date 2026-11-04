@@ -236,6 +236,9 @@ public:
 
   const GameTimeToBeat& GetTimeToBeat() const { return m_timeToBeat; }
   void SetTimeToBeat(const GameTimeToBeat& timeToBeat) { m_timeToBeat = timeToBeat; }
+
+  const GamePopularity& GetPopularity() const { return m_popularity; }
+  void SetPopularity(const GamePopularity& popularity) { m_popularity = popularity; }
   ///@}
 
   /*!
@@ -428,6 +431,7 @@ private:
   GameCategory m_category;
   int m_parentGameId;
   GameTimeToBeat m_timeToBeat;
+  GamePopularity m_popularity;
 
   // Ratings and identifiers
   std::map<std::string, GameRating> m_ratings;

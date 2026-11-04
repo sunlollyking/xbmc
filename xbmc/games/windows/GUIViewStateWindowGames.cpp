@@ -99,6 +99,12 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
         SetSortMethod(SortBy::TIME, SortOrder::DESCENDING);
       else if (list == "recentlyadded")
         SetSortMethod(SortBy::DATE_ADDED, SortOrder::DESCENDING);
+      else if (list == "popular" || list == "mostwanted")
+      {
+        AddSortMethod(SortBy::PLAYLIST_ORDER, 35804, // Popularity
+                      LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+        SetSortMethod(SortBy::PLAYLIST_ORDER, SortOrder::ASCENDING);
+      }
       else if (url.HasOption("seriesid"))
         SetSortMethod(SortBy::YEAR, SortOrder::ASCENDING);
     }
