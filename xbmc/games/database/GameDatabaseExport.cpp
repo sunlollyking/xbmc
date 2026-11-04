@@ -294,6 +294,8 @@ void CGameDatabase::ImportFromXML(const std::string& path)
       SetFavourite(idGame, true);
     if (tag.IsCompleted())
       SetCompleted(idGame, true);
+    else if (tag.IsBeaten())
+      SetBeaten(idGame, true);
     if (tag.GetUserRating() > 0)
       SetUserRating(idGame, tag.GetUserRating());
     ++matched;

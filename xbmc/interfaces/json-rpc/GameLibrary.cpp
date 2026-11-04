@@ -252,6 +252,8 @@ JSONRPC_STATUS CGameLibrary::SetGameDetails(const std::string& method,
     db.SetUserRating(idGame, static_cast<int>(parameterObject["userrating"].asInteger()));
   if (ParameterNotNull(parameterObject, "favourite"))
     db.SetFavourite(idGame, parameterObject["favourite"].asBoolean());
+  if (ParameterNotNull(parameterObject, "beaten"))
+    db.SetBeaten(idGame, parameterObject["beaten"].asBoolean());
   if (ParameterNotNull(parameterObject, "completed"))
     db.SetCompleted(idGame, parameterObject["completed"].asBoolean());
   if (ParameterNotNull(parameterObject, "defaultreleaseid"))

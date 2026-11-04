@@ -32,6 +32,7 @@
 #include "utils/Variant.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <set>
 
 using namespace KODI;
@@ -125,6 +126,43 @@ std::string ReleaseLabel(const std::string& gameTitle, const GameRelease& releas
   if (parts.empty())
     return own.empty() ? gameTitle : own;
   return StringUtils::Join(parts, " \u00b7 ");
+}
+
+//! A time to beat in whole hours, or in minutes under an hour
+std::string TimeToBeatLabel(int seconds)
+{
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+  if (seconds < 60 * 60)
+    return StringUtils::Format(strings.Get(35775), std::max(1, (seconds + 30) / 60)); // "{0:d} min"
+  return StringUtils::Format(strings.Get(35774), (seconds + 30 * 60) / (60 * 60)); // "{0:d} h"
+}
+
+void SetTimeToBeatProperties(CFileItem& item, const GameTimeToBeat& time)
+{
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+  for (const char* key : {"timetobeat", "timetobeatmain", "timetobeatextras", "timetobeatcomplete"})
+    item.ClearProperty(key);
+
+  if (time.main > 0)
+    item.SetProperty("timetobeatmain", TimeToBeatLabel(time.main));
+  if (time.extras > 0)
+    item.SetProperty("timetobeatextras", TimeToBeatLabel(time.extras));
+  if (time.complete > 0)
+    item.SetProperty("timetobeatcomplete", TimeToBeatLabel(time.complete));
+
+  // One line for a skin to show, from the shortest way through to 100%
+  const int toBeat = time.main > 0 ? time.main : time.extras;
+  std::string summary;
+  if (toBeat > 0 && time.complete > 0)
+    summary = StringUtils::Format(strings.Get(35776), TimeToBeatLabel(toBeat),
+                                  TimeToBeatLabel(time.complete)); // "{0:s} · 100%: {1:s}"
+  else if (toBeat > 0)
+    summary = TimeToBeatLabel(toBeat);
+  else if (time.complete > 0)
+    summary =
+        StringUtils::Format(strings.Get(35777), TimeToBeatLabel(time.complete)); // "100%: {0:s}"
+  if (!summary.empty())
+    item.SetProperty("timetobeat", summary);
 }
 } // namespace
 
@@ -230,6 +268,8 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendWhere("game_view.playCount = 0");
   else if (list == "favourites")
     filter.AppendWhere("game_view.favourite = 1");
+  else if (list == "beaten")
+    filter.AppendWhere("game_view.beaten = 1");
   else if (list == "completed")
     filter.AppendWhere("game_view.completed = 1");
   else if (list == "multiplayer")
@@ -430,6 +470,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
         // The same tick the video library puts on something watched
         item->SetOverlayImage(CGUIListItem::ICON_OVERLAY_WATCHED);
       }
+      SetCompletionProperties(*item, game);
       if (game.GetPlayTime() > 0)
         item->SetProperty("playtime", StringUtils::SecondsToTimeString(game.GetPlayTime(),
                                                                        TIME_FORMAT_HH_MM));
@@ -522,6 +563,20 @@ void CGameDatabase::SetAgeProperties(CFileItem& item, int age)
     item.SetProperty("ageratingboard", board);
     item.SetProperty("agerating", classification);
   }
+}
+
+void CGameDatabase::SetCompletionProperties(CFileItem& item, const CGameInfoTag& game)
+{
+  item.ClearProperty("beaten");
+  item.ClearProperty("completion");
+  if (game.IsBeaten())
+  {
+    item.SetProperty("beaten", true);
+    item.SetProperty("completion",
+                     CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
+                         game.IsCompleted() ? 35531 : 35712)); // "Completed" / "Beaten"
+  }
+  SetTimeToBeatProperties(item, game.GetTimeToBeat());
 }
 
 bool CGameDatabase::GetFacetNav(const std::string& baseDir, CFileItemList& items)

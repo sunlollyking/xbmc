@@ -179,6 +179,13 @@ public:
    * \param fileNameAndPath A file of the game
    */
   bool SetCompletedForFile(const std::string& fileNameAndPath);
+
+  /*!
+   * \brief Mark beaten the game a file belongs to
+   *
+   * \param fileNameAndPath A file of the game
+   */
+  bool SetBeatenForFile(const std::string& fileNameAndPath);
   ///@}
 
   /*!
@@ -310,7 +317,10 @@ public:
                                        int exceptGame = -1);
   bool SetDefaultRelease(int idGame, int idRelease);
   bool SetFavourite(int idGame, bool favourite);
+  //! Completing a game beats it too
   bool SetCompleted(int idGame, bool completed);
+  //! A game that is not beaten is not completed either
+  bool SetBeaten(int idGame, bool beaten);
 
   //! \brief How often a game was played, over every file it has
   bool SetPlayCount(int idGame, int count);
@@ -364,6 +374,17 @@ public:
    * \param age An age from CGameAgeRatings::AGES, or 0 to clear them
    */
   static void SetAgeProperties(CFileItem& item, int age);
+
+  /*!
+   * \brief Put how far a game has been played through, and how long it takes,
+   *        on its item
+   *
+   * Sets "beaten" and "completion" ("Beaten" or "Completed") for a game that
+   * has been beaten, and "timetobeat" (one line, e.g. "12 h · 100%: 30 h") with
+   * "timetobeatmain", "timetobeatextras" and "timetobeatcomplete" where they
+   * are known.
+   */
+  static void SetCompletionProperties(CFileItem& item, const CGameInfoTag& game);
   bool SetUserRating(int idGame, int rating);
 
   /*!
@@ -417,7 +438,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 10; }
+  int GetSchemaVersion() const override { return 11; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

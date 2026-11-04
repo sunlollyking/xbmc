@@ -275,6 +275,29 @@ struct GameAgeRating
 
 /*!
  * \ingroup games
+ * \brief How long players take to beat a game, in seconds, or 0 where unknown
+ */
+struct GameTimeToBeat
+{
+  int main{0}; // the main story
+  int extras{0}; // the main story and what is around it
+  int complete{0}; // everything, to 100%
+
+  //! A time no game takes, so anything longer is a bad value
+  static constexpr int MAX_SECONDS = 10000 * 60 * 60;
+
+  //! \brief A reported time, or 0 if it is not one
+  static int Valid(int64_t seconds)
+  {
+    return seconds > 0 && seconds <= MAX_SECONDS ? static_cast<int>(seconds) : 0;
+  }
+
+  bool IsEmpty() const { return main <= 0 && extras <= 0 && complete <= 0; }
+  bool operator==(const GameTimeToBeat&) const = default;
+};
+
+/*!
+ * \ingroup games
  * \brief One file on disk belonging to a release
  */
 /*!

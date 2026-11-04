@@ -64,6 +64,7 @@ void CGameInfoTag::Reset()
   m_coop = false;
   m_category = GameCategory::RETAIL;
   m_parentGameId = -1;
+  m_timeToBeat = {};
 
   m_ratings.clear();
   m_strDefaultRating.clear();
@@ -81,6 +82,7 @@ void CGameInfoTag::Reset()
   m_userRating = 0;
   m_favourite = false;
   m_completed = false;
+  m_beaten = false;
   m_achievementsTotal = 0;
   m_achievementsEarned = 0;
   m_achievementsHardcore = 0;
@@ -131,6 +133,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_coop = tag.m_coop;
     m_category = tag.m_category;
     m_parentGameId = tag.m_parentGameId;
+    m_timeToBeat = tag.m_timeToBeat;
 
     m_ratings = tag.m_ratings;
     m_strDefaultRating = tag.m_strDefaultRating;
@@ -148,6 +151,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_userRating = tag.m_userRating;
     m_favourite = tag.m_favourite;
     m_completed = tag.m_completed;
+    m_beaten = tag.m_beaten;
     m_achievementsTotal = tag.m_achievementsTotal;
     m_achievementsEarned = tag.m_achievementsEarned;
     m_achievementsHardcore = tag.m_achievementsHardcore;
@@ -177,16 +181,15 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_strCartridgeType == tag.m_strCartridgeType && m_strGameClient == tag.m_strGameClient &&
          m_databaseId == tag.m_databaseId && m_platformId == tag.m_platformId &&
          m_defaultReleaseId == tag.m_defaultReleaseId && m_strSortTitle == tag.m_strSortTitle &&
-         m_strOriginalTitle == tag.m_strOriginalTitle &&
-         m_strReleaseDate == tag.m_strReleaseDate && m_developers == tag.m_developers &&
-         m_publishers == tag.m_publishers && m_collections == tag.m_collections &&
-         m_tags == tag.m_tags && m_playersMin == tag.m_playersMin &&
-         m_playersMax == tag.m_playersMax && m_coop == tag.m_coop &&
-         m_category == tag.m_category && m_uniqueIds == tag.m_uniqueIds &&
-         m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
-         m_strLastPlayed == tag.m_strLastPlayed &&
+         m_strOriginalTitle == tag.m_strOriginalTitle && m_strReleaseDate == tag.m_strReleaseDate &&
+         m_developers == tag.m_developers && m_publishers == tag.m_publishers &&
+         m_collections == tag.m_collections && m_tags == tag.m_tags &&
+         m_playersMin == tag.m_playersMin && m_playersMax == tag.m_playersMax &&
+         m_coop == tag.m_coop && m_category == tag.m_category && m_timeToBeat == tag.m_timeToBeat &&
+         m_uniqueIds == tag.m_uniqueIds && m_playCount == tag.m_playCount &&
+         m_playTime == tag.m_playTime && m_strLastPlayed == tag.m_strLastPlayed &&
          m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
-         m_completed == tag.m_completed && m_rating == tag.m_rating &&
+         m_completed == tag.m_completed && m_beaten == tag.m_beaten && m_rating == tag.m_rating &&
          m_strAgeRating == tag.m_strAgeRating;
 }
 
@@ -359,6 +362,9 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_coop;
     ar << static_cast<int>(m_category);
     ar << m_parentGameId;
+    ar << m_timeToBeat.main;
+    ar << m_timeToBeat.extras;
+    ar << m_timeToBeat.complete;
     ar << static_cast<int>(m_ratings.size());
     for (const auto& [type, rating] : m_ratings)
     {
@@ -389,6 +395,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_userRating;
     ar << m_favourite;
     ar << m_completed;
+    ar << m_beaten;
     ar << m_achievementsTotal;
     ar << m_achievementsEarned;
     ar << m_achievementsHardcore;
@@ -441,6 +448,9 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> value;
     m_category = static_cast<GameCategory>(value);
     ar >> m_parentGameId;
+    ar >> m_timeToBeat.main;
+    ar >> m_timeToBeat.extras;
+    ar >> m_timeToBeat.complete;
     int count = 0;
     ar >> count;
     m_ratings.clear();
@@ -483,6 +493,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_userRating;
     ar >> m_favourite;
     ar >> m_completed;
+    ar >> m_beaten;
     ar >> m_achievementsTotal;
     ar >> m_achievementsEarned;
     ar >> m_achievementsHardcore;
@@ -529,6 +540,9 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["playersmin"] = m_playersMin;
   value["playersmax"] = m_playersMax;
   value["coop"] = m_coop;
+  value["timetobeat"]["main"] = m_timeToBeat.main;
+  value["timetobeat"]["extras"] = m_timeToBeat.extras;
+  value["timetobeat"]["complete"] = m_timeToBeat.complete;
   value["category"] = std::string(CGameLibraryTypes::ToString(m_category));
   value["matchedby"] = std::string(CGameLibraryTypes::ToString(m_matchMethod));
 
@@ -585,6 +599,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["userrating"] = m_userRating;
   value["favourite"] = m_favourite;
   value["completed"] = m_completed;
+  value["beaten"] = IsBeaten();
   value["achievementstotal"] = m_achievementsTotal;
   value["achievementsearned"] = m_achievementsEarned;
   value["achievementshardcore"] = m_achievementsHardcore;
@@ -747,6 +762,17 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
       players->SetAttribute("coop", true);
   }
 
+  if (!m_timeToBeat.IsEmpty())
+  {
+    tinyxml2::XMLElement* timeToBeat = AddChild(game, "timetobeat", "");
+    if (m_timeToBeat.main > 0)
+      timeToBeat->SetAttribute("main", m_timeToBeat.main);
+    if (m_timeToBeat.extras > 0)
+      timeToBeat->SetAttribute("extras", m_timeToBeat.extras);
+    if (m_timeToBeat.complete > 0)
+      timeToBeat->SetAttribute("complete", m_timeToBeat.complete);
+  }
+
   if (m_category != GameCategory::RETAIL)
     XMLUtils::SetString(game, "category", std::string(CGameLibraryTypes::ToString(m_category)));
 
@@ -800,6 +826,8 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
     XMLUtils::SetBoolean(game, "favourite", true);
   if (m_completed)
     XMLUtils::SetBoolean(game, "completed", true);
+  if (IsBeaten())
+    XMLUtils::SetBoolean(game, "beaten", true);
   if (m_achievementsTotal > 0)
   {
     tinyxml2::XMLElement* element = AddChild(game, "achievements", "");
@@ -869,6 +897,18 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
     players->QueryBoolAttribute("coop", &m_coop);
   }
 
+  if (const tinyxml2::XMLElement* timeToBeat = element->FirstChildElement("timetobeat");
+      timeToBeat != nullptr)
+  {
+    const auto seconds = [timeToBeat](const char* name)
+    {
+      int value = 0;
+      timeToBeat->QueryIntAttribute(name, &value);
+      return GameTimeToBeat::Valid(value);
+    };
+    m_timeToBeat = {seconds("main"), seconds("extras"), seconds("complete")};
+  }
+
   if (const std::string value = ChildText(element, "category"); !value.empty())
     m_category = CGameLibraryTypes::GameCategoryFromString(value);
 
@@ -936,6 +976,8 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
     m_favourite = StringUtils::EqualsNoCase(value, "true");
   if (const std::string value = ChildText(element, "completed"); !value.empty())
     m_completed = StringUtils::EqualsNoCase(value, "true");
+  if (const std::string value = ChildText(element, "beaten"); !value.empty())
+    m_beaten = StringUtils::EqualsNoCase(value, "true");
 
   if (const tinyxml2::XMLElement* child = element->FirstChildElement("achievements");
       child != nullptr)

@@ -74,7 +74,7 @@
 					<top>180</top>
 					<control type="image">
 						<width>1244</width>
-						<height>280</height>
+						<height>342</height>
 						<texture border="21">dialogs/dialog-bg.png</texture>
 					</control>
 					<control type="grouplist" id="4000">
@@ -82,7 +82,7 @@
 						<left>40</left>
 						<top>20</top>
 						<width>1170</width>
-						<height>250</height>
+						<height>312</height>
 						<itemgap>0</itemgap>
 						<orientation>vertical</orientation>
 						<include content="GameInfoFact">
@@ -108,6 +108,10 @@
 						<include content="GameInfoFact">
 							<param name="label" value="$LOCALIZE[35525]" />
 							<param name="info" value="ListItem.Players" />
+						</include>
+						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35773]" />
+							<param name="info" value="ListItem.Property(timetobeat)" />
 						</include>
 						<include content="GameInfoFact">
 							<param name="label" value="$LOCALIZE[35524]" />
@@ -205,10 +209,10 @@
 					</control>
 				</control>
 				<control type="group" id="141">
-					<top>468</top>
+					<top>530</top>
 					<control type="button" id="138">
 						<width>1244</width>
-						<height>236</height>
+						<height>174</height>
 						<textoffsetx>40</textoffsetx>
 						<textoffsety>20</textoffsety>
 						<aligny>bottom</aligny>
@@ -225,14 +229,14 @@
 						<left>40</left>
 						<top>26</top>
 						<width>1164</width>
-						<height>190</height>
+						<height>128</height>
 						<font>font13</font>
 						<label>$INFO[ListItem.Plot]</label>
 						<autoscroll delay="8000" time="3000" repeat="10000">Control.HasFocus(138)</autoscroll>
 					</control>
 					<control type="group">
 						<description>Every other picture the library holds; the Artwork button opens them whole</description>
-						<top>218</top>
+						<top>156</top>
 						<control type="label">
 							<left>40</left>
 							<top>0</top>
@@ -445,7 +449,7 @@
 		</control>
 		<include content="InfoDialogTopBarInfo">
 			<param name="main_label" value="$INFO[ListItem.Title]" />
-			<param name="sub_label" value="$INFO[ListItem.Platform]$INFO[ListItem.Year, · ,]" />
+			<param name="sub_label" value="$INFO[ListItem.Platform]$INFO[ListItem.Year, · ,]$INFO[ListItem.Property(completion), · ,]" />
 		</include>
 		<include condition="Skin.HasSetting(touchmode)">TouchBackButton</include>
 	</controls>

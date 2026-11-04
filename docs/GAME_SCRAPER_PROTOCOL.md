@@ -124,6 +124,7 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "tags": [],
   "players": {"min": 1, "max": 2},
   "coop": true,
+  "timetobeat": {"main": 7200, "extras": 9000, "complete": 14400},
   "category": "retail",
   "ratings": {"libretro": {"rating": 8.5, "max": 10, "votes": 0}},
   "ageratings": [{"board": "ESRB", "value": "E", "descriptors": ""}],
@@ -142,7 +143,9 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
 }
 ```
 
-Every key is optional except `version` and `title`. Words for `category`,
+Every key is optional except `version` and `title`. `timetobeat` is how long
+players take, in seconds: `main` for the main story, `extras` for that and what
+is around it, `complete` for everything. Words for `category`,
 `status` and `licence` are the ones in `GameLibraryTypes.cpp`:
 category `retail|hack|homebrew|demo|bios|application`; status
 `retail|beta|proto|sample|demo|alpha|kiosk|debug|program`; licence
