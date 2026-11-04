@@ -59,6 +59,7 @@ void CGameInfoTag::Reset()
   m_collections.clear();
   m_tags.clear();
   m_similar.clear();
+  m_modes.clear();
   m_related.clear();
   m_languages.clear();
 
@@ -139,6 +140,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_seriesId = tag.m_seriesId;
     m_tags = tag.m_tags;
     m_similar = tag.m_similar;
+    m_modes = tag.m_modes;
     m_related = tag.m_related;
     m_languages = tag.m_languages;
 
@@ -203,7 +205,7 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_developers == tag.m_developers && m_publishers == tag.m_publishers &&
          m_collections == tag.m_collections && m_strSeries == tag.m_strSeries &&
          m_seriesId == tag.m_seriesId && m_tags == tag.m_tags && m_similar == tag.m_similar &&
-         m_related == tag.m_related && m_languages == tag.m_languages &&
+         m_modes == tag.m_modes && m_related == tag.m_related && m_languages == tag.m_languages &&
          m_playersMin == tag.m_playersMin && m_playersMax == tag.m_playersMax &&
          m_coop == tag.m_coop && m_dropIn == tag.m_dropIn && m_splitScreen == tag.m_splitScreen &&
          m_coopPlayers == tag.m_coopPlayers && m_category == tag.m_category &&
@@ -382,6 +384,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_seriesId;
     ar << m_tags;
     ar << m_similar;
+    ar << m_modes;
     ar << static_cast<int>(m_related.size());
     for (const GameRelation& relation : m_related)
     {
@@ -491,6 +494,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_seriesId;
     ar >> m_tags;
     ar >> m_similar;
+    ar >> m_modes;
     int related = 0;
     ar >> related;
     m_related.assign(static_cast<size_t>(std::max(related, 0)), {});
@@ -615,6 +619,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["seriesid"] = m_seriesId;
   value["tags"] = m_tags;
   value["similar"] = m_similar;
+  value["modes"] = m_modes;
   value["languagesupport"] = CVariant(CVariant::VariantTypeArray);
   for (const GameLanguage& language : m_languages)
   {
@@ -857,6 +862,7 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
     XMLUtils::SetString(game, "series", m_strSeries);
   XMLUtils::SetStringArray(game, "tag", m_tags);
   XMLUtils::SetStringArray(game, "similar", m_similar);
+  XMLUtils::SetStringArray(game, "mode", m_modes);
   for (const GameRelation& relation : m_related)
     AddChild(game, "related", relation.title)->SetAttribute("kind", relation.kind.c_str());
   for (const GameLanguage& language : m_languages)
@@ -1018,6 +1024,8 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
     m_tags = std::move(values);
   if (std::vector<std::string> values = ChildTexts(element, "similar"); !values.empty())
     m_similar = std::move(values);
+  if (std::vector<std::string> values = ChildTexts(element, "mode"); !values.empty())
+    m_modes = std::move(values);
   for (const tinyxml2::XMLElement* child = element->FirstChildElement("language"); child != nullptr;
        child = child->NextSiblingElement("language"))
   {

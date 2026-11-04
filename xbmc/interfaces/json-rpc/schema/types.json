@@ -5183,6 +5183,7 @@
         "seriesid",
         "tags",
         "similar",
+        "modes",
         "related",
         "languagesupport",
         "players",
@@ -5362,6 +5363,13 @@
           "type": "string"
         },
         "description": "Games like this one, by name"
+      },
+      "modes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "How the game can be played, such as single player or split screen"
       },
       "related": {
         "type": "array",

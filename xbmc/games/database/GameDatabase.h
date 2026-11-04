@@ -443,6 +443,9 @@ public:
    */
   static void SetLanguageProperties(CFileItem& item, const CGameInfoTag& game);
 
+  //! \brief Put how a game can be played on its item, "modes"
+  static void SetModeProperties(CFileItem& item, const CGameInfoTag& game);
+
   //! \brief The languages a game can be played in as JSON, for the library to keep
   static std::string SerializeLanguages(const std::vector<GameLanguage>& languages);
 
@@ -502,7 +505,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 16; }
+  int GetSchemaVersion() const override { return 17; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

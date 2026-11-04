@@ -42,7 +42,7 @@ struct OverviewChild
   int description;
 };
 
-constexpr std::array<OverviewChild, 28> overviewChildren{{
+constexpr std::array<OverviewChild, 29> overviewChildren{{
     {"titles", 35544, 35640},
     {"genres", 135, 35641},
     {"years", 652, 35642},
@@ -50,6 +50,7 @@ constexpr std::array<OverviewChild, 28> overviewChildren{{
     {"publishers", 35522, 35644},
     {"collections", 35523, 35645},
     {"series", 35778, 35779},
+    {"modes", 35798, 35799},
     {"tags", 20459, 35646},
     {"regions", 35524, 35647},
     {"players", 35525, 35648},
@@ -260,6 +261,7 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
     case GameDbNode::PUBLISHERS:
     case GameDbNode::COLLECTIONS:
     case GameDbNode::SERIES:
+    case GameDbNode::MODES:
     case GameDbNode::TAGS:
     case GameDbNode::REGIONS:
     case GameDbNode::PLAYERS:

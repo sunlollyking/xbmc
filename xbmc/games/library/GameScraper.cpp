@@ -525,6 +525,8 @@ bool CGameScraper::ReadDetails(const std::string& id,
     details.SetTags(Strings(payload["tags"]));
   if (payload.isMember("similar"))
     details.SetSimilar(Strings(payload["similar"]));
+  if (payload.isMember("modes"))
+    details.SetModes(Strings(payload["modes"]));
   if (payload["languagesupport"].isArray())
   {
     std::vector<GameLanguage> languages;
