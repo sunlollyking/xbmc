@@ -125,6 +125,9 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
   "tags": [],
   "players": {"min": 1, "max": 2},
   "coop": true,
+  "coopplayers": 2,
+  "dropin": false,
+  "splitscreen": false,
   "timetobeat": {"main": 7200, "extras": 9000, "complete": 14400},
   "category": "retail",
   "ratings": {"libretro": {"rating": 8.5, "max": 10, "votes": 0}},
@@ -146,7 +149,10 @@ One item via `xbmcplugin.setResolvedUrl(handle, True, item)` with property
 
 Every key is optional except `version` and `title`. `timetobeat` is how long
 players take, in seconds: `main` for the main story, `extras` for that and what
-is around it, `complete` for everything. `series` is the run of games this one
+is around it, `complete` for everything. `coopplayers` is how many can play
+together in co-op on one machine; `dropin` says a player can join or leave at
+any time, and `splitscreen` that players share one screen split between them.
+`series` is the run of games this one
 belongs to, such as Mario Kart, where `collections` may also name wider
 groupings, such as the Mario franchise. Words for `category`,
 `status` and `licence` are the ones in `GameLibraryTypes.cpp`:

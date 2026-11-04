@@ -117,7 +117,10 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "timeToBeatExtras integer, "
                   "timeToBeatComplete integer, "
                   "idSeries integer, "
-                  "highScores text)");
+                  "highScores text, "
+                  "dropIn bool, "
+                  "splitScreen bool, "
+                  "coopPlayers integer)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -449,6 +452,16 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   if (version < 13)
   {
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN highScores text");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
+  }
+
+  // 14: how a game is played together on one machine. The game view lists the
+  // game's columns, so it is rebuilt too.
+  if (version < 14)
+  {
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN dropIn bool");
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN splitScreen bool");
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN coopPlayers integer");
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
 }

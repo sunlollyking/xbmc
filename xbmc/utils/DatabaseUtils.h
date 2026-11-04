@@ -164,6 +164,8 @@ enum class Field
   HAS_ACHIEVEMENTS,
   COOP,
   BEATEN,
+  DROP_IN,
+  SPLIT_SCREEN,
   MAX
 };
 

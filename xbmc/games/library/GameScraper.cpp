@@ -530,6 +530,13 @@ bool CGameScraper::ReadDetails(const std::string& id,
   }
   if (payload.isMember("coop"))
     details.SetCoop(payload["coop"].asBoolean());
+  if (payload.isMember("dropin"))
+    details.SetDropIn(payload["dropin"].asBoolean());
+  if (payload.isMember("splitscreen"))
+    details.SetSplitScreen(payload["splitscreen"].asBoolean());
+  if (const int64_t players = payload["coopplayers"].asInteger();
+      players > 0 && players <= MAX_PLAYERS)
+    details.SetCoopPlayers(static_cast<int>(players));
   if (payload["timetobeat"].isObject())
   {
     const CVariant& times = payload["timetobeat"];

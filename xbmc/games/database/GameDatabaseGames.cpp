@@ -149,6 +149,10 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
              details.GetPublishers());
     SetLinks("collection_link", "idCollection", "collection", "idCollection", idGame,
              collectionNames);
+    m_pDS->exec(PrepareSQL(
+        "UPDATE game SET dropIn = %i, splitScreen = %i, coopPlayers = %i WHERE idGame = %i",
+        details.IsDropIn() ? 1 : 0, details.IsSplitScreen() ? 1 : 0, details.GetCoopPlayers(),
+        idGame));
     m_pDS->exec(PrepareSQL("UPDATE game SET idSeries = (SELECT idCollection FROM collection WHERE "
                            "name = '%s') WHERE idGame = %i",
                            details.GetSeries().c_str(), idGame));
@@ -546,6 +550,9 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   details.SetPlayers(record->at(GAMEDB_PLAYERS_MIN).get_asInt(),
                      record->at(GAMEDB_PLAYERS_MAX).get_asInt());
   details.SetCoop(record->at(GAMEDB_COOP).get_asBool());
+  details.SetDropIn(record->at(GAMEDB_DROP_IN).get_asBool());
+  details.SetSplitScreen(record->at(GAMEDB_SPLIT_SCREEN).get_asBool());
+  details.SetCoopPlayers(record->at(GAMEDB_COOP_PLAYERS).get_asInt());
   details.SetCategory(
       CGameLibraryTypes::GameCategoryFromString(record->at(GAMEDB_CATEGORY).get_asString()));
   details.SetParentGameId(record->at(GAMEDB_PARENT_GAME_ID).get_asInt());

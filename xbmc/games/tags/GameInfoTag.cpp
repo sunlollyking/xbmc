@@ -62,6 +62,9 @@ void CGameInfoTag::Reset()
   m_playersMin = 0;
   m_playersMax = 0;
   m_coop = false;
+  m_dropIn = false;
+  m_splitScreen = false;
+  m_coopPlayers = 0;
   m_category = GameCategory::RETAIL;
   m_parentGameId = -1;
   m_timeToBeat = {};
@@ -136,6 +139,9 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_playersMin = tag.m_playersMin;
     m_playersMax = tag.m_playersMax;
     m_coop = tag.m_coop;
+    m_dropIn = tag.m_dropIn;
+    m_splitScreen = tag.m_splitScreen;
+    m_coopPlayers = tag.m_coopPlayers;
     m_category = tag.m_category;
     m_parentGameId = tag.m_parentGameId;
     m_timeToBeat = tag.m_timeToBeat;
@@ -191,12 +197,14 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_developers == tag.m_developers && m_publishers == tag.m_publishers &&
          m_collections == tag.m_collections && m_strSeries == tag.m_strSeries &&
          m_seriesId == tag.m_seriesId && m_tags == tag.m_tags && m_playersMin == tag.m_playersMin &&
-         m_playersMax == tag.m_playersMax && m_coop == tag.m_coop && m_category == tag.m_category &&
-         m_timeToBeat == tag.m_timeToBeat && m_uniqueIds == tag.m_uniqueIds &&
-         m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
-         m_strLastPlayed == tag.m_strLastPlayed && m_userRating == tag.m_userRating &&
-         m_favourite == tag.m_favourite && m_completed == tag.m_completed &&
-         m_beaten == tag.m_beaten && m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
+         m_playersMax == tag.m_playersMax && m_coop == tag.m_coop && m_dropIn == tag.m_dropIn &&
+         m_splitScreen == tag.m_splitScreen && m_coopPlayers == tag.m_coopPlayers &&
+         m_category == tag.m_category && m_timeToBeat == tag.m_timeToBeat &&
+         m_uniqueIds == tag.m_uniqueIds && m_playCount == tag.m_playCount &&
+         m_playTime == tag.m_playTime && m_strLastPlayed == tag.m_strLastPlayed &&
+         m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
+         m_completed == tag.m_completed && m_beaten == tag.m_beaten &&
+         m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
          m_strAgeRating == tag.m_strAgeRating;
 }
 
@@ -369,6 +377,9 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_playersMin;
     ar << m_playersMax;
     ar << m_coop;
+    ar << m_dropIn;
+    ar << m_splitScreen;
+    ar << m_coopPlayers;
     ar << static_cast<int>(m_category);
     ar << m_parentGameId;
     ar << m_timeToBeat.main;
@@ -460,6 +471,9 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_playersMin;
     ar >> m_playersMax;
     ar >> m_coop;
+    ar >> m_dropIn;
+    ar >> m_splitScreen;
+    ar >> m_coopPlayers;
     ar >> value;
     m_category = static_cast<GameCategory>(value);
     ar >> m_parentGameId;
@@ -563,6 +577,9 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["playersmin"] = m_playersMin;
   value["playersmax"] = m_playersMax;
   value["coop"] = m_coop;
+  value["dropin"] = m_dropIn;
+  value["splitscreen"] = m_splitScreen;
+  value["coopplayers"] = m_coopPlayers;
   value["timetobeat"]["main"] = m_timeToBeat.main;
   value["timetobeat"]["extras"] = m_timeToBeat.extras;
   value["timetobeat"]["complete"] = m_timeToBeat.complete;
@@ -780,7 +797,8 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
     XMLUtils::SetString(game, "series", m_strSeries);
   XMLUtils::SetStringArray(game, "tag", m_tags);
 
-  if (m_playersMin > 0 || m_playersMax > 0 || m_coop)
+  if (m_playersMin > 0 || m_playersMax > 0 || m_coop || m_dropIn || m_splitScreen ||
+      m_coopPlayers > 0)
   {
     tinyxml2::XMLElement* players = AddChild(game, "players", "");
     if (m_playersMin > 0)
@@ -789,6 +807,12 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
       players->SetAttribute("max", m_playersMax);
     if (m_coop)
       players->SetAttribute("coop", true);
+    if (m_coopPlayers > 0)
+      players->SetAttribute("coopmax", m_coopPlayers);
+    if (m_dropIn)
+      players->SetAttribute("dropin", true);
+    if (m_splitScreen)
+      players->SetAttribute("splitscreen", true);
   }
 
   if (!m_timeToBeat.IsEmpty())
@@ -926,6 +950,12 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
     players->QueryIntAttribute("min", &m_playersMin);
     players->QueryIntAttribute("max", &m_playersMax);
     players->QueryBoolAttribute("coop", &m_coop);
+    players->QueryBoolAttribute("dropin", &m_dropIn);
+    players->QueryBoolAttribute("splitscreen", &m_splitScreen);
+    int coopPlayers = 0;
+    if (players->QueryIntAttribute("coopmax", &coopPlayers) == tinyxml2::XML_SUCCESS &&
+        coopPlayers > 0 && coopPlayers <= MAX_PLAYERS)
+      m_coopPlayers = coopPlayers;
   }
 
   if (const tinyxml2::XMLElement* timeToBeat = element->FirstChildElement("timetobeat");

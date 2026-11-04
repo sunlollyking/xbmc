@@ -321,6 +321,8 @@ bool CGameDatabase::GetFilter(CGameDbUrl& url, Filter& filter, SortDescription& 
     filter.AppendWhere("game_view.playersMax >= 2");
   else if (list == "coop")
     filter.AppendWhere("game_view.coop = 1");
+  else if (list == "couchcoop")
+    filter.AppendWhere("(game_view.coop = 1 OR game_view.dropIn = 1 OR game_view.splitScreen = 1)");
   else if (list == "achievements")
     filter.AppendWhere("game_view.achievementsTotal > 0");
   else if (list == "inprogress")
@@ -518,6 +520,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       SetCompletionProperties(*item, game);
       SetSeriesProperties(*item, game);
       SetHighScoreProperties(*item, game);
+      SetCoopProperties(*item, game);
       if (game.GetPlayTime() > 0)
         item->SetProperty("playtime", StringUtils::SecondsToTimeString(game.GetPlayTime(),
                                                                        TIME_FORMAT_HH_MM));
@@ -601,6 +604,23 @@ void CGameDatabase::SetSeriesProperties(CFileItem& item, const CGameInfoTag& gam
     item.SetProperty("series", game.GetSeries());
     item.SetProperty("seriesid", game.GetSeriesId());
   }
+}
+
+void CGameDatabase::SetCoopProperties(CFileItem& item, const CGameInfoTag& game)
+{
+  const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();
+  std::vector<std::string> parts;
+  if (game.GetCoopPlayers() > 1)
+    parts.emplace_back(
+        StringUtils::Format(strings.Get(35786), game.GetCoopPlayers())); // "{0:d} players"
+  if (game.IsDropIn())
+    parts.emplace_back(strings.Get(35787)); // "drop-in"
+  if (game.IsSplitScreen())
+    parts.emplace_back(strings.Get(35788)); // "split screen"
+
+  item.ClearProperty("coopdetails");
+  if (!parts.empty())
+    item.SetProperty("coopdetails", StringUtils::Join(parts, " \u00b7 "));
 }
 
 void CGameDatabase::SetHighScoreProperties(CFileItem& item, const CGameInfoTag& game)
