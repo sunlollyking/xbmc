@@ -1351,6 +1351,7 @@ void CGUIWindowManager::MarkDirty(const CRect& rect)
 
 void CGUIWindowManager::RenderPass() const
 {
+  CServiceBroker::GetWinSystem()->GetGfxContext().ClearStencilBuckets();
   if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_guiFrontToBackRendering)
     RenderPassDual();
   else
