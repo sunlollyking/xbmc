@@ -10,6 +10,7 @@
 
 #include "utils/StringUtils.h"
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <utility>
@@ -182,6 +183,13 @@ std::string_view CGameLibraryTypes::ToString(MatchMethod method)
 MatchMethod CGameLibraryTypes::MatchMethodFromString(std::string_view method)
 {
   return FromWord(matchMethods, method);
+}
+
+bool CGameLibraryTypes::IsRelationKind(std::string_view kind)
+{
+  static constexpr std::array<std::string_view, 6> kinds{"remake", "remaster",  "port",
+                                                         "dlc",    "expansion", "original"};
+  return std::ranges::find(kinds, kind) != kinds.end();
 }
 
 int CGameLibraryTypes::PlatformTypeLabel(PlatformType type)

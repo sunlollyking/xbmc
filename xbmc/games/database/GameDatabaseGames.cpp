@@ -149,7 +149,12 @@ int CGameDatabase::SetDetailsForGame(CGameInfoTag& details, const KODI::ART::Art
              details.GetPublishers());
     SetLinks("collection_link", "idCollection", "collection", "idCollection", idGame,
              collectionNames);
-    m_pDS->exec(PrepareSQL("DELETE FROM game_link WHERE idGame = %i AND kind = 'similar'", idGame));
+    m_pDS->exec(PrepareSQL("DELETE FROM game_link WHERE idGame = %i", idGame));
+    for (const GameRelation& relation : details.GetRelated())
+      m_pDS->exec(PrepareSQL("INSERT INTO game_link (idGame, kind, title, titleKey) VALUES (%i, "
+                             "'%s', '%s', '%s')",
+                             idGame, relation.kind.c_str(), relation.title.c_str(),
+                             CGameLibraryTypes::TitleKey(relation.title).c_str()));
     for (const std::string& title : details.GetSimilar())
       m_pDS->exec(PrepareSQL("INSERT INTO game_link (idGame, kind, title, titleKey) VALUES (%i, "
                              "'similar', '%s', '%s')",
@@ -656,6 +661,20 @@ bool CGameDatabase::GetGameInfo(int idGame, CGameInfoTag& details)
       m_pDS->close();
     }
     details.SetSimilar(similar);
+
+    std::vector<GameRelation> related;
+    if (m_pDS->query(PrepareSQL("SELECT kind, title FROM game_link WHERE idGame = %i AND kind <> "
+                                "'similar' ORDER BY kind, title",
+                                idGame)))
+    {
+      while (!m_pDS->eof())
+      {
+        related.push_back({m_pDS->fv(0).get_asString(), m_pDS->fv(1).get_asString()});
+        m_pDS->next();
+      }
+      m_pDS->close();
+    }
+    details.SetRelated(related);
 
     std::vector<GameRelease> releases;
     GetReleasesForGame(idGame, releases);

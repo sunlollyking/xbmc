@@ -237,6 +237,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   written.SetSeries("Test Bros.");
   written.SetTags({"verified"});
   written.SetSimilar({"Test Bros. 2", "Test Land"});
+  written.SetRelated({{"remake", "Super Test Bros. Deluxe"}, {"dlc", "Test Pack"}});
   written.SetPlayers(1, 4);
   written.SetCoop(true);
   written.SetCoopPlayers(2);
@@ -274,6 +275,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   EXPECT_EQ(read.GetSeries(), "Test Bros.");
   EXPECT_EQ(read.GetTags(), written.GetTags());
   EXPECT_EQ(read.GetSimilar(), written.GetSimilar());
+  EXPECT_EQ(read.GetRelated(), written.GetRelated());
   EXPECT_EQ(read.GetPlayersMin(), 1);
   EXPECT_EQ(read.GetPlayersMax(), 4);
   EXPECT_TRUE(read.IsCoop());

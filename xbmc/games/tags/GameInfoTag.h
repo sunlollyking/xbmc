@@ -187,6 +187,10 @@ public:
   //! \brief Games like this one, by name, as a catalogue suggests them
   const std::vector<std::string>& GetSimilar() const { return m_similar; }
   void SetSimilar(const std::vector<std::string>& similar) { m_similar = similar; }
+
+  //! \brief Remakes, ports, add-ons and the like of this game, by name
+  const std::vector<GameRelation>& GetRelated() const { return m_related; }
+  void SetRelated(const std::vector<GameRelation>& related) { m_related = related; }
   ///@}
 
   /*!
@@ -402,6 +406,7 @@ private:
   int m_seriesId{-1};
   std::vector<std::string> m_tags;
   std::vector<std::string> m_similar;
+  std::vector<GameRelation> m_related;
 
   // Play facts
   int m_playersMin;

@@ -21314,7 +21314,13 @@ msgctxt "#35792"
 msgid "More like this"
 msgstr ""
 
-#empty strings from id 35793 to 35999
+#. Button that lists a game's remakes, ports and add-ons in the library
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35793"
+msgid "Related"
+msgstr ""
+
+#empty strings from id 35794 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

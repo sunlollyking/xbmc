@@ -102,7 +102,8 @@ public:
    */
   bool IsTitles() const
   {
-    return m_titles && !HasOption("xsp") && !HasOption("filter") && !HasOption("similarto");
+    return m_titles && !HasOption("xsp") && !HasOption("filter") && !HasOption("similarto") &&
+           !HasOption("relatedto");
   }
 
   /*!
