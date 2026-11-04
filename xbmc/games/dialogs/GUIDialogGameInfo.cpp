@@ -55,6 +55,7 @@ constexpr int CONTROL_BTN_GAME_CLIENT = 14;
 constexpr int CONTROL_BTN_VIDEO_FILTER = 15;
 constexpr int CONTROL_BTN_ARTWORK = 16;
 constexpr int CONTROL_BTN_SERIES = 18;
+constexpr int CONTROL_BTN_SIMILAR = 20;
 
 /*!
  * \brief The pictures a game has, in the order a person would look at them
@@ -148,6 +149,12 @@ void CGUIDialogGameInfo::Reload()
     CGameDatabase::SetHighScoreProperties(*m_item, tag);
     CGameDatabase::SetCoopProperties(*m_item, tag);
     CGameDatabase::SetAgeContentProperties(*m_item, tag);
+
+    // Only the games like it that are in the library can be opened
+    m_item->ClearProperty("similarcount");
+    if (const int count = db.CountGames("gamedb://titles/?similarto=" + std::to_string(idGame));
+        count > 0)
+      m_item->SetProperty("similarcount", count);
     KODI::ART::Artwork art;
     if (db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     {
@@ -230,6 +237,9 @@ bool CGUIDialogGameInfo::OnMessage(CGUIMessage& message)
           return true;
         case CONTROL_BTN_SERIES:
           OnSeries();
+          return true;
+        case CONTROL_BTN_SIMILAR:
+          OnBrowse("gamedb://titles/?similarto=");
           return true;
         case CONTROL_BTN_CHOOSE_ART:
           OnChooseArt();
@@ -519,6 +529,16 @@ void CGUIDialogGameInfo::OnSeries()
 
   const std::string path =
       "gamedb://series/" + std::to_string(m_item->GetGameInfoTag()->GetSeriesId()) + "/";
+  Close();
+  CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAMES, path);
+}
+
+void CGUIDialogGameInfo::OnBrowse(const std::string& pathForGame)
+{
+  if (!m_item || !m_item->HasGameInfoTag() || m_item->GetGameInfoTag()->GetDatabaseId() <= 0)
+    return;
+
+  const std::string path = pathForGame + std::to_string(m_item->GetGameInfoTag()->GetDatabaseId());
   Close();
   CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAMES, path);
 }

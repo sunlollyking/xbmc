@@ -83,6 +83,9 @@ private:
   //! \brief Open the series the game belongs to in the Games window
   void OnSeries();
 
+  //! \brief Open a list of games for this one, its id appended to the path
+  void OnBrowse(const std::string& pathForGame);
+
   /*!
    * \brief Choose which of a kind of picture the game shows
    *

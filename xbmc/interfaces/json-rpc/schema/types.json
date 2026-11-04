@@ -5182,6 +5182,7 @@
         "series",
         "seriesid",
         "tags",
+        "similar",
         "players",
         "playersmin",
         "playersmax",
@@ -5352,6 +5353,13 @@
       },
       "tags": {
         "$ref": "Array.String"
+      },
+      "similar": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Games like this one, by name"
       },
       "players": {
         "type": "integer"

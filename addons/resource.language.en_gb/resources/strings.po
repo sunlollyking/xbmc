@@ -21308,7 +21308,13 @@ msgctxt "#35791"
 msgid "Age rating content"
 msgstr ""
 
-#empty strings from id 35792 to 35999
+#. Button that lists the games in the library like this one
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35792"
+msgid "More like this"
+msgstr ""
+
+#empty strings from id 35793 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

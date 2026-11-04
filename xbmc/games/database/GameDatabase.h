@@ -293,6 +293,9 @@ public:
    */
   bool GetFacetNav(const std::string& baseDir, CFileItemList& items);
 
+  //! \brief How many games a library path lists, as a listing would show them
+  int CountGames(const std::string& baseDir);
+
   /*!
    * \brief List the series in a path's scope, each pictured by its first game
    */
@@ -487,7 +490,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 14; }
+  int GetSchemaVersion() const override { return 15; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:
