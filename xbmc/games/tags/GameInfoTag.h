@@ -200,6 +200,18 @@ public:
   bool IsCoop() const { return m_coop; }
   void SetCoop(bool coop) { m_coop = coop; }
 
+  //! \brief Whether a second player can join or leave at any time
+  bool IsDropIn() const { return m_dropIn; }
+  void SetDropIn(bool dropIn) { m_dropIn = dropIn; }
+
+  //! \brief Whether players on one machine share the screen split between them
+  bool IsSplitScreen() const { return m_splitScreen; }
+  void SetSplitScreen(bool splitScreen) { m_splitScreen = splitScreen; }
+
+  //! \brief Most players at once in co-op on one machine, or 0 if unknown
+  int GetCoopPlayers() const { return m_coopPlayers; }
+  void SetCoopPlayers(int players) { m_coopPlayers = players; }
+
   GameCategory GetCategory() const { return m_category; }
   void SetCategory(GameCategory category) { m_category = category; }
 
@@ -390,6 +402,9 @@ private:
   int m_playersMin;
   int m_playersMax;
   bool m_coop;
+  bool m_dropIn{false};
+  bool m_splitScreen{false};
+  int m_coopPlayers{0};
   GameCategory m_category;
   int m_parentGameId;
   GameTimeToBeat m_timeToBeat;

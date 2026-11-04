@@ -238,6 +238,9 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   written.SetTags({"verified"});
   written.SetPlayers(1, 4);
   written.SetCoop(true);
+  written.SetCoopPlayers(2);
+  written.SetDropIn(true);
+  written.SetSplitScreen(true);
   written.SetUniqueID("igdb", "1234", true);
   written.SetUniqueID("thegamesdb", "99");
   written.SetPlayCount(7);
@@ -272,6 +275,9 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   EXPECT_EQ(read.GetPlayersMin(), 1);
   EXPECT_EQ(read.GetPlayersMax(), 4);
   EXPECT_TRUE(read.IsCoop());
+  EXPECT_EQ(read.GetCoopPlayers(), 2);
+  EXPECT_TRUE(read.IsDropIn());
+  EXPECT_TRUE(read.IsSplitScreen());
   EXPECT_EQ(read.GetUniqueID("igdb"), "1234");
   EXPECT_EQ(read.GetUniqueID("thegamesdb"), "99");
   EXPECT_EQ(read.GetPlayCount(), 7);

@@ -146,6 +146,7 @@ void CGUIDialogGameInfo::Reload()
     CGameDatabase::SetCompletionProperties(*m_item, tag);
     CGameDatabase::SetSeriesProperties(*m_item, tag);
     CGameDatabase::SetHighScoreProperties(*m_item, tag);
+    CGameDatabase::SetCoopProperties(*m_item, tag);
     KODI::ART::Artwork art;
     if (db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     {

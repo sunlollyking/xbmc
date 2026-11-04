@@ -28,6 +28,9 @@ constexpr const char* SETTING_GAMELIBRARY_SHOWDERIVEDGAMES = "gamelibrary.showde
 constexpr const char* SETTING_GAMELIBRARY_TITLESTYLE = "gamelibrary.titlestyle";
 constexpr const char* SETTING_GAMELIBRARY_GROUPSERIES = "gamelibrary.groupseries";
 
+//! More players than any game takes at once, so a larger number is a bad value
+constexpr int MAX_PLAYERS = 64;
+
 //! \brief Which of a game's names to show; the order matches settings.xml
 enum class TitleStyle
 {

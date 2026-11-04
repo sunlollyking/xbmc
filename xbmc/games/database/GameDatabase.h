@@ -417,6 +417,12 @@ public:
    *        and who set it, and "highscores", the table as text
    */
   static void SetHighScoreProperties(CFileItem& item, const CGameInfoTag& game);
+
+  /*!
+   * \brief Put how a game is played together on one machine on its item:
+   *        "coopdetails", e.g. "2 players · drop-in · split screen"
+   */
+  static void SetCoopProperties(CFileItem& item, const CGameInfoTag& game);
   bool SetUserRating(int idGame, int rating);
 
   /*!
@@ -470,7 +476,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 13; }
+  int GetSchemaVersion() const override { return 14; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

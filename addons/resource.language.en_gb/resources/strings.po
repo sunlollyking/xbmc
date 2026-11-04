@@ -21260,7 +21260,49 @@ msgctxt "#35783"
 msgid "High scores"
 msgstr ""
 
-#empty strings from id 35784 to 35999
+#. The list of games several can play together on one machine
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35784"
+msgid "Couch co-op"
+msgstr ""
+
+#. Description of the list of games several can play together on one machine
+#: xbmc/filesystem/GameDatabaseDirectory.cpp
+msgctxt "#35785"
+msgid "Games two or more can play together on one screen, as a team or split screen."
+msgstr ""
+
+#. How many can play a game together in co-op
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35786"
+msgid "{0:d} players"
+msgstr ""
+
+#. A game a second player can join or leave at any time
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35787"
+msgid "drop-in"
+msgstr ""
+
+#. A game whose players share the screen split between them
+#: xbmc/games/database/GameDatabaseNav.cpp
+msgctxt "#35788"
+msgid "split screen"
+msgstr ""
+
+#. Smart playlist rule: a game a second player can join at any time
+#: xbmc/playlists/SmartPlayList.cpp
+msgctxt "#35789"
+msgid "Drop-in co-op"
+msgstr ""
+
+#. Smart playlist rule: a game played on a split screen
+#: xbmc/playlists/SmartPlayList.cpp
+msgctxt "#35790"
+msgid "Split screen"
+msgstr ""
+
+#empty strings from id 35791 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

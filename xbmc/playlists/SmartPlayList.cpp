@@ -68,6 +68,8 @@ static const auto fields = std::array{
   TranslateField{ "favourite",         Field::FAVOURITE,                  BOOLEAN_FIELD,  nullptr,                              false, 1036 },
   TranslateField{ "completed",         Field::COMPLETED,                  BOOLEAN_FIELD,  nullptr,                              false, 35531 },
   TranslateField{ "beaten",            Field::BEATEN,                     BOOLEAN_FIELD,  nullptr,                              false, 35712 },
+  TranslateField{ "dropin",            Field::DROP_IN,                    BOOLEAN_FIELD,  nullptr,                              false, 35789 },
+  TranslateField{ "splitscreen",       Field::SPLIT_SCREEN,               BOOLEAN_FIELD,  nullptr,                              false, 35790 },
   TranslateField{ "hasachievements",   Field::HAS_ACHIEVEMENTS,           BOOLEAN_FIELD,  nullptr,                              false, 35534 },
   TranslateField{ "coop",              Field::COOP,                       BOOLEAN_FIELD,  nullptr,                              false, 35533 },
   TranslateField{ "filename",          Field::FILENAME,                   TEXT_FIELD,     nullptr,                              false, 561 },
@@ -493,6 +495,7 @@ std::vector<Field> CSmartPlaylistRule::GetFields(const std::string &type)
         Field::DATE_ADDED, Field::FILENAME,       Field::PATH,
         Field::FAVOURITE,  Field::COMPLETED,      Field::HAS_ACHIEVEMENTS,
         Field::COOP,       Field::TIME,           Field::BEATEN,
+        Field::DROP_IN,    Field::SPLIT_SCREEN,
     };
   }
   else if (type == MEDIA::CONTENT::MUSICVIDEOS)
@@ -782,7 +785,8 @@ std::string CSmartPlaylistRule::GetBooleanQuery(const std::string &negate, const
   {
     if (m_field == static_cast<int>(Field::FAVOURITE) ||
         m_field == static_cast<int>(Field::COMPLETED) || m_field == static_cast<int>(Field::COOP) ||
-        m_field == static_cast<int>(Field::BEATEN))
+        m_field == static_cast<int>(Field::BEATEN) || m_field == static_cast<int>(Field::DROP_IN) ||
+        m_field == static_cast<int>(Field::SPLIT_SCREEN))
       return negate + GetField(m_field, strType);
     if (m_field == static_cast<int>(Field::HAS_ACHIEVEMENTS))
       return negate + " " + GetField(m_field, strType) + " > 0";

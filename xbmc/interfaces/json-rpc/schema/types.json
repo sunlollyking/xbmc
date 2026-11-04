@@ -5186,6 +5186,9 @@
         "playersmin",
         "playersmax",
         "coop",
+        "coopplayers",
+        "dropin",
+        "splitscreen",
         "timetobeat",
         "category",
         "rating",
@@ -5361,6 +5364,18 @@
       },
       "coop": {
         "type": "boolean"
+      },
+      "coopplayers": {
+        "type": "integer",
+        "description": "Most players at once in co-op on one machine, or 0 if unknown"
+      },
+      "dropin": {
+        "type": "boolean",
+        "description": "Whether a second player can join or leave at any time"
+      },
+      "splitscreen": {
+        "type": "boolean",
+        "description": "Whether players on one machine share the screen split between them"
       },
       "timetobeat": {
         "type": "object",

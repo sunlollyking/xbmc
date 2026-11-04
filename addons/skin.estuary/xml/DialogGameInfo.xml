@@ -114,6 +114,10 @@
 							<param name="info" value="ListItem.Players" />
 						</include>
 						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35599]" />
+							<param name="info" value="ListItem.Property(coopdetails)" />
+						</include>
+						<include content="GameInfoFact">
 							<param name="label" value="$LOCALIZE[35773]" />
 							<param name="info" value="ListItem.Property(timetobeat)" />
 						</include>
