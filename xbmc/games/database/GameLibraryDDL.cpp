@@ -123,7 +123,8 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "coopPlayers integer, "
                   "languages text, "
                   "popularity float, "
-                  "wantToPlay float)");
+                  "wantToPlay float, "
+                  "spinoff bool)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -504,6 +505,14 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   {
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN popularity float");
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN wantToPlay float");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
+  }
+
+  // 19: whether a game is a spin-off of its series. The game view lists the
+  // game's columns, so it is rebuilt too.
+  if (version < 19)
+  {
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN spinoff bool");
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
 }

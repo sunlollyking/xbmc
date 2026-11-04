@@ -75,6 +75,7 @@ void CGameInfoTag::Reset()
   m_popularity = {};
   m_strSeries.clear();
   m_seriesId = -1;
+  m_spinoff = false;
 
   m_ratings.clear();
   m_strDefaultRating.clear();
@@ -139,6 +140,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_collections = tag.m_collections;
     m_strSeries = tag.m_strSeries;
     m_seriesId = tag.m_seriesId;
+    m_spinoff = tag.m_spinoff;
     m_tags = tag.m_tags;
     m_similar = tag.m_similar;
     m_modes = tag.m_modes;
@@ -206,17 +208,17 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_strOriginalTitle == tag.m_strOriginalTitle && m_strReleaseDate == tag.m_strReleaseDate &&
          m_developers == tag.m_developers && m_publishers == tag.m_publishers &&
          m_collections == tag.m_collections && m_strSeries == tag.m_strSeries &&
-         m_seriesId == tag.m_seriesId && m_tags == tag.m_tags && m_similar == tag.m_similar &&
-         m_modes == tag.m_modes && m_related == tag.m_related && m_languages == tag.m_languages &&
-         m_playersMin == tag.m_playersMin && m_playersMax == tag.m_playersMax &&
-         m_coop == tag.m_coop && m_dropIn == tag.m_dropIn && m_splitScreen == tag.m_splitScreen &&
-         m_coopPlayers == tag.m_coopPlayers && m_category == tag.m_category &&
-         m_timeToBeat == tag.m_timeToBeat && m_popularity == tag.m_popularity &&
-         m_uniqueIds == tag.m_uniqueIds && m_playCount == tag.m_playCount &&
-         m_playTime == tag.m_playTime && m_strLastPlayed == tag.m_strLastPlayed &&
-         m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
-         m_completed == tag.m_completed && m_beaten == tag.m_beaten &&
-         m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
+         m_seriesId == tag.m_seriesId && m_spinoff == tag.m_spinoff && m_tags == tag.m_tags &&
+         m_similar == tag.m_similar && m_modes == tag.m_modes && m_related == tag.m_related &&
+         m_languages == tag.m_languages && m_playersMin == tag.m_playersMin &&
+         m_playersMax == tag.m_playersMax && m_coop == tag.m_coop && m_dropIn == tag.m_dropIn &&
+         m_splitScreen == tag.m_splitScreen && m_coopPlayers == tag.m_coopPlayers &&
+         m_category == tag.m_category && m_timeToBeat == tag.m_timeToBeat &&
+         m_popularity == tag.m_popularity && m_uniqueIds == tag.m_uniqueIds &&
+         m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
+         m_strLastPlayed == tag.m_strLastPlayed && m_userRating == tag.m_userRating &&
+         m_favourite == tag.m_favourite && m_completed == tag.m_completed &&
+         m_beaten == tag.m_beaten && m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
          m_strAgeRating == tag.m_strAgeRating;
 }
 
@@ -385,6 +387,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_collections;
     ar << m_strSeries;
     ar << m_seriesId;
+    ar << m_spinoff;
     ar << m_tags;
     ar << m_similar;
     ar << m_modes;
@@ -497,6 +500,7 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_collections;
     ar >> m_strSeries;
     ar >> m_seriesId;
+    ar >> m_spinoff;
     ar >> m_tags;
     ar >> m_similar;
     ar >> m_modes;
@@ -624,6 +628,7 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["collections"] = m_collections;
   value["series"] = m_strSeries;
   value["seriesid"] = m_seriesId;
+  value["spinoff"] = m_spinoff;
   value["tags"] = m_tags;
   value["similar"] = m_similar;
   value["modes"] = m_modes;
@@ -868,7 +873,11 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
                                : m_publishers);
   XMLUtils::SetStringArray(game, "collection", m_collections);
   if (!m_strSeries.empty())
-    XMLUtils::SetString(game, "series", m_strSeries);
+  {
+    tinyxml2::XMLElement* series = AddChild(game, "series", m_strSeries);
+    if (m_spinoff)
+      series->SetAttribute("spinoff", true);
+  }
   XMLUtils::SetStringArray(game, "tag", m_tags);
   XMLUtils::SetStringArray(game, "similar", m_similar);
   XMLUtils::SetStringArray(game, "mode", m_modes);
@@ -1037,7 +1046,10 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
   if (std::vector<std::string> values = ChildTexts(element, "collection"); !values.empty())
     m_collections = std::move(values);
   if (const std::string value = ChildText(element, "series"); !value.empty())
+  {
     m_strSeries = value;
+    element->FirstChildElement("series")->QueryBoolAttribute("spinoff", &m_spinoff);
+  }
   if (std::vector<std::string> values = ChildTexts(element, "tag"); !values.empty())
     m_tags = std::move(values);
   if (std::vector<std::string> values = ChildTexts(element, "similar"); !values.empty())

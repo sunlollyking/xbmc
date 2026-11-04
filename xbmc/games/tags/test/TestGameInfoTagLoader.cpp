@@ -235,6 +235,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   written.SetPublishers({"Nobody"});
   written.SetCollections({"Test Bros."});
   written.SetSeries("Test Bros.");
+  written.SetSpinoff(true);
   written.SetTags({"verified"});
   written.SetSimilar({"Test Bros. 2", "Test Land"});
   written.SetModes({"Single player", "Co-operative"});
@@ -276,6 +277,7 @@ TEST(TestGameInfoTagLoader, WhatIsWrittenIsWhatIsReadBack)
   EXPECT_EQ(read.GetPublishers(), written.GetPublishers());
   EXPECT_EQ(read.GetCollections(), written.GetCollections());
   EXPECT_EQ(read.GetSeries(), "Test Bros.");
+  EXPECT_TRUE(read.IsSpinoff());
   EXPECT_EQ(read.GetTags(), written.GetTags());
   EXPECT_EQ(read.GetSimilar(), written.GetSimilar());
   EXPECT_EQ(read.GetModes(), written.GetModes());
