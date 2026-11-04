@@ -301,7 +301,7 @@ bool CRetroPlayer::Open(const CFileItem& file, const CPlayerOptions& options)
 
     if (CGameDatabase library; library.Open())
       library.MarkPlayed(fileCopy.GetPath());
-    m_gameServices.StartPlaySession(fileCopy.GetPath());
+    m_gameServices.StartPlaySession(fileCopy.GetPath(), m_gameClient->ID());
     m_callback.OnAVStarted(fileCopy);
     if (!bStandalone)
       m_autoSave = std::make_unique<CRetroPlayerAutoSave>(*this, m_gameServices.GameSettings());
@@ -370,6 +370,8 @@ bool CRetroPlayer::CloseFile(bool reopen /* = false */)
   if (m_gameClient)
     m_gameClient->Unload();
   m_gameClient.reset();
+
+  m_gameServices.RecordHighScores();
 
   // A game client that renders on the GPU shares it with Kodi and releases its
   // resources as it unloads, without restoring the state Kodi left set up. The

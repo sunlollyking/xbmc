@@ -118,6 +118,10 @@
 							<param name="info" value="ListItem.Property(timetobeat)" />
 						</include>
 						<include content="GameInfoFact">
+							<param name="label" value="$LOCALIZE[35782]" />
+							<param name="info" value="ListItem.Property(highscore)" />
+						</include>
+						<include content="GameInfoFact">
 							<param name="label" value="$LOCALIZE[35524]" />
 							<param name="info" value="ListItem.Region" />
 						</include>
@@ -375,6 +379,15 @@
 						<param name="icon" value="icons/infodialogs/versions.png" />
 						<param name="label" value="$LOCALIZE[35543]" />
 						<param name="visible" value="Integer.IsGreater(ListItem.ReleaseCount,1)" />
+					</include>
+					<include content="InfoDialogButton">
+						<param name="id" value="19" />
+						<param name="icon" value="icons/infodialogs/rating.png" />
+						<param name="label" value="$LOCALIZE[35783]" />
+						<param name="onclick_1" value="SetProperty(TextViewer_Header,$ESCINFO[ListItem.Title],home)" />
+						<param name="onclick_2" value="SetProperty(TextViewer_Text,$ESCINFO[ListItem.Property(highscores)],home)" />
+						<param name="onclick_3" value="ActivateWindow(1102)" />
+						<param name="visible" value="!String.IsEmpty(ListItem.Property(highscores))" />
 					</include>
 					<include content="InfoDialogButton">
 						<param name="id" value="18" />

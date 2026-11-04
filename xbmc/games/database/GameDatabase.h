@@ -186,6 +186,14 @@ public:
    * \param fileNameAndPath A file of the game
    */
   bool SetBeatenForFile(const std::string& fileNameAndPath);
+
+  /*!
+   * \brief Keep the high scores of the game a file belongs to
+   *
+   * \param fileNameAndPath A file of the game
+   * \param scores The table, as CGameHighScores::Serialize() writes it
+   */
+  bool SetHighScoresForFile(const std::string& fileNameAndPath, const std::string& scores);
   ///@}
 
   /*!
@@ -403,6 +411,12 @@ public:
 
   //! \brief Put a game's series, "series" and "seriesid", on its item
   static void SetSeriesProperties(CFileItem& item, const CGameInfoTag& game);
+
+  /*!
+   * \brief Put a game's high scores on its item: "highscore", the best score
+   *        and who set it, and "highscores", the table as text
+   */
+  static void SetHighScoreProperties(CFileItem& item, const CGameInfoTag& game);
   bool SetUserRating(int idGame, int rating);
 
   /*!
@@ -456,7 +470,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 12; }
+  int GetSchemaVersion() const override { return 13; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:

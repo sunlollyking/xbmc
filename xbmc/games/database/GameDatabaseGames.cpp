@@ -15,6 +15,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "games/library/GameAgeRatings.h"
+#include "games/library/GameHighScores.h"
 #include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
 #include "settings/Settings.h"
@@ -572,6 +573,8 @@ void CGameDatabase::GetDetailsForGame(const dbiplus::sql_record* record, CGameIn
   details.SetDevelopers(SplitList(record->at(GAMEDB_DEVELOPERS).get_asString()));
   details.SetPublishers(SplitList(record->at(GAMEDB_PUBLISHERS).get_asString()));
   details.SetCollections(SplitList(record->at(GAMEDB_COLLECTIONS).get_asString()));
+  details.SetHighScores(
+      CGameHighScores::Deserialize(record->at(GAMEDB_HIGH_SCORES).get_asString()));
   if (record->at(GAMEDB_SERIES_ID).get_asInt() > 0)
   {
     details.SetSeries(record->at(GAMEDB_SERIES_NAME).get_asString());

@@ -85,6 +85,7 @@ void CGameInfoTag::Reset()
   m_favourite = false;
   m_completed = false;
   m_beaten = false;
+  m_highScores = {};
   m_achievementsTotal = 0;
   m_achievementsEarned = 0;
   m_achievementsHardcore = 0;
@@ -156,6 +157,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_favourite = tag.m_favourite;
     m_completed = tag.m_completed;
     m_beaten = tag.m_beaten;
+    m_highScores = tag.m_highScores;
     m_achievementsTotal = tag.m_achievementsTotal;
     m_achievementsEarned = tag.m_achievementsEarned;
     m_achievementsHardcore = tag.m_achievementsHardcore;
@@ -194,7 +196,7 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
          m_strLastPlayed == tag.m_strLastPlayed && m_userRating == tag.m_userRating &&
          m_favourite == tag.m_favourite && m_completed == tag.m_completed &&
-         m_beaten == tag.m_beaten && m_rating == tag.m_rating &&
+         m_beaten == tag.m_beaten && m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
          m_strAgeRating == tag.m_strAgeRating;
 }
 
@@ -403,6 +405,10 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_favourite;
     ar << m_completed;
     ar << m_beaten;
+    ar << m_highScores.columns;
+    ar << static_cast<int>(m_highScores.rows.size());
+    for (const std::vector<std::string>& row : m_highScores.rows)
+      ar << row;
     ar << m_achievementsTotal;
     ar << m_achievementsEarned;
     ar << m_achievementsHardcore;
@@ -503,6 +509,12 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_favourite;
     ar >> m_completed;
     ar >> m_beaten;
+    ar >> m_highScores.columns;
+    int rows = 0;
+    ar >> rows;
+    m_highScores.rows.assign(static_cast<size_t>(std::max(rows, 0)), {});
+    for (std::vector<std::string>& row : m_highScores.rows)
+      ar >> row;
     ar >> m_achievementsTotal;
     ar >> m_achievementsEarned;
     ar >> m_achievementsHardcore;
@@ -611,6 +623,10 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["favourite"] = m_favourite;
   value["completed"] = m_completed;
   value["beaten"] = IsBeaten();
+  value["highscores"]["columns"] = m_highScores.columns;
+  value["highscores"]["rows"] = CVariant(CVariant::VariantTypeArray);
+  for (const std::vector<std::string>& row : m_highScores.rows)
+    value["highscores"]["rows"].push_back(row);
   value["achievementstotal"] = m_achievementsTotal;
   value["achievementsearned"] = m_achievementsEarned;
   value["achievementshardcore"] = m_achievementsHardcore;
