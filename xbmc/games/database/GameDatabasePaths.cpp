@@ -450,6 +450,19 @@ bool CGameDatabase::SetCompletedForFile(const std::string& fileNameAndPath)
       idFile));
 }
 
+bool CGameDatabase::SetHighScoresForFile(const std::string& fileNameAndPath,
+                                         const std::string& scores)
+{
+  const int idFile = GetFileId(fileNameAndPath);
+  if (idFile <= 0)
+    return false;
+
+  return ExecuteQuery(PrepareSQL(
+      "UPDATE game SET highScores = '%s' WHERE idGame = (SELECT r.idGame FROM files f JOIN "
+      "gamerelease r ON r.idRelease = f.idRelease WHERE f.idFile = %i)",
+      scores.c_str(), idFile));
+}
+
 bool CGameDatabase::SetBeatenForFile(const std::string& fileNameAndPath)
 {
   const int idFile = GetFileId(fileNameAndPath);

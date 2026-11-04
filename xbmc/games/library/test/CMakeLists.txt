@@ -3,6 +3,7 @@ set(SOURCES TestGameAgeRatings.cpp
             TestGameFileIdentity.cpp
             TestGameLibraryTypes.cpp
             TestGameNameParser.cpp
+            TestHighScoreDecoder.cpp
             TestReleasePolicy.cpp
 )
 

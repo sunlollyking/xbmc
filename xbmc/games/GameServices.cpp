@@ -16,6 +16,7 @@
 #include "games/GameUtils.h"
 #include "games/agents/input/AgentInput.h"
 #include "games/database/GameDatabase.h"
+#include "games/library/GameHighScores.h"
 #include "profiles/ProfileManager.h"
 #include "utils/FileExtensionProvider.h"
 
@@ -92,10 +93,11 @@ void CGameServices::OnAddonRepoInstalled()
   m_fileExtensionProvider.RegisterGameExtensions(CGameUtils::GetGameExtensions());
 }
 
-void CGameServices::StartPlaySession(const std::string& gamePath)
+void CGameServices::StartPlaySession(const std::string& gamePath, const std::string& gameClient)
 {
   std::lock_guard lock(m_playSessionMutex);
   m_playSessionPath = gamePath;
+  m_playSessionClient = gameClient;
   m_playSessionStart = std::chrono::steady_clock::now();
 }
 
@@ -110,6 +112,9 @@ void CGameServices::EndPlaySession()
     gamePath = std::move(m_playSessionPath);
     m_playSessionPath.clear();
     started = m_playSessionStart;
+    m_endedSessionPath = gamePath;
+    m_endedSessionClient = std::move(m_playSessionClient);
+    m_playSessionClient.clear();
   }
 
   const auto seconds =
@@ -120,6 +125,20 @@ void CGameServices::EndPlaySession()
 
   if (CGameDatabase library; library.Open())
     library.AddPlayTime(gamePath, static_cast<unsigned int>(seconds));
+}
+
+void CGameServices::RecordHighScores()
+{
+  std::string gamePath;
+  std::string gameClient;
+  {
+    std::lock_guard lock(m_playSessionMutex);
+    gamePath = std::move(m_endedSessionPath);
+    gameClient = std::move(m_endedSessionClient);
+    m_endedSessionPath.clear();
+    m_endedSessionClient.clear();
+  }
+  CGameHighScores::Record(gamePath, gameClient);
 }
 
 void CGameServices::MarkPlayingGameCompleted()

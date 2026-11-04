@@ -9,6 +9,7 @@
 #pragma once
 
 #include "games/library/GameLibraryTypes.h"
+#include "games/library/HighScoreDecoder.h"
 #include "utils/IArchivable.h"
 #include "utils/ISerializable.h"
 #include "utils/ISortable.h"
@@ -306,6 +307,10 @@ public:
   bool IsCompleted() const { return m_completed; }
   void SetCompleted(bool completed) { m_completed = completed; }
 
+  //! \brief The high scores the game last saved, as it shows them
+  const HighScoreTable& GetHighScores() const { return m_highScores; }
+  void SetHighScores(const HighScoreTable& scores) { m_highScores = scores; }
+
   //! \brief Whether the game has been beaten, which a completed game always has
   bool IsBeaten() const { return m_beaten || m_completed; }
   void SetBeaten(bool beaten) { m_beaten = beaten; }
@@ -413,6 +418,7 @@ private:
   std::string m_strLastScraped;
   bool m_completed;
   bool m_beaten{false};
+  HighScoreTable m_highScores;
   int m_achievementsTotal;
   int m_achievementsEarned;
   int m_achievementsHardcore;

@@ -80,10 +80,18 @@ public:
    * owned here: the first close records the session and the rest find nothing
    * to record.
    */
-  void StartPlaySession(const std::string& gamePath);
+  void StartPlaySession(const std::string& gamePath, const std::string& gameClient);
 
   //! \brief Record the time played and forget the session, if one is open
   void EndPlaySession();
+
+  /*!
+   * \brief Keep the high scores of the game whose session ended last
+   *
+   * Called once the game client has unloaded the game, which is when an
+   * arcade emulator writes its scores out.
+   */
+  void RecordHighScores();
 
   //! \brief Mark the game being played completed in the library, if it is in it
   void MarkPlayingGameCompleted();
@@ -128,6 +136,9 @@ private:
 
   std::mutex m_playSessionMutex;
   std::string m_playSessionPath;
+  std::string m_playSessionClient;
+  std::string m_endedSessionPath;
+  std::string m_endedSessionClient;
   std::chrono::steady_clock::time_point m_playSessionStart;
 
   // Game services

@@ -5204,6 +5204,7 @@
         "favourite",
         "completed",
         "beaten",
+        "highscores",
         "achievementstotal",
         "achievementsearned",
         "achievementshardcore",
@@ -5434,6 +5435,27 @@
       "beaten": {
         "type": "boolean",
         "description": "Whether the game has been beaten, which a completed game always has"
+      },
+      "highscores": {
+        "type": "object",
+        "description": "The high scores the game last saved, as it shows them",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
       },
       "achievementstotal": {
         "type": "integer"

@@ -116,7 +116,8 @@ void CGameLibraryDDL::CreateTables(CDatabase& db)
                   "timeToBeatMain integer, "
                   "timeToBeatExtras integer, "
                   "timeToBeatComplete integer, "
-                  "idSeries integer)");
+                  "idSeries integer, "
+                  "highScores text)");
 
   CLog::Log(LOGINFO, "GAME: Creating release table");
   db.ExecuteQuery("CREATE TABLE gamerelease ("
@@ -440,6 +441,14 @@ void CGameLibraryDDL::UpdateTables(CDatabase& db, int version)
   if (version < 12)
   {
     db.ExecuteQuery("ALTER TABLE game ADD COLUMN idSeries integer");
+    db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
+  }
+
+  // 13: the high scores an arcade game saved. The game view lists the game's
+  // columns, so it is rebuilt too.
+  if (version < 13)
+  {
+    db.ExecuteQuery("ALTER TABLE game ADD COLUMN highScores text");
     db.ExecuteQuery("DROP VIEW IF EXISTS game_view");
   }
 }

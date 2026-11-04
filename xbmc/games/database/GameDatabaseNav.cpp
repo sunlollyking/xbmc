@@ -16,6 +16,7 @@
 #include "games/GameManual.h"
 #include "games/library/GameAgeRatings.h"
 #include "games/library/GameDbUrl.h"
+#include "games/library/GameHighScores.h"
 #include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIListItem.h"
@@ -516,6 +517,7 @@ bool CGameDatabase::GetGamesByWhere(const std::string& baseDir,
       }
       SetCompletionProperties(*item, game);
       SetSeriesProperties(*item, game);
+      SetHighScoreProperties(*item, game);
       if (game.GetPlayTime() > 0)
         item->SetProperty("playtime", StringUtils::SecondsToTimeString(game.GetPlayTime(),
                                                                        TIME_FORMAT_HH_MM));
@@ -598,6 +600,17 @@ void CGameDatabase::SetSeriesProperties(CFileItem& item, const CGameInfoTag& gam
   {
     item.SetProperty("series", game.GetSeries());
     item.SetProperty("seriesid", game.GetSeriesId());
+  }
+}
+
+void CGameDatabase::SetHighScoreProperties(CFileItem& item, const CGameInfoTag& game)
+{
+  item.ClearProperty("highscore");
+  item.ClearProperty("highscores");
+  if (const std::string best = CGameHighScores::Best(game.GetHighScores()); !best.empty())
+  {
+    item.SetProperty("highscore", best);
+    item.SetProperty("highscores", CGameHighScores::Text(game.GetHighScores()));
   }
 }
 

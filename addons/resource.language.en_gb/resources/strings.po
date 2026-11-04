@@ -21248,7 +21248,19 @@ msgctxt "#35781"
 msgid "Games of the same series, such as Mario Kart, show as one entry in the list of titles, as movies in a set do. Open it to see the games."
 msgstr ""
 
-#empty strings from id 35782 to 35999
+#. Label for the best score an arcade game saved, followed by the score and who set it
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35782"
+msgid "High score"
+msgstr ""
+
+#. Button that shows the high score table an arcade game saved
+#: addons/skin.estuary/xml/DialogGameInfo.xml
+msgctxt "#35783"
+msgid "High scores"
+msgstr ""
+
+#empty strings from id 35784 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
