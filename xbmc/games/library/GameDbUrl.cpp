@@ -20,7 +20,7 @@ using namespace GAME;
 
 namespace
 {
-constexpr std::array<std::pair<GameDbNode, std::string_view>, 16> nodeSegments{{
+constexpr std::array<std::pair<GameDbNode, std::string_view>, 17> nodeSegments{{
     {GameDbNode::PLATFORMS, "platforms"},
     {GameDbNode::GAMES, "titles"},
     {GameDbNode::RELEASES, "releases"},
@@ -31,6 +31,7 @@ constexpr std::array<std::pair<GameDbNode, std::string_view>, 16> nodeSegments{{
     {GameDbNode::COLLECTIONS, "collections"},
     {GameDbNode::SERIES, "series"},
     {GameDbNode::MODES, "modes"},
+    {GameDbNode::CHARACTERS, "characters"},
     {GameDbNode::TAGS, "tags"},
     {GameDbNode::REGIONS, "regions"},
     {GameDbNode::PLAYERS, "players"},
@@ -40,7 +41,7 @@ constexpr std::array<std::pair<GameDbNode, std::string_view>, 16> nodeSegments{{
 }};
 
 // A facet's segment, and the option its chosen value becomes
-constexpr std::array<std::pair<std::string_view, std::string_view>, 12> facetOptions{{
+constexpr std::array<std::pair<std::string_view, std::string_view>, 13> facetOptions{{
     {"genres", "genreid"},
     {"years", "year"},
     {"developers", "developerid"},
@@ -48,6 +49,7 @@ constexpr std::array<std::pair<std::string_view, std::string_view>, 12> facetOpt
     {"collections", "collectionid"},
     {"series", "seriesid"},
     {"modes", "modeid"},
+    {"characters", "characterid"},
     {"tags", "tagid"},
     {"regions", "region"},
     {"players", "players"},
@@ -56,8 +58,8 @@ constexpr std::array<std::pair<std::string_view, std::string_view>, 12> facetOpt
 }};
 
 const std::vector<std::string_view> facetNames{
-    "genres", "years", "developers", "publishers", "collections", "series",
-    "modes",  "tags",  "regions",    "players",    "ageratings",  "categories",
+    "genres", "years",   "developers", "publishers", "collections", "series",     "modes",
+    "tags",   "regions", "players",    "ageratings", "categories",  "characters",
 };
 
 const std::vector<std::string_view> listNames{

@@ -238,3 +238,50 @@ std::vector<std::string> CGameDatabase::GetLinkNames(const std::string& linkTabl
 
   return names;
 }
+
+void CGameDatabase::SetCharacters(int idGame, const std::vector<GameCharacter>& characters)
+{
+  std::vector<std::string> names;
+  for (const GameCharacter& character : characters)
+  {
+    if (std::ranges::find(names, character.name) == names.end())
+      names.emplace_back(character.name);
+  }
+  SetLinks("gamecharacter_link", "idCharacter", "gamecharacter", "idCharacter", idGame, names);
+
+  // A character keeps the latest picture a catalogue gave of them
+  for (const GameCharacter& character : characters)
+  {
+    if (!character.thumb.empty())
+      m_pDS->exec(PrepareSQL("UPDATE gamecharacter SET thumb = '%s' WHERE name = '%s'",
+                             character.thumb.c_str(), character.name.c_str()));
+  }
+}
+
+std::vector<GameCharacter> CGameDatabase::GetCharacters(int idGame)
+{
+  std::vector<GameCharacter> characters;
+
+  try
+  {
+    if (m_pDS->query(PrepareSQL("SELECT gamecharacter.name, gamecharacter.thumb FROM gamecharacter "
+                                "JOIN gamecharacter_link ON gamecharacter_link.idCharacter = "
+                                "gamecharacter.idCharacter WHERE gamecharacter_link.idGame = %i "
+                                "ORDER BY gamecharacter.name",
+                                idGame)))
+    {
+      while (!m_pDS->eof())
+      {
+        characters.push_back({m_pDS->fv(0).get_asString(), m_pDS->fv(1).get_asString()});
+        m_pDS->next();
+      }
+      m_pDS->close();
+    }
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "GAME: Failed to read the characters of game {}", idGame);
+  }
+
+  return characters;
+}

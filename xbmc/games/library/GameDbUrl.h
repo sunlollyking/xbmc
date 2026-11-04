@@ -39,6 +39,7 @@ enum class GameDbNode
   COLLECTIONS,
   SERIES,
   MODES,
+  CHARACTERS,
   TAGS,
   REGIONS,
   PLAYERS,
@@ -61,7 +62,7 @@ enum class GameDbNode
  *   gamedb://[platforms/<id>/]<list>/
  *   gamedb://collections/<id>/
  *
- * A facet is genres, years, developers, publishers, collections, series,
+ * A facet is genres, years, developers, publishers, collections, series, characters,
  * modes, tags, regions, players, ageratings or categories, and choosing a value lists the
  * games that have it. A list is a ready-made selection: recentlyadded,
  * recentlyplayed, neverplayed, favourites, beaten, completed, multiplayer, coop, couchcoop,

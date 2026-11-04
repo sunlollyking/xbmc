@@ -61,6 +61,7 @@ private:
   static void CreateIndexes(CDatabase& db);
   static void CreateViews(CDatabase& db);
   static void CreateGameLinkTable(CDatabase& db);
+  static void CreateCharacterTables(CDatabase& db);
   static void CreateTriggers(CDatabase& db);
   static void CreateLookupTable(CDatabase& db, const char* table, const char* idColumn);
   static void CreateLookupIndexes(CDatabase& db, const char* table, const char* idColumn);

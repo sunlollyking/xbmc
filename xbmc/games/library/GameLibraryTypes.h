@@ -350,6 +350,21 @@ struct GamePopularity
 
 /*!
  * \ingroup games
+ * \brief Someone who appears in a game, with a picture of them where one is known
+ */
+struct GameCharacter
+{
+  std::string name;
+  std::string thumb;
+
+  //! More characters than a catalogue lists for any one game
+  static constexpr size_t MAX_PER_GAME = 100;
+
+  bool operator==(const GameCharacter&) const = default;
+};
+
+/*!
+ * \ingroup games
  * \brief One file on disk belonging to a release
  */
 /*!

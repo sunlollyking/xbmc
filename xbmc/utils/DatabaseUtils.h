@@ -168,6 +168,7 @@ enum class Field
   SPLIT_SCREEN,
   AGE_CONTENT,
   GAME_MODE,
+  GAME_CHARACTER,
   MAX
 };
 

@@ -57,6 +57,7 @@ constexpr int CONTROL_BTN_ARTWORK = 16;
 constexpr int CONTROL_BTN_SERIES = 18;
 constexpr int CONTROL_BTN_SIMILAR = 20;
 constexpr int CONTROL_BTN_RELATED = 21;
+constexpr int CONTROL_BTN_CHARACTERS = 22;
 
 /*!
  * \brief The pictures a game has, in the order a person would look at them
@@ -162,6 +163,9 @@ void CGUIDialogGameInfo::Reload()
     if (const int count = db.CountGames("gamedb://titles/?relatedto=" + std::to_string(idGame));
         count > 0)
       m_item->SetProperty("relatedcount", count);
+    m_item->ClearProperty("charactercount");
+    if (!tag.GetCharacters().empty())
+      m_item->SetProperty("charactercount", static_cast<int>(tag.GetCharacters().size()));
     KODI::ART::Artwork art;
     if (db.GetArtForItem(idGame, KODI::MEDIA::TYPE::GAME, art))
     {
@@ -250,6 +254,9 @@ bool CGUIDialogGameInfo::OnMessage(CGUIMessage& message)
           return true;
         case CONTROL_BTN_RELATED:
           OnBrowse("gamedb://titles/?relatedto=");
+          return true;
+        case CONTROL_BTN_CHARACTERS:
+          OnBrowse("gamedb://characters/?gameid=");
           return true;
         case CONTROL_BTN_CHOOSE_ART:
           OnChooseArt();

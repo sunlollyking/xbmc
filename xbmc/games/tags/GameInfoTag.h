@@ -243,6 +243,9 @@ public:
 
   const GamePopularity& GetPopularity() const { return m_popularity; }
   void SetPopularity(const GamePopularity& popularity) { m_popularity = popularity; }
+
+  const std::vector<GameCharacter>& GetCharacters() const { return m_characters; }
+  void SetCharacters(const std::vector<GameCharacter>& characters) { m_characters = characters; }
   ///@}
 
   /*!
@@ -437,6 +440,7 @@ private:
   int m_parentGameId;
   GameTimeToBeat m_timeToBeat;
   GamePopularity m_popularity;
+  std::vector<GameCharacter> m_characters;
 
   // Ratings and identifiers
   std::map<std::string, GameRating> m_ratings;

@@ -505,7 +505,7 @@ protected:
   void CreateTables() override;
   void CreateAnalytics() override;
   void UpdateTables(int version) override;
-  int GetSchemaVersion() const override { return 19; }
+  int GetSchemaVersion() const override { return 20; }
   const char* GetBaseDBName() const override { return GAME_DATABASE_NAME; }
 
 private:
@@ -538,6 +538,8 @@ private:
                                         const std::string& lookupIdColumn,
                                         int idGame,
                                         const std::string& nameColumn = "name");
+  void SetCharacters(int idGame, const std::vector<GameCharacter>& characters);
+  std::vector<GameCharacter> GetCharacters(int idGame);
 
   // Games
   void GetDetailsForGame(const dbiplus::sql_record* record, CGameInfoTag& details);

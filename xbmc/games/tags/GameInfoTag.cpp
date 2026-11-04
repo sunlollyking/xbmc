@@ -73,6 +73,7 @@ void CGameInfoTag::Reset()
   m_parentGameId = -1;
   m_timeToBeat = {};
   m_popularity = {};
+  m_characters.clear();
   m_strSeries.clear();
   m_seriesId = -1;
   m_spinoff = false;
@@ -157,6 +158,7 @@ CGameInfoTag& CGameInfoTag::operator=(const CGameInfoTag& tag)
     m_parentGameId = tag.m_parentGameId;
     m_timeToBeat = tag.m_timeToBeat;
     m_popularity = tag.m_popularity;
+    m_characters = tag.m_characters;
 
     m_ratings = tag.m_ratings;
     m_strDefaultRating = tag.m_strDefaultRating;
@@ -214,11 +216,12 @@ bool CGameInfoTag::operator==(const CGameInfoTag& tag) const
          m_playersMax == tag.m_playersMax && m_coop == tag.m_coop && m_dropIn == tag.m_dropIn &&
          m_splitScreen == tag.m_splitScreen && m_coopPlayers == tag.m_coopPlayers &&
          m_category == tag.m_category && m_timeToBeat == tag.m_timeToBeat &&
-         m_popularity == tag.m_popularity && m_uniqueIds == tag.m_uniqueIds &&
-         m_playCount == tag.m_playCount && m_playTime == tag.m_playTime &&
-         m_strLastPlayed == tag.m_strLastPlayed && m_userRating == tag.m_userRating &&
-         m_favourite == tag.m_favourite && m_completed == tag.m_completed &&
-         m_beaten == tag.m_beaten && m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
+         m_popularity == tag.m_popularity && m_characters == tag.m_characters &&
+         m_uniqueIds == tag.m_uniqueIds && m_playCount == tag.m_playCount &&
+         m_playTime == tag.m_playTime && m_strLastPlayed == tag.m_strLastPlayed &&
+         m_userRating == tag.m_userRating && m_favourite == tag.m_favourite &&
+         m_completed == tag.m_completed && m_beaten == tag.m_beaten &&
+         m_highScores == tag.m_highScores && m_rating == tag.m_rating &&
          m_strAgeRating == tag.m_strAgeRating;
 }
 
@@ -418,6 +421,12 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar << m_timeToBeat.complete;
     ar << m_popularity.visits;
     ar << m_popularity.wantToPlay;
+    ar << static_cast<int>(m_characters.size());
+    for (const GameCharacter& character : m_characters)
+    {
+      ar << character.name;
+      ar << character.thumb;
+    }
     ar << static_cast<int>(m_ratings.size());
     for (const auto& [type, rating] : m_ratings)
     {
@@ -536,6 +545,16 @@ void CGameInfoTag::Archive(CArchive& ar)
     ar >> m_timeToBeat.complete;
     ar >> m_popularity.visits;
     ar >> m_popularity.wantToPlay;
+    int characters = 0;
+    ar >> characters;
+    m_characters.clear();
+    for (int i = 0; i < characters; ++i)
+    {
+      GameCharacter character;
+      ar >> character.name;
+      ar >> character.thumb;
+      m_characters.emplace_back(std::move(character));
+    }
     int count = 0;
     ar >> count;
     m_ratings.clear();
@@ -662,6 +681,14 @@ void CGameInfoTag::Serialize(CVariant& value) const
   value["timetobeat"]["complete"] = m_timeToBeat.complete;
   value["popularity"]["visits"] = m_popularity.visits;
   value["popularity"]["wanttoplay"] = m_popularity.wantToPlay;
+  value["characters"] = CVariant(CVariant::VariantTypeArray);
+  for (const GameCharacter& character : m_characters)
+  {
+    CVariant entry;
+    entry["name"] = character.name;
+    entry["thumb"] = character.thumb;
+    value["characters"].push_back(entry);
+  }
   value["category"] = std::string(CGameLibraryTypes::ToString(m_category));
   value["matchedby"] = std::string(CGameLibraryTypes::ToString(m_matchMethod));
 
@@ -932,6 +959,13 @@ void CGameInfoTag::Save(tinyxml2::XMLNode* node, const char* tag) const
       popularity->SetAttribute("wanttoplay", m_popularity.wantToPlay);
   }
 
+  for (const GameCharacter& character : m_characters)
+  {
+    tinyxml2::XMLElement* element = AddChild(game, "character", character.name);
+    if (!character.thumb.empty())
+      element->SetAttribute("thumb", character.thumb.c_str());
+  }
+
   if (m_category != GameCategory::RETAIL)
     XMLUtils::SetString(game, "category", std::string(CGameLibraryTypes::ToString(m_category)));
 
@@ -1112,6 +1146,23 @@ bool CGameInfoTag::Load(const tinyxml2::XMLElement* element)
     };
     m_popularity = {value("visits"), value("wanttoplay")};
   }
+
+  std::vector<GameCharacter> characters;
+  for (const tinyxml2::XMLElement* character = element->FirstChildElement("character");
+       character != nullptr && characters.size() < GameCharacter::MAX_PER_GAME;
+       character = character->NextSiblingElement("character"))
+  {
+    if (character->GetText() == nullptr)
+      continue;
+    std::string name = character->GetText();
+    StringUtils::Trim(name);
+    if (name.empty())
+      continue;
+    const char* thumb = character->Attribute("thumb");
+    characters.push_back({name, thumb != nullptr ? thumb : ""});
+  }
+  if (!characters.empty())
+    m_characters = std::move(characters);
 
   if (const std::string value = ChildText(element, "category"); !value.empty())
     m_category = CGameLibraryTypes::GameCategoryFromString(value);
