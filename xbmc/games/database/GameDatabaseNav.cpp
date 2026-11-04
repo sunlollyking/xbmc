@@ -606,6 +606,20 @@ void CGameDatabase::SetSeriesProperties(CFileItem& item, const CGameInfoTag& gam
   }
 }
 
+void CGameDatabase::SetAgeContentProperties(CFileItem& item, const CGameInfoTag& game)
+{
+  item.ClearProperty("ageratingcontent");
+  const std::vector<GameAgeRating>& ratings = game.GetAgeRatings();
+  const auto rated = std::ranges::find_if(ratings, [](const GameAgeRating& rating)
+                                          { return !rating.descriptors.empty(); });
+  if (rated == ratings.end())
+    return;
+
+  item.SetProperty("ageratingcontent", rated == ratings.begin()
+                                           ? rated->descriptors
+                                           : rated->board + ": " + rated->descriptors);
+}
+
 void CGameDatabase::SetCoopProperties(CFileItem& item, const CGameInfoTag& game)
 {
   const auto& strings = CServiceBroker::GetResourcesComponent().GetLocalizeStrings();

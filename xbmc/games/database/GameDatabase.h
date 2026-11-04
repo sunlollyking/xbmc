@@ -423,6 +423,17 @@ public:
    *        "coopdetails", e.g. "2 players · drop-in · split screen"
    */
   static void SetCoopProperties(CFileItem& item, const CGameInfoTag& game);
+
+  /*!
+   * \brief Put what a game was age rated for on its item, "ageratingcontent",
+   *        e.g. "Violence, Bad Language"
+   *
+   * The reasons come from the first board, in the person's order, that gives
+   * any. A board other than the first rating's is named, as it may rate
+   * differently.
+   */
+  static void SetAgeContentProperties(CFileItem& item, const CGameInfoTag& game);
+
   bool SetUserRating(int idGame, int rating);
 
   /*!

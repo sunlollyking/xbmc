@@ -70,6 +70,7 @@ static const auto fields = std::array{
   TranslateField{ "beaten",            Field::BEATEN,                     BOOLEAN_FIELD,  nullptr,                              false, 35712 },
   TranslateField{ "dropin",            Field::DROP_IN,                    BOOLEAN_FIELD,  nullptr,                              false, 35789 },
   TranslateField{ "splitscreen",       Field::SPLIT_SCREEN,               BOOLEAN_FIELD,  nullptr,                              false, 35790 },
+  TranslateField{ "agecontent",        Field::AGE_CONTENT,                TEXT_FIELD,     nullptr,                              false, 35791 },
   TranslateField{ "hasachievements",   Field::HAS_ACHIEVEMENTS,           BOOLEAN_FIELD,  nullptr,                              false, 35534 },
   TranslateField{ "coop",              Field::COOP,                       BOOLEAN_FIELD,  nullptr,                              false, 35533 },
   TranslateField{ "filename",          Field::FILENAME,                   TEXT_FIELD,     nullptr,                              false, 561 },
@@ -495,7 +496,7 @@ std::vector<Field> CSmartPlaylistRule::GetFields(const std::string &type)
         Field::DATE_ADDED, Field::FILENAME,       Field::PATH,
         Field::FAVOURITE,  Field::COMPLETED,      Field::HAS_ACHIEVEMENTS,
         Field::COOP,       Field::TIME,           Field::BEATEN,
-        Field::DROP_IN,    Field::SPLIT_SCREEN,
+        Field::DROP_IN,    Field::SPLIT_SCREEN,   Field::AGE_CONTENT,
     };
   }
   else if (type == MEDIA::CONTENT::MUSICVIDEOS)
@@ -1098,6 +1099,10 @@ std::string CSmartPlaylistRule::FormatWhereClause(const std::string &negate, con
       query = gameLink("developer_link", "idCompany", "company");
     else if (m_field == static_cast<int>(Field::STUDIO))
       query = gameLink("publisher_link", "idCompany", "company");
+    else if (m_field == static_cast<int>(Field::AGE_CONTENT))
+      query = negate + " EXISTS (SELECT 1 FROM agerating WHERE agerating.media_id = " +
+              GetField(static_cast<int>(Field::ID), strType) +
+              " AND agerating.media_type = 'game' AND agerating.descriptors" + parameter + ")";
     else if (m_field == static_cast<int>(Field::REGION))
       query = negate +
               " EXISTS (SELECT 1 FROM gamerelease JOIN release_region ON "

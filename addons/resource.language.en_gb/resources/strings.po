@@ -21302,7 +21302,13 @@ msgctxt "#35790"
 msgid "Split screen"
 msgstr ""
 
-#empty strings from id 35791 to 35999
+#. Smart playlist rule: what a game was age rated for, such as violence
+#: xbmc/playlists/SmartPlayList.cpp
+msgctxt "#35791"
+msgid "Age rating content"
+msgstr ""
+
+#empty strings from id 35792 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"
