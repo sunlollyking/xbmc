@@ -272,9 +272,11 @@ std::string CGameDatabaseDirectory::GetLabel(const std::string& path)
   if (!dbUrl.FromString(path))
     return "";
 
-  std::string trimmed = path;
-  URIUtils::RemoveSlashAtEnd(trimmed);
-  const std::string last = URIUtils::GetFileName(trimmed);
+  // The first segment of gamedb://genres/ is the URL's host name
+  const CURL url(path);
+  std::string segments = url.GetHostName() + "/" + url.GetFileName();
+  URIUtils::RemoveSlashAtEnd(segments);
+  const std::string last = URIUtils::GetFileName(segments);
 
   const int label = LabelForSegment(last);
   if (label > 0)
