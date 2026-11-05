@@ -292,6 +292,44 @@ TEST_F(TestGamesGUIInfo, GetsRichPresenceFromAchievementState)
   EXPECT_EQ(value, "Fighting Lavos");
 }
 
+TEST_F(TestGamesGUIInfo, NamesTheLeaderboardATrackerShows)
+{
+  CAchievementRuntime achievementRuntime;
+  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
+  std::string value{"stale"};
+
+  achievementRuntime.SetLeaderboardAttempt(1, "Survivor", true);
+  achievementRuntime.SetLeaderboardAttempt(2, "Savior", true);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+
+  // With two attempts running, the tracker could be either one's
+  achievementRuntime.SetLeaderboardTracker({7, "0:00.01"}, true);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+
+  achievementRuntime.SetLeaderboardAttempt(1, {}, false);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
+  EXPECT_EQ(value, "Savior");
+
+  // An attempt without a name still makes two
+  achievementRuntime.SetLeaderboardAttempt(3, {}, true);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+  achievementRuntime.SetLeaderboardAttempt(3, {}, false);
+
+  // Hidden without the attempt ending, as a reset does
+  achievementRuntime.SetLeaderboardTracker({7, {}}, false);
+  achievementRuntime.SetLeaderboardTracker({7, "0:00.01"}, true);
+  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
+                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
+  EXPECT_TRUE(value.empty());
+}
+
 TEST_F(TestGamesGUIInfo, GetLabelRequiresCurrentGameInGUIInfoManager)
 {
   CFileItem item{"/roms/test.rom", false};

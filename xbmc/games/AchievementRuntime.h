@@ -476,7 +476,8 @@ public:
   void SetLeaderboardAttempt(unsigned int leaderboardId, const std::string& title, bool running);
 
   /*!
-   * \brief The names of the leaderboard attempts running
+   * \brief The names of the leaderboard attempts running, one per attempt and
+   * empty for an attempt without one
    */
   std::vector<std::string> GetLeaderboardAttemptTitles() const;
 

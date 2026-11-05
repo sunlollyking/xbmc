@@ -4553,8 +4553,10 @@ constexpr std::array<InfoMap, 88> videoplayer = {{
 ///   \table_row3{   <b>`RetroPlayer.LeaderboardTrackerTitle`</b>,
 ///                  \anchor RetroPlayer_LeaderboardTrackerTitle
 ///                  _string_,
-///     @return The names of the leaderboard attempts running while their value is
+///     @return The name of the leaderboard being attempted while its value is
 ///     shown\, so a skin can say what the value is for\, or an empty string.
+///     With more than one attempt running\, the value can't be matched to one
+///     of them\, so the string is empty.
 ///     <p><hr>
 ///     @skinning_v23 **[New Infolabel]** \link RetroPlayer_LeaderboardTrackerTitle `RetroPlayer.LeaderboardTrackerTitle`\endlink
 ///     <p>

@@ -419,10 +419,7 @@ std::vector<std::string> CAchievementRuntime::GetLeaderboardAttemptTitles() cons
 
   std::vector<std::string> titles;
   for (const auto& [id, title] : m_attempts)
-  {
-    if (!title.empty())
-      titles.emplace_back(title);
-  }
+    titles.emplace_back(title);
   return titles;
 }
 
