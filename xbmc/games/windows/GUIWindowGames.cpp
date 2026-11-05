@@ -161,8 +161,14 @@ bool CGUIWindowGames::OnClickMsg(int controlId, int actionId)
   {
     case ACTION_DELETE_ITEM:
     {
+      if (pItem->HasProperty("gameid") && !pItem->HasProperty("releaseid"))
+      {
+        OnRemoveFromLibrary(iItem);
+        return true;
+      }
       // Is delete allowed?
-      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+      if (!pItem->HasProperty("releaseid") &&
+          CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
               CSettings::SETTING_FILELISTS_ALLOWFILEDELETION))
       {
         OnDeleteItem(iItem);
