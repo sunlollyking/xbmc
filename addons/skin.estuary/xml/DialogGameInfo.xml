@@ -213,7 +213,7 @@
 						<control type="textbox">
 							<top>250</top>
 							<width>340</width>
-							<height>72</height>
+							<height>68</height>
 							<font>font12</font>
 							<align>right</align>
 							<textcolor>grey</textcolor>
@@ -242,7 +242,7 @@
 						<left>40</left>
 						<top>26</top>
 						<width>1164</width>
-						<height>128</height>
+						<height>123</height>
 						<font>font13</font>
 						<label>$INFO[ListItem.Plot]</label>
 						<autoscroll delay="8000" time="3000" repeat="10000">Control.HasFocus(138)</autoscroll>

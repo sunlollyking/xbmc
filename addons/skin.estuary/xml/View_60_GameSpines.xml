@@ -105,7 +105,7 @@
 				<control type="textbox">
 					<top>205</top>
 					<width>1100</width>
-					<height>160</height>
+					<height>136</height>
 					<font>font12</font>
 					<label>$INFO[ListItem.Plot]</label>
 					<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
