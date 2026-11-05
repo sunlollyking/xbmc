@@ -120,7 +120,9 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
     uint64_t sequence = 0, ns = 0;
     usleep(1000);
     int s = drmCrtcGetSequence(m_fd, m_crtcId, &sequence, &ns);
-    if (s != 0)
+    // Zero is how the kernel marks a timestamp it could not determine
+    // e.g. during a modeset
+    if (s != 0 || ns == 0)
     {
       // Vblank is off while the CRTC is reconfigured, as when the output
       // switches to HDR, so wait for it to come back. If it doesn't, Setup()
@@ -128,14 +130,13 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
       const auto now = std::chrono::steady_clock::now();
       if (!failingSince)
       {
-        CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: drmCrtcGetSequence failed ({}), waiting",
-                  __FUNCTION__, s);
+        CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: no vblank timestamp ({}), waiting", __FUNCTION__,
+                  s);
         failingSince = now;
       }
       else if (now - *failingSince >= MAX_VBLANK_WAIT)
       {
-        CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: drmCrtcGetSequence still failing ({})",
-                  __FUNCTION__, s);
+        CLog::Log(LOGWARNING, "CVideoSyncGbm::{}: still no vblank timestamp ({})", __FUNCTION__, s);
         break;
       }
       if (stopEvent.Wait(std::chrono::milliseconds(100)))
@@ -145,16 +146,11 @@ void CVideoSyncGbm::Run(CEvent& stopEvent)
 
     if (failingSince)
     {
-      CLog::Log(LOGINFO, "CVideoSyncGbm::{}: drmCrtcGetSequence works again", __FUNCTION__);
+      CLog::Log(LOGINFO, "CVideoSyncGbm::{}: vblank timestamps are back", __FUNCTION__);
       failingSince.reset();
     }
 
     if (sequence == m_sequence)
-      continue;
-
-    // Zero is how the kernel marks a timestamp it could not determine
-    // e.g. during a modeset
-    if (ns == 0)
       continue;
 
     m_refClock->UpdateClock(sequence - m_sequence, MonotonicToHostCounter(ns));

@@ -19668,7 +19668,7 @@ msgstr ""
 #. Help text for the encore mode setting
 #: system/settings/settings.xml
 msgctxt "#35304"
-msgid "Allow achievements you have already earned to be triggered again.[CR][CR]Applies the next time you load the game."
+msgid "Allow achievements you have already earned to be triggered again."
 msgstr ""
 
 #. Notification shown when hardcore mode refuses something, {0:s} is the feature
@@ -20043,7 +20043,7 @@ msgstr ""
 #. Help text for setting "Enable run-ahead" of label #35378
 #: system/settings/settings.xml
 msgctxt "#35379"
-msgid "Make games respond sooner to the controller by running the emulator ahead and showing a frame from the future. The emulator runs once more for every frame ahead, so this suits 8-bit and 16-bit systems. Systems with large save states, such as the PlayStation, may slow down."
+msgid "Make games respond sooner to the controller by running the emulator ahead and showing a frame from the future. This suits 8-bit and 16-bit systems. Systems with large save states, such as the PlayStation, may slow down."
 msgstr ""
 
 #. Setting for how many frames to run ahead
@@ -20958,10 +20958,11 @@ msgctxt "#35718"
 msgid "Attempt active"
 msgstr ""
 
-#. Date an achievement was earned before encore mode re-armed it. {0:s} is a localised date
-#: xbmc/games/dialogs/osd/DialogGameAchievements.cpp
+#. Shown when Encore mode is switched on or off during a game, and under its help text in the game's settings
+#: xbmc/games/addons/cheevos/GameClientCheevos.cpp
+#: addons/skin.estuary/xml/Includes_Games.xml
 msgctxt "#35719"
-msgid "Previously unlocked {0:s}"
+msgid "Applies the next time you load the game."
 msgstr ""
 
 #empty strings from id 35720 to 35725
@@ -21198,13 +21199,7 @@ msgctxt "#35765"
 msgid "Unrated"
 msgstr ""
 
-#. Shown when Encore mode is switched on or off during a game
-#: xbmc/games/addons/cheevos/GameClientCheevos.cpp
-msgctxt "#35766"
-msgid "Applies the next time you load the game."
-msgstr ""
-
-#empty strings from id 35767 to 35999
+#empty strings from id 35766 to 35999
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
 msgctxt "#36000"

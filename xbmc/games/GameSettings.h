@@ -44,10 +44,10 @@ public:
   bool ReplaceLabels();
   bool RewindEnabled();
   unsigned int MaxRewindTimeSec();
-  bool RunaheadEnabled() const;
-  unsigned int RunaheadFrames() const;
   bool SyncPlaybackToDisplay();
   double SyncToDisplayLimit();
+  bool RunaheadEnabled() const;
+  unsigned int RunaheadFrames() const;
 
   /*!
    * \brief Whether a game shown with a video filter goes out in HDR

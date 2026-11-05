@@ -241,6 +241,9 @@ public:
    */
   bool SerializeSpeculative(uint8_t* data, size_t size);
 
+  //! Whether SerializeSpeculative() asks the client for a state of its own
+  bool HasSpeculativeStates() const;
+
   /*!
    * \brief Put back a state this client produced moments ago
    *

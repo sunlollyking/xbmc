@@ -57,7 +57,6 @@ bool HardcoreRestrictionsApply(GAME::CGameClient& gameClient)
 {
   return gameClient.Cheevos().IsHardcoreActive();
 }
-
 } // namespace
 
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
@@ -798,7 +797,10 @@ void CReversiblePlayback::AddFrame(const uint8_t* runaheadState /* = nullptr */)
     const auto started =
         measure ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
 
-    if (runaheadState != nullptr && m_runaheadState.size() == m_memoryStream->FrameSize())
+    // A state saved for run-ahead may only be one the client can load back
+    // that way, and rewind loads its states as ordinary ones
+    if (runaheadState != nullptr && m_runaheadState.size() == m_memoryStream->FrameSize() &&
+        !m_gameClient->HasSpeculativeStates())
     {
       std::memcpy(m_memoryStream->BeginFrame(), runaheadState, m_runaheadState.size());
       serialized = true;

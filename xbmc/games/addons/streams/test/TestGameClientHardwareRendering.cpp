@@ -328,12 +328,12 @@ public:
     kodi::addon::CPrivateBase::m_interface = m_previous;
   }
 
+  std::string LibretroCore() const { return m_addon->LibretroCore(); }
+
   bool InstalledSpeculativeFrames() const
   {
     return m_addonCallbacks.RunFrameSpeculative != nullptr;
   }
-
-  std::string LibretroCore() const { return m_addon->LibretroCore(); }
 
 private:
   AddonGlobalInterface* m_previous;
@@ -1200,6 +1200,35 @@ TEST_F(TestGameClientHardwareRendering, RewindRetriesUntilSerializationBecomesAv
   settings->SetBool("gamesgeneral.enablerewind", rewindEnabled);
 }
 
+TEST_F(TestGameClientHardwareRendering, PropertiesPassTheLibretroCore)
+{
+  CXBMCTinyXML2 xml;
+  const std::string addonXml =
+      R"(<addon id="game.test.core" name="Core test" version="1.0.0">
+      <extension point="kodi.gameclient" library="test.so">
+        <libretro_core>test_libretro</libretro_core>
+      </extension>
+      <extension point="kodi.addon.metadata"><platform>all</platform></extension>
+    </addon>)";
+  ASSERT_TRUE(xml.Parse(addonXml));
+  CGameClient client(
+      ADDON::CAddonInfoBuilder::Generate(xml.RootElement(), ADDON::RepositoryDirInfo{}));
+  ASSERT_TRUE(client.AddonProperties().InitializeProperties());
+  ASSERT_NE(client.GetInstanceInterface()->props->libretro_core, nullptr);
+  EXPECT_STREQ(client.GetInstanceInterface()->props->libretro_core, "test_libretro");
+}
+
+TEST_F(TestGameClientHardwareRendering, DevKitReadsTheLibretroCoreFromNewerKodi)
+{
+  // An 8.2.0 Kodi's properties end before the field
+  {
+    DevKitInstance addon(m_client->Streams(), "8.2.0", "test_libretro");
+    EXPECT_EQ(addon.LibretroCore(), "");
+  }
+  DevKitInstance addon(m_client->Streams(), "8.2.1", "test_libretro");
+  EXPECT_EQ(addon.LibretroCore(), "test_libretro");
+}
+
 namespace
 {
 // Turns run-ahead on for one test, and puts the settings back after it
@@ -1247,18 +1276,38 @@ TEST_F(TestGameClientHardwareRendering, RunaheadRestoresTheRealFrame)
   EXPECT_EQ(m_core.serializations, 1U);
   EXPECT_EQ(m_core.deserializations, 0U);
 
-  // Rewind reuses the state run-ahead restores to. The first time, the client
-  // also loads it back before running ahead.
+  // Rewind takes a state of its own, since the client saves one for run-ahead
+  // differently. The first time, the client also loads it back before running
+  // ahead.
   playback.FrameEvent();
   EXPECT_EQ(m_core.frames, 2U);
   EXPECT_EQ(m_core.speculativeFrames, 2U);
-  EXPECT_EQ(m_core.serializations, 2U);
+  EXPECT_EQ(m_core.serializations, 3U);
   EXPECT_EQ(m_core.deserializations, 2U);
 
   playback.FrameEvent();
   EXPECT_EQ(m_core.frames, 3U);
   EXPECT_EQ(m_core.speculativeFrames, 4U);
   EXPECT_EQ(m_core.deserializations, 3U);
+}
+
+TEST_F(TestGameClientHardwareRendering, RunaheadSharesAnOrdinaryStateWithRewind)
+{
+  RETRO::CPlaybackTestEnvironment environment;
+  CRunaheadSettings runahead(true);
+  m_client->GetInstanceInterface()->toAddon->SerializeSpeculative = nullptr;
+  RETRO::CReversiblePlayback playback(m_client.get(), environment.Renderer(), environment.Streams(),
+                                      environment.Messenger(),
+                                      environment.ProcessInfo().GetDisplayPacing(), 60.0, 0);
+  playback.SetSpeed(1.0);
+
+  playback.FrameEvent();
+  EXPECT_EQ(m_core.serializations, 1U);
+
+  // Rewind reuses the state run-ahead restores to
+  playback.FrameEvent();
+  EXPECT_EQ(m_core.speculativeFrames, 2U);
+  EXPECT_EQ(m_core.serializations, 2U);
 }
 
 TEST_F(TestGameClientHardwareRendering, RunaheadNeedsSpeculativeFrames)
@@ -1400,35 +1449,6 @@ TEST_F(TestGameClientHardwareRendering, DevKitLeavesSpeculativeFramesToNewerKodi
   }
   DevKitInstance addon(m_client->Streams(), "8.6.0");
   EXPECT_TRUE(addon.InstalledSpeculativeFrames());
-}
-
-TEST_F(TestGameClientHardwareRendering, PropertiesPassTheLibretroCore)
-{
-  CXBMCTinyXML2 xml;
-  const std::string addonXml =
-      R"(<addon id="game.test.core" name="Core test" version="1.0.0">
-      <extension point="kodi.gameclient" library="test.so">
-        <libretro_core>test_libretro</libretro_core>
-      </extension>
-      <extension point="kodi.addon.metadata"><platform>all</platform></extension>
-    </addon>)";
-  ASSERT_TRUE(xml.Parse(addonXml));
-  CGameClient client(
-      ADDON::CAddonInfoBuilder::Generate(xml.RootElement(), ADDON::RepositoryDirInfo{}));
-  ASSERT_TRUE(client.AddonProperties().InitializeProperties());
-  ASSERT_NE(client.GetInstanceInterface()->props->libretro_core, nullptr);
-  EXPECT_STREQ(client.GetInstanceInterface()->props->libretro_core, "test_libretro");
-}
-
-TEST_F(TestGameClientHardwareRendering, DevKitReadsTheLibretroCoreFromNewerKodi)
-{
-  // An 8.2.0 Kodi's properties end before the field
-  {
-    DevKitInstance addon(m_client->Streams(), "8.2.0", "test_libretro");
-    EXPECT_EQ(addon.LibretroCore(), "");
-  }
-  DevKitInstance addon(m_client->Streams(), "8.2.1", "test_libretro");
-  EXPECT_EQ(addon.LibretroCore(), "test_libretro");
 }
 
 TEST_F(TestGameClientHardwareRendering, DevKitInstallsHandleBeforeSingleReset)

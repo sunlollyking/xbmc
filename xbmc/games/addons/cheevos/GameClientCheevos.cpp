@@ -139,7 +139,7 @@ void CGameClientCheevos::Notify(const Observable& obs, const ObservableMessage m
   const bool encore = gameSettings.GetAchievementsEncore();
   if (m_encoreSetting.exchange(encore) != encore)
     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35303),
-                                          Localize(35766));
+                                          Localize(35719));
 
   const bool setting = gameSettings.GetAchievementsHardcore();
 
@@ -326,7 +326,7 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
 
   // Beating a set counts achievements earned in either mode, so a hardcore
   // unlock of one already earned can't beat it
-  if (!newlyEarned || earnedBefore)
+  if (earnedBefore)
     return;
 
   // Beaten by this unlock: the last progression achievement, or the first win

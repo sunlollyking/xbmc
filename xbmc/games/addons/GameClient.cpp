@@ -1313,6 +1313,11 @@ RestoreResult CGameClient::Deserialize(const uint8_t* data,
   return bSuccess ? RestoreResult::Restored : RestoreResult::StateUncertain;
 }
 
+bool CGameClient::HasSpeculativeStates() const
+{
+  return m_ifc.game->toAddon->SerializeSpeculative != nullptr;
+}
+
 bool CGameClient::SerializeSpeculative(uint8_t* data, size_t size)
 {
   if (m_ifc.game->toAddon->SerializeSpeculative == nullptr)
