@@ -114,9 +114,9 @@
 
 			<control type="image">
 				<right>80</right>
-				<top>70</top>
+				<top>110</top>
 				<width>420</width>
-				<height>410</height>
+				<height>370</height>
 				<aspectratio align="right" aligny="bottom">keep</aspectratio>
 				<fadetime>300</fadetime>
 				<texture background="true">$VAR[GameSpinesBoxVar]</texture>
