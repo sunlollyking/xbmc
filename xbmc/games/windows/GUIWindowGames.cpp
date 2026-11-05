@@ -24,6 +24,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/GameDatabaseDirectory.h"
+#include "games/ContextMenus.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/GameUtils.h"
@@ -254,7 +255,8 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
     }
     else
     {
-      if (CanPlay(*item))
+      // A library game's Play comes first in the menu, from the context menu manager
+      if (CanPlay(*item) && !CONTEXTMENU::CGamePlay().IsVisible(*item))
       {
         buttons.Add(CONTEXT_BUTTON_PLAY_ITEM, 208); // Play
       }

@@ -15,6 +15,13 @@
 namespace CONTEXTMENU
 {
 
+struct CGamePlay : CStaticContextMenuAction
+{
+  CGamePlay() : CStaticContextMenuAction(208) {} // "Play"
+  bool IsVisible(const CFileItem& item) const override;
+  bool Execute(const std::shared_ptr<CFileItem>& item) const override;
+};
+
 struct CGameMarkBeaten : CStaticContextMenuAction
 {
   CGameMarkBeaten() : CStaticContextMenuAction(35770) {} // "Mark as beaten"
