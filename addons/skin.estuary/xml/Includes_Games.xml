@@ -1020,7 +1020,7 @@
 		<value condition="!String.IsEmpty(ListItem.Property(achievement.progression))">icons/achievements/progression.png</value>
 	</variable>
 	<variable name="GameAchievementsProgressVar">
-		<value condition="!String.IsEmpty(Window.Property(Achievements.HasSets))">$INFO[Window.Property(Achievements.Progress)]$INFO[Window.Property(Achievements.Beaten),  [COLOR white]•[/COLOR]  ,]</value>
+		<value condition="!String.IsEmpty(Window.Property(Achievements.HasSets)) | String.IsEmpty(RetroPlayer.AchievementsProgress)">$INFO[Window.Property(Achievements.Progress)]$INFO[Window.Property(Achievements.Beaten),  [COLOR white]•[/COLOR]  ,]</value>
 		<value>$INFO[RetroPlayer.AchievementsProgress]$INFO[Window.Property(Achievements.Progress),  [COLOR white]•[/COLOR]  ,]$INFO[Window.Property(Achievements.Beaten),  [COLOR white]•[/COLOR]  ,]</value>
 	</variable>
 	<variable name="GameAchievementAttemptingLabelVar">
