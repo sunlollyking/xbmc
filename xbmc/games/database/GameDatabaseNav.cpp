@@ -1157,8 +1157,12 @@ bool CGameDatabase::GetReleasesNav(const std::string& baseDir, CFileItemList& it
     item->SetProperty("gameid", game.GetDatabaseId());
     item->SetProperty("releaseid", release.id);
     item->SetProperty("isdefaultrelease", release.isDefault);
+    // The version that plays comes first, as a film's default version does
     if (release.isDefault)
+    {
       item->Select(true);
+      item->SetSpecialSort(SortSpecial::TOP);
+    }
     items.Add(item);
   }
 
