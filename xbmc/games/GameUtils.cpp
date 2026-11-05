@@ -570,6 +570,12 @@ void CGameUtils::OpenInsideArchive(CFileItem& item, const std::string& gameClien
       return;
   }
 
+  // A set the library knows is given whole before an emulator is chosen, as
+  // its chips can share another emulator's extensions ("ad2s.4d" is DICE's)
+  CGameDatabase db;
+  if (db.Open() && !db.GetRomsetsForFile(item.GetPath()).empty())
+    return;
+
   // An archive holding a single game is that game, as it is when browsing
   std::string gamePath;
   const std::unique_ptr<XFILE::IFileDirectory> directory{
