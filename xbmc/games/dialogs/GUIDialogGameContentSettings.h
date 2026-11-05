@@ -63,6 +63,7 @@ protected:
 private:
   void SetFolder(const std::string& folder);
   void SetLabel2(const std::string& settingId, const std::string& label);
+  void SetFocusToSetting(const std::string& settingId);
   std::string PlatformLabel(const std::string& slug) const;
   std::string ScraperLabel(const std::string& addonId) const;
   std::string GameClientLabel(const std::string& addonId) const;
