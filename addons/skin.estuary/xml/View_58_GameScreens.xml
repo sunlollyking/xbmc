@@ -13,7 +13,7 @@
 				<left>50</left>
 				<right>50</right>
 				<top>list_top_offset</top>
-				<bottom>180</bottom>
+				<bottom>220</bottom>
 				<onleft>9000</onleft>
 				<onright>58600</onright>
 				<onup>58</onup>
@@ -119,11 +119,11 @@
 				<right>20</right>
 				<top>list_top_offset</top>
 				<width>12</width>
-				<bottom>180</bottom>
+				<bottom>220</bottom>
 				<onleft>58</onleft>
 				<onright>58</onright>
 				<orientation>vertical</orientation>
-				<animation effect="zoom" end="50,100" time="300" tween="sine" center="20,0" easing="inout" condition="!Control.HasFocus(58600)">conditional</animation>
+				<animation effect="zoom" end="50,100" time="300" tween="sine" center="auto" easing="inout" condition="!Control.HasFocus(58600)">conditional</animation>
 			</control>
 		</control>
 	</include>
