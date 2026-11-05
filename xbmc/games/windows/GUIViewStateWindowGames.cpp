@@ -78,12 +78,16 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     SetSortOrder(SortOrder::ASCENDING);
 
     const CViewState* viewState = CViewStateSettings::GetInstance().Get("gameslibrary");
-    if (viewState)
+    // A smart playlist opens in the order it was saved with, as it does for videos
+    if (PLAYLIST::IsSmartPlayList(items))
+      AddPlaylistOrder(items, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Title, Year
+    else if (viewState)
     {
       SetSortMethod(viewState->m_sortDescription);
-      SetViewAsControl(viewState->m_viewMode);
       SetSortOrder(viewState->m_sortDescription.sortOrder);
     }
+    if (viewState)
+      SetViewAsControl(viewState->m_viewMode);
 
     // A node that ranks its games opens in its own order. A sort chosen for
     // the node itself is still restored over this when the view state loads.
