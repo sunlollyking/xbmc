@@ -17,6 +17,8 @@
 #include "guilib/GUIListItem.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
+#include "messaging/ApplicationMessenger.h"
+#include "playlists/PlayListTypes.h"
 
 using namespace KODI;
 
@@ -48,6 +50,19 @@ bool SetCompleted(const std::shared_ptr<CFileItem>& item, bool completed)
 
 namespace CONTEXTMENU
 {
+
+bool CGamePlay::IsVisible(const CFileItem& item) const
+{
+  return IsLibraryGame(item) && !item.IsFolder();
+}
+
+bool CGamePlay::Execute(const std::shared_ptr<CFileItem>& item) const
+{
+  CServiceBroker::GetAppMessenger()->PostMsg(TMSG_APPLICATION_PLAY_MEDIA,
+                                             static_cast<int>(PLAYLIST::Id::TYPE_NONE), -1,
+                                             new CFileItem(*item), "");
+  return true;
+}
 
 bool CGameMarkCompleted::IsVisible(const CFileItem& item) const
 {

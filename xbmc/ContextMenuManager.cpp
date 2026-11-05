@@ -95,6 +95,7 @@ void CContextMenuManager::Init()
       std::make_shared<CONTEXTMENU::CAlbumInfo>(),
       std::make_shared<CONTEXTMENU::CArtistInfo>(),
       std::make_shared<CONTEXTMENU::CSongInfo>(),
+      std::make_shared<CONTEXTMENU::CGamePlay>(),
       std::make_shared<CONTEXTMENU::CGameMarkCompleted>(),
       std::make_shared<CONTEXTMENU::CGameMarkNotCompleted>(),
       std::make_shared<CONTEXTMENU::CVideoMarkWatched>(),
