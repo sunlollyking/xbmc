@@ -225,7 +225,7 @@
 						<left>40</left>
 						<top>26</top>
 						<width>1164</width>
-						<height>190</height>
+						<height>164</height>
 						<font>font13</font>
 						<label>$INFO[ListItem.Plot]</label>
 						<autoscroll delay="8000" time="3000" repeat="10000">Control.HasFocus(138)</autoscroll>
