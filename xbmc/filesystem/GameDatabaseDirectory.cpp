@@ -27,6 +27,7 @@
 
 #include <array>
 #include <cctype>
+#include <string_view>
 #include <utility>
 
 using namespace KODI::GAME;
@@ -97,6 +98,20 @@ std::string ArtLabel(const std::string& type)
   return label;
 }
 
+/*!
+ * \brief Give a node of the overview its glyph, named after it
+ *
+ * The glyphs ship with Kodi rather than with a skin, so every skin draws the
+ * same thing here instead of falling back to a folder that says nothing about
+ * where it leads.
+ */
+void SetGlyph(CFileItem& item, std::string_view node)
+{
+  const std::string glyph = "special://xbmc/media/gamelibrary/" + std::string(node) + ".png";
+  item.SetArt("icon", glyph);
+  item.SetArt("thumb", glyph);
+}
+
 std::string Localize(int id)
 {
   return CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(id);
@@ -148,6 +163,7 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         const auto item = std::make_shared<CFileItem>(Localize(35520));
         item->SetPath(base + "platforms/");
         item->SetFolder(true);
+        SetGlyph(*item, "platforms");
         items.Add(item);
       }
 
@@ -159,13 +175,7 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         // A line on what is down there. Several of these are not obvious from
         // the name alone -- what counts as a hack, or as needing attention.
         item->SetProperty("description", Localize(description));
-        // A glyph for the node, named after it. These ship with Kodi rather
-        // than with a skin, so every skin draws the same thing here instead of
-        // falling back to a folder that says nothing about where it leads.
-        const std::string glyph =
-            "special://xbmc/media/gamelibrary/" + std::string(segment) + ".png";
-        item->SetArt("icon", glyph);
-        item->SetArt("thumb", glyph);
+        SetGlyph(*item, segment);
         // The rest of these are filters and read well in alphabetical order.
         // This one is not a filter, it is the way to the games themselves, and
         // sorting it under A leaves it second behind age ratings.
@@ -180,6 +190,7 @@ bool CGameDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList& items)
         const auto playlists = std::make_shared<CFileItem>(Localize(136));
         playlists->SetPath("special://gameplaylists/");
         playlists->SetFolder(true);
+        SetGlyph(*playlists, "playlists");
         items.Add(playlists);
       }
       // Inside a platform these all belong to that machine, and none of them
