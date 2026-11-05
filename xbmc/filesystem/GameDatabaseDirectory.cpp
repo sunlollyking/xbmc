@@ -291,9 +291,33 @@ std::string CGameDatabaseDirectory::GetLabel(const std::string& path)
   if (!dbUrl.FromString(path))
     return "";
 
-  std::string trimmed = path;
-  URIUtils::RemoveSlashAtEnd(trimmed);
-  const std::string last = URIUtils::GetFileName(trimmed);
+  // A list chosen from a game's information is named after the game
+  struct GameList
+  {
+    GameDbNode node;
+    const char* option;
+    int label;
+  };
+  for (const auto& [node, option, listLabel] : {GameList{GameDbNode::GAMES, "similarto", 35792},
+                                                GameList{GameDbNode::GAMES, "relatedto", 35793},
+                                                GameList{GameDbNode::CHARACTERS, "gameid", 35806}})
+  {
+    CVariant gameId;
+    if (dbUrl.GetNode() == node && dbUrl.GetOption(option, gameId))
+    {
+      CGameDatabase db;
+      CGameInfoTag game;
+      if (db.Open() && db.GetGameInfo(static_cast<int>(gameId.asInteger()), game))
+        return game.GetTitle() + " / " + Localize(listLabel);
+      return Localize(listLabel);
+    }
+  }
+
+  // The first segment of gamedb://genres/ is the URL's host name
+  const CURL url(path);
+  std::string segments = url.GetHostName() + "/" + url.GetFileName();
+  URIUtils::RemoveSlashAtEnd(segments);
+  const std::string last = URIUtils::GetFileName(segments);
 
   const int label = LabelForSegment(last);
   if (label > 0)
