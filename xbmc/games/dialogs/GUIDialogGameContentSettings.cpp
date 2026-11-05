@@ -23,6 +23,7 @@
 #include "games/dialogs/osd/DialogGameVideoRotation.h"
 #include "games/library/PlatformCatalogue.h"
 #include "guilib/GUIComponent.h"
+#include "guilib/GUIMacros.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
 #include "settings/lib/Setting.h"
@@ -229,6 +230,13 @@ void CGUIDialogGameContentSettings::SetLabel2(const std::string& settingId, cons
     SET_CONTROL_LABEL2(control->GetID(), label);
 }
 
+void CGUIDialogGameContentSettings::SetFocusToSetting(const std::string& settingId)
+{
+  const BaseSettingControlPtr control = GetSettingControl(settingId);
+  if (control && control->GetControl())
+    SET_CONTROL_FOCUS(control->GetID(), 0);
+}
+
 void CGUIDialogGameContentSettings::SetupView()
 {
   CGUIDialogSettingsManualBase::SetupView();
@@ -265,10 +273,17 @@ void CGUIDialogGameContentSettings::InitializeSettings()
   const std::shared_ptr<CSettingGroup> scanGroup = AddGroup(category, 20322);
   if (scanGroup)
   {
-    AddToggle(scanGroup, SETTING_SCAN_RECURSIVE, 20346, SettingLevel::Basic, m_scanRecursive);
-    AddToggle(scanGroup, SETTING_USE_FOLDER_NAMES, 20330, SettingLevel::Basic, m_useFolderNames);
-    AddToggle(scanGroup, SETTING_NO_UPDATE, 20432, SettingLevel::Basic, m_noUpdate);
-    AddToggle(scanGroup, SETTING_EXCLUDE, 20380, SettingLevel::Basic, m_exclude);
+    // As in the video library, a folder of a platform is scanned and one of
+    // none is the one that can be left out of scans
+    const bool hasPlatform = !m_platformSlug.empty();
+    AddToggle(scanGroup, SETTING_SCAN_RECURSIVE, 20346, SettingLevel::Basic, m_scanRecursive,
+              false, hasPlatform);
+    AddToggle(scanGroup, SETTING_USE_FOLDER_NAMES, 20330, SettingLevel::Basic, m_useFolderNames,
+              false, hasPlatform);
+    AddToggle(scanGroup, SETTING_NO_UPDATE, 20432, SettingLevel::Basic, m_noUpdate, false,
+              hasPlatform);
+    AddToggle(scanGroup, SETTING_EXCLUDE, 20380, SettingLevel::Basic, m_exclude, false,
+              !hasPlatform);
   }
 
   const std::shared_ptr<CSettingGroup> playGroup = AddGroup(category, 35201);
@@ -312,7 +327,12 @@ void CGUIDialogGameContentSettings::OnSettingAction(const std::shared_ptr<const 
   if (id == SETTING_PLATFORM)
   {
     if (ChoosePlatform())
-      SetLabel2(SETTING_PLATFORM, PlatformLabel(m_platformSlug));
+    {
+      if (!m_platformSlug.empty())
+        m_exclude = false;
+      SetupView();
+      SetFocusToSetting(SETTING_PLATFORM);
+    }
   }
   else if (id == SETTING_SCRAPER)
   {
