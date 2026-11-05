@@ -1682,7 +1682,7 @@
 				<left>$PARAM[left]</left>
 				<top>$PARAM[facts_top]</top>
 				<control type="grouplist">
-					<width>480</width>
+					<width>460</width>
 					<height>230</height>
 					<itemgap>0</itemgap>
 					<orientation>vertical</orientation>
@@ -1730,51 +1730,51 @@
 					</include>
 				</control>
 				<control type="grouplist">
-					<left>490</left>
-					<width>350</width>
+					<left>470</left>
+					<width>355</width>
 					<height>230</height>
 					<itemgap>0</itemgap>
 					<orientation>vertical</orientation>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35524]" />
 						<param name="info" value="ListItem.Region" />
-						<param name="lw" value="150" />
-						<param name="vw" value="200" />
+						<param name="lw" value="205" />
+						<param name="vw" value="150" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35601]" />
 						<param name="info" value="ListItem.Property(languages)" />
-						<param name="lw" value="150" />
-						<param name="vw" value="200" />
+						<param name="lw" value="205" />
+						<param name="vw" value="150" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35602]" />
 						<param name="info" value="ListItem.Property(revision)" />
-						<param name="lw" value="150" />
-						<param name="vw" value="200" />
+						<param name="lw" value="205" />
+						<param name="vw" value="150" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35603]" />
 						<param name="info" value="ListItem.Property(serial)" />
-						<param name="lw" value="150" />
-						<param name="vw" value="200" />
+						<param name="lw" value="205" />
+						<param name="vw" value="150" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35543]" />
 						<param name="info" value="ListItem.ReleaseCount" />
-						<param name="lw" value="150" />
-						<param name="vw" value="200" />
+						<param name="lw" value="205" />
+						<param name="vw" value="150" />
 					</include>
 					<include content="GameFactCompact">
 						<param name="label" value="$LOCALIZE[35510]" />
 						<param name="info" value="ListItem.GameClient" />
-						<param name="lw" value="150" />
-						<param name="vw" value="200" />
+						<param name="lw" value="205" />
+						<param name="vw" value="150" />
 					</include>
 				</control>
 				<control type="grouplist">
-					<left>850</left>
-					<width>300</width>
+					<left>830</left>
+					<width>320</width>
 					<height>230</height>
 					<itemgap>0</itemgap>
 					<orientation>vertical</orientation>
