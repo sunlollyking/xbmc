@@ -76,7 +76,7 @@
 				<right>90</right>
 				<top>440</top>
 				<width>460</width>
-				<height>180</height>
+				<height>170</height>
 				<font>font12</font>
 				<label>$INFO[ListItem.Plot]</label>
 				<autoscroll time="3000" delay="7000" repeat="5000">!System.HasActiveModalDialog + Skin.HasSetting(AutoScroll)</autoscroll>
