@@ -693,7 +693,8 @@ bool CGUIWindowGames::PlayGame(const CFileItem& item)
 
 bool CGUIWindowGames::CanPlay(const CFileItem& item) const
 {
-  if (item.IsGame())
+  // A platform's folder carries game details too, but only a game is played
+  if (item.IsGame() && !item.IsFolder())
     return true;
 
   if (item.IsFolder())
