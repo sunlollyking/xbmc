@@ -26,6 +26,7 @@
 #include "games/addons/GameClient.h"
 #include "games/addons/cheats/GameClientCheats.h"
 #include "games/library/GameLibraryTypes.h"
+#include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/guiinfo/GUIInfo.h"
@@ -349,9 +350,14 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
           }
           break;
         case LISTITEM_REGION:
-          // Stored as a list; read as a sentence
-          value = StringUtils::Join(StringUtils::Split(tag->GetRegion(), ","), ", ");
+        {
+          // A library game keeps its regions as codes, a file outside it as names
+          std::vector<std::string> names;
+          for (const std::string& region : StringUtils::Split(tag->GetRegion(), ","))
+            names.emplace_back(CGameNameParser::RegionName(GameRegion::FromString(region)));
+          value = StringUtils::Join(names, ", ");
           return !value.empty();
+        }
         case LISTITEM_RELEASE_COUNT:
           if (tag->GetReleaseCount() > 0)
           {
