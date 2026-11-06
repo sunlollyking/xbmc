@@ -14,9 +14,11 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <string_view>
+#include <vector>
 
 using namespace KODI::PICTURE;
 
@@ -26,6 +28,20 @@ float GetFloat(std::string_view xmp, std::string_view name, float fallback)
 {
   const std::string_view value = XMP::GetValue(xmp, name);
   return value.empty() ? fallback : StringUtils::ToFloat(value, fallback);
+}
+
+// one value for all three channels, or one for each
+GainMapChannels GetChannels(std::string_view xmp,
+                            std::string_view name,
+                            const GainMapChannels& fallback)
+{
+  const std::vector<std::string_view> values = XMP::GetValues(xmp, name);
+  if (values.size() != 1 && values.size() != 3)
+    return fallback;
+  GainMapChannels channels{};
+  for (size_t c = 0; c < channels.size(); ++c)
+    channels[c] = StringUtils::ToFloat(values[values.size() == 1 ? 0 : c], fallback[c]);
+  return channels;
 }
 
 uint32_t GetUnsigned(std::string_view data, size_t pos, size_t bytes, bool littleEndian)
@@ -47,14 +63,15 @@ bool ParseMpf(
     return false;
   const bool littleEndian = tiff.starts_with("II");
 
+  // 64-bit sums: tiff.size() - n wraps for a short TIFF, a size_t sum on 32-bit builds
   const uint32_t ifd = GetUnsigned(tiff, 4, 4, littleEndian);
-  if (ifd > tiff.size() - 2)
+  if (static_cast<uint64_t>(ifd) + 2 > tiff.size())
     return false;
   const uint32_t count = GetUnsigned(tiff, ifd, 2, littleEndian);
   for (uint32_t i = 0; i < count; ++i)
   {
     const size_t entry = ifd + 2 + 12 * static_cast<size_t>(i);
-    if (entry > tiff.size() - 12)
+    if (entry + 12 > tiff.size())
       return false;
     if (GetUnsigned(tiff, entry, 2, littleEndian) != 0xB002)
       continue;
@@ -62,7 +79,7 @@ bool ParseMpf(
     // The gain map is the second picture
     const uint32_t bytes = GetUnsigned(tiff, entry + 4, 4, littleEndian);
     const uint32_t entries = GetUnsigned(tiff, entry + 8, 4, littleEndian);
-    if (bytes < 32 || entries > tiff.size() - 32)
+    if (bytes < 32 || static_cast<uint64_t>(entries) + 32 > tiff.size())
       return false;
     size = GetUnsigned(tiff, entries + 20, 4, littleEndian);
     const uint32_t relative = GetUnsigned(tiff, entries + 24, 4, littleEndian);
@@ -166,20 +183,23 @@ GainMap KODI::PICTURE::ReadGainMap(const std::string& path)
     return {};
 
   GainMapParams& params = gainMap.params;
-  params.min = GetFloat(gainMapXmp, "hdrgm:GainMapMin", params.min);
-  params.max = GetFloat(gainMapXmp, "hdrgm:GainMapMax", params.max);
-  params.gamma = GetFloat(gainMapXmp, "hdrgm:Gamma", params.gamma);
-  params.offsetSdr = GetFloat(gainMapXmp, "hdrgm:OffsetSDR", params.offsetSdr);
-  params.offsetHdr = GetFloat(gainMapXmp, "hdrgm:OffsetHDR", params.offsetHdr);
+  params.min = GetChannels(gainMapXmp, "hdrgm:GainMapMin", params.min);
+  params.max = GetChannels(gainMapXmp, "hdrgm:GainMapMax", params.max);
+  params.gamma = GetChannels(gainMapXmp, "hdrgm:Gamma", params.gamma);
+  params.offsetSdr = GetChannels(gainMapXmp, "hdrgm:OffsetSDR", params.offsetSdr);
+  params.offsetHdr = GetChannels(gainMapXmp, "hdrgm:OffsetHDR", params.offsetHdr);
   params.capacityMin = GetFloat(gainMapXmp, "hdrgm:HDRCapacityMin", params.capacityMin);
   params.capacityMax = GetFloat(gainMapXmp, "hdrgm:HDRCapacityMax", params.capacityMax);
-  for (const float value : {params.min, params.max, params.gamma, params.offsetSdr,
-                            params.offsetHdr, params.capacityMin, params.capacityMax})
+  const auto finite = [](float value) { return std::isfinite(value); };
+  for (const GainMapChannels& channels :
+       {params.min, params.max, params.gamma, params.offsetSdr, params.offsetHdr})
   {
-    if (!std::isfinite(value))
+    if (!std::ranges::all_of(channels, finite))
       return {};
   }
-  if (params.gamma <= 0.0f || params.capacityMax <= params.capacityMin)
+  if (!finite(params.capacityMin) || !finite(params.capacityMax) ||
+      std::ranges::any_of(params.gamma, [](float gamma) { return gamma <= 0.0f; }) ||
+      params.capacityMax <= params.capacityMin)
     return {};
 
   return gainMap;

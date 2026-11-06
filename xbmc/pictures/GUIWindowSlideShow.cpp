@@ -267,6 +267,7 @@ void CGUIWindowSlideShow::Reset()
   m_iVideoSlide = -1;
   m_bPlayingMotion = false;
   m_iMotionSlide = -1;
+  m_iMotionClipsSlide = -1;
   m_bErrorMessage = false;
   {
     std::unique_lock lock(m_motionClipsSection);
@@ -350,6 +351,14 @@ void CGUIWindowSlideShow::OnDeinitWindow(int nextWindowID)
   m_bSlideShow = false;
 
   CGUIDialog::OnDeinitWindow(nextWindowID);
+}
+
+void CGUIWindowSlideShow::FreeResources(bool forceUnLoad)
+{
+  m_Image[0]->Free();
+  m_Image[1]->Free();
+
+  CGUIDialog::FreeResources(forceUnLoad);
 }
 
 void CGUIWindowSlideShow::Add(const CFileItem *picture)
@@ -467,6 +476,9 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   if (m_bSlideShow && !m_bPause && !appPower->IsInScreenSaver())
     appPower->ResetScreenSaver();
+  // A slideshow that Reset() emptied, with its window still open, has nothing to show in HDR
+  if (m_hdrOutput && m_slides.empty())
+    SetHdrOutput(false);
   int iSlides = m_slides.size();
   if (!iSlides)
     return;
@@ -759,6 +771,23 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
   if (bPlayVideo && !PlayVideo())
       return;
 
+  // Only the current and next pictures' clips can still play
+  if (m_iMotionClipsSlide != m_iCurrentSlide)
+  {
+    m_iMotionClipsSlide = m_iCurrentSlide;
+    const std::string& current = m_slides.at(m_iCurrentSlide)->GetDynPath();
+    const std::string& next = m_slides.at(m_iNextSlide)->GetDynPath();
+    std::unique_lock lock(m_motionClipsSection);
+    std::erase_if(m_motionClips,
+                  [&current, &next](const auto& clip)
+                  {
+                    if (clip.first == current || clip.first == next)
+                      return false;
+                    XFILE::CFile::Delete(clip.second);
+                    return true;
+                  });
+  }
+
   if (m_hdrOutput && !m_showHdr)
     SetHdrOutput(false);
 
@@ -784,7 +813,9 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
       !m_Image[m_iCurrentPic]->DrawNextImage())
   {
     m_iMotionSlide = m_iCurrentSlide;
-    PlayMotion();
+    // The clip would take the player from any music playing, and the music wouldn't come back
+    if (!appPlayer || !appPlayer->IsPlayingAudio())
+      PlayMotion();
   }
 
   if (m_Image[m_iCurrentPic]->IsLoaded())
@@ -1275,8 +1306,15 @@ bool CGUIWindowSlideShow::OnMessage(CGUIMessage& message)
       break;
 
       case GUI_MSG_PLAYBACK_ERROR:
+        // A moving photo whose clip won't play stays in the slideshow as a photo
+        if (m_bPlayingMotion &&
+            !CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>()->IsPlaying())
+        {
+          EndMotion();
+          break;
+        }
         // While a player is running, the error is a late one from a video already left behind
-        if (m_bPlayingVideo && !m_bPlayingMotion && m_iVideoSlide >= 0 &&
+        if (m_bPlayingVideo && m_iVideoSlide >= 0 &&
             m_iVideoSlide < static_cast<int>(m_slides.size()) &&
             !CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>()->IsPlaying())
         {
@@ -1425,6 +1463,9 @@ void CGUIWindowSlideShow::CloseMotionClip()
 
 bool CGUIWindowSlideShow::IsShowingVideo() const
 {
+  // A reset slideshow has no current slide
+  if (m_iCurrentSlide < 0 || m_iCurrentSlide >= static_cast<int>(m_slides.size()))
+    return false;
   // A video's thumbnail, or a moving photo, stays on screen until the clip has a picture to show
   if (!IsVideo(*m_slides.at(m_iCurrentSlide)) && !m_bPlayingMotion)
     return false;
@@ -1528,21 +1569,10 @@ void CGUIWindowSlideShow::OnLoadPic(int iPic,
     CLog::Log(LOGDEBUG, "Finished background loading slot {}, {}: {}", iPic, iSlideNumber,
               m_slides.at(iSlideNumber)->GetPath());
     // Process() looks for the clip as soon as the picture is loaded
+    if (!motionClip.empty())
     {
       std::unique_lock lock(m_motionClipsSection);
-      // Only the current and next pictures' clips can still play
-      const std::string& current = m_slides.at(m_iCurrentSlide)->GetDynPath();
-      const std::string& next = m_slides.at(m_iNextSlide)->GetDynPath();
-      std::erase_if(m_motionClips,
-                    [&current, &next](const auto& clip)
-                    {
-                      if (clip.first == current || clip.first == next)
-                        return false;
-                      XFILE::CFile::Delete(clip.second);
-                      return true;
-                    });
-      if (!motionClip.empty())
-        m_motionClips[strFileName] = motionClip;
+      m_motionClips[strFileName] = motionClip;
     }
     m_Image[iPic]->SetOriginalSize(pTexture->GetOriginalWidth(), pTexture->GetOriginalHeight(),
                                    bFullSize);

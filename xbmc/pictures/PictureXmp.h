@@ -32,6 +32,11 @@ std::string Read(XFILE::CFile& file);
 std::string_view GetValue(std::string_view xmp, std::string_view name);
 
 /*!
+ * \brief Get every value of a property written as an rdf:Seq list, or its one value otherwise.
+ */
+std::vector<std::string_view> GetValues(std::string_view xmp, std::string_view name);
+
+/*!
  * \brief Get a property's value as a whole number, or 0 if it's missing.
  */
 uint64_t GetUnsigned(std::string_view xmp, std::string_view name);

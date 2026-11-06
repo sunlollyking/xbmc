@@ -8,20 +8,26 @@
 
 #pragma once
 
+#include <array>
 #include <string>
 
 namespace KODI::PICTURE
 {
 /*!
+ * \brief A value per colour channel: red, green and blue.
+ */
+using GainMapChannels = std::array<float, 3>;
+
+/*!
  * \brief How to apply an Ultra HDR gain map. The min, max and capacity values are log2.
  */
 struct GainMapParams
 {
-  float min{0.0f};
-  float max{1.0f};
-  float gamma{1.0f};
-  float offsetSdr{1.0f / 64};
-  float offsetHdr{1.0f / 64};
+  GainMapChannels min{0.0f, 0.0f, 0.0f};
+  GainMapChannels max{1.0f, 1.0f, 1.0f};
+  GainMapChannels gamma{1.0f, 1.0f, 1.0f};
+  GainMapChannels offsetSdr{1.0f / 64, 1.0f / 64, 1.0f / 64};
+  GainMapChannels offsetHdr{1.0f / 64, 1.0f / 64, 1.0f / 64};
   float capacityMin{0.0f};
   float capacityMax{1.0f};
 };

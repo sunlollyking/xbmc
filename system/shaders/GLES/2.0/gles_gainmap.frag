@@ -18,11 +18,11 @@ varying vec2 v_tex;
 uniform sampler2D u_picture; // SDR picture, sRGB
 uniform sampler2D u_gainMap;
 uniform vec2 u_gainMapScale; // gain map texture coordinates from the picture's
-uniform float u_min;         // log2
-uniform float u_max;         // log2
-uniform float u_gamma;
-uniform float u_offsetSdr;
-uniform float u_offsetHdr;
+uniform vec3 u_min;         // log2
+uniform vec3 u_max;         // log2
+uniform vec3 u_gamma;
+uniform vec3 u_offsetSdr;
+uniform vec3 u_offsetHdr;
 uniform float u_weight;      // how much of the gain map the display can show, 0 to 1
 uniform float u_alpha;
 
@@ -58,8 +58,9 @@ void main()
   vec3 sdr = ToLinear(picture.rgb);
 
   // Ultra HDR: recover the HDR picture from the SDR one and the gain map
-  float gain = texture2D(u_gainMap, v_tex * u_gainMapScale).r;
-  float logBoost = mix(u_min, u_max, pow(gain, 1.0 / u_gamma));
+  // a gain map with one channel decodes to grey, the same in all three
+  vec3 gain = texture2D(u_gainMap, v_tex * u_gainMapScale).rgb;
+  vec3 logBoost = mix(u_min, u_max, pow(gain, 1.0 / u_gamma));
   vec3 hdr = (sdr + u_offsetSdr) * exp2(logBoost * u_weight) - u_offsetHdr;
 
   vec3 result = ToPQ(bt709_to_bt2020 * max(hdr, vec3(0.0)) * SDR_WHITE);

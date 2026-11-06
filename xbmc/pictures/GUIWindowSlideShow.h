@@ -110,6 +110,7 @@ public:
   bool OnMessage(CGUIMessage& message) override;
   EVENT_RESULT OnMouseEvent(const CPoint& point, const KODI::MOUSE::CMouseEvent& event) override;
   bool OnAction(const CAction& action) override;
+  void FreeResources(bool forceUnLoad = false) override;
   void Render() override;
   void RenderEx() override;
   bool WantsRenderEx() const override { return m_hdrOutput; }
@@ -180,6 +181,7 @@ private:
   bool m_bPlayingMotion = false;
   std::string m_motionClip;
   int m_iMotionSlide = -1;
+  int m_iMotionClipsSlide = -1;
   mutable CCriticalSection m_motionClipsSection;
   std::map<std::string, std::string, std::less<>> m_motionClips; // picture path -> clip path
   bool m_bErrorMessage;

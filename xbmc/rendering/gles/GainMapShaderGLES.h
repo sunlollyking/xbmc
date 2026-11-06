@@ -10,6 +10,7 @@
 
 #include "guilib/Shader.h"
 
+#include <array>
 #include <string>
 
 namespace KODI::PICTURE
@@ -40,11 +41,11 @@ protected:
   bool OnEnabled() override;
 
 private:
-  float m_min{0.0f};
-  float m_max{0.0f};
-  float m_gamma{1.0f};
-  float m_offsetSdr{0.0f};
-  float m_offsetHdr{0.0f};
+  std::array<float, 3> m_min{};
+  std::array<float, 3> m_max{};
+  std::array<float, 3> m_gamma{1.0f, 1.0f, 1.0f};
+  std::array<float, 3> m_offsetSdr{};
+  std::array<float, 3> m_offsetHdr{};
   float m_weight{0.0f};
   float m_scaleX{1.0f};
   float m_scaleY{1.0f};

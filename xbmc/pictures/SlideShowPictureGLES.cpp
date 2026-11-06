@@ -34,6 +34,14 @@ CSlideShowPicGLES::CSlideShowPicGLES() = default;
 
 CSlideShowPicGLES::~CSlideShowPicGLES() = default;
 
+void CSlideShowPicGLES::Free()
+{
+  m_posVBO.Destroy();
+  m_texVBO.Destroy();
+  m_IBO.Destroy();
+  m_gainMapShader.reset();
+}
+
 void CSlideShowPicGLES::Render(float* x,
                                float* y,
                                CTexture* pTexture,
@@ -167,15 +175,22 @@ bool CSlideShowPicGLES::RenderHdr(float* x,
   const GLint posLoc = m_gainMapShader->GetPosLoc();
   const GLint texLoc = m_gainMapShader->GetTexLoc();
 
-  glVertexAttribPointer(posLoc, 3, GL_FLOAT, 0, 0, ver);
-  glVertexAttribPointer(texLoc, 2, GL_FLOAT, 0, 0, tex);
+  m_posVBO.SetData(ver, GL_STREAM_DRAW);
+  glVertexAttribPointer(posLoc, 3, GL_FLOAT, 0, 0, 0);
   glEnableVertexAttribArray(posLoc);
+
+  m_texVBO.SetData(tex, GL_STREAM_DRAW);
+  glVertexAttribPointer(texLoc, 2, GL_FLOAT, 0, 0, 0);
   glEnableVertexAttribArray(texLoc);
 
-  glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, idx);
+  m_IBO.SetDataOnce(idx);
+  glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 
   glDisableVertexAttribArray(posLoc);
   glDisableVertexAttribArray(texLoc);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   m_gainMapShader->Disable();
   glActiveTexture(GL_TEXTURE0);

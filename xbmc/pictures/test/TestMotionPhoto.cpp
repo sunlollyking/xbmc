@@ -10,8 +10,10 @@
 #include "FileItemList.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "filesystem/SpecialProtocol.h"
 #include "pictures/MotionPhoto.h"
 #include "test/TestUtils.h"
+#include "utils/URIUtils.h"
 
 #include <memory>
 #include <string>
@@ -120,12 +122,38 @@ TEST(TestMotionPhoto, MotionPhotoWithItemElements)
   PICTURE::ClearMotionPhotoClips();
 }
 
-TEST(TestMotionPhoto, MicroVideo)
+TEST(TestMotionPhoto, ClipIsCopiedAgainAfterClearing)
 {
+  const std::string picture = "special://temp/motionphoto-again.jpg";
   const std::string xmp =
       "GCamera:MicroVideo=\"1\" GCamera:MicroVideoOffset=\"" + std::to_string(CLIP.size()) + "\"";
-  EXPECT_EQ(Extract(MakeJpeg(xmp, CLIP)), CLIP);
+  WriteFile(picture, MakeJpeg(xmp, CLIP));
+  const std::string clip = PICTURE::ExtractMotionPhotoClip(picture);
+  ASSERT_FALSE(clip.empty());
+
+  // VideoPlayer lists the clip's folder when it plays the clip, and the listing is cached
+  CFileItemList items;
+  ASSERT_TRUE(
+      XFILE::CDirectory::GetDirectory(CSpecialProtocol::TranslatePath(URIUtils::GetDirectory(clip)),
+                                      items, "", XFILE::DIR_FLAG_DEFAULTS));
   PICTURE::ClearMotionPhotoClips();
+  EXPECT_FALSE(XFILE::CFile::Exists(CSpecialProtocol::TranslatePath(clip), false));
+
+  EXPECT_EQ(PICTURE::ExtractMotionPhotoClip(picture), clip);
+  EXPECT_TRUE(XFILE::CFile::Exists(CSpecialProtocol::TranslatePath(clip), false));
+  PICTURE::ClearMotionPhotoClips();
+  XFILE::CFile::Delete(picture);
+}
+
+TEST(TestMotionPhoto, MicroVideo)
+{
+  for (const std::string prefix : {"GCamera", "Camera"})
+  {
+    const std::string xmp = prefix + ":MicroVideo=\"1\" " + prefix + ":MicroVideoOffset=\"" +
+                            std::to_string(CLIP.size()) + "\"";
+    EXPECT_EQ(Extract(MakeJpeg(xmp, CLIP)), CLIP) << prefix;
+    PICTURE::ClearMotionPhotoClips();
+  }
 }
 
 TEST(TestMotionPhoto, StillPhoto)

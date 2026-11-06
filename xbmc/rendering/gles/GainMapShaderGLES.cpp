@@ -60,11 +60,11 @@ bool CGainMapShaderGLES::OnEnabled()
 {
   glUniformMatrix4fv(m_hProj, 1, GL_FALSE, glMatrixProject.Get());
   glUniformMatrix4fv(m_hModel, 1, GL_FALSE, glMatrixModview.Get());
-  glUniform1f(m_hMin, m_min);
-  glUniform1f(m_hMax, m_max);
-  glUniform1f(m_hGamma, m_gamma);
-  glUniform1f(m_hOffsetSdr, m_offsetSdr);
-  glUniform1f(m_hOffsetHdr, m_offsetHdr);
+  glUniform3fv(m_hMin, 1, m_min.data());
+  glUniform3fv(m_hMax, 1, m_max.data());
+  glUniform3fv(m_hGamma, 1, m_gamma.data());
+  glUniform3fv(m_hOffsetSdr, 1, m_offsetSdr.data());
+  glUniform3fv(m_hOffsetHdr, 1, m_offsetHdr.data());
   glUniform1f(m_hWeight, m_weight);
   glUniform2f(m_hScale, m_scaleX, m_scaleY);
   glUniform1f(m_hAlpha, m_alpha);
