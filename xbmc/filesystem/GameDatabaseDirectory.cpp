@@ -20,6 +20,7 @@
 #include "resources/ResourcesComponent.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/DefaultArt.h"
 #include "utils/SortUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -101,13 +102,36 @@ std::string ArtLabel(const std::string& type)
 /*!
  * \brief Give a node of the overview its glyph, named after it
  *
- * The glyphs ship with Kodi rather than with a skin, so every skin draws the
- * same thing here instead of falling back to a folder that says nothing about
- * where it leads.
+ * A node the video and music libraries have too uses the skin's own icon for
+ * it. The rest ship with Kodi, drawn in the same style, so every skin shows
+ * what they lead to instead of a folder.
  */
 void SetGlyph(CFileItem& item, std::string_view node)
 {
-  const std::string glyph = "special://xbmc/media/gamelibrary/" + std::string(node) + ".png";
+  static constexpr std::array<std::pair<std::string_view, const char*>, 15> skinIcons{{
+      {"titles", KODI::ART::DEFAULT::ADDON_GAME},
+      {"genres", KODI::ART::DEFAULT::GENRE},
+      {"years", KODI::ART::DEFAULT::YEAR},
+      {"developers", KODI::ART::DEFAULT::PROGRAM},
+      {"collections", KODI::ART::DEFAULT::SETS},
+      {"characters", KODI::ART::DEFAULT::ACTOR},
+      {"tags", KODI::ART::DEFAULT::TAGS},
+      {"regions", KODI::ART::DEFAULT::COUNTRY},
+      {"players", KODI::ART::DEFAULT::USER},
+      {"recentlyadded", KODI::ART::DEFAULT::MUSIC_RECENTLY_ADDED},
+      {"recentlyplayed", KODI::ART::DEFAULT::MUSIC_RECENTLY_PLAYED},
+      {"continueplaying", KODI::ART::DEFAULT::IN_PROGRESS_SHOWS},
+      {"mostplayed", KODI::ART::DEFAULT::MUSIC_TOP_100},
+      {"favourites", KODI::ART::DEFAULT::FAVOURITES},
+      {"playlists", KODI::ART::DEFAULT::PLAYLIST},
+  }};
+
+  std::string glyph = "special://xbmc/media/gamelibrary/" + std::string(node) + ".png";
+  for (const auto& [name, icon] : skinIcons)
+  {
+    if (name == node)
+      glyph = icon;
+  }
   item.SetArt("icon", glyph);
   item.SetArt("thumb", glyph);
 }
