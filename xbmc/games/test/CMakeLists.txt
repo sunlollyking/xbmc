@@ -1,4 +1,11 @@
-set(SOURCES TestGameUtils.cpp)
+set(SOURCES TestGameArt.cpp
+            TestGameAgeContent.cpp
+            TestGameLanguages.cpp
+            TestGameManual.cpp
+            TestGameSeries.cpp
+            TestGameThumbLoader.cpp
+            TestGameUtils.cpp
+            TestGameVideoSettings.cpp)
 set(HEADERS)
 
 core_add_test_library(games_test)

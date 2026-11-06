@@ -121,6 +121,7 @@ const CWindowTranslator::WindowMapByName CWindowTranslator::WindowMappingByName 
     {"musicinformation", WINDOW_DIALOG_MUSIC_INFO},
     {"okdialog", WINDOW_DIALOG_OK},
     {"movieinformation", WINDOW_DIALOG_VIDEO_INFO},
+    {"gameinformation", WINDOW_DIALOG_GAME_INFO},
     {"managevideoversions", WINDOW_DIALOG_MANAGE_VIDEO_VERSIONS},
     {"managevideoextras", WINDOW_DIALOG_MANAGE_VIDEO_EXTRAS},
     {"textviewer", WINDOW_DIALOG_TEXT_VIEWER},

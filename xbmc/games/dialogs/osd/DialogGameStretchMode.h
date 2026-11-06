@@ -26,6 +26,17 @@ public:
   CDialogGameStretchMode();
   ~CDialogGameStretchMode() override = default;
 
+  struct StretchModeProperties
+  {
+    int stringIndex;
+    RETRO::STRETCHMODE stretchMode;
+  };
+
+  /*!
+   * \brief The list of all the stretch modes along with their properties
+   */
+  static const std::vector<StretchModeProperties> m_allStretchModes;
+
 protected:
   // implementation of CDialogGameVideoSelect
   std::string GetHeading() override;
@@ -37,18 +48,7 @@ protected:
   bool OnClickAction() override;
 
 private:
-  struct StretchModeProperties
-  {
-    int stringIndex;
-    RETRO::STRETCHMODE stretchMode;
-  };
-
   std::vector<StretchModeProperties> m_stretchModes;
-
-  /*!
-   * \brief The list of all the stretch modes along with their properties
-   */
-  static const std::vector<StretchModeProperties> m_allStretchModes;
 };
 } // namespace GAME
 } // namespace KODI

@@ -33,6 +33,7 @@
 #include "utils/log.h"
 #include "video/VideoDatabase.h"
 #include "games/database/GameDatabase.h"
+#include "games/library/GameLibraryQueue.h"
 #include "video/VideoLibraryQueue.h"
 
 using namespace KODI::MESSAGING;
@@ -100,6 +101,14 @@ static int CleanLibrary(const std::vector<std::string>& params)
     else
       CLog::Log(LOGERROR, "CleanLibrary is not possible while scanning or cleaning");
   }
+  else if (StringUtils::EqualsNoCase(params[0], "games"))
+  {
+    auto& queue = KODI::GAME::CGameLibraryQueue::GetInstance();
+    if (!queue.IsScanningLibrary())
+      queue.CleanLibrary({}, userInitiated);
+    else
+      CLog::Log(LOGERROR, "CleanLibrary is not possible while scanning or cleaning");
+  }
   else if (StringUtils::EqualsNoCase(params[0], "music"))
   {
     if (!CMusicLibraryQueue::GetInstance().IsScanningLibrary())
@@ -129,6 +138,8 @@ static int ExportLibrary(const std::vector<std::string>& params)
   int iHeading = 647;
   if (StringUtils::EqualsNoCase(params[0], "music"))
     iHeading = 20196;
+  else if (StringUtils::EqualsNoCase(params[0], "games"))
+    iHeading = 35631; // "Export game library"
   std::string path;
   std::vector<CMediaSource> shares;
   CServiceBroker::GetMediaManager().GetLocalDrives(shares);
@@ -224,6 +235,13 @@ static int ExportLibrary(const std::vector<std::string>& params)
       videodatabase.Open();
       videodatabase.ExportToXML(path, singleFile, thumbs, actorThumbs, overwrite);
       videodatabase.Close();
+    }
+    else if (StringUtils::EqualsNoCase(params[0], "games"))
+    {
+      KODI::GAME::CGameDatabase gamedatabase;
+      gamedatabase.Open();
+      gamedatabase.ExportToXML(path, singleFile, thumbs, overwrite);
+      gamedatabase.Close();
     }
     else
     {
@@ -338,6 +356,14 @@ static int UpdateLibrary(const std::vector<std::string>& params)
     else
       CVideoLibraryQueue::GetInstance().ScanLibrary(params.size() > 1 ? params[1] : "", false,
                                                     userInitiated);
+  }
+  else if (StringUtils::EqualsNoCase(params[0], "games"))
+  {
+    auto& queue = KODI::GAME::CGameLibraryQueue::GetInstance();
+    if (queue.IsScanningLibrary())
+      queue.StopLibraryScanning();
+    else
+      queue.ScanLibrary(params.size() > 1 ? params[1] : "", userInitiated);
   }
 
   return 0;

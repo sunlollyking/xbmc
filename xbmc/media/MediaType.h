@@ -32,6 +32,9 @@ enum class TYPE
   SEASON,
   EPISODE,
   VIDEO_VERSION,
+  GAME,
+  GAME_PLATFORM,
+  GAME_RELEASE,
 };
 
 //! \brief The name a type is stored and exposed under, e.g. "movie". Empty for NONE.

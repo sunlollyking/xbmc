@@ -58,6 +58,17 @@ std::string Localize(uint32_t stringId)
 }
 
 /*!
+ * \brief The icon for a notification that speaks for RetroAchievements
+ *
+ * The player's own avatar, as the sign-in notification uses. Empty when they
+ * are signed out, which leaves the notification with Kodi's own icon.
+ */
+std::string RetroAchievementsIcon()
+{
+  return CServiceBroker::GetGameServices().GameSettings().GetRAUserPicUrl();
+}
+
+/*!
  * \brief Ask the achievements dialog to rebuild itself
  *
  * Called from the add-on's thread, so the message is queued rather than sent.
@@ -237,11 +248,12 @@ void CGameClientCheevos::QueueStartupToast()
 
 void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data)
 {
-  OnAchievementTriggered(data, CServiceBroker::GetGameServices().AchievementRuntime(),
-                         m_encoreModeEnabled);
+  if (OnAchievementTriggered(data, CServiceBroker::GetGameServices().AchievementRuntime(),
+                             m_encoreModeEnabled))
+    CServiceBroker::GetGameServices().MarkPlayingGameBeaten();
 }
 
-void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data,
+bool CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_triggered& data,
                                                 CAchievementRuntime& runtime,
                                                 bool encoreModeEnabled)
 {
@@ -265,7 +277,7 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   {
     CLog::Log(LOGDEBUG, "CGameClientCheevos: achievement {} \"{}\" was already earned", data.id,
               title);
-    return;
+    return false;
   }
 
   CLog::Log(LOGINFO, "CGameClientCheevos: earned achievement {} \"{}\" ({} points){}", data.id,
@@ -281,20 +293,20 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
                                         TOAST_DISPLAY_TIME_MS, true, TOAST_MESSAGE_TIME_MS);
 
   if (!newlyEarned)
-    return;
+    return false;
 
   // Beaten by this unlock: the last progression achievement, or the first win
   // once there are none left to earn
   const auto achievement = std::ranges::find(state.achievements, data.id, &AchievementInfo::id);
   if (achievement == state.achievements.end())
-    return;
+    return false;
 
   const BeatenProgress beaten = state.GetBeatenProgress(achievement->setId);
   const bool newlyBeaten =
       beaten.IsBeaten() && (achievement->type == AchievementType::PROGRESSION ||
                             (achievement->type == AchievementType::WIN && beaten.winEarned == 1));
   if (!newlyBeaten)
-    return;
+    return false;
 
   const auto set = std::ranges::find(state.sets, achievement->setId, &AchievementSet::id);
   const std::string setTitle =
@@ -305,6 +317,9 @@ void CGameClientCheevos::OnAchievementTriggered(const game_rc_achievement_trigge
   // "Beaten"
   CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35712), setTitle,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+
+  // A subset is a challenge of its own; only the game's own set beats the game
+  return state.sets.empty() || state.sets.front().id == achievement->setId;
 }
 
 void CGameClientCheevos::OnAchievementSets(const game_rc_achievement_sets& data)
@@ -398,9 +413,10 @@ void CGameClientCheevos::OnGameCompleted(const std::string& title, bool hardcore
   CLog::Log(LOGINFO, "CGameClientCheevos: {} \"{}\"", hardcore ? "mastered" : "completed", title);
 
   // "Game mastered" / "Game completed"
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
-                                        Localize(hardcore ? 35282 : 35283), title,
-                                        TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(hardcore ? 35282 : 35283),
+                                        title, TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
+
+  CServiceBroker::GetGameServices().MarkPlayingGameCompleted();
 }
 
 void CGameClientCheevos::OnAchievementProgress(const game_rc_achievement_progress* progress,
@@ -508,6 +524,7 @@ void CGameClientCheevos::OnLoginResult(const game_rc_login_result& data)
 void CGameClientCheevos::OnGameClosed()
 {
   m_encoreModeEnabled = false;
+  m_loggedTrackerId = 0;
 
   CServiceBroker::GetGameServices().AchievementRuntime().SetAchievementSetHandler(nullptr);
 
@@ -588,7 +605,7 @@ void CGameClientCheevos::OnLeaderboardStarted(const game_rc_leaderboard& data)
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" started", data.id, title);
 
   // "Leaderboard attempt started"
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35354), title,
+  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35354), title,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 
@@ -599,7 +616,7 @@ void CGameClientCheevos::OnLeaderboardFailed(const game_rc_leaderboard& data)
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} \"{}\" failed", data.id, title);
 
   // "Leaderboard attempt failed"
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35355), title,
+  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35355), title,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 
@@ -616,14 +633,21 @@ void CGameClientCheevos::OnLeaderboardSubmitted(const game_rc_leaderboard& data)
       value.empty() ? title : StringUtils::Format("{}  ·  {}", value, title);
 
   // "Leaderboard attempt submitted"
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35356), message,
+  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35356), message,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 
 void CGameClientCheevos::OnLeaderboardTracker(const game_rc_leaderboard_tracker& data, bool show)
 {
-  CLog::Log(LOGDEBUG, "CGameClientCheevos: leaderboard tracker {} = \"{}\"",
-            show ? "shown" : "hidden", SafeString(data.display));
+  // Only when it appears or goes, never on the value. An attempt in progress
+  // updates its tracker every frame, and logging each one buried a three
+  // minute session under eight thousand lines.
+  const unsigned int loggedId = show ? data.id : 0;
+  if (m_loggedTrackerId.exchange(loggedId) != loggedId)
+  {
+    CLog::Log(LOGDEBUG, "CGameClientCheevos: leaderboard tracker {} = \"{}\"",
+              show ? "shown" : "hidden", SafeString(data.display));
+  }
 
   LeaderboardTracker tracker;
   tracker.id = data.id;
@@ -637,13 +661,18 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
   const std::string submitted = SafeString(data.submitted_score);
   const std::string best = SafeString(data.best_score);
 
+  // The server can answer with a count taken before it filed the entry, which
+  // reads as "484 of 483". Whatever it meant, a total below the rank is not a
+  // total, and the player is at worst last.
+  const unsigned int totalEntries = std::max(data.num_entries, data.new_rank);
+
   CLog::Log(LOGINFO, "CGameClientCheevos: leaderboard {} placed {} of {} with {}", data.id,
-            data.new_rank, data.num_entries, submitted);
+            data.new_rank, totalEntries, submitted);
 
   // The leaderboards list would otherwise show where the player stood before
   // this attempt until the game is reloaded
   CServiceBroker::GetGameServices().AchievementRuntime().SetLeaderboardStanding(
-      data.id, data.new_rank, best.empty() ? submitted : best, data.num_entries);
+      data.id, data.new_rank, best.empty() ? submitted : best, totalEntries);
 
   // Dropping the fetched page is not enough on its own: the kept copy in
   // userdata was fetched before this submission, so it would be loaded straight
@@ -668,7 +697,7 @@ void CGameClientCheevos::OnLeaderboardScoreboard(const game_rc_leaderboard_score
     message += StringUtils::Format("  ·  {}", StringUtils::Format(Localize(35358), best));
 
   // "Leaderboard attempt submitted"
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35356), message,
+  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35356), message,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 
@@ -686,7 +715,7 @@ void CGameClientCheevos::OnSubsetCompleted(const std::string& title)
   CLog::Log(LOGINFO, "CGameClientCheevos: completed subset \"{}\"", title);
 
   // "Subset completed"
-  CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35307), title,
+  CGUIDialogKaiToast::QueueNotification(RetroAchievementsIcon(), Localize(35307), title,
                                         TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
 }
 

@@ -18,6 +18,8 @@
 #include "addons/kodi-dev-kit/include/kodi/c-api/addon-instance/pvr/pvr_epg.h" // EPG_TAG_INVALID_UID
 #include "filesystem/Directory.h"
 #include "imagefiles/ImageFileURL.h"
+#include "games/GameThumbLoader.h"
+#include "games/tags/GameInfoTag.h"
 #include "music/MusicThumbLoader.h"
 #include "music/tags/MusicInfoTag.h"
 #include "pictures/PictureInfoTag.h"
@@ -306,6 +308,8 @@ void CFileItemHandler::HandleFileItemList(const char *ID, bool allowFile, const 
       thumbLoader = new CVideoThumbLoader();
     else if (items.Get(start)->HasMusicInfoTag())
       thumbLoader = new CMusicThumbLoader();
+    else if (items.Get(start)->HasGameInfoTag())
+      thumbLoader = new KODI::GAME::CGameThumbLoader();
 
     if (thumbLoader != NULL)
       thumbLoader->OnLoaderStart();
@@ -381,6 +385,8 @@ void CFileItemHandler::HandleFileItem(const char* ID,
         }
         if (item->HasMusicInfoTag() && !item->GetMusicInfoTag()->GetURL().empty())
           object["file"] = item->GetMusicInfoTag()->GetURL().c_str();
+        if (item->HasGameInfoTag() && !item->GetGameInfoTag()->GetURL().empty())
+          object["file"] = item->GetGameInfoTag()->GetURL().c_str();
         if (item->HasPVRTimerInfoTag() && !item->GetPVRTimerInfoTag()->Path().empty())
           object["file"] = item->GetPVRTimerInfoTag()->Path().c_str();
 
@@ -418,6 +424,8 @@ void CFileItemHandler::HandleFileItem(const char* ID,
         object[ID] = item->GetMusicInfoTag()->GetDatabaseId();
       else if (item->HasVideoInfoTag() && item->GetVideoInfoTag()->m_iDbId > 0)
         object[ID] = item->GetVideoInfoTag()->m_iDbId;
+      else if (item->HasGameInfoTag() && item->GetGameInfoTag()->HasDatabaseId())
+        object[ID] = item->GetGameInfoTag()->GetDatabaseId();
 
       if (StringUtils::CompareNoCase(ID, "id") == 0)
       {
@@ -462,6 +470,8 @@ void CFileItemHandler::HandleFileItem(const char* ID,
         thumbLoader = new CVideoThumbLoader();
       else if (item->HasMusicInfoTag())
         thumbLoader = new CMusicThumbLoader();
+      else if (item->HasGameInfoTag())
+        thumbLoader = new KODI::GAME::CGameThumbLoader();
 
       if (thumbLoader != NULL)
       {
@@ -486,6 +496,8 @@ void CFileItemHandler::HandleFileItem(const char* ID,
       FillDetails(item->GetMusicInfoTag(), item, fields, object, thumbLoader);
     if (item->HasPictureInfoTag())
       FillDetails(item->GetPictureInfoTag(), item, fields, object, thumbLoader);
+    if (item->HasGameInfoTag())
+      FillDetails(item->GetGameInfoTag(), item, fields, object, thumbLoader);
 
     FillDetails(item.get(), item, fields, object, thumbLoader);
 

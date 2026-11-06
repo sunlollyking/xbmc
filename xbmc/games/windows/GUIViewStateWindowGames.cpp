@@ -12,6 +12,7 @@
 #include "FileItemList.h"
 #include "ServiceBroker.h"
 #include "games/GameUtils.h"
+#include "games/library/GameDbUrl.h"
 #include "guilib/WindowIDs.h"
 #include "playlists/PlayListFileItemClassify.h"
 #include "ServiceBroker.h"
@@ -36,22 +37,86 @@ using KODI::MEDIA::MediaSection;
 CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
   : CGUIViewState(items)
 {
+  // "The Legend of Zelda" sorts under L where a person asked for that, as it
+  // does everywhere else in Kodi
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  const SortAttribute byTitle =
+      settings && settings->GetBool(CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING)
+          ? SortAttributeIgnoreArticle
+          : SortAttributeNone;
+
   if (items.IsVirtualDirectoryRoot())
   {
-    AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS());
+    AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS(), byTitle);
     AddSortMethod(SortBy::DRIVE_TYPE, 564, LABEL_MASKS());
     SetSortMethod(SortBy::LABEL);
     SetSortOrder(SortOrder::ASCENDING);
     SetViewAsControl(DEFAULT_VIEW_LIST);
   }
+  // The library, and a playlist whose results come from it. A folder of files
+  // is not either of those, even though its items are games too.
+  else if (URIUtils::IsProtocol(items.GetPath(), "gamedb") || PLAYLIST::IsSmartPlayList(items))
+  {
+    if (items.GetContent() == "games" || items.GetContent() == "releases")
+    {
+      // A series folded into the titles sorts among them, as a movie set does
+      const auto titles = static_cast<SortAttribute>(byTitle | SortAttributeIgnoreFolders);
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y"), titles); // Title, Year
+      AddSortMethod(SortBy::YEAR, 562, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+      AddSortMethod(SortBy::RATING, 563, LABEL_MASKS("%T", "%R", "%T", "%R"));
+      AddSortMethod(SortBy::USER_RATING, 38018, LABEL_MASKS("%T", "%r", "%T", "%r"));
+      AddSortMethod(SortBy::PLAYCOUNT, 567, LABEL_MASKS("%T", "%V", "%T", "%V"));
+      AddSortMethod(SortBy::LAST_PLAYED, 568, LABEL_MASKS("%T", "%p", "%T", "%p"));
+      AddSortMethod(SortBy::TIME, 35671, LABEL_MASKS("%T", "", "%T", "")); // Time played
+      AddSortMethod(SortBy::DATE_ADDED, 570, LABEL_MASKS("%T", "%a", "%T", "%a"));
+      AddSortMethod(SortBy::STUDIO, 35549, LABEL_MASKS("%T", "%U", "%T", "%U")); // Platform
+      SetSortMethod(SortBy::LABEL);
+    }
+    else
+    {
+      AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%L", "%V", "%L", "%V"), byTitle); // Label, count
+      SetSortMethod(SortBy::LABEL);
+    }
+    SetSortOrder(SortOrder::ASCENDING);
+
+    const CViewState* viewState = CViewStateSettings::GetInstance().Get("gameslibrary");
+    // A smart playlist opens in the order it was saved with, as it does for videos
+    if (PLAYLIST::IsSmartPlayList(items))
+      AddPlaylistOrder(items, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Title, Year
+    else if (viewState)
+    {
+      SetSortMethod(viewState->m_sortDescription);
+      SetSortOrder(viewState->m_sortDescription.sortOrder);
+    }
+    if (viewState)
+      SetViewAsControl(viewState->m_viewMode);
+
+    // A node that ranks its games opens in its own order. A sort chosen for
+    // the node itself is still restored over this when the view state loads.
+    CGameDbUrl url;
+    if (url.FromString(items.GetPath()))
+    {
+      const std::string& list = url.GetList();
+      if (list == "recentlyplayed" || list == "continueplaying")
+        SetSortMethod(SortBy::LAST_PLAYED, SortOrder::DESCENDING);
+      else if (list == "mostplayed")
+        SetSortMethod(SortBy::TIME, SortOrder::DESCENDING);
+      else if (list == "recentlyadded")
+        SetSortMethod(SortBy::DATE_ADDED, SortOrder::DESCENDING);
+      else if (list == "popular" || list == "mostwanted")
+      {
+        AddSortMethod(SortBy::PLAYLIST_ORDER, 35804, // Popularity
+                      LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+        SetSortMethod(SortBy::PLAYLIST_ORDER, SortOrder::ASCENDING);
+      }
+      else if (url.HasOption("seriesid"))
+        SetSortMethod(SortBy::YEAR, SortOrder::ASCENDING);
+    }
+  }
   else
   {
-    const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-    AddSortMethod(SortBy::LABEL,
-                  settings->GetBool(CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING)
-                      ? SortAttributeIgnoreArticle
-                      : SortAttributeNone,
-                  551, LABEL_MASKS("%L", "%I", "%L", "")); // Label, Size | Label, empty
+    AddSortMethod(SortBy::LABEL, byTitle, 551,
+                  LABEL_MASKS("%L", "%I", "%L", "")); // Label, Size | Label, empty
     AddSortMethod(SortBy::FILE, 561,
                   LABEL_MASKS("%L", "%I", "%L", "")); // Label, Size | Label, empty
     AddSortMethod(SortBy::SIZE, 553,
@@ -81,6 +146,9 @@ std::string CGUIViewStateWindowGames::GetExtensions()
   // Ensure .zip appears
   exts.insert(".zip");
 
+  // A smart playlist is listed alongside games, as it is for video and music
+  exts.insert(".xsp");
+
   return StringUtils::Join(exts, "|");
 }
 
@@ -91,9 +159,12 @@ std::vector<CMediaSource>& CGUIViewStateWindowGames::GetSources()
 
 void CGUIViewStateWindowGames::SaveViewState()
 {
+  const char* viewState = URIUtils::IsProtocol(m_items.GetPath(), "gamedb")
+                              ? VIEW::STATE::GAMES_LIBRARY
+                              : VIEW::STATE::GAMES;
   // The root lists sources by name, so its state isn't the default for game folders
   SaveViewToDb(m_items.GetPath(), WINDOW_GAMES,
                m_items.IsVirtualDirectoryRoot()
                    ? nullptr
-                   : CViewStateSettings::GetInstance().Get(VIEW::STATE::GAMES));
+                   : CViewStateSettings::GetInstance().Get(viewState));
 }

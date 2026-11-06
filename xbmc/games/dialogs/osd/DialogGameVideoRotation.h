@@ -26,6 +26,8 @@ public:
   CDialogGameVideoRotation();
   ~CDialogGameVideoRotation() override = default;
 
+  static std::string GetRotationLabel(unsigned int rotationDegCCW);
+
 protected:
   // implementation of CDialogGameVideoSelect
   std::string GetHeading() override;
@@ -37,9 +39,6 @@ protected:
   bool OnClickAction() override;
 
 private:
-  // Helper functions
-  static std::string GetRotationLabel(unsigned int rotationDegCCW);
-
   // Dialog parameters
   std::vector<unsigned int> m_rotations; // Degrees counter-clockwise
 };

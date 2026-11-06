@@ -38,13 +38,15 @@ constexpr size_t CHUNK_SIZE = 1024 * 1024; // 1 MiB
 
 constexpr std::array<const char*, 2> sheetExtensions{".cue", ".gdi"};
 constexpr std::array<const char*, 3> programExtensions{".exe", ".com", ".bat"};
+constexpr std::array<const char*, 1> dsExtensions{".nds"};
 
 constexpr std::string_view SATURN_MAGIC = "SEGA SEGASATURN";
 constexpr std::string_view MEGACD_MAGIC = "SEGADISCSYSTEM";
 constexpr std::string_view DREAMCAST_MAGIC = "SEGA SEGAKATANA";
 
-//! A track that a cue sheet or GDI file names has its header near the start.
-//! Looking further into one in an archive would decompress the whole track.
+//! In an archive, a disc's header is looked for only near the start of its data
+//! track or image. Looking further would decompress the whole of it, often for
+//! a disc whose header this doesn't know.
 constexpr uint64_t MAX_ARCHIVED_TRACK_SCAN = 16 * 1024 * 1024; // 16 MiB
 
 // The protocol that lists an archive's files: zip's own, or the one the VFS
@@ -163,6 +165,18 @@ std::string HeaderField(const std::string& data, size_t offset, size_t length)
   StringUtils::Trim(value);
   return value;
 }
+
+//! The four letters a Nintendo DS cartridge's header names its game by, "VFSV",
+//! or empty for homebrew, which leaves them blank or fills them with '#'
+std::string DsGameCode(const std::string& path)
+{
+  const std::string code = HeaderField(ReadHead(path, 0x10), 0x0C, 4);
+  const bool valid =
+      code.size() == 4 &&
+      std::ranges::all_of(code,
+                          [](char c) { return (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'); });
+  return valid ? code : "";
+}
 } // namespace
 
 std::string CGameFileIdentity::NormaliseSerial(std::string serial)
@@ -263,6 +277,10 @@ std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath, uint
   CRegExp playStation(true);
   if (!playStation.RegComp("BOOT\\s*=\\s*cdrom:\\\\?([A-Z]{4})[_-]?([0-9]{3})\\.?([0-9]{2})"))
     return "";
+  // So does a PSP disc, in UMD_DATA.BIN: "ULUS-10080|56D3ECEFB2365F41|0001|"
+  CRegExp psp(true);
+  if (!psp.RegComp("([A-Z]{4})-([0-9]{5})\\|[0-9A-F]{16}\\|"))
+    return "";
 
   // Enough of the last chunk is kept for a header that straddles the join
   static constexpr size_t OVERLAP = 0x400;
@@ -292,6 +310,9 @@ std::string CGameFileIdentity::ReadDiscSerial(const std::string& trackPath, uint
     if (playStation.RegFind(window) >= 0)
       return NormaliseSerial(playStation.GetMatch(1) + playStation.GetMatch(2) +
                              playStation.GetMatch(3));
+
+    if (psp.RegFind(window) >= 0)
+      return NormaliseSerial(psp.GetMatch(1) + psp.GetMatch(2));
 
     if (window.size() > OVERLAP)
       window.erase(0, window.size() - OVERLAP);
@@ -418,7 +439,11 @@ bool CGameFileIdentity::HashLargestMember(const std::string& path, GameFile& fil
   // catalogue knows the game by it.
   if (count > 1 && program)
     return false;
-  if (!best || best->GetSize() > static_cast<int64_t>(maxSize))
+  if (!best)
+    return false;
+  if (HasExtension(best->GetPath(), dsExtensions))
+    file.serial = DsGameCode(Uncached(best->GetPath()));
+  if (best->GetSize() > static_cast<int64_t>(maxSize))
     return false;
 
   GameFile member;
@@ -438,12 +463,22 @@ std::string CGameFileIdentity::ReadArchivedDiscSerial(const std::string& path)
   if (!ArchiveFiles(path, members))
     return "";
 
-  // Only a disc whose cue sheet or GDI file names its data track is read. The
-  // header of any other disc may not be one this knows.
+  // A cue sheet or GDI file names the data track. Without one, the largest
+  // file is the disc image.
   const std::string sheet = FindSheet(members);
-  if (sheet.empty())
-    return "";
-  const std::string track = FirstTrack(sheet);
+  std::string track = sheet.empty() ? "" : FirstTrack(sheet);
+  if (track.empty())
+  {
+    std::shared_ptr<CFileItem> largest;
+    for (const auto& member : members)
+    {
+      if (!member->IsFolder() && (!largest || member->GetSize() > largest->GetSize()))
+        largest = member;
+    }
+    if (largest)
+      track = largest->GetPath();
+  }
+
   return track.empty() ? "" : ReadDiscSerial(Uncached(track), MAX_ARCHIVED_TRACK_SCAN);
 }
 
@@ -472,7 +507,7 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
     if (!ArchiveProtocol(path).empty())
     {
       if (media != MediaFormat::DISC)
-        return HashArchive(path, file, limit);
+        return HashArchive(path, file, limit) || !file.serial.empty();
       file.serial = ReadArchivedDiscSerial(path);
       return !file.serial.empty();
     }
@@ -488,10 +523,13 @@ bool CGameFileIdentity::Identify(const std::string& path, GameFile& file, MediaF
       return !file.serial.empty();
     }
 
-    if (file.size > limit)
-      return false;
+    if (HasExtension(path, dsExtensions))
+      file.serial = DsGameCode(path);
 
-    return HashWhole(path, file, limit);
+    if (file.size > limit)
+      return !file.serial.empty();
+
+    return HashWhole(path, file, limit) || !file.serial.empty();
   }
   catch (...)
   {

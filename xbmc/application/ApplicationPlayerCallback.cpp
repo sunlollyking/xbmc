@@ -52,6 +52,8 @@ void CApplicationPlayerCallback::OnPlayBackEnded()
 {
   CLog::LogF(LOGDEBUG, "call");
 
+  CServiceBroker::GetGameServices().EndPlaySession();
+
   CGUIMessage msg(GUI_MSG_PLAYBACK_ENDED, 0, 0);
   CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
 }
@@ -436,6 +438,8 @@ void CApplicationPlayerCallback::OnPlayBackResumed()
 void CApplicationPlayerCallback::OnPlayBackStopped()
 {
   CLog::LogF(LOGDEBUG, "call");
+
+  CServiceBroker::GetGameServices().EndPlaySession();
 
   CGUIMessage msg(GUI_MSG_PLAYBACK_STOPPED, 0, 0);
   CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);

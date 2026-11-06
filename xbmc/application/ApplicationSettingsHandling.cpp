@@ -66,6 +66,7 @@ void CApplicationSettingsHandling::RegisterSettings()
                                           CSettings::SETTING_SOURCE_VIDEOS,
                                           CSettings::SETTING_SOURCE_MUSIC,
                                           CSettings::SETTING_SOURCE_PICTURES,
+                                          CSettings::SETTING_SOURCE_GAMES,
                                           CSettings::SETTING_VIDEOSCREEN_FAKEFULLSCREEN,
                                           CSettings::SETTING_VIDEOLIBRARY_FLATTENVERSIONS,
                                       });
@@ -178,6 +179,11 @@ void CApplicationSettingsHandling::OnSettingAction(const std::shared_ptr<const C
   }
   else if (settingId == CSettings::SETTING_SOURCE_PICTURES)
     CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_PICTURES);
+  else if (settingId == CSettings::SETTING_SOURCE_GAMES)
+  {
+    std::vector<std::string> params{"sources://games/", "return"};
+    CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_GAMES, params);
+  }
 }
 
 bool CApplicationSettingsHandling::OnSettingUpdate(const std::shared_ptr<CSetting>& setting,
