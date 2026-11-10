@@ -44,12 +44,14 @@
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
+#include "utils/XBMCTinyXML2.h"
 #include "utils/log.h"
 
 #include <algorithm>
 #include <array>
 #include <iterator>
 #include <map>
+#include <optional>
 #include <tuple>
 
 using namespace KODI;
@@ -156,6 +158,111 @@ std::string FolderName(const std::string& folder)
   std::string path = folder;
   URIUtils::RemoveSlashAtEnd(path);
   return URIUtils::GetFileName(path);
+}
+
+bool HasPlatformExtension(const std::string& name, const PlatformInfo& platform)
+{
+  std::string ext = StringUtils::ToLower(URIUtils::GetExtension(name));
+  if (ext.empty())
+    return false;
+  ext.erase(0, 1);
+  return std::ranges::find(platform.extensions, ext) != platform.extensions.end();
+}
+
+/*!
+ * \brief The first part of an image split across a folder named after it
+ *
+ * A dump too big for the card it was copied to is split into 00, 01, ... in a
+ * folder named like the image, sometimes inside a second folder of that name.
+ * Given the first part, the emulator joins the others to it.
+ */
+std::string SplitImageFirstPart(const std::string& folder, const PlatformInfo& platform)
+{
+  const std::string name = FolderName(folder);
+  if (!HasPlatformExtension(name, platform))
+    return "";
+  for (const std::string& parts : {folder, URIUtils::AddFileToFolder(folder, name)})
+  {
+    const std::string first = URIUtils::AddFileToFolder(parts, "00");
+    if (XFILE::CFile::Exists(first, false))
+      return first;
+  }
+  return "";
+}
+
+/*!
+ * \brief The file a PlayStation 3 disc copied into a folder is loaded from
+ *
+ * The folder holds the disc's files: PS3_DISC.SFB names the disc, and
+ * PS3_GAME/PARAM.SFO describes the game when the copy left that out. The
+ * program itself, PS3_GAME/USRDIR/EBOOT.BIN, is what makes it a disc.
+ */
+std::optional<std::string> DiscFolderProgram(const std::string& folder)
+{
+  if (!XFILE::CFile::Exists(URIUtils::AddFileToFolder(folder, "PS3_GAME", "USRDIR", "EBOOT.BIN"),
+                            false))
+    return std::nullopt;
+  for (const std::string& file : {URIUtils::AddFileToFolder(folder, "PS3_DISC.SFB"),
+                                  URIUtils::AddFileToFolder(folder, "PS3_GAME", "PARAM.SFO")})
+  {
+    if (XFILE::CFile::Exists(file, false))
+      return file;
+  }
+  return std::nullopt;
+}
+
+//! The title ID an unpacked title's code/app.xml or meta/meta.xml gives
+std::string UnpackedTitleId(const std::string& folder)
+{
+  for (const std::string& file : {URIUtils::AddFileToFolder(folder, "code", "app.xml"),
+                                  URIUtils::AddFileToFolder(folder, "meta", "meta.xml")})
+  {
+    CXBMCTinyXML2 xml;
+    if (!xml.LoadFile(file) || xml.RootElement() == nullptr)
+      continue;
+    const tinyxml2::XMLElement* id = xml.RootElement()->FirstChildElement("title_id");
+    if (id != nullptr && id->GetText() != nullptr)
+      return StringUtils::ToLower(id->GetText());
+  }
+  return "";
+}
+
+/*!
+ * \brief The program of a title unpacked from a console into a folder
+ *
+ * A Wii U title copied off the console is a folder holding code/, content/ and
+ * meta/, the program being the one file in code/ the platform plays. An update
+ * or DLC unpacks the same way but is no game, as the type in its title ID says;
+ * an update can carry its game's meta.xml, so code/app.xml is asked first.
+ */
+std::optional<std::string> UnpackedTitleProgram(const std::string& folder,
+                                                const PlatformInfo& platform)
+{
+  if (!XFILE::CFile::Exists(URIUtils::AddFileToFolder(folder, "meta", "meta.xml"), false))
+    return std::nullopt;
+
+  const std::string titleId = UnpackedTitleId(folder);
+  if (titleId.starts_with("0005000e") || titleId.starts_with("0005000c"))
+    return std::string();
+
+  CFileItemList code;
+  if (!XFILE::CDirectory::GetDirectory(URIUtils::AddFileToFolder(folder, "code/"), code,
+                                       ExtensionMask(platform),
+                                       XFILE::DIR_FLAG_NO_FILE_DIRS | XFILE::DIR_FLAG_NO_FILE_INFO))
+    return std::nullopt;
+
+  std::string program;
+  for (const auto& item : code)
+  {
+    if (item->IsFolder() || !HasPlatformExtension(item->GetPath(), platform))
+      continue;
+    if (!program.empty())
+      return std::nullopt;
+    program = item->GetPath();
+  }
+  if (program.empty())
+    return std::nullopt;
+  return program;
 }
 
 /*!
@@ -585,6 +692,57 @@ std::vector<CGameInfoScanner::Entry> CGameInfoScanner::GroupEntries(const CFileI
   return entries;
 }
 
+std::vector<CGameInfoScanner::Entry> CGameInfoScanner::FolderGames(const CFileItemList& items,
+                                                                   const PlatformInfo& platform)
+{
+  std::vector<Entry> games;
+  for (const auto& item : items)
+  {
+    if (!item->IsFolder())
+      continue;
+
+    Entry entry;
+    entry.folder = item->GetPath();
+    entry.nameFromFolder = true;
+    entry.folderIsGame = true;
+    entry.path = SplitImageFirstPart(entry.folder, platform);
+    entry.folderIsImage = !entry.path.empty();
+    if (!entry.folderIsImage)
+    {
+      std::optional<std::string> program = UnpackedTitleProgram(entry.folder, platform);
+      if (!program)
+        program = DiscFolderProgram(entry.folder);
+      if (!program)
+        continue;
+      entry.path = *program;
+    }
+
+    if (!entry.path.empty())
+      entry.files.emplace_back(entry.path);
+    games.emplace_back(std::move(entry));
+  }
+  return games;
+}
+
+std::optional<CGameInfoScanner::Entry> CGameInfoScanner::FolderGameOf(const std::string& playPath,
+                                                                     const PlatformInfo& platform)
+{
+  // A folder game's file is at most two folders below the folder that is the game
+  std::string folder = URIUtils::GetDirectory(playPath);
+  for (int depth = 0; depth < 3 && !folder.empty(); ++depth)
+  {
+    CFileItemList items;
+    items.Add(std::make_shared<CFileItem>(folder, true));
+    for (Entry& game : FolderGames(items, platform))
+    {
+      if (game.path == playPath)
+        return std::move(game);
+    }
+    folder = URIUtils::GetParentPath(folder);
+  }
+  return std::nullopt;
+}
+
 void CGameInfoScanner::FillRequest(const Entry& entry,
                                    const ParsedGameName& parsed,
                                    const GameFile& identity,
@@ -592,8 +750,11 @@ void CGameInfoScanner::FillRequest(const Entry& entry,
                                    GameScrapeRequest& request)
 {
   request.title = parsed.displayTitle;
-  request.fileName = entry.isFolder ? URIUtils::GetFileName(entry.folder)
-                                    : URIUtils::GetFileName(entry.path);
+  if (entry.folderIsGame)
+    request.fileName = FolderName(entry.folder);
+  else
+    request.fileName = entry.isFolder ? URIUtils::GetFileName(entry.folder)
+                                      : URIUtils::GetFileName(entry.path);
   request.platformSlug = platform.slug;
   request.platformIds = platform.providerIds;
   request.crc32 = identity.crc32;
@@ -661,10 +822,22 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
   std::string storedHash;
   m_database.GetPathHash(folder, storedHash);
 
+  std::vector<Entry> folderGames = FolderGames(items, platform);
+  std::set<std::string> gameFolders;
+  for (const Entry& game : folderGames)
+    gameFolders.insert(game.folder);
+
   bool found = false;
   if (hash != storedHash)
   {
     std::vector<Entry> entries = GroupEntries(items, content.useFolderNames);
+    std::erase_if(entries, [&gameFolders](const Entry& e)
+                  { return e.isFolder && gameFolders.contains(e.folder); });
+    std::erase_if(folderGames, [](const Entry& e) { return e.path.empty(); });
+    // A folder that is a game comes first, so an archive of it kept beside it
+    // joins its release rather than being what plays
+    entries.insert(entries.begin(), std::make_move_iterator(folderGames.begin()),
+                   std::make_move_iterator(folderGames.end()));
 
     // A folder reached by recursion that holds a single game is that game. The
     // file inside is named for the dump rather than the title often enough --
@@ -718,7 +891,7 @@ bool CGameInfoScanner::ScanFolder(const std::string& folder,
     {
       if (!m_bRunning)
         break;
-      if (item->IsFolder())
+      if (item->IsFolder() && !gameFolders.contains(item->GetPath()))
       {
         const auto [complete, subFound] = DoScan(item->GetPath());
         found = found || subFound == ContentFound::NewContentFound;
@@ -842,15 +1015,23 @@ bool CGameInfoScanner::RefreshGame(int idGame)
   FollowCatalogue(platform);
 
   Entry entry;
-  entry.path = playPath;
-  entry.folder = URIUtils::GetDirectory(playPath);
+  if (std::optional<Entry> folderGame = FolderGameOf(playPath, platform))
+  {
+    entry = std::move(*folderGame);
+  }
+  else
+  {
+    entry.path = playPath;
+    entry.folder = URIUtils::GetDirectory(playPath);
+
+    // A scan names a game after its folder when the folder holds only that game.
+    // The title it gave the release says which of the two names it read.
+    const ParsedGameName fromFolder = CGameNameParser::Parse(FolderName(entry.folder), false);
+    entry.nameFromFolder = !fromFolder.title.empty() && fromFolder.title == release->title;
+  }
+  entry.files.clear();
   for (const GameFile& file : release->files)
     entry.files.emplace_back(file.path);
-
-  // A scan names a game after its folder when the folder holds only that game.
-  // The title it gave the release says which of the two names it read.
-  const ParsedGameName fromFolder = CGameNameParser::Parse(FolderName(entry.folder), false);
-  entry.nameFromFolder = !fromFolder.title.empty() && fromFolder.title == release->title;
 
   m_bRunning = true;
   const bool ok = ScanEntry(entry, content, platform, idGame);
@@ -1239,7 +1420,8 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
   const bool fromFolder = entry.isFolder || entry.nameFromFolder;
   const std::string nameSource =
       fromFolder ? FolderName(entry.folder) : URIUtils::GetFileName(playPath);
-  const ParsedGameName parsed = CGameNameParser::Parse(nameSource, !fromFolder);
+  const ParsedGameName parsed =
+      CGameNameParser::Parse(nameSource, !fromFolder || entry.folderIsImage);
   if (parsed.displayTitle.empty())
     return false;
 

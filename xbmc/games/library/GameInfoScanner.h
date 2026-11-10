@@ -18,6 +18,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -94,6 +95,10 @@ public:
     bool isFolder{false};
     //! The folder names the game, because it holds only this one
     bool nameFromFolder{false};
+    //! The folder is named like the image whose parts it holds
+    bool folderIsImage{false};
+    //! The folder itself is the game, whatever file in it plays
+    bool folderIsGame{false};
   };
 
   /*!
@@ -103,6 +108,23 @@ public:
    * it lists, and in a folder-per-game layout the folder is the game.
    */
   static std::vector<Entry> GroupEntries(const CFileItemList& items, bool useFolderNames);
+
+  /*!
+   * \brief The folders among a folder's items that are each one game
+   *
+   * An image split into parts is a folder named like the image, a title
+   * unpacked from a console is a folder holding its program in code/, and a
+   * PlayStation 3 disc copied off holds its program in PS3_GAME/USRDIR/. None
+   * holds more games to look for. An update or DLC unpacked the same way is
+   * returned without a path: it is no game, and holds none either.
+   */
+  static std::vector<Entry> FolderGames(const CFileItemList& items, const PlatformInfo& platform);
+
+  /*!
+   * \brief The folder game a file plays, as a scan of the folder above finds it
+   */
+  static std::optional<Entry> FolderGameOf(const std::string& playPath,
+                                           const PlatformInfo& platform);
 
   /*!
    * \brief Build the request a scraper is sent for an entry
