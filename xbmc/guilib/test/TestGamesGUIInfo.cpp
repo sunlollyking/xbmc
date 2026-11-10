@@ -69,6 +69,8 @@ TEST_F(TestGamesGUIInfo, TranslatesRetroPlayerLabels)
             RETROPLAYER_ACHIEVEMENTS_LOGGED_IN);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.HasCheats"), RETROPLAYER_HAS_CHEATS);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.SupportsCheats"), RETROPLAYER_SUPPORTS_CHEATS);
+  EXPECT_EQ(infoManager.TranslateString("RetroPlayer.SupportsSavestates"),
+            RETROPLAYER_SUPPORTS_SAVESTATES);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorTitle"),
             RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE);
   EXPECT_EQ(infoManager.TranslateString("RetroPlayer.AchievementsIndicatorProgress"),
