@@ -576,6 +576,20 @@ void CGameUtils::OpenInsideArchive(CFileItem& item, const std::string& gameClien
   if (db.Open() && !db.GetRomsetsForFile(item.GetPath()).empty())
     return;
 
+  // The emulator the game plays with says which files are games: a readme.txt
+  // is one to the emulators that play text files
+  GameClientPtr client;
+  if (ADDON::AddonPtr addon;
+      !gameClient.empty() &&
+      CServiceBroker::GetAddonMgr().GetAddon(gameClient, addon, ADDON::AddonType::GAMEDLL,
+                                             ADDON::OnlyEnabled::CHOICE_NO))
+    client = std::static_pointer_cast<CGameClient>(addon);
+  const auto isGame = [&client](const std::string& path)
+  {
+    return client ? client->IsExtensionValid(URIUtils::GetExtension(path))
+                  : HasGameExtension(path);
+  };
+
   // An archive holding a single game is that game, as it is when browsing
   std::string gamePath;
   const std::unique_ptr<XFILE::IFileDirectory> directory{
@@ -589,7 +603,7 @@ void CGameUtils::OpenInsideArchive(CFileItem& item, const std::string& gameClien
     std::vector<std::string> games;
     for (const auto& file : files)
     {
-      if (!file->IsFolder() && HasGameExtension(file->GetPath()))
+      if (!file->IsFolder() && isGame(file->GetPath()))
         games.push_back(file->GetPath());
     }
 
@@ -628,7 +642,7 @@ void CGameUtils::OpenInsideArchive(CFileItem& item, const std::string& gameClien
       gamePath = games.front();
   }
   else if (!contents.IsFolder() && contents.GetPath() != archivePath &&
-           HasGameExtension(contents.GetPath()))
+           isGame(contents.GetPath()))
   {
     gamePath = contents.GetPath();
   }
