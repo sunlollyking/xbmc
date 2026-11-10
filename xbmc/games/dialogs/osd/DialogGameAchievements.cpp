@@ -385,9 +385,9 @@ bool CDialogGameAchievements::OnMessage(CGUIMessage& message)
         if (m_fetched && m_fetched->achievements.empty())
         {
           // "RetroAchievements", "This game doesn't support RetroAchievements"
-          CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, Localize(35264),
-                                                Localize(35286), TOAST_DISPLAY_TIME_MS, false,
-                                                TOAST_MESSAGE_TIME_MS);
+          CGUIDialogKaiToast::QueueNotification(
+              CServiceBroker::GetGameServices().GameSettings().GetRAUserPicUrl(), Localize(35264),
+              Localize(35286), TOAST_DISPLAY_TIME_MS, false, TOAST_MESSAGE_TIME_MS);
           Close();
           return true;
         }
