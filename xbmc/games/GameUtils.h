@@ -101,6 +101,18 @@ public:
   static bool HasGameExtension(const std::string& path);
 
   /*!
+   * \brief The extension that says which emulators play a game
+   *
+   * The first part of an image split across a folder, 00, takes the
+   * extension of the image the folder is named after.
+   *
+   * \param path The path of the game file
+   *
+   * \return The extension with its leading dot, or empty if it has none
+   */
+  static std::string GetGameExtension(const std::string& path);
+
+  /*!
    * \brief Get all game extensions
    */
   static std::set<std::string> GetGameExtensions();

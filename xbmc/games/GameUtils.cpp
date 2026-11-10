@@ -733,7 +733,7 @@ void CGameUtils::GetGameClients(const ADDON::VECADDONS& addons,
 {
   bHasVfsGameClient = false;
 
-  const std::string extension = URIUtils::GetExtension(translatedUrl.Get());
+  const std::string extension = GetGameExtension(translatedUrl.Get());
 
   // A game inside an archive is copied out for a client that reads only local
   // files, so it can be offered one
@@ -764,6 +764,17 @@ void CGameUtils::GetGameClients(const ADDON::VECADDONS& addons,
   }
 }
 
+std::string CGameUtils::GetGameExtension(const std::string& path)
+{
+  if (URIUtils::GetFileName(path) == "00")
+  {
+    std::string image = URIUtils::GetDirectory(path);
+    URIUtils::RemoveSlashAtEnd(image);
+    return URIUtils::GetExtension(image);
+  }
+  return URIUtils::GetExtension(path);
+}
+
 bool CGameUtils::HasGameExtension(const std::string& path)
 {
   using namespace ADDON;
@@ -776,7 +787,8 @@ bool CGameUtils::HasGameExtension(const std::string& path)
   std::string filename = CURL(path).GetFileNameWithoutPath();
 
   // Get the file extension
-  std::string extension = URIUtils::GetExtension(filename);
+  std::string extension =
+      filename == "00" ? GetGameExtension(path) : URIUtils::GetExtension(filename);
   if (extension.empty())
     return false;
 
