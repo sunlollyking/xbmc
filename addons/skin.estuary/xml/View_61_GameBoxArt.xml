@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<!--
+		The Wall's grid of boxes, every tile in a platform's listing the shape of that platform's
+		usual case, the box front filling it. Elsewhere the tiles are portrait.
+	-->
+	<include name="View_61_GameBoxArt">
+		<control type="group">
+			<include>OpenClose_Right</include>
+			<left>50</left>
+			<top>0</top>
+			<visible>Control.IsVisible(61)</visible>
+			<include>Visible_Right</include>
+			<control type="panel" id="61">
+				<left>0</left>
+				<top>0</top>
+				<width>98%</width>
+				<height>100%</height>
+				<onleft>9000</onleft>
+				<onright>531</onright>
+				<onup condition="Integer.IsGreater(Container.NumPages,1)">61</onup>
+				<onup condition="!Integer.IsGreater(Container.NumPages,1)">9000</onup>
+				<ondown>61</ondown>
+				<viewtype label="$LOCALIZE[31625]">icon</viewtype>
+				<preloaditems>2</preloaditems>
+				<pagecontrol>531</pagecontrol>
+				<scrolltime tween="cubic" easing="out">500</scrolltime>
+				<visible>Container.Content(games)</visible>
+				<itemlayout height="320" width="300" condition="$EXP[GamePlatformSquare]">
+					<control type="group">
+						<top>120</top>
+						<include>InfoWallGameSquare</include>
+					</control>
+				</itemlayout>
+				<focusedlayout height="320" width="300" condition="$EXP[GamePlatformSquare]">
+					<control type="group">
+						<depth>DepthContentPopout</depth>
+						<animation effect="zoom" start="100" end="110" time="200" tween="sine" easing="inout" center="160,255">Focus</animation>
+						<animation effect="zoom" start="110" end="100" time="200" tween="sine" easing="inout" center="160,255">UnFocus</animation>
+						<top>120</top>
+						<include content="InfoWallGameSquare">
+							<param name="focused" value="true" />
+						</include>
+					</control>
+				</focusedlayout>
+				<itemlayout height="320" width="400" condition="$EXP[GamePlatformLandscape]">
+					<control type="group">
+						<top>120</top>
+						<include>InfoWallGameLandscape</include>
+					</control>
+				</itemlayout>
+				<focusedlayout height="320" width="400" condition="$EXP[GamePlatformLandscape]">
+					<control type="group">
+						<depth>DepthContentPopout</depth>
+						<animation effect="zoom" start="100" end="110" time="200" tween="sine" easing="inout" center="210,255">Focus</animation>
+						<animation effect="zoom" start="110" end="100" time="200" tween="sine" easing="inout" center="210,255">UnFocus</animation>
+						<top>120</top>
+						<include content="InfoWallGameLandscape">
+							<param name="focused" value="true" />
+						</include>
+					</control>
+				</focusedlayout>
+				<itemlayout height="445" width="300" condition="!$EXP[GamePlatformShaped]">
+					<control type="group">
+						<top>120</top>
+						<include>InfoWallGamePortrait</include>
+					</control>
+				</itemlayout>
+				<focusedlayout height="445" width="300" condition="!$EXP[GamePlatformShaped]">
+					<control type="group">
+						<depth>DepthContentPopout</depth>
+						<animation effect="zoom" start="100" end="110" time="200" tween="sine" easing="inout" center="160,300">Focus</animation>
+						<animation effect="zoom" start="110" end="100" time="200" tween="sine" easing="inout" center="160,300">UnFocus</animation>
+						<top>120</top>
+						<include content="InfoWallGamePortrait">
+							<param name="focused" value="true" />
+						</include>
+					</control>
+				</focusedlayout>
+			</control>
+		</control>
+	</include>
+</includes>

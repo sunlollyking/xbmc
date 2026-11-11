@@ -2552,4 +2552,210 @@
 			</control>
 		</control>
 	</include>
+	<!--
+		A platform's games in the library, and the shape of that platform's usual case: square for
+		jewel cases and small cartridge boxes, landscape for N64 and SNES boxes, portrait for the
+		rest. The numbers are the box library's platform ids:
+		square: PlayStation 53, Saturn 49, Dreamcast 45, Neo Geo CD 25, PC Engine CD 23, PC Engine 22,
+		CD-i 39, Mega-CD 44, 3DO 1, Jaguar CD 9, Game Boy 32, Game Boy Color 31, Game Boy Advance 30,
+		DS 28, 3DS 59, Neo Geo Pocket 42, Neo Geo Pocket Color 41, WonderSwan 12, WonderSwan Color 11;
+		landscape: Nintendo 64 27, SNES 54.
+	-->
+	<expression name="GamePlatformView">Container.Content(games) + String.StartsWith(Container.FolderPath,gamedb://platforms/)</expression>
+	<expression name="GamePlatformSquare">$EXP[GamePlatformView] + [String.Contains(Container.FolderPath,gamedb://platforms/53/) | String.Contains(Container.FolderPath,gamedb://platforms/49/) | String.Contains(Container.FolderPath,gamedb://platforms/45/) | String.Contains(Container.FolderPath,gamedb://platforms/25/) | String.Contains(Container.FolderPath,gamedb://platforms/23/) | String.Contains(Container.FolderPath,gamedb://platforms/22/) | String.Contains(Container.FolderPath,gamedb://platforms/39/) | String.Contains(Container.FolderPath,gamedb://platforms/44/) | String.Contains(Container.FolderPath,gamedb://platforms/1/) | String.Contains(Container.FolderPath,gamedb://platforms/9/) | String.Contains(Container.FolderPath,gamedb://platforms/32/) | String.Contains(Container.FolderPath,gamedb://platforms/31/) | String.Contains(Container.FolderPath,gamedb://platforms/30/) | String.Contains(Container.FolderPath,gamedb://platforms/28/) | String.Contains(Container.FolderPath,gamedb://platforms/59/) | String.Contains(Container.FolderPath,gamedb://platforms/42/) | String.Contains(Container.FolderPath,gamedb://platforms/41/) | String.Contains(Container.FolderPath,gamedb://platforms/12/) | String.Contains(Container.FolderPath,gamedb://platforms/11/)]</expression>
+	<expression name="GamePlatformLandscape">$EXP[GamePlatformView] + [String.Contains(Container.FolderPath,gamedb://platforms/27/) | String.Contains(Container.FolderPath,gamedb://platforms/54/)]</expression>
+	<expression name="GamePlatformShaped">$EXP[GamePlatformSquare] | $EXP[GamePlatformLandscape]</expression>
+
+	<!--
+		InfoWallMovieLayout's tile for a game, at any size: a box pw x ph, with its frame (fw x fh =
+		pw+40 x ph+40), focus highlight (hw x hh = pw+48 x ph+48) and overlays placed as the movie
+		tile places them, dy lower.
+	-->
+	<include name="InfoWallGameShapeLayout">
+		<param name="focused">false</param>
+		<param name="dy">0</param>
+		<definition>
+			<control type="group">
+				<top>$PARAM[dy]</top>
+				<control type="group">
+					<visible>String.IsEmpty(ListItem.Art(boxfront)) + String.IsEmpty(ListItem.Art(poster))</visible>
+					<control type="image">
+						<left>15</left>
+						<top>-10</top>
+						<width>$PARAM[fw]</width>
+						<height>$PARAM[fh]</height>
+						<texture>dialogs/dialog-bg-nobo.png</texture>
+						<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+						<bordersize>20</bordersize>
+					</control>
+					<control type="image">
+						<left>15</left>
+						<top>-10</top>
+						<width>$PARAM[fw]</width>
+						<height>$PARAM[fh]</height>
+						<texture colordiffuse="button_focus">colors/grey.png</texture>
+						<bordersize>20</bordersize>
+						<visible>$PARAM[focused]</visible>
+						<include condition="$PARAM[focused]">Animation_FocusTextureFade</include>
+					</control>
+					<control type="image">
+						<left>35</left>
+						<top>10</top>
+						<width>$PARAM[pw]</width>
+						<height>$PARAM[icon_h]</height>
+						<texture>DefaultAddonGame.png</texture>
+						<aspectratio>keep</aspectratio>
+					</control>
+					<control type="textbox">
+						<left>40</left>
+						<top>$PARAM[label_top]</top>
+						<width>$PARAM[label_w]</width>
+						<height>120</height>
+						<font>font27</font>
+						<align>center</align>
+						<aligny>center</aligny>
+						<label>$INFO[ListItem.Label]</label>
+						<autoscroll time="2000" delay="3000" repeat="5000">$PARAM[focused]</autoscroll>
+					</control>
+				</control>
+				<control type="group">
+					<visible>!String.IsEmpty(ListItem.Art(boxfront)) | !String.IsEmpty(ListItem.Art(poster))</visible>
+					<control type="image">
+						<left>11</left>
+						<top>-14</top>
+						<width>$PARAM[hw]</width>
+						<height>$PARAM[hh]</height>
+						<texture colordiffuse="button_focus">colors/grey.png</texture>
+						<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+						<bordersize>20</bordersize>
+						<visible>$PARAM[focused]</visible>
+						<include condition="$PARAM[focused]">Animation_FocusTextureFade</include>
+					</control>
+					<control type="image">
+						<left>15</left>
+						<top>-10</top>
+						<width>$PARAM[fw]</width>
+						<height>$PARAM[fh]</height>
+						<texture background="true">$VAR[GameInfoBoxVar]</texture>
+						<aspectratio>scale</aspectratio>
+						<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+						<bordersize>20</bordersize>
+					</control>
+				</control>
+				<control type="group">
+					<visible>ListItem.IsPlaying | ListItem.IsResumable | Integer.IsGreater(ListItem.Playcount,0)</visible>
+					<control type="image">
+						<left>35</left>
+						<top>$PARAM[fade_top]</top>
+						<width>$PARAM[pw]</width>
+						<height>50</height>
+						<texture colordiffuse="CCFFFFFF">overlays/overlayfade.png</texture>
+						<visible>!String.IsEmpty(ListItem.Art(boxfront)) | !String.IsEmpty(ListItem.Art(poster))</visible>
+					</control>
+					<control type="image">
+						<left>40</left>
+						<top>$PARAM[icon_top]</top>
+						<width>24</width>
+						<height>24</height>
+						<align>left</align>
+						<aligny>center</aligny>
+						<texture>$VAR[ItemTypeIconVar]</texture>
+					</control>
+					<control type="image">
+						<left>$PARAM[status_left]</left>
+						<top>$PARAM[icon_top]</top>
+						<width>24</width>
+						<height>24</height>
+						<texture>$VAR[ItemStatusIconVar]</texture>
+					</control>
+				</control>
+				<control type="group">
+					<left>$PARAM[rating_left]</left>
+					<top>-8</top>
+					<include condition="Skin.HasSetting(circle_rating) | Skin.HasSetting(circle_userrating)">RatingCircle</include>
+				</control>
+				<control type="progress">
+					<left>35</left>
+					<top>$PARAM[progress_top]</top>
+					<width>$PARAM[pw]</width>
+					<height>1</height>
+					<texturebg></texturebg>
+					<midtexture colordiffuse="button_focus" border="3">progress/texturebg_alt_white.png</midtexture>
+					<info>ListItem.PercentPlayed</info>
+					<visible>!Integer.IsEqual(ListItem.PercentPlayed,0)</visible>
+				</control>
+			</control>
+		</definition>
+	</include>
+
+	<!-- Game tiles by case shape, for the Box Art view -->
+	<include name="InfoWallGameSquare">
+		<param name="focused">false</param>
+		<definition>
+			<include content="InfoWallGameShapeLayout">
+				<param name="focused" value="$PARAM[focused]" />
+				<param name="pw" value="250" />
+				<param name="ph" value="250" />
+				<param name="fw" value="290" />
+				<param name="fh" value="290" />
+				<param name="hw" value="298" />
+				<param name="hh" value="298" />
+				<param name="icon_h" value="110" />
+				<param name="label_top" value="119" />
+				<param name="label_w" value="242" />
+				<param name="fade_top" value="210" />
+				<param name="icon_top" value="233" />
+				<param name="status_left" value="254" />
+				<param name="rating_left" value="135" />
+				<param name="progress_top" value="240" />
+				<param name="dy" value="0" />
+			</include>
+		</definition>
+	</include>
+	<include name="InfoWallGameLandscape">
+		<param name="focused">false</param>
+		<definition>
+			<include content="InfoWallGameShapeLayout">
+				<param name="focused" value="$PARAM[focused]" />
+				<param name="pw" value="350" />
+				<param name="ph" value="250" />
+				<param name="fw" value="390" />
+				<param name="fh" value="290" />
+				<param name="hw" value="398" />
+				<param name="hh" value="298" />
+				<param name="icon_h" value="110" />
+				<param name="label_top" value="119" />
+				<param name="label_w" value="342" />
+				<param name="fade_top" value="210" />
+				<param name="icon_top" value="233" />
+				<param name="status_left" value="354" />
+				<param name="rating_left" value="185" />
+				<param name="progress_top" value="240" />
+				<param name="dy" value="0" />
+			</include>
+		</definition>
+	</include>
+	<include name="InfoWallGamePortrait">
+		<param name="focused">false</param>
+		<definition>
+			<include content="InfoWallGameShapeLayout">
+				<param name="focused" value="$PARAM[focused]" />
+				<param name="pw" value="250" />
+				<param name="ph" value="375" />
+				<param name="fw" value="290" />
+				<param name="fh" value="415" />
+				<param name="hw" value="298" />
+				<param name="hh" value="423" />
+				<param name="icon_h" value="235" />
+				<param name="label_top" value="244" />
+				<param name="label_w" value="242" />
+				<param name="fade_top" value="335" />
+				<param name="icon_top" value="358" />
+				<param name="status_left" value="254" />
+				<param name="rating_left" value="135" />
+				<param name="progress_top" value="365" />
+				<param name="dy" value="0" />
+			</include>
+		</definition>
+	</include>
 </includes>
