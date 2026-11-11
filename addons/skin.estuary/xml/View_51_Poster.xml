@@ -126,6 +126,7 @@
 				<texture>colors/black.png</texture>
 				<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
 				<bordersize>20</bordersize>
+				<visible>!String.IsEqual(ListItem.DBType,game)</visible>
 			</control>
 			<control type="image">
 				<left>4</left>
@@ -136,6 +137,21 @@
 				<aspectratio>scale</aspectratio>
 				<texture fallback="DefaultMovies.png" background="true">$VAR[PosterThumbVar]</texture>
 				<visible>!Container.Content(platforms)</visible>
+				<visible>!String.IsEqual(ListItem.DBType,game)</visible>
+			</control>
+			<!-- A game's box, fitted whole and standing on the bottom, where the status
+			     overlays are, with its shadow round the picture -->
+			<control type="image">
+				<top>-16</top>
+				<left>-16</left>
+				<width>516</width>
+				<height>756</height>
+				<fadetime>200</fadetime>
+				<aspectratio align="center" aligny="bottom">keep</aspectratio>
+				<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+				<bordersize>20</bordersize>
+				<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+				<visible>String.IsEqual(ListItem.DBType,game)</visible>
 			</control>
 			<control type="image">
 				<left>4</left>
@@ -216,8 +232,24 @@
 				<width>482</width>
 				<height>721</height>
 				<visible>Control.HasFocus(51)</visible>
+				<visible>!String.IsEqual(ListItem.DBType,game)</visible>
 				<animation effect="fade" time="100">VisibleChange</animation>
 				<texture border="4" infill="false" colordiffuse="button_focus">colors/white.png</texture>
+			</control>
+			<!-- The game's box again, invisible, carrying the focus outline round the picture -->
+			<control type="image">
+				<left>1</left>
+				<top>1</top>
+				<width>482</width>
+				<height>721</height>
+				<visible>Control.HasFocus(51)</visible>
+				<visible>String.IsEqual(ListItem.DBType,game)</visible>
+				<animation effect="fade" time="100">VisibleChange</animation>
+				<colordiffuse>00FFFFFF</colordiffuse>
+				<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+				<aspectratio align="center" aligny="bottom">keep</aspectratio>
+				<bordertexture border="4" infill="false" colordiffuse="button_focus">colors/white.png</bordertexture>
+				<bordersize>3</bordersize>
 			</control>
 			<control type="group">
 				<left>216</left>

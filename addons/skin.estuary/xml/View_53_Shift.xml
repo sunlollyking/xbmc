@@ -156,6 +156,21 @@
 			<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
 			<bordersize>20</bordersize>
 			<visible>!String.IsEmpty(ListItem.Art(poster))</visible>
+			<visible>!String.IsEqual(ListItem.DBType,game)</visible>
+		</control>
+		<!-- A game's box, fitted whole and standing on the bottom, where the status
+		     overlays are, with its shadow round the picture -->
+		<control type="image">
+			<depth>DepthContentPopout</depth>
+			<left>18</left>
+			<top>90</top>
+			<width>334</width>
+			<height>480</height>
+			<aspectratio aligny="bottom">keep</aspectratio>
+			<texture fallback="DefaultAddonGame.png" background="true">$VAR[GameInfoBoxVar]</texture>
+			<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+			<bordersize>20</bordersize>
+			<visible>String.IsEqual(ListItem.DBType,game) + [!String.IsEmpty(ListItem.Art(boxfront)) | !String.IsEmpty(ListItem.Art(poster))]</visible>
 		</control>
 		<control type="textbox">
 			<left>20</left>

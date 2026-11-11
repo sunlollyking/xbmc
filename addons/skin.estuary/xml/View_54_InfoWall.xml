@@ -248,6 +248,7 @@
 		<definition>
 			<control type="group">
 				<visible>String.IsEmpty(ListItem.Art(poster))</visible>
+				<visible>![String.IsEqual(ListItem.DBType,game) + !String.IsEmpty(ListItem.Art(boxfront))]</visible>
 				<control type="image">
 					<left>15</left>
 					<top>-10</top>
@@ -304,6 +305,7 @@
 			</control>
 			<control type="group">
 				<visible>!String.IsEmpty(ListItem.Art(poster))</visible>
+				<visible>!String.IsEqual(ListItem.DBType,game)</visible>
 				<control type="image">
 					<left>11</left>
 					<top>-14</top>
@@ -322,6 +324,35 @@
 					<height>415</height>
 					<texture background="true">$INFO[ListItem.Art(poster)]</texture>
 					<aspectratio>scale</aspectratio>
+					<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
+					<bordersize>20</bordersize>
+				</control>
+			</control>
+			<!-- A game's box runs from a tall carton to a square jewel case, so it is
+			     fitted whole, standing on the row, with its shadow and focus frame
+			     round the picture rather than the tile -->
+			<control type="group">
+				<visible>String.IsEqual(ListItem.DBType,game) + [!String.IsEmpty(ListItem.Art(boxfront)) | !String.IsEmpty(ListItem.Art(poster))]</visible>
+				<control type="image">
+					<left>31</left>
+					<top>6</top>
+					<width>258</width>
+					<height>383</height>
+					<colordiffuse>00FFFFFF</colordiffuse>
+					<texture background="true">$VAR[GameInfoBoxVar]</texture>
+					<aspectratio aligny="bottom">keep</aspectratio>
+					<bordertexture colordiffuse="button_focus">colors/grey.png</bordertexture>
+					<bordersize>4</bordersize>
+					<visible>$PARAM[focused]</visible>
+					<include condition="$PARAM[focused]">Animation_FocusTextureFade</include>
+				</control>
+				<control type="image">
+					<left>15</left>
+					<top>-10</top>
+					<width>290</width>
+					<height>415</height>
+					<texture background="true">$VAR[GameInfoBoxVar]</texture>
+					<aspectratio aligny="bottom">keep</aspectratio>
 					<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
 					<bordersize>20</bordersize>
 				</control>
