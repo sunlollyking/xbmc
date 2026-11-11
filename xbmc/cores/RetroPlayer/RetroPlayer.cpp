@@ -150,7 +150,9 @@ std::string CRetroPlayer::GetBezelForGame(const CFileItem& item)
   if (!db.Open())
     return "";
 
-  const int idGame = db.GetGameIdByFile(item.GetDynPath());
+  // The library knows a zipped game by its archive, not the file inside it
+  // that it is opened as
+  const int idGame = db.GetGameIdByFile(item.GetPath());
   if (idGame <= 0)
     return "";
 
