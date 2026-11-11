@@ -3058,12 +3058,7 @@
           </control>
         </setting>
         <setting id="gamesgeneral.hdrvideofilters" type="boolean" label="35311" help="35312">
-          <requirement>
-            <and>
-              <condition>HAVE_GBM</condition>
-              <condition>HAS_GLES</condition>
-            </and>
-          </requirement>
+          <requirement>HAVE_GBM</requirement>
           <level>2</level>
           <default>false</default>
           <control type="toggle" />
