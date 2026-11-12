@@ -17019,7 +17019,19 @@ msgctxt "#24189"
 msgid "Installing {0:s}"
 msgstr ""
 
-#empty strings from id 24190 to 24990
+#. Event log entry once a video library scan has finished
+#: xbmc/video/VideoInfoScanner.cpp
+msgctxt "#24190"
+msgid "Scan finished: {0:d} added, {1:d} rescanned but already in the library, {2:d} unchanged folders skipped, {3:d} not found, {4:d} failed"
+msgstr ""
+
+#. Event log entry for an item a video library scan couldn't look up
+#: xbmc/video/VideoInfoScanner.cpp
+msgctxt "#24191"
+msgid "Lookup failed for {0:s}: {1:s}"
+msgstr ""
+
+#empty strings from id 24192 to 24990
 
 #. Used as error message in add-on browser when add-on repository data could not be downloaded
 #: xbmc/filesystem/AddonsDirectory.cpp
@@ -19664,7 +19676,7 @@ msgstr ""
 #. Help text for the encore mode setting
 #: system/settings/settings.xml
 msgctxt "#35304"
-msgid "Allow achievements you have already earned to be triggered again.[CR][CR]Applies the next time you load the game."
+msgid "Allow achievements you have already earned to be triggered again."
 msgstr ""
 
 #. Notification shown when hardcore mode refuses something, {0:s} is the feature
@@ -20027,7 +20039,7 @@ msgstr ""
 #. Help text for setting "Enable run-ahead" of label #35378
 #: system/settings/settings.xml
 msgctxt "#35379"
-msgid "Make games respond sooner to the controller by running the emulator ahead and showing a frame from the future. The emulator runs once more for every frame ahead, so this suits 8-bit and 16-bit systems. Emulators with large save states are left alone."
+msgid "Make games respond sooner to the controller by running the emulator ahead and showing a frame from the future. This suits 8-bit and 16-bit systems. Systems with large save states, such as the PlayStation, may slow down."
 msgstr ""
 
 #. Setting for how many frames to run ahead
@@ -20039,7 +20051,7 @@ msgstr ""
 #. Help text for setting "Frames to run ahead" of label #35380
 #: system/settings/settings.xml
 msgctxt "#35381"
-msgid "Each frame removes one frame of delay, as long as the game has that much delay to remove. Start at one, and raise it only if the game still responds late."
+msgid "Each frame removes one frame of delay, as long as the game has that much delay to remove. Going further skips the first frames of each move instead. Start at one, and raise it only if the game still responds late."
 msgstr ""
 
 #. Format for the run-ahead frames slider, e.g. "2 frames"
@@ -20942,7 +20954,14 @@ msgctxt "#35718"
 msgid "Attempt active"
 msgstr ""
 
-#empty strings from id 35719 to 35725
+#. Shown when Encore mode is switched on or off during a game, and under its help text in the game's settings
+#: xbmc/games/addons/cheevos/GameClientCheevos.cpp
+#: addons/skin.estuary/xml/Includes_Games.xml
+msgctxt "#35719"
+msgid "Applies the next time you load the game."
+msgstr ""
+
+#empty strings from id 35720 to 35725
 
 #. Label of the context menu item that sets the video filter for a game or folder
 #: xbmc/games/windows/GUIWindowGames.cpp

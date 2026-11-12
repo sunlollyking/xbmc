@@ -174,6 +174,8 @@ private:
    */
   JoystickMap m_joysticks;
 
+  // A client can set rumble from its own thread
+  std::mutex m_rumbleMutex;
   bool m_holdRumble{false};
   std::map<std::pair<std::string, std::string>, float> m_heldRumble;
 

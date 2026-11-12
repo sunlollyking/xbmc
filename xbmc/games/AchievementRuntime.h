@@ -13,6 +13,7 @@
 #include <functional>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace KODI::GAME
@@ -61,8 +62,22 @@ struct AchievementInfo
    */
   CDateTime unlockedDate;
 
+  /*!
+   * \brief When an achievement that encore re-armed was earned before,
+   *        invalid otherwise
+   */
+  CDateTime previouslyUnlockedDate;
+
   unsigned int points{0};
   bool earned{false};
+
+  /*!
+   * \brief Whether it was earned in hardcore mode
+   *
+   * RetroAchievements counts the modes separately: an achievement earned in
+   * casual mode can still be earned again in hardcore.
+   */
+  bool earnedHardcore{false};
 
   /*!
    * \brief Progress towards the achievement from 0.0 to 100.0, or 0.0 if the
@@ -269,6 +284,7 @@ struct AchievementState
 {
   std::string gameTitle;
   unsigned int gameId{0};
+  std::string gameIconUrl;
   unsigned int totalAchievements{0};
   unsigned int unlockedAchievements{0};
   std::string richPresence;
@@ -332,10 +348,12 @@ public:
    * \param unlockedDate When it was earned. Carried as a date rather than
    *        formatted text so the runtime stays free of locale handling and
    *        the formatting happens where it is displayed.
+   * \param hardcore True if it was earned in hardcore mode
    * \param[out] newlyEarned True if this changed the achievement's state
    */
   AchievementState MarkEarned(unsigned int achievementId,
                               const CDateTime& unlockedDate,
+                              bool hardcore,
                               bool& newlyEarned);
   /*!
    * \brief Record the loaded game's sets, and each achievement's set and type
@@ -448,6 +466,20 @@ public:
   void SetLeaderboardTracker(const LeaderboardTracker& tracker, bool active);
 
   std::vector<LeaderboardTracker> GetLeaderboardTrackers() const;
+
+  /*!
+   * \brief Note a leaderboard attempt starting or ending
+   *
+   * A tracker doesn't say which leaderboard it times, so the skin is given the
+   * names of the attempts running while it is shown.
+   */
+  void SetLeaderboardAttempt(unsigned int leaderboardId, const std::string& title, bool running);
+
+  /*!
+   * \brief The names of the leaderboard attempts running, one per attempt and
+   * empty for an attempt without one
+   */
+  std::vector<std::string> GetLeaderboardAttemptTitles() const;
 
   /*!
    * \brief Replace the leaderboards of the loaded game
@@ -565,6 +597,7 @@ private:
   //! that publishing one cannot drop an attempt already on screen. Usually
   //! empty, and rarely more than one at a time.
   std::vector<LeaderboardTracker> m_trackers;
+  std::vector<std::pair<unsigned int, std::string>> m_attempts;
   unsigned int m_selectedLeaderboard{0};
 
   //! Moved on whenever the signed-in account does, so an answer asked for by

@@ -61,7 +61,7 @@ bool PortConnected(const std::string& platform)
   return connected;
 }
 
-class TestPortManager : public testing::Test
+class TestPortManagerPlatforms : public testing::Test
 {
 protected:
   void SetUp() override { ASSERT_TRUE(XFILE::CDirectory::Create(PROFILE)); }
@@ -69,7 +69,7 @@ protected:
 };
 } // namespace
 
-TEST_F(TestPortManager, KeepsAPortSetupForEachPlatform)
+TEST_F(TestPortManagerPlatforms, KeepsAPortSetupForEachPlatform)
 {
   UnplugInGame("wii");
 
@@ -81,7 +81,7 @@ TEST_F(TestPortManager, KeepsAPortSetupForEachPlatform)
   EXPECT_TRUE(PortConnected(""));
 }
 
-TEST_F(TestPortManager, StartsAPlatformFromTheGameClientsSetup)
+TEST_F(TestPortManagerPlatforms, StartsAPlatformFromTheGameClientsSetup)
 {
   UnplugInGame("");
 

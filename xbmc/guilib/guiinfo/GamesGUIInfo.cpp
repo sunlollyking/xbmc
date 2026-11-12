@@ -25,6 +25,7 @@
 #include "games/GameUtils.h"
 #include "games/addons/GameClient.h"
 #include "games/addons/cheats/GameClientCheats.h"
+#include "games/addons/cheevos/GameClientCheevos.h"
 #include "games/library/GameLibraryTypes.h"
 #include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
@@ -570,6 +571,16 @@ bool CGamesGUIInfo::GetLabel(std::string& value,
       value = AchievementRuntime().GetShownLeaderboardTracker().display;
       return true;
     }
+    case RETROPLAYER_LEADERBOARD_TRACKER_TITLE:
+    {
+      value.clear();
+      // Nothing ties a tracker to a leaderboard, so it's only named while a
+      // single leaderboard is being attempted
+      const std::vector<std::string> titles = AchievementRuntime().GetLeaderboardAttemptTitles();
+      if (titles.size() == 1 && !AchievementRuntime().GetShownLeaderboardTracker().display.empty())
+        value = titles.front();
+      return true;
+    }
     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE:
     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE:
     case RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS:
@@ -704,7 +715,8 @@ bool CGamesGUIInfo::GetBool(bool& value,
     }
     case RETROPLAYER_ACHIEVEMENTS_HARDCORE:
     {
-      value = CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+      const GameClientPtr gameClient = CGameUtils::GetPlayingGameClient();
+      value = gameClient && gameClient->Cheevos().IsHardcoreActive();
       return true;
     }
     default:

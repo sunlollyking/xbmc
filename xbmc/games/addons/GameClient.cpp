@@ -140,6 +140,23 @@ bool CopyWhole(const std::string& from, const std::string& to)
 constexpr const char* GAME_PROPERTY_SUPPORTS_DISC_CONTROL = "supports_disc_control";
 constexpr const char* GAME_PROPERTY_PLATFORMS = "platforms";
 constexpr const char* GAME_PROPERTY_LIBRETRO_CORE = "libretro_core";
+constexpr const char* GAME_PROPERTY_SAVESTATE_FEATURES = "savestate_features";
+
+// Any other value is unknown, which RetroArch treats as deterministic
+CGameClient::SavestateFeatures ParseSavestateFeatures(const std::string& features)
+{
+  using SavestateFeatures = CGameClient::SavestateFeatures;
+  // libretro's core info rates a core without savestates "null"
+  if (features == "null" || features == "disabled")
+    return SavestateFeatures::DISABLED;
+  if (features == "basic")
+    return SavestateFeatures::BASIC;
+  if (features == "serialized")
+    return SavestateFeatures::SERIALIZED;
+  if (features == "deterministic")
+    return SavestateFeatures::DETERMINISTIC;
+  return SavestateFeatures::UNKNOWN;
+}
 
 /*!
  * \brief Holds a hardware-rendering client's context current for a call into it
@@ -232,6 +249,8 @@ CGameClient::CGameClient(const ADDON::AddonInfoPtr& addonInfo)
 
   m_libretroCore =
       addonInfo->Type(AddonType::GAMEDLL)->GetValue(GAME_PROPERTY_LIBRETRO_CORE).asString();
+  m_savestateFeatures = ParseSavestateFeatures(
+      addonInfo->Type(AddonType::GAMEDLL)->GetValue(GAME_PROPERTY_SAVESTATE_FEATURES).asString());
 }
 
 CGameClient::~CGameClient(void)
@@ -1285,6 +1304,40 @@ RestoreResult CGameClient::Deserialize(const uint8_t* data,
   return bSuccess ? RestoreResult::Restored : RestoreResult::StateUncertain;
 }
 
+bool CGameClient::HasSpeculativeStates() const
+{
+  return m_ifc.game->toAddon->SerializeSpeculative != nullptr;
+}
+
+bool CGameClient::SerializeSpeculative(uint8_t* data, size_t size)
+{
+  if (m_ifc.game->toAddon->SerializeSpeculative == nullptr)
+    return Serialize(data, size);
+
+  if (data == nullptr || size == 0)
+    return false;
+
+  std::unique_lock lock(m_critSection);
+  if (!m_bIsPlaying)
+    return false;
+
+  try
+  {
+    // Refusing a state is expected while the client couldn't load it back, so
+    // it isn't logged as an error
+    CClientFrameScope hwScope(Streams());
+    if (hwScope.IsBound())
+      return m_ifc.game->toAddon->SerializeSpeculative(m_ifc.game, data, size) ==
+             GAME_ERROR_NO_ERROR;
+  }
+  catch (...)
+  {
+    LogException("SerializeSpeculative()");
+  }
+
+  return false;
+}
+
 bool CGameClient::RestoreState(const uint8_t* data, size_t size)
 {
   if (data == nullptr || size == 0)
@@ -1298,7 +1351,12 @@ bool CGameClient::RestoreState(const uint8_t* data, size_t size)
   {
     CClientFrameScope hwScope(Streams());
     if (hwScope.IsBound())
+    {
+      if (m_ifc.game->toAddon->DeserializeSpeculative != nullptr)
+        return LogError(m_ifc.game->toAddon->DeserializeSpeculative(m_ifc.game, data, size),
+                        "DeserializeSpeculative()");
       return LogError(m_ifc.game->toAddon->Deserialize(m_ifc.game, data, size), "Deserialize()");
+    }
   }
   catch (...)
   {

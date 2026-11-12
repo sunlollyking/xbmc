@@ -87,6 +87,23 @@ public:
    */
   bool IsBezelShown() const { return m_bezelShown; }
 
+  /*!
+   * \brief Record that the renderer was asked for in the current frame
+   */
+  void SetUsed();
+
+  /*!
+   * \brief Check if the renderer wasn't asked for in the last frame, so its
+   * textures can be released
+   */
+  bool IsUnused() const;
+
+  /*!
+   * \brief Release the frame and textures of a renderer that isn't being drawn,
+   * keeping its compiled shaders for when it's drawn again
+   */
+  void ReleaseTextures();
+
 protected:
   // Protected renderer interface
   virtual bool ConfigureInternal() { return true; }
@@ -145,6 +162,8 @@ private:
 
   uint64_t m_renderFrameCount = 0;
   uint64_t m_lastRender = 0;
+  uint64_t m_lastUse = 0;
+  bool m_texturesReleased = false;
 };
 } // namespace RETRO
 } // namespace KODI

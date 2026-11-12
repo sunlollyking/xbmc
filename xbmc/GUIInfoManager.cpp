@@ -4550,6 +4550,17 @@ constexpr std::array<InfoMap, 88> videoplayer = {{
 ///     @skinning_v23 **[New Boolean Condition]** \link RetroPlayer_AchievementsHardcore `RetroPlayer.AchievementsHardcore`\endlink
 ///     <p>
 ///   }
+///   \table_row3{   <b>`RetroPlayer.LeaderboardTrackerTitle`</b>,
+///                  \anchor RetroPlayer_LeaderboardTrackerTitle
+///                  _string_,
+///     @return The name of the leaderboard being attempted while its value is
+///     shown\, so a skin can say what the value is for\, or an empty string.
+///     With more than one attempt running\, the value can't be matched to one
+///     of them\, so the string is empty.
+///     <p><hr>
+///     @skinning_v23 **[New Infolabel]** \link RetroPlayer_LeaderboardTrackerTitle `RetroPlayer.LeaderboardTrackerTitle`\endlink
+///     <p>
+///   }
 ///   \table_row3{   <b>`RetroPlayer.AchievementsProgress`</b>,
 ///                  \anchor RetroPlayer_AchievementsProgress
 ///                  _string_,
@@ -4726,7 +4737,7 @@ constexpr std::array<InfoMap, 88> videoplayer = {{
 ///
 /// -----------------------------------------------------------------------------
 // clang-format off
-constexpr std::array<InfoMap, 31> retroplayer = {{
+constexpr std::array<InfoMap, 32> retroplayer = {{
     {"title", RETROPLAYER_TITLE},
     {"platform", RETROPLAYER_PLATFORM},
     {"genres", RETROPLAYER_GENRES},
@@ -4744,6 +4755,7 @@ constexpr std::array<InfoMap, 31> retroplayer = {{
     {"achievementschallengetitle", RETROPLAYER_ACHIEVEMENTS_CHALLENGE_TITLE},
     {"achievementschallengebadge", RETROPLAYER_ACHIEVEMENTS_CHALLENGE_BADGE},
     {"leaderboardtracker", RETROPLAYER_LEADERBOARD_TRACKER},
+    {"leaderboardtrackertitle", RETROPLAYER_LEADERBOARD_TRACKER_TITLE},
     {"achievementsindicatortitle", RETROPLAYER_ACHIEVEMENTS_INDICATOR_TITLE},
     {"achievementsindicatorbadge", RETROPLAYER_ACHIEVEMENTS_INDICATOR_BADGE},
     {"achievementsindicatorprogress", RETROPLAYER_ACHIEVEMENTS_INDICATOR_PROGRESS},
@@ -6468,8 +6480,7 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///                  \anchor ListItem_Rating
 ///                  _string_,
 ///     @return The scraped rating of the currently selected item in a container (1-10).
-///     @param name - [opt] you can specify the name of the scraper to retrieve a specific rating\,
-///     for use in dialogvideoinfo.xml.
+///     @param name - [opt] you can specify the name of the scraper to retrieve a specific rating.
 ///     <p><hr>
 ///     @skinning_v18 **[Infolabel Updated]** \link ListItem_Rating `ListItem.Rating([name])`\endlink replaces
 ///     the old `ListItem.Ratings([name])` infolabel.
@@ -6479,6 +6490,8 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///     <p>
 ///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Rating `ListItem.Rating`\endlink extended
 ///     to support games
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Rating `ListItem.Rating(name)`\endlink
+///     filled in library lists and widgets
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.Set`</b>,
@@ -6534,12 +6547,14 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///                  \anchor ListItem_Votes
 ///                  _string_,
 ///     @return The scraped votes of the currently selected movie in a container.
-///     @param name - [opt] you can specify the name of the scraper to retrieve specific votes\,
-///     for use in `dialogvideoinfo.xml`.
+///     @param name - [opt] you can specify the name of the scraper to retrieve specific votes.
 ///     <p><hr>
 ///     @skinning_v17 **[Infolabel Updated]** \link ListItem_Votes `ListItem.Votes([name])`\endlink
 ///     add optional param <b>name</b> to specify the scrapper.
 ///     @skinning_v13 **[New Infolabel]** \link ListItem_Votes `ListItem.Votes`\endlink
+///     <p>
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Votes `ListItem.Votes(name)`\endlink
+///     filled in library lists and widgets
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.RatingAndVotes([name])`</b>,
@@ -6547,12 +6562,15 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///                  _string_,
 ///     @return The scraped rating and votes of the currently selected movie in a
 ///     container (1-10).
-///     @param name - [opt] you can specify the name of the scraper to retrieve specific votes\,
-///     for use in `dialogvideoinfo.xml`.
+///     @param name - [opt] you can specify the name of the scraper to retrieve a specific rating
+///     and votes.
 ///     <p><hr>
 ///     @skinning_v17 **[New Infolabel]** \link ListItem_RatingAndVotes `ListItem.RatingAndVotes([name])`\endlink
 ///     @skinning_v17 **[Infolabel Updated]** \link ListItem_RatingAndVotes `ListItem.RatingAndVotes`\endlink
 ///     now available for albums/songs.
+///     <p>
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_RatingAndVotes
+///     `ListItem.RatingAndVotes(name)`\endlink filled in library lists and widgets
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.Mood`</b>,
@@ -6711,6 +6729,8 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///     <p>
 ///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Tag `ListItem.Tag`\endlink extended
 ///     to support games
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_Tag `ListItem.Tag`\endlink filled in
+///     library lists and widgets
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.Tagline`</b>,
@@ -7827,11 +7847,13 @@ constexpr std::array<InfoMap, 3> container_str = {{
 ///   \table_row3{   <b>`ListItem.UniqueID(name)`</b>,
 ///                  \anchor ListItem_UniqueID
 ///                  _string_,
-///     @return The scraped metadata id of the currently selected item in a container\,
-///     for use in dialogvideoinfo.xml.
+///     @return The scraped metadata id of the currently selected item in a container.
 ///     @param name - the name of the metadata provider.
 ///     <p><hr>
 ///     @skinning_v19 **[New Infolabel]** \link ListItem_UniqueID `ListItem.UniqueID(name)`\endlink
+///     <p>
+///     @skinning_v23 **[Infolabel Updated]** \link ListItem_UniqueID `ListItem.UniqueID(name)`\endlink
+///     filled in library lists and widgets
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`ListItem.BitRate`</b>,

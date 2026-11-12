@@ -44,10 +44,10 @@ public:
   bool ReplaceLabels();
   bool RewindEnabled();
   unsigned int MaxRewindTimeSec();
-  bool RunaheadEnabled() const;
-  unsigned int RunaheadFrames() const;
   bool SyncPlaybackToDisplay();
   double SyncToDisplayLimit();
+  bool RunaheadEnabled() const;
+  unsigned int RunaheadFrames() const;
   std::string GetRAUsername() const;
   std::string GetRAToken() const;
 
@@ -77,14 +77,6 @@ public:
    * which RetroAchievements requires.
    */
   void SetAchievementsHardcore(bool hardcore);
-
-  /*!
-   * \brief Whether hardcore mode is offered to the player
-   *
-   * RetroAchievements decide which clients may earn hardcore unlocks, so the
-   * setting stays hidden until they have approved Kodi.
-   */
-  bool AchievementsHardcoreOffered() const;
 
   /*!
    * \brief Whether achievements already earned can be triggered again
@@ -134,6 +126,7 @@ public:
 
   // Inherited from ISettingCallback
   void OnSettingAction(const std::shared_ptr<const CSetting>& setting) override;
+  bool OnSettingChanging(const std::shared_ptr<const CSetting>& setting) override;
   void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
 
 private:

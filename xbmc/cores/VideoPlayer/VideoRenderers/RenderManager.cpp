@@ -232,6 +232,7 @@ bool CRenderManager::Configure()
     m_clockSync.Reset();
     m_dvdClock.SetVsyncAdjust(0);
     m_overlays.Reset();
+    OVERLAY::MarkDirty();
     m_overlays.SetStereoMode(m_picture.stereoMode);
 
     m_renderState = STATE_CONFIGURED;
@@ -506,6 +507,15 @@ void CRenderManager::DeleteRenderer()
     delete m_pRenderer;
     m_pRenderer = NULL;
   }
+}
+
+bool CRenderManager::CompositeVideoCapture(KODI::RENDERING::CAPTURE::CaptureResult& result)
+{
+  std::unique_lock lock(m_statelock);
+  if (m_renderState != STATE_CONFIGURED || !m_pRenderer)
+    return true;
+
+  return m_pRenderer->CompositeVideoCapture(result);
 }
 
 void CRenderManager::ServiceVideoCaptures()

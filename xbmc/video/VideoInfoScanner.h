@@ -23,6 +23,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 class CAdvancedSettings;
@@ -130,6 +131,19 @@ namespace KODI::VIDEO
      be its own for those already there to be seen.
      */
     void DeferMovieExtras() { m_deferMovieExtras = true; }
+
+    /*! \brief Look the videos up with these scrapers, as CVideoDatabase::GetScraperForPath()
+     cached them, so that the details already read with them are read from their cache.
+     */
+    void UseScrapers(const CVideoDatabase::ScraperCache& scrapers)
+    {
+      m_scraperCache.insert(scrapers.begin(), scrapers.end());
+    }
+
+    /*! \brief Look the movies or tv shows up by these ids with a python scraper, rather than search
+     for them.
+     */
+    void LookUpBy(const ADDON::CScraper::UniqueIDs& uniqueIDs) { m_uniqueIDs = uniqueIDs; }
 
     /*! \brief Add the extras of a refreshed movie: those its discs name, and those of the extras
      folders beside it, which a scan finds as it lists the movie's folders.
@@ -307,8 +321,10 @@ namespace KODI::VIDEO
     EpisodeResult EnumerateSeriesFolder(CFileItem* item, EPISODELIST& episodeList);
     bool ProcessItemByVideoInfoTag(const CFileItem *item, EPISODELIST &episodeList);
 
-    static std::pair<VersionConversionResult, int> ProcessVideoVersion(
-        VideoDbContentType itemType, int dbId, int targetDbId = -1, bool canBecomeDefault = true);
+    std::pair<VersionConversionResult, int> ProcessVideoVersion(VideoDbContentType itemType,
+                                                                int dbId,
+                                                                int targetDbId = -1,
+                                                                bool canBecomeDefault = true);
     static void RemovePartNumberFromTitle(int dbId,
                                           VideoDbContentType itemType,
                                           CVideoDatabase& db);
@@ -338,11 +354,41 @@ namespace KODI::VIDEO
     //! isn't hashed, so that the next scan tries it again.
     unsigned int m_failedLookups{0};
 
+    //! What the scan did, logged once it has finished
+    struct ScanSummary
+    {
+      enum class Type
+      {
+        MOVIE,
+        VERSION, //!< of a movie
+        TV_SHOW,
+        EPISODE,
+        MUSIC_VIDEO
+      };
+
+      struct Item
+      {
+        Type type;
+        std::string path;
+        std::string title; //!< of an item added
+      };
+
+      std::vector<Item> added;
+      std::vector<Item> existing; //!< items in rescanned directories already in the library
+      unsigned int unchangedDirectories{0};
+      std::vector<Item> notFound;
+      std::vector<Item> failed;
+    };
+    ScanSummary m_summary;
+
     SimilarVideoScanAction m_similarVideoAction{SimilarVideoScanAction::NONE};
     bool m_ignoreVideoExtras{false};
 
     //! Whether RetrieveVideoInfo() leaves a movie's extras to AddMovieExtras()
     bool m_deferMovieExtras{false};
+
+    //! The ids RetrieveVideoInfo() looks movies and tv shows up by, where it would otherwise search
+    ADDON::CScraper::UniqueIDs m_uniqueIDs;
 
     //! Whether the folder a movie is in names it (the scraper's "movies are in separate folders")
     bool m_useFolderNames{false};
@@ -357,6 +403,15 @@ namespace KODI::VIDEO
     CVideoInfoScannerExtras m_extras{m_database, m_art};
 
   private:
+    /*!
+     * \brief Count an item that wasn't added in the summary, and log it as an event
+     * \param[in] type What the item is
+     * \param[in] path Path of the item
+     * \param[in] failed Whether its lookup failed, rather than found nothing
+     */
+    void NotAdded(ScanSummary::Type type, const std::string& path, bool failed);
+    void ReportSummary() const;
+
     /*!
      * \brief Remove paths that share missing ancestors with \p directory from the list of paths
      *        to scan
