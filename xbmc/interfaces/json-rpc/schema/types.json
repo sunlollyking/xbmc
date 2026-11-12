@@ -184,7 +184,8 @@
       "pictures",
       "files",
       "programs",
-      "games"
+      "games",
+      "game"
     ]
   },
   "List.Amount": {
@@ -928,8 +929,7 @@
       },
       {
         "type": "object",
-        "description":
-            "A tv episode has a title and may have an episode number, season number and the title of the show it belongs to.",
+        "description": "A tv episode has a title and may have an episode number, season number and the title of the show it belongs to.",
         "properties": {
           "type": {
             "$ref": "Notifications.Item.Type",
@@ -1329,8 +1329,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the (song)genreid/genre, roleid/role or sourceid fields will result in increased response times",
+      "description": "Requesting the (song)genreid/genre, roleid/role or sourceid fields will result in increased response times",
       "enum": [
         "instrument",
         "style",
@@ -1365,8 +1364,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the songgenres, artistid and/or sourceid fields will result in increased response times",
+      "description": "Requesting the songgenres, artistid and/or sourceid fields will result in increased response times",
       "enum": [
         "title",
         "description",
@@ -1412,8 +1410,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the genreid, artistid, albumartistid and/or sourceid fields will result in increased response times",
+      "description": "Requesting the genreid, artistid, albumartistid and/or sourceid fields will result in increased response times",
       "enum": [
         "title",
         "artist",
@@ -1897,8 +1894,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the cast, ratings, showlink, streamdetails, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the cast, ratings, showlink, streamdetails, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "genre",
@@ -1959,8 +1955,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the cast, ratings, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the cast, ratings, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "genre",
@@ -2019,8 +2014,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the cast, ratings, streamdetails, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the cast, ratings, streamdetails, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "plot",
@@ -2061,8 +2055,7 @@
     "extends": "Item.Fields.Base",
     "items": {
       "type": "string",
-      "description":
-          "Requesting the streamdetails, uniqueid and/or tag field will result in increased response times",
+      "description": "Requesting the streamdetails, uniqueid and/or tag field will result in increased response times",
       "enum": [
         "title",
         "playcount",
@@ -2479,8 +2472,7 @@
       },
       "status": {
         "type": "string",
-        "description":
-            "Returns 'returning series', 'in production', 'planned', 'cancelled' or 'ended'"
+        "description": "Returns 'returning series', 'in production', 'planned', 'cancelled' or 'ended'"
       },
       "uniqueid": {
         "$ref": "Media.UniqueID"
@@ -3918,8 +3910,7 @@
       },
       "dynpath": {
         "type": "string",
-        "description":
-            "An experimental property for debug purposes, often same as mediapath but when different gives the actual file playing that should also be in file property"
+        "description": "An experimental property for debug purposes, often same as mediapath but when different gives the actual file playing that should also be in file property"
       },
       "isboxset": {
         "type": "boolean"
@@ -5227,5 +5218,481 @@
       "videos",
       "viewmodes"
     ]
+  },
+  "Game.Fields.Game": {
+    "extends": "Item.Fields.Base",
+    "items": {
+      "type": "string",
+      "enum": [
+        "title",
+        "sorttitle",
+        "originaltitle",
+        "overview",
+        "platform",
+        "platformid",
+        "platformslug",
+        "year",
+        "releasedate",
+        "developers",
+        "publishers",
+        "genres",
+        "collections",
+        "series",
+        "seriesid",
+        "tags",
+        "similar",
+        "modes",
+        "popularity",
+        "spinoff",
+        "characters",
+        "related",
+        "languagesupport",
+        "players",
+        "playersmin",
+        "playersmax",
+        "coop",
+        "coopplayers",
+        "dropin",
+        "splitscreen",
+        "timetobeat",
+        "category",
+        "rating",
+        "votes",
+        "ratings",
+        "agerating",
+        "ageratings",
+        "uniqueid",
+        "releasecount",
+        "releases",
+        "playcount",
+        "playtime",
+        "lastplayed",
+        "dateadded",
+        "userrating",
+        "favourite",
+        "completed",
+        "beaten",
+        "highscores",
+        "achievementstotal",
+        "achievementsearned",
+        "achievementshardcore",
+        "matchedby",
+        "gameclient",
+        "trailer",
+        "manual",
+        "file",
+        "art",
+        "thumbnail",
+        "fanart"
+      ]
+    }
+  },
+  "Game.Rating": {
+    "type": "object",
+    "properties": {
+      "rating": {
+        "type": "number",
+        "required": true
+      },
+      "max": {
+        "type": "number"
+      },
+      "votes": {
+        "type": "integer"
+      },
+      "default": {
+        "type": "boolean"
+      }
+    }
+  },
+  "Game.Ratings": {
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "Game.Rating"
+    }
+  },
+  "Game.AgeRating": {
+    "type": "object",
+    "properties": {
+      "board": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string",
+        "required": true
+      },
+      "descriptors": {
+        "type": "string"
+      }
+    }
+  },
+  "Game.Details.Release": {
+    "type": "object",
+    "properties": {
+      "releaseid": {
+        "$ref": "Library.Id",
+        "required": true
+      },
+      "title": {
+        "type": "string"
+      },
+      "regions": {
+        "$ref": "Array.String"
+      },
+      "languages": {
+        "$ref": "Array.String"
+      },
+      "revision": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string"
+      },
+      "licence": {
+        "type": "string"
+      },
+      "edition": {
+        "type": "string"
+      },
+      "default": {
+        "type": "boolean"
+      },
+      "files": {
+        "$ref": "Array.String"
+      }
+    }
+  },
+  "Game.Details.Game": {
+    "extends": "Media.Details.Base",
+    "properties": {
+      "gameid": {
+        "$ref": "Library.Id",
+        "required": true
+      },
+      "title": {
+        "type": "string"
+      },
+      "sorttitle": {
+        "type": "string"
+      },
+      "originaltitle": {
+        "type": "string"
+      },
+      "overview": {
+        "type": "string"
+      },
+      "platform": {
+        "type": "string"
+      },
+      "platformid": {
+        "$ref": "Library.Id"
+      },
+      "platformslug": {
+        "type": "string"
+      },
+      "year": {
+        "type": "integer"
+      },
+      "releasedate": {
+        "type": "string"
+      },
+      "developers": {
+        "$ref": "Array.String"
+      },
+      "publishers": {
+        "$ref": "Array.String"
+      },
+      "genres": {
+        "$ref": "Array.String"
+      },
+      "collections": {
+        "$ref": "Array.String"
+      },
+      "series": {
+        "type": "string",
+        "description": "The run of games this one belongs to, such as Mario Kart"
+      },
+      "seriesid": {
+        "$ref": "Library.Id"
+      },
+      "tags": {
+        "$ref": "Array.String"
+      },
+      "similar": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Games like this one, by name"
+      },
+      "modes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "How the game can be played, such as single player or split screen"
+      },
+      "popularity": {
+        "type": "object",
+        "properties": {
+          "visits": {
+            "type": "number"
+          },
+          "wanttoplay": {
+            "type": "number"
+          }
+        },
+        "description": "How often the game's page is looked at, and how many want to play it, as IGDB counts them; 0 where unknown"
+      },
+      "spinoff": {
+        "type": "boolean",
+        "description": "Whether the game is a spin-off of its series rather than one of its main games"
+      },
+      "characters": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "thumb": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Who appears in the game, with a picture of each where there is one"
+      },
+      "related": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["remake", "remaster", "port", "dlc", "expansion", "original"]
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Remakes, ports, add-ons and the like of this game, by name"
+      },
+      "languagesupport": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "language": {
+              "type": "string"
+            },
+            "audio": {
+              "type": "boolean"
+            },
+            "subtitles": {
+              "type": "boolean"
+            },
+            "interface": {
+              "type": "boolean"
+            }
+          }
+        },
+        "description": "The languages the game can be played in: spoken, subtitled or in its menus"
+      },
+      "players": {
+        "type": "integer"
+      },
+      "playersmin": {
+        "type": "integer"
+      },
+      "playersmax": {
+        "type": "integer"
+      },
+      "coop": {
+        "type": "boolean"
+      },
+      "coopplayers": {
+        "type": "integer",
+        "description": "Most players at once in co-op on one machine, or 0 if unknown"
+      },
+      "dropin": {
+        "type": "boolean",
+        "description": "Whether a second player can join or leave at any time"
+      },
+      "splitscreen": {
+        "type": "boolean",
+        "description": "Whether players on one machine share the screen split between them"
+      },
+      "timetobeat": {
+        "type": "object",
+        "description": "How long players take to beat the game, in seconds, or 0 where unknown",
+        "properties": {
+          "main": {
+            "type": "integer"
+          },
+          "extras": {
+            "type": "integer"
+          },
+          "complete": {
+            "type": "integer"
+          }
+        }
+      },
+      "category": {
+        "type": "string"
+      },
+      "rating": {
+        "type": "number"
+      },
+      "votes": {
+        "type": "integer"
+      },
+      "ratings": {
+        "$ref": "Game.Ratings"
+      },
+      "agerating": {
+        "type": "string"
+      },
+      "ageratings": {
+        "type": "array",
+        "items": {
+          "$ref": "Game.AgeRating"
+        }
+      },
+      "uniqueid": {
+        "$ref": "Media.UniqueID"
+      },
+      "releasecount": {
+        "type": "integer"
+      },
+      "releases": {
+        "type": "array",
+        "items": {
+          "$ref": "Game.Details.Release"
+        }
+      },
+      "playcount": {
+        "type": "integer"
+      },
+      "playtime": {
+        "type": "integer",
+        "description": "How long the game has been played for, in seconds"
+      },
+      "lastplayed": {
+        "type": "string"
+      },
+      "dateadded": {
+        "type": "string"
+      },
+      "userrating": {
+        "type": "integer"
+      },
+      "favourite": {
+        "type": "boolean"
+      },
+      "completed": {
+        "type": "boolean"
+      },
+      "beaten": {
+        "type": "boolean",
+        "description": "Whether the game has been beaten, which a completed game always has"
+      },
+      "highscores": {
+        "type": "object",
+        "description": "The high scores the game last saved, as it shows them",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "achievementstotal": {
+        "type": "integer"
+      },
+      "achievementsearned": {
+        "type": "integer"
+      },
+      "achievementshardcore": {
+        "type": "integer"
+      },
+      "matchedby": {
+        "type": "string"
+      },
+      "gameclient": {
+        "type": "string"
+      },
+      "trailer": {
+        "type": "string"
+      },
+      "manual": {
+        "type": "string"
+      },
+      "file": {
+        "type": "string"
+      },
+      "art": {
+        "$ref": "Media.Artwork"
+      }
+    }
+  },
+  "Game.Fields.Platform": {
+    "extends": "Item.Fields.Base",
+    "items": {
+      "type": "string",
+      "enum": [
+        "title",
+        "platformslug",
+        "manufacturer",
+        "platformtype",
+        "released",
+        "gamecount",
+        "art",
+        "thumbnail",
+        "fanart"
+      ]
+    }
+  },
+  "Game.Details.Platform": {
+    "extends": "Media.Details.Base",
+    "properties": {
+      "platformid": {
+        "$ref": "Library.Id",
+        "required": true
+      },
+      "title": {
+        "type": "string"
+      },
+      "platformslug": {
+        "type": "string"
+      },
+      "manufacturer": {
+        "type": "string"
+      },
+      "platformtype": {
+        "type": "string"
+      },
+      "released": {
+        "type": "integer"
+      },
+      "gamecount": {
+        "type": "integer"
+      },
+      "art": {
+        "$ref": "Media.Artwork"
+      }
+    }
   }
 }

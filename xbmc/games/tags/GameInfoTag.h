@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "games/library/GameLibraryTypes.h"
+#include "games/library/HighScoreDecoder.h"
 #include "utils/IArchivable.h"
 #include "utils/ISerializable.h"
 #include "utils/ISortable.h"
@@ -15,6 +17,7 @@
 #include <map>
 #include <string>
 #include <vector>
+
 #include <tinyxml2.h>
 
 namespace KODI
@@ -23,6 +26,13 @@ namespace GAME
 {
 /*!
  * \ingroup games
+ *
+ * \brief Everything a list item knows about a game
+ *
+ * Filled by the game client when a game is running, by the library when a
+ * game is listed from it, and by a sidecar file when one sits beside the game.
+ * A tag from the library carries a database ID; one from the other sources
+ * does not.
  */
 class CGameInfoTag : public IArchivable, public ISerializable, public ISortable
 {
@@ -94,36 +104,282 @@ public:
   const std::string& GetGameClient() const { return m_strGameClient; }
   void SetGameClient(const std::string& strGameClient) { m_strGameClient = strGameClient; }
 
-  // Original title
-  const std::string& GetOriginalTitle() const { return m_strOriginalTitle; }
-  void SetOriginalTitle(const std::string& strOriginalTitle)
-  {
-    m_strOriginalTitle = strOriginalTitle;
-  }
+  /*!
+   * \name Library identity
+   *
+   * Present only when the tag was filled from the library.
+   */
+  ///@{
+  int GetDatabaseId() const { return m_databaseId; }
+  void SetDatabaseId(int id) { m_databaseId = id; }
+  bool HasDatabaseId() const { return m_databaseId > 0; }
 
-  // Rating, out of 10. A value outside 0 to 10, or NaN, is ignored.
-  float GetRating() const { return m_rating; }
+  int GetPlatformId() const { return m_platformId; }
+  void SetPlatformId(int id) { m_platformId = id; }
+
+  const std::string& GetPlatformSlug() const { return m_strPlatformSlug; }
+  void SetPlatformSlug(const std::string& slug) { m_strPlatformSlug = slug; }
+
+  int GetDefaultReleaseId() const { return m_defaultReleaseId; }
+  void SetDefaultReleaseId(int id) { m_defaultReleaseId = id; }
+
+  MatchMethod GetMatchMethod() const { return m_matchMethod; }
+  void SetMatchMethod(MatchMethod method) { m_matchMethod = method; }
+  ///@}
+
+  /*!
+   * \name Titles and text
+   */
+  ///@{
+  const std::string& GetSortTitle() const { return m_strSortTitle; }
+  void SetSortTitle(const std::string& title) { m_strSortTitle = title; }
+
+  const std::string& GetOriginalTitle() const { return m_strOriginalTitle; }
+  void SetOriginalTitle(const std::string& title) { m_strOriginalTitle = title; }
+
+  const std::string& GetReleaseDate() const { return m_strReleaseDate; }
+  void SetReleaseDate(const std::string& date) { m_strReleaseDate = date; }
+
+  const std::string& GetTrailer() const { return m_strTrailer; }
+  void SetTrailer(const std::string& url) { m_strTrailer = url; }
+
+  const std::string& GetManual() const { return m_strManual; }
+  void SetManual(const std::string& url) { m_strManual = url; }
+
+  /*! \brief What this dump is, when it is not simply the game: a port, a
+   *         remake, a mod. Empty for the game itself.
+   */
+  const std::string& GetEdition() const { return m_strEdition; }
+  void SetEdition(const std::string& edition) { m_strEdition = edition; }
+  ///@}
+
+  /*!
+   * \name People and groupings
+   *
+   * The single developer and publisher above are kept for the game client
+   * and older sidecars; these lists are what the library stores.
+   */
+  ///@{
+  const std::vector<std::string>& GetDevelopers() const { return m_developers; }
+  void SetDevelopers(const std::vector<std::string>& developers);
+
+  const std::vector<std::string>& GetPublishers() const { return m_publishers; }
+  void SetPublishers(const std::vector<std::string>& publishers);
+
+  const std::vector<std::string>& GetCollections() const { return m_collections; }
+  void SetCollections(const std::vector<std::string>& collections) { m_collections = collections; }
+
+  /*!
+   * \brief The run of games this one belongs to, like "Mario Kart", or empty
+   *
+   * One of the game's collections; a franchise such as "Mario" is wider.
+   */
+  const std::string& GetSeries() const { return m_strSeries; }
+  void SetSeries(const std::string& series) { m_strSeries = series; }
+
+  //! \brief The library's id for the series, or -1
+  int GetSeriesId() const { return m_seriesId; }
+  void SetSeriesId(int id) { m_seriesId = id; }
+
+  //! \brief Whether the game is a spin-off of its series rather than one of its main games
+  bool IsSpinoff() const { return m_spinoff; }
+  void SetSpinoff(bool spinoff) { m_spinoff = spinoff; }
+
+  const std::vector<std::string>& GetTags() const { return m_tags; }
+  void SetTags(const std::vector<std::string>& tags) { m_tags = tags; }
+
+  //! \brief Games like this one, by name, as a catalogue suggests them
+  //! \brief How the game can be played, e.g. "Single player", "Split screen"
+  const std::vector<std::string>& GetModes() const { return m_modes; }
+  void SetModes(const std::vector<std::string>& modes) { m_modes = modes; }
+
+  const std::vector<std::string>& GetSimilar() const { return m_similar; }
+  void SetSimilar(const std::vector<std::string>& similar) { m_similar = similar; }
+
+  //! \brief Remakes, ports, add-ons and the like of this game, by name
+  const std::vector<GameRelation>& GetRelated() const { return m_related; }
+  void SetRelated(const std::vector<GameRelation>& related) { m_related = related; }
+
+  //! \brief The languages the game can be played in, and how
+  const std::vector<GameLanguage>& GetLanguages() const { return m_languages; }
+  void SetLanguages(const std::vector<GameLanguage>& languages) { m_languages = languages; }
+  ///@}
+
+  /*!
+   * \name Play facts
+   */
+  ///@{
+  int GetPlayersMin() const { return m_playersMin; }
+  int GetPlayersMax() const { return m_playersMax; }
+  void SetPlayers(int min, int max);
+
+  // Most players at once, or 0 if unknown
+  unsigned int GetPlayers() const { return static_cast<unsigned int>(m_playersMax); }
+  void SetPlayers(unsigned int players);
+
+  bool IsCoop() const { return m_coop; }
+  void SetCoop(bool coop) { m_coop = coop; }
+
+  //! \brief Whether a second player can join or leave at any time
+  bool IsDropIn() const { return m_dropIn; }
+  void SetDropIn(bool dropIn) { m_dropIn = dropIn; }
+
+  //! \brief Whether players on one machine share the screen split between them
+  bool IsSplitScreen() const { return m_splitScreen; }
+  void SetSplitScreen(bool splitScreen) { m_splitScreen = splitScreen; }
+
+  //! \brief Most players at once in co-op on one machine, or 0 if unknown
+  int GetCoopPlayers() const { return m_coopPlayers; }
+  void SetCoopPlayers(int players) { m_coopPlayers = players; }
+
+  GameCategory GetCategory() const { return m_category; }
+  void SetCategory(GameCategory category) { m_category = category; }
+
+  int GetParentGameId() const { return m_parentGameId; }
+  void SetParentGameId(int id) { m_parentGameId = id; }
+
+  const GameTimeToBeat& GetTimeToBeat() const { return m_timeToBeat; }
+  void SetTimeToBeat(const GameTimeToBeat& timeToBeat) { m_timeToBeat = timeToBeat; }
+
+  const GamePopularity& GetPopularity() const { return m_popularity; }
+  void SetPopularity(const GamePopularity& popularity) { m_popularity = popularity; }
+
+  const std::vector<GameCharacter>& GetCharacters() const { return m_characters; }
+  void SetCharacters(const std::vector<GameCharacter>& characters) { m_characters = characters; }
+  ///@}
+
+  /*!
+   * \name Ratings and identifiers
+   */
+  ///@{
+  const std::map<std::string, GameRating>& GetRatings() const { return m_ratings; }
+  void SetRating(const std::string& type, const GameRating& rating);
+  void SetRatings(const std::map<std::string, GameRating>& ratings, const std::string& defaultType);
+
+  /*!
+   * \brief A rating, scaled to 0-10
+   *
+   * \param type The source, such as "igdbcritic", or empty for the rating to show
+   */
+  GameRating GetRatingDetails(const std::string& type = "") const;
+
+  // Rating, out of 10: the rating to show from a source, or else the one set
+  // here. A value outside 0 to 10, or NaN, is ignored.
+  float GetRating() const;
   void SetRating(float rating)
   {
     if (rating >= 0.0f && rating <= 10.0f)
       m_rating = rating;
   }
+  const std::string& GetDefaultRatingType() const { return m_strDefaultRating; }
 
-  // Most players at once, or 0 if unknown
-  unsigned int GetPlayers() const { return m_players; }
-  void SetPlayers(unsigned int players) { m_players = players; }
+  const std::vector<GameAgeRating>& GetAgeRatings() const { return m_ageRatings; }
+  void SetAgeRatings(const std::vector<GameAgeRating>& ratings) { m_ageRatings = ratings; }
 
-  // Age rating, e.g. "PEGI 12"
-  const std::string& GetAgeRating() const { return m_strAgeRating; }
+  /*!
+   * \brief The age rating to show, e.g. "ESRB E" or "PEGI 12": from the boards
+   *        above, or else the one set here
+   */
+  std::string GetAgeRating() const;
   void SetAgeRating(const std::string& strAgeRating) { m_strAgeRating = strAgeRating; }
 
-  // Trailer
-  const std::string& GetTrailer() const { return m_strTrailer; }
-  void SetTrailer(const std::string& strTrailer) { m_strTrailer = strTrailer; }
+  const std::map<std::string, std::string>& GetUniqueIDs() const { return m_uniqueIds; }
+  void SetUniqueID(const std::string& type, const std::string& value, bool isDefault = false);
+  void SetUniqueIDs(const std::map<std::string, std::string>& ids, const std::string& defaultType);
+  std::string GetUniqueID(const std::string& type = "") const;
+  const std::string& GetDefaultUniqueIDType() const { return m_strDefaultUniqueId; }
+  ///@}
 
-  // Tags
-  const std::vector<std::string>& GetTags() const { return m_tags; }
-  void SetTags(const std::vector<std::string>& tags) { m_tags = tags; }
+  /*!
+   * \name Releases
+   */
+  ///@{
+  const std::vector<GameRelease>& GetReleases() const { return m_releases; }
+  void SetReleases(const std::vector<GameRelease>& releases);
+  const GameRelease* GetDefaultRelease() const;
+
+  /*!
+   * \brief How many releases the game has, known even when they are not loaded
+   */
+  int GetReleaseCount() const { return m_releaseCount; }
+  void SetReleaseCount(int count) { m_releaseCount = count; }
+  ///@}
+
+  /*!
+   * \name The user's own state
+   */
+  ///@{
+  int GetPlayCount() const { return m_playCount; }
+  void SetPlayCount(int count) { m_playCount = count; }
+
+  //! \brief How long the game has been played for, in seconds
+  int GetPlayTime() const { return m_playTime; }
+  void SetPlayTime(int seconds) { m_playTime = seconds; }
+
+  const std::string& GetLastPlayed() const { return m_strLastPlayed; }
+  void SetLastPlayed(const std::string& date) { m_strLastPlayed = date; }
+
+  const std::string& GetDateAdded() const { return m_strDateAdded; }
+  void SetDateAdded(const std::string& date) { m_strDateAdded = date; }
+
+  int GetUserRating() const { return m_userRating; }
+  void SetUserRating(int rating) { m_userRating = rating; }
+
+  bool IsFavourite() const { return m_favourite; }
+  void SetFavourite(bool favourite) { m_favourite = favourite; }
+
+  //! \brief A game the collection asked not to be shown, as a game list may say
+  bool IsHidden() const { return m_hidden; }
+  void SetHidden(bool hidden) { m_hidden = hidden; }
+
+  /*!
+   * \brief When a scraper last described this game, or empty
+   *
+   * Empty means the game is in the library but nothing has described it: the
+   * library was built offline, or the internet was away when it was scanned.
+   * A later scan finishes the job rather than skipping the file.
+   */
+  const std::string& GetLastScraped() const { return m_strLastScraped; }
+  void SetLastScraped(const std::string& when) { m_strLastScraped = when; }
+
+  bool IsCompleted() const { return m_completed; }
+  void SetCompleted(bool completed) { m_completed = completed; }
+
+  //! \brief The high scores the game last saved, as it shows them
+  const HighScoreTable& GetHighScores() const { return m_highScores; }
+  void SetHighScores(const HighScoreTable& scores) { m_highScores = scores; }
+
+  //! \brief Whether the game has been beaten, which a completed game always has
+  bool IsBeaten() const { return m_beaten || m_completed; }
+  void SetBeaten(bool beaten) { m_beaten = beaten; }
+
+  int GetAchievementsTotal() const { return m_achievementsTotal; }
+  int GetAchievementsEarned() const { return m_achievementsEarned; }
+  int GetAchievementsHardcore() const { return m_achievementsHardcore; }
+  void SetAchievements(int total, int earned, int hardcore);
+  bool HasAchievements() const { return m_achievementsTotal > 0; }
+
+  const std::string& GetLastUnlock() const { return m_strLastUnlock; }
+  void SetLastUnlock(const std::string& date) { m_strLastUnlock = date; }
+  ///@}
+
+  /*!
+   * \brief Write this game to an XML element, and read one back
+   *
+   * The shape a game NFO takes, and what a library export is made of. Only
+   * what a person or another library could act on is written: the database
+   * ids a game holds are meaningless anywhere but the library that issued
+   * them, while the unique ids from the catalogues travel.
+   */
+  void Save(tinyxml2::XMLNode* node, const char* tag) const;
+
+  /*!
+   * \brief Read a game from an XML element
+   *
+   * A field absent from the element leaves what the tag already holds, so a
+   * hand-written NFO can say one thing and leave the rest to the scraper.
+   */
+  bool Load(const tinyxml2::XMLElement* element);
 
   void Archive(CArchive& ar) override;
   void Serialize(CVariant& value) const override;
@@ -144,12 +400,77 @@ private:
   std::string m_strFormat;
   std::string m_strCartridgeType;
   std::string m_strGameClient;
+
+  // Library identity
+  int m_databaseId;
+  int m_platformId;
+  std::string m_strPlatformSlug;
+  int m_defaultReleaseId;
+  MatchMethod m_matchMethod;
+
+  // Titles and text
+  std::string m_strSortTitle;
   std::string m_strOriginalTitle;
-  float m_rating;
-  unsigned int m_players;
-  std::string m_strAgeRating;
+  std::string m_strReleaseDate;
   std::string m_strTrailer;
+  std::string m_strManual;
+  std::string m_strEdition;
+
+  // People and groupings
+  std::vector<std::string> m_developers;
+  std::vector<std::string> m_publishers;
+  std::vector<std::string> m_collections;
+  std::string m_strSeries;
+  int m_seriesId{-1};
+  bool m_spinoff{false};
   std::vector<std::string> m_tags;
+  std::vector<std::string> m_similar;
+  std::vector<std::string> m_modes;
+  std::vector<GameRelation> m_related;
+  std::vector<GameLanguage> m_languages;
+
+  // Play facts
+  int m_playersMin;
+  int m_playersMax;
+  bool m_coop;
+  bool m_dropIn{false};
+  bool m_splitScreen{false};
+  int m_coopPlayers{0};
+  GameCategory m_category;
+  int m_parentGameId;
+  GameTimeToBeat m_timeToBeat;
+  GamePopularity m_popularity;
+  std::vector<GameCharacter> m_characters;
+
+  // Ratings and identifiers
+  std::map<std::string, GameRating> m_ratings;
+  std::string m_strDefaultRating;
+  float m_rating;
+  std::vector<GameAgeRating> m_ageRatings;
+  std::string m_strAgeRating;
+  std::map<std::string, std::string> m_uniqueIds;
+  std::string m_strDefaultUniqueId;
+
+  // Releases
+  std::vector<GameRelease> m_releases;
+  int m_releaseCount;
+
+  // The user's own state
+  int m_playCount;
+  int m_playTime;
+  std::string m_strLastPlayed;
+  std::string m_strDateAdded;
+  int m_userRating;
+  bool m_favourite;
+  bool m_hidden{false};
+  std::string m_strLastScraped;
+  bool m_completed;
+  bool m_beaten{false};
+  HighScoreTable m_highScores;
+  int m_achievementsTotal;
+  int m_achievementsEarned;
+  int m_achievementsHardcore;
+  std::string m_strLastUnlock;
 };
 } // namespace GAME
 } // namespace KODI

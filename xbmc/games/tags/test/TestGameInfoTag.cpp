@@ -122,3 +122,17 @@ TEST(TestGameInfoTag, IgnoresARatingOutsideZeroToTen)
   tag.SetRating(0.0f);
   EXPECT_EQ(tag.GetRating(), 0.0f);
 }
+
+TEST(TestGameInfoTag, ACompletedGameHasBeenBeaten)
+{
+  CGameInfoTag tag;
+  EXPECT_FALSE(tag.IsBeaten());
+
+  tag.SetCompleted(true);
+  EXPECT_TRUE(tag.IsBeaten());
+
+  tag.SetCompleted(false);
+  tag.SetBeaten(true);
+  EXPECT_TRUE(tag.IsBeaten());
+  EXPECT_FALSE(tag.IsCompleted());
+}

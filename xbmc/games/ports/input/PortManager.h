@@ -37,6 +37,19 @@ public:
 
   void SetControllerTree(const CControllerTree& controllerTree);
   void LoadXML();
+
+  /*!
+   * \brief Use the port setup kept for one platform
+   *
+   * A game client that plays several platforms, as Dolphin plays GameCube and
+   * Wii games, keeps a setup for each. A platform without one yet starts from
+   * the setup already loaded, and changes are saved as that platform's.
+   *
+   * \param platform The platform's slug, e.g. "wii"
+   * \param defaults The ports as they are before any setup is loaded
+   */
+  void UsePlatform(const std::string& platform, const CControllerTree& defaults);
+
   void SaveXMLAsync();
   void Clear();
 
@@ -82,6 +95,7 @@ private:
   static bool HasState(const CControllerNode& controller);
 
   CControllerTree m_controllerTree;
+  std::string m_profilePath;
   std::string m_xmlPath;
 
   std::vector<std::future<void>> m_saveFutures;

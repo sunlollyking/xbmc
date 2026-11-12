@@ -20,20 +20,28 @@
 #include "dialogs/GUIDialogProgress.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
+#include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
 #include "filesystem/FileDirectoryFactory.h"
+#include "filesystem/GameDatabaseDirectory.h"
+#include "games/ContextMenus.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
 #include "games/GameUtils.h"
 #include "games/database/GameDatabase.h"
+#include "games/dialogs/GUIDialogGameContentSettings.h"
+#include "games/dialogs/GUIDialogGameInfo.h"
+#include "games/library/GameLibraryQueue.h"
 #include "games/library/GameNameParser.h"
 #include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
 #include "input/actions/ActionIDs.h"
+#include "interfaces/AnnouncementManager.h"
 #include "media/MediaLockState.h"
 #include "messaging/ApplicationMessenger.h"
+#include "messaging/helpers/DialogOKHelper.h"
 #include "playlists/PlayListFileItemClassify.h"
 #include "playlists/PlayListTypes.h"
 #include "resources/LocalizeStrings.h"
@@ -48,6 +56,12 @@
 #include <algorithm>
 
 using namespace KODI;
+
+namespace
+{
+// The values the games library select-action setting stores, which are Kodi's
+// own action ids so the setting reads the same as the video one
+} // namespace
 using namespace GAME;
 using KODI::MEDIA::MediaSection;
 
@@ -85,14 +99,35 @@ bool CGUIWindowGames::OnMessage(CGUIMessage& message)
 {
   switch (message.GetMessage())
   {
+    case GUI_MSG_WINDOW_DEINIT:
+    {
+      if (m_thumbLoader.IsLoading())
+        m_thumbLoader.StopThread();
+      break;
+    }
     case GUI_MSG_WINDOW_INIT:
     {
       m_rootDir.AllowNonLocalSources(true);
 
       // Is this the first time the window is opened?
-      if (m_vecItems->GetPath() == "?" && message.GetStringParam().empty())
-        message.SetStringParam(
-            CMediaSourceSettings::GetInstance().GetDefaultSource(MediaSection::GAMES));
+      const std::string& destination = message.GetStringParam();
+      if (StringUtils::EqualsNoCase(destination, "files"))
+      {
+        message.SetStringParam("sources://games/");
+      }
+      else if (StringUtils::EqualsNoCase(destination, "library"))
+      {
+        message.SetStringParam("gamedb://platforms/");
+      }
+      else if (m_vecItems->GetPath() == "?" && destination.empty())
+      {
+        // The library, once it has anything in it; the files otherwise
+        CGameDatabase db;
+        if (db.Open() && db.HasContent())
+          message.SetStringParam("gamedb://platforms/");
+        else
+          message.SetStringParam(CMediaSourceSettings::GetInstance().GetDefaultSource(MediaSection::GAMES));
+      }
 
       m_dlgProgress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(
           WINDOW_DIALOG_PROGRESS);
@@ -126,8 +161,14 @@ bool CGUIWindowGames::OnClickMsg(int controlId, int actionId)
   {
     case ACTION_DELETE_ITEM:
     {
+      if (pItem->HasProperty("gameid") && !pItem->HasProperty("releaseid"))
+      {
+        OnRemoveFromLibrary(iItem);
+        return true;
+      }
       // Is delete allowed?
-      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+      if (!pItem->HasProperty("releaseid") &&
+          CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
               CSettings::SETTING_FILELISTS_ALLOWFILEDELETION))
       {
         OnDeleteItem(iItem);
@@ -151,6 +192,12 @@ bool CGUIWindowGames::OnClickMsg(int controlId, int actionId)
         if (pItem->HasAddonInfo())
         {
           CGUIDialogAddonInfo::ShowForItem(pItem);
+          return true;
+        }
+        if (pItem->HasProperty("gameid"))
+        {
+          if (CGUIDialogGameInfo::ShowFor(pItem))
+            PlayGame(*pItem);
           return true;
         }
       }
@@ -182,9 +229,12 @@ bool CGUIWindowGames::OnClick(int iItem, const std::string& player /* = "" */)
   CFileItemPtr item = m_vecItems->Get(iItem);
   if (item)
   {
-    if (!item->IsFolder())
+    // A playlist is opened, not played, and a new one is made in the editor
+    if (!item->IsFolder() && !PLAYLIST::IsSmartPlayList(*item) && !PLAYLIST::IsPlayList(*item) &&
+        !URIUtils::IsProtocol(item->GetPath(), "newsmartplaylist"))
     {
-      PlayGame(*item);
+      if (!CGameUtils::OnSelect(item))
+        PlayGame(*item);
       return true;
     }
   }
@@ -205,21 +255,61 @@ void CGUIWindowGames::GetContextButtons(int itemNumber, CContextButtons& buttons
     }
     else
     {
-      if (CanPlay(*item))
+      // A library game's Play comes first in the menu, from the context menu manager
+      if (CanPlay(*item) && !CONTEXTMENU::CGamePlay().IsVisible(*item))
       {
         buttons.Add(CONTEXT_BUTTON_PLAY_ITEM, 208); // Play
       }
 
-      // Offered on folders as well as games: setting one on a folder is the
-      // point, and a game only overrides the folder it sits in
-      if (item->IsFolder() || CanPlay(*item))
+      // A machine in the library is where the emulator and the picture belong;
+      // a single game may still override what its machine chose
+      if (item->HasProperty("platformid") || (!item->IsFolder() && CanPlay(*item)))
       {
         buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_EMULATOR, 35510); // "Default emulator"
+        buttons.Add(CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER, 35726); // "Default video filter"
       }
 
-      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-              CSettings::SETTING_FILELISTS_ALLOWFILEDELETION) &&
-          !item->IsReadOnly())
+      // A smart playlist is edited where it is listed, as video and music do
+      if (PLAYLIST::IsSmartPlayList(*item) || PLAYLIST::IsSmartPlayList(*m_vecItems))
+        buttons.Add(CONTEXT_BUTTON_EDIT_SMART_PLAYLIST, 586); // "Edit smart playlist"
+
+      // A shelf of the library can be described again, which is how games a
+      // catalogue did not know when they were scanned are picked up later
+      if (item->IsFolder() && URIUtils::IsProtocol(item->GetPath(), "gamedb"))
+        buttons.Add(CONTEXT_BUTTON_REFRESH_THUMBS, 184); // "Refresh"
+
+      // A library game has an information dialog and can be described again
+      if (item->HasProperty("gameid") && !item->HasProperty("releaseid"))
+      {
+        buttons.Add(CONTEXT_BUTTON_INFO, 19033); // "Information"
+        buttons.Add(CONTEXT_BUTTON_REFRESH_THUMBS, 184); // "Refresh"
+        if (item->HasGameInfoTag() && item->GetGameInfoTag()->GetReleaseCount() > 1)
+          buttons.Add(CONTEXT_BUTTON_CHOOSE_GAME_VERSION, 35761); // "Choose version"
+      }
+
+      // A version of a library game can be made the one that plays
+      if (item->HasProperty("releaseid") && !item->GetProperty("isdefaultrelease").asBoolean())
+        buttons.Add(CONTEXT_BUTTON_SET_DEFAULT, 35551); // "Set as default version"
+
+      // A folder of games is given its platform, scraper, emulator and filter in one place
+      if (item->IsFolder() && !m_vecItems->IsPlugin() && !URIUtils::IsProtocol(item->GetPath(), "gamedb"))
+      {
+        buttons.Add(CONTEXT_BUTTON_SET_CONTENT, 20333); // "Set content"
+        CGameDatabase db;
+        if (db.Open() && db.GetPlatformIdForPath(item->GetPath()) > 0)
+          buttons.Add(CONTEXT_BUTTON_SCAN, 35540); // "Scan to library"
+      }
+
+      // A library game is taken out of the library, as a film is; deleting or
+      // renaming its file would leave the library pointing at nothing
+      if (item->HasProperty("gameid") && !item->HasProperty("releaseid"))
+      {
+        buttons.Add(CONTEXT_BUTTON_DELETE, 646); // "Remove from library"
+      }
+      else if (!item->HasProperty("releaseid") &&
+               CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+                   CSettings::SETTING_FILELISTS_ALLOWFILEDELETION) &&
+               !item->IsReadOnly())
       {
         buttons.Add(CONTEXT_BUTTON_DELETE, 117);
         buttons.Add(CONTEXT_BUTTON_RENAME, 118);
@@ -251,11 +341,79 @@ bool CGUIWindowGames::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
       case CONTEXT_BUTTON_SET_DEFAULT_EMULATOR:
         CGameUtils::ChooseAndSetDefaultGameClient(*item);
         return true;
-      case CONTEXT_BUTTON_INFO:
-        CGUIDialogAddonInfo::ShowForItem(item);
+      case CONTEXT_BUTTON_SET_DEFAULT_VIDEO_FILTER:
+        CGameUtils::ChooseAndSetDefaultVideoFilter(*item);
         return true;
+      case CONTEXT_BUTTON_SET_CONTENT:
+      {
+        bool scanNow = false;
+        if (CGUIDialogGameContentSettings::Show(item->GetPath(), scanNow) && scanNow)
+          CGameLibraryQueue::GetInstance().ScanLibrary(item->GetPath());
+        return true;
+      }
+      case CONTEXT_BUTTON_SCAN:
+        CGameLibraryQueue::GetInstance().ScanLibrary(item->GetPath());
+        return true;
+      case CONTEXT_BUTTON_REFRESH_THUMBS:
+      {
+        if (item->HasProperty("gameid"))
+        {
+          CGameLibraryQueue::GetInstance().RefreshGame(
+              static_cast<int>(item->GetProperty("gameid").asInteger()), true);
+          return true;
+        }
+
+        // A folder of the library: every game under it, asked about again
+        CFileItemList games;
+        if (XFILE::CDirectory::GetDirectory(item->GetPath(), games, "", XFILE::DIR_FLAG_DEFAULTS))
+        {
+          std::vector<int> ids;
+          for (const auto& game : games)
+          {
+            const int idGame = static_cast<int>(game->GetProperty("gameid").asInteger());
+            if (idGame > 0)
+              ids.emplace_back(idGame);
+          }
+          if (!ids.empty())
+            CGameLibraryQueue::GetInstance().RefreshGames(std::move(ids));
+        }
+        return true;
+      }
+      case CONTEXT_BUTTON_CHOOSE_GAME_VERSION:
+        ChooseVersionAndPlay(static_cast<int>(item->GetProperty("gameid").asInteger()));
+        return true;
+      case CONTEXT_BUTTON_SET_DEFAULT:
+      {
+        CGameDatabase db;
+        if (db.Open() &&
+            db.SetDefaultRelease(static_cast<int>(item->GetProperty("gameid").asInteger()),
+                                 static_cast<int>(item->GetProperty("releaseid").asInteger())))
+          Refresh(true);
+        return true;
+      }
+      case CONTEXT_BUTTON_INFO:
+        if (item->HasProperty("gameid"))
+        {
+          if (CGUIDialogGameInfo::ShowFor(item))
+            PlayGame(*item);
+        }
+        else
+          CGUIDialogAddonInfo::ShowForItem(item);
+        return true;
+      case CONTEXT_BUTTON_EDIT_SMART_PLAYLIST:
+      {
+        // The path is copied because opening the editor destroys our items
+        const std::string playlist =
+            PLAYLIST::IsSmartPlayList(*item) ? item->GetPath() : m_vecItems->GetPath();
+        if (CGUIDialogSmartPlaylistEditor::EditPlaylist(playlist, "games"))
+          Refresh(true);
+        return true;
+      }
       case CONTEXT_BUTTON_DELETE:
-        OnDeleteItem(itemNumber);
+        if (item->HasProperty("gameid"))
+          OnRemoveFromLibrary(itemNumber);
+        else
+          OnDeleteItem(itemNumber);
         return true;
       case CONTEXT_BUTTON_RENAME:
         OnRenameItem(itemNumber);
@@ -272,6 +430,23 @@ bool CGUIWindowGames::OnAddMediaSource()
   return CGUIDialogMediaSource::ShowAndAddMediaSource(MediaSection::GAMES);
 }
 
+bool CGUIWindowGames::Update(const std::string& strDirectory, bool updateFilterPath /* = true */)
+{
+  if (m_thumbLoader.IsLoading())
+    m_thumbLoader.StopThread();
+
+  if (!CGUIMediaWindow::Update(strDirectory, updateFilterPath))
+    return false;
+
+  // Games carry no artwork of their own: nothing scrapes them and the add-ons
+  // that run them describe the emulator rather than the game. What a collection
+  // does have is images sitting beside the files, so a platform folder shows
+  // the system it holds and a game shows its own cover.
+  m_thumbLoader.Load(*m_vecItems);
+
+  return true;
+}
+
 bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemList& items)
 {
   if (!CGUIMediaWindow::GetDirectory(strDirectory, items))
@@ -281,6 +456,11 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
   for (int i = 0; i < items.Size(); ++i)
   {
     CFileItemPtr item = items[i];
+    // A game the library knows is one game, whatever it is packed in. Neo Geo
+    // and the arcade sets are zips, and turning those into folders means
+    // choosing a game lists the ROMs inside it rather than opening the game.
+    if (item->HasGameInfoTag() && item->GetGameInfoTag()->GetDatabaseId() > 0)
+      continue;
     if (item->IsFolder() || !item->IsFileFolder(FileFolderType::ALWAYS))
       continue;
 
@@ -302,7 +482,8 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
 
       // Check if file folder contains games or subfolders
       if (std::ranges::any_of(fileFolderItems,
-                              [](const CFileItemPtr& fileFolderItem) {
+                              [](const CFileItemPtr& fileFolderItem)
+                              {
                                 return fileFolderItem->IsFolder() ||
                                        CGameUtils::HasGameExtension(fileFolderItem->GetPath());
                               }))
@@ -327,14 +508,32 @@ bool CGUIWindowGames::GetDirectory(const std::string& strDirectory, CFileItemLis
   }
 
   // Set label
+  if (URIUtils::PathEquals(items.GetPath(), "special://gameplaylists/", true))
+  {
+    const auto newPlaylist = std::make_shared<CFileItem>("newsmartplaylist://games", false);
+    newPlaylist->SetLabel(
+        CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(21437));
+    newPlaylist->SetArt("icon", "DefaultAddSource.png");
+    newPlaylist->SetLabelPreformatted(true);
+    items.Add(newPlaylist);
+    items.SetLabel(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(136)); // "Playlists"
+  }
+
   std::string label;
   if (items.GetLabel().empty())
   {
-    std::string source;
-    if (m_rootDir.IsSource(items.GetPath(),
-                           &CMediaSourceSettings::GetInstance().GetSources(MediaSection::GAMES),
-                           &source))
-      label = std::move(source);
+    if (URIUtils::IsProtocol(items.GetPath(), "gamedb"))
+    {
+      label = XFILE::CGameDatabaseDirectory::GetLabel(items.GetPath());
+    }
+    else
+    {
+      std::string source;
+      if (m_rootDir.IsSource(items.GetPath(),
+                             &CMediaSourceSettings::GetInstance().GetSources(MediaSection::GAMES),
+                             &source))
+        label = std::move(source);
+    }
   }
 
   if (!label.empty())
@@ -417,7 +616,63 @@ void CGUIWindowGames::OnItemInfo(int itemNumber)
     if (item->IsPlugin() || item->IsScript())
       CGUIDialogAddonInfo::ShowForItem(item);
   }
+}
 
+void CGUIWindowGames::OnRemoveFromLibrary(int itemNumber)
+{
+  CFileItemPtr item = m_vecItems->Get(itemNumber);
+  if (!item)
+    return;
+
+  if (CGameLibraryQueue::GetInstance().IsRunning())
+  {
+    MESSAGING::HELPERS::ShowOKDialogText(CVariant{257}, CVariant{14057});
+    return;
+  }
+
+  const std::string question = StringUtils::Format(
+      CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(433), item->GetLabel());
+  if (!CGUIDialogYesNo::ShowAndGetInput(CVariant{646}, CVariant{question}))
+    return;
+
+  const int idGame = static_cast<int>(item->GetProperty("gameid").asInteger());
+  CGameDatabase db;
+  if (!db.Open() || !db.DeleteGame(idGame))
+    return;
+
+  CVariant data;
+  data["id"] = idGame;
+  data["type"] = "game";
+  CServiceBroker::GetAnnouncementManager()->Announce(ANNOUNCEMENT::GameLibrary, "OnRemove", data);
+
+  Refresh(true);
+}
+
+void CGUIWindowGames::ChooseVersionAndPlay(int idGame)
+{
+  CFileItemList versions;
+  if (!XFILE::CDirectory::GetDirectory("gamedb://titles/" + std::to_string(idGame) + "/", versions,
+                                       "", XFILE::DIR_FLAG_DEFAULTS) ||
+      versions.IsEmpty())
+    return;
+
+  auto* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
+  if (dialog == nullptr)
+    return;
+
+  dialog->Reset();
+  dialog->SetHeading(CVariant{35761}); // "Choose version"
+  dialog->SetItems(versions);
+  for (int i = 0; i < versions.Size(); ++i)
+  {
+    if (versions[i]->GetProperty("isdefaultrelease").asBoolean())
+      dialog->SetSelected(i);
+  }
+  dialog->Open();
+
+  if (dialog->IsConfirmed() && dialog->GetSelectedFileItem())
+    PlayGame(*dialog->GetSelectedFileItem());
 }
 
 bool CGUIWindowGames::PlayGame(const CFileItem& item)
@@ -444,7 +699,8 @@ bool CGUIWindowGames::PlayGame(const CFileItem& item)
 
 bool CGUIWindowGames::CanPlay(const CFileItem& item) const
 {
-  if (item.IsGame())
+  // A platform's folder carries game details too, but only a game is played
+  if (item.IsGame() && !item.IsFolder())
     return true;
 
   if (item.IsFolder())

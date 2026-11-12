@@ -70,7 +70,8 @@ static const translateType types[] = {
     {CGUIDialogSmartPlaylistEditor::TYPE_MUSICVIDEOS, MEDIA::CONTENT::MUSICVIDEOS, 20389},
     {CGUIDialogSmartPlaylistEditor::TYPE_MOVIES, MEDIA::CONTENT::MOVIES, 20342},
     {CGUIDialogSmartPlaylistEditor::TYPE_TVSHOWS, MEDIA::CONTENT::TVSHOWS, 20343},
-    {CGUIDialogSmartPlaylistEditor::TYPE_EPISODES, MEDIA::CONTENT::EPISODES, 20360}};
+    {CGUIDialogSmartPlaylistEditor::TYPE_EPISODES, MEDIA::CONTENT::EPISODES, 20360},
+    {CGUIDialogSmartPlaylistEditor::TYPE_GAMES, MEDIA::CONTENT::GAMES, 35545}};
 
 CGUIDialogSmartPlaylistEditor::CGUIDialogSmartPlaylistEditor(void)
     : CGUIDialog(WINDOW_DIALOG_SMART_PLAYLIST_EDITOR, "SmartPlaylistEditor.xml")
@@ -173,6 +174,8 @@ bool CGUIDialogSmartPlaylistEditor::OnMessage(CGUIMessage& message)
             PLAYLIST_TYPE type = ConvertType(m_playlist.GetType());
             if (type == TYPE_SONGS || type == TYPE_ALBUMS || type == TYPE_ARTISTS)
               m_mode = "music";
+            else if (type == TYPE_GAMES)
+              m_mode = "games";
             else
               m_mode = "video";
           }
@@ -359,11 +362,10 @@ void CGUIDialogSmartPlaylistEditor::OnOrder()
   CGUIDialogSelect* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
   dialog->Reset();
   for (auto order: orders)
-    dialog->Add(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
-        SortUtils::GetSortLabel(order)));
+    dialog->Add(PLAYLIST::CSmartPlaylistRule::GetLocalizedOrder(order, m_playlist.GetType()));
   dialog->SetHeading(CVariant{ 21429 });
-  dialog->SetSelected(CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
-      SortUtils::GetSortLabel(m_playlist.m_orderField)));
+  dialog->SetSelected(
+      PLAYLIST::CSmartPlaylistRule::GetLocalizedOrder(m_playlist.m_orderField, m_playlist.GetType()));
   dialog->Open();
   int newSelected = dialog->GetSelectedItem();
   if (!dialog->IsConfirmed() || newSelected < 0 || orders[newSelected] == m_playlist.m_orderField)
@@ -489,7 +491,8 @@ void CGUIDialogSmartPlaylistEditor::UpdateButtons()
   {
     CFileItemPtr item(new CFileItem("", false));
     item->SetLabel(
-        std::static_pointer_cast<PLAYLIST::CSmartPlaylistRule>(rule)->GetLocalizedRule());
+        std::static_pointer_cast<PLAYLIST::CSmartPlaylistRule>(rule)->GetLocalizedRule(
+            m_playlist.GetType()));
     m_ruleLabels->Add(item);
   }
   CFileItemPtr item(new CFileItem("", false));
@@ -510,9 +513,8 @@ void CGUIDialogSmartPlaylistEditor::UpdateButtons()
                        CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(21431));
   }
 
-  SET_CONTROL_LABEL2(CONTROL_ORDER_FIELD,
-                     CServiceBroker::GetResourcesComponent().GetLocalizeStrings().Get(
-                         SortUtils::GetSortLabel(m_playlist.m_orderField)));
+  SET_CONTROL_LABEL2(CONTROL_ORDER_FIELD, PLAYLIST::CSmartPlaylistRule::GetLocalizedOrder(
+                                             m_playlist.m_orderField, m_playlist.GetType()));
   SET_CONTROL_LABEL2(CONTROL_TYPE, GetLocalizedType(ConvertType(m_playlist.GetType())));
 
   // setup groups
@@ -671,6 +673,10 @@ std::vector<CGUIDialogSmartPlaylistEditor::PLAYLIST_TYPE> CGUIDialogSmartPlaylis
     allowedTypes.push_back(TYPE_EPISODES);
     allowedTypes.push_back(TYPE_MUSICVIDEOS);
     allowedTypes.push_back(TYPE_MIXED);
+  }
+  else if (mode == "games")
+  {
+    allowedTypes.push_back(TYPE_GAMES);
   }
   return allowedTypes;
 }

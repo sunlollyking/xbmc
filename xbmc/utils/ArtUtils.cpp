@@ -93,8 +93,8 @@ void FillInDefaultIcon(CFileItem& item)
         // Live TV Channel
         item.SetArt(ART::TYPE::ICON, ART::DEFAULT::TV_SHOWS);
       }
-      else if (URIUtils::IsArchive(item.GetPath()))
-      { // archive
+      else if (URIUtils::IsArchive(item.GetPath()) && !item.HasGameInfoTag())
+      { // archive, unless it is a zipped game
         item.SetArt(ART::TYPE::ICON, ART::DEFAULT::FILE);
       }
       else if (item.IsUsablePVRRecording())
@@ -141,6 +141,14 @@ void FillInDefaultIcon(CFileItem& item)
       else if (item.IsFavourite())
       {
         item.SetArt(ART::TYPE::ICON, ART::DEFAULT::FAVOURITES);
+      }
+      else if (item.HasGameInfoTag())
+      {
+        // Deliberately not CFileItem::IsGame(), which asks the binary add-on
+        // cache and can reach for the repository list -- far too much to do
+        // for every item of every listing, and it needs a service broker this
+        // is called without.
+        item.SetArt("icon", "DefaultAddonGame.png");
       }
       else
       {

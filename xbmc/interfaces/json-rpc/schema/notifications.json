@@ -633,6 +633,136 @@
     ],
     "returns": null
   },
+  "GameLibrary.OnScanStarted": {
+    "type": "notification",
+    "description": "Scanning the game library has been started.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnScanFinished": {
+    "type": "notification",
+    "description": "Scanning the game library has been finished.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnCleanStarted": {
+    "type": "notification",
+    "description": "Cleaning the game library has been started.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnCleanFinished": {
+    "type": "notification",
+    "description": "Cleaning the game library has been finished.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "null",
+        "required": true
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnUpdate": {
+    "type": "notification",
+    "description": "A game has been updated.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "object",
+        "required": true,
+        "properties": {
+          "id": {
+            "$ref": "Library.Id",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "game",
+              "platform"
+            ],
+            "required": true
+          }
+        }
+      }
+    ],
+    "returns": null
+  },
+  "GameLibrary.OnRemove": {
+    "type": "notification",
+    "description": "A game has been removed.",
+    "params": [
+      {
+        "name": "sender",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data",
+        "type": "object",
+        "required": true,
+        "properties": {
+          "id": {
+            "$ref": "Library.Id",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "game",
+              "platform"
+            ],
+            "required": true
+          }
+        }
+      }
+    ],
+    "returns": null
+  },
   "Files.OnPlayCountChanged": {
     "type": "notification",
     "description": "The play count of a file has changed, in or outside the library.",

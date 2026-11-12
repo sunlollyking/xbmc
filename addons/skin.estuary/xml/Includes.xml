@@ -22,11 +22,16 @@
 	<include file="View_500_Wall.xml" />
 	<include file="View_501_Banner.xml" />
 	<include file="View_502_FanArt.xml" />
+	<include file="View_56_GameDetails.xml" />
+	<include file="View_57_GameShelf.xml" />
+	<include file="View_60_GameSpines.xml" />
+	<include file="View_58_GameScreens.xml" />
+	<include file="View_59_GameMachines.xml" />
 	<include file="View_504_MediaList.xml" />
 	<include file="Variables.xml" />
 	<include condition="Integer.IsLessOrEqual(System.ScreenHeight,720)" file="Constants_720.xml" />
 	<include condition="Integer.IsGreater(System.ScreenHeight,720)" file="Constants_1080.xml" />
-	<expression name="infodialog_active">Window.IsActive(musicinformation) | Window.IsActive(songinformation) | Window.IsActive(movieinformation) | Window.IsActive(addoninformation) | Window.IsActive(pvrguideinfo) | Window.IsActive(pvrrecordinginfo) | Window.IsActive(pictureinfo) | Window.IsVisible(script-embuary-video.xml) | Window.IsVisible(script-embuary-person.xml) | Window.IsVisible(script-embuary-image.xml)</expression>
+	<expression name="infodialog_active">Window.IsActive(musicinformation) | Window.IsActive(songinformation) | Window.IsActive(movieinformation) | Window.IsActive(addoninformation) | Window.IsActive(pvrguideinfo) | Window.IsActive(pvrrecordinginfo) | Window.IsActive(pictureinfo) | Window.IsActive(gameinformation) | Window.IsVisible(script-embuary-video.xml) | Window.IsVisible(script-embuary-person.xml) | Window.IsVisible(script-embuary-image.xml)</expression>
 	<expression name="sidebar_visible">ControlGroup(9000).HasFocus | Control.HasFocus(6130) | Control.HasFocus(6131)</expression>
 	<expression name="videoasset_true">Container.Content(videoassets) | Container.Content(videoversions) | Container.Content(videoextras)</expression>
 	<include name="CommonScrollbars">
