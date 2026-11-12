@@ -248,6 +248,14 @@ private:
   std::shared_ptr<CRenderBezel> GetBezel();
 
   void CheckFlush();
+
+  /*!
+   * \brief Release the textures of renderers nothing draws any more, such as
+   * a filter preview that has scrolled off screen
+   *
+   * Called on the rendering thread with m_oldRenderersMutex held.
+   */
+  void ReleaseUnusedTextures();
   void DestroyContextInternal();
 
   /*!

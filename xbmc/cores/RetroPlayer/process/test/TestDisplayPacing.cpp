@@ -26,217 +26,73 @@ double Micros(Clock::duration duration)
 {
   return std::chrono::duration<double, std::micro>(duration).count();
 }
-
-// Takes a frame at each of the first count refreshes, returning the last
-Clock::time_point TakeFrames(CDisplayPacing& pacing, int count)
-{
-  Clock::time_point when;
-  for (int i = 0; i < count; ++i)
-  {
-    when = START + i * REFRESH;
-    pacing.OnFrameTaken(when);
-  }
-  return when;
-}
 } // namespace
 
-TEST(TestDisplayPacing, MeasuresTheRefreshThroughJitter)
+TEST(TestDisplayPacing, TakesTheIntervalFromTheRefreshRate)
 {
   CDisplayPacing pacing;
+  pacing.SetRefreshRateSource([] { return 60.0; });
+  pacing.OnFrameTaken(START);
 
-  Clock::time_point when;
-  for (int i = 0; i < 120; ++i)
-  {
-    // Up to 1 ms late, as a busy rendering thread takes them
-    when = START + i * REFRESH + std::chrono::microseconds((i * 7919) % 1000);
-    pacing.OnFrameTaken(when);
-  }
-
-  EXPECT_NEAR(Micros(pacing.Interval(when)), Micros(REFRESH), 10.0);
+  EXPECT_NEAR(Micros(pacing.Interval(START)), Micros(REFRESH), 1.0);
 }
 
-TEST(TestDisplayPacing, CountsARefreshThatTookNoFrame)
+TEST(TestDisplayPacing, HasNoIntervalWithoutARefreshRate)
 {
   CDisplayPacing pacing;
+  pacing.OnFrameTaken(START);
+  EXPECT_EQ(pacing.Interval(START), Clock::duration::zero());
 
-  Clock::time_point when;
-  for (int i = 0; i < 60; ++i)
-  {
-    if (i == 40)
-      continue;
-    when = START + i * REFRESH;
-    pacing.OnFrameTaken(when);
-  }
-
-  EXPECT_NEAR(Micros(pacing.Interval(when)), Micros(REFRESH), 1.0);
+  // As the display's reference clock reports while the display changes mode
+  pacing.SetRefreshRateSource([] { return -1.0; });
+  EXPECT_EQ(pacing.Interval(START), Clock::duration::zero());
 }
 
-TEST(TestDisplayPacing, IgnoresASecondFrameInTheSameRefresh)
+TEST(TestDisplayPacing, HasNoIntervalBeforeAFrameIsTaken)
 {
   CDisplayPacing pacing;
+  pacing.SetRefreshRateSource([] { return 60.0; });
 
-  Clock::time_point when = TakeFrames(pacing, 40);
-  pacing.OnFrameTaken(when + 1ms);
+  EXPECT_EQ(pacing.Interval(START), Clock::duration::zero());
+}
 
-  EXPECT_NEAR(Micros(pacing.Interval(when + 1ms)), Micros(REFRESH), 1.0);
+TEST(TestDisplayPacing, FollowsAChangeOfRefreshRateAtOnce)
+{
+  CDisplayPacing pacing;
+  double refreshRate = 60.0;
+  pacing.SetRefreshRateSource([&refreshRate] { return refreshRate; });
+  pacing.OnFrameTaken(START);
+
+  refreshRate = 50.0;
+  EXPECT_NEAR(Micros(pacing.Interval(START)), 20'000.0, 1.0);
 }
 
 TEST(TestDisplayPacing, PredictsTheNextFrameAfterNow)
 {
   CDisplayPacing pacing;
-  const Clock::time_point last = TakeFrames(pacing, 40);
+  pacing.SetRefreshRateSource([] { return 60.0; });
+  pacing.OnFrameTaken(START);
 
-  EXPECT_NEAR(Micros(pacing.NextTake(last + REFRESH / 5) - last), Micros(REFRESH), 1.0);
-  EXPECT_NEAR(Micros(pacing.NextTake(last + REFRESH * 5 / 2) - last), Micros(REFRESH * 3), 1.0);
+  EXPECT_NEAR(Micros(pacing.NextTake(START + 5ms) - START), Micros(REFRESH), 1.0);
+  EXPECT_NEAR(Micros(pacing.NextTake(START + REFRESH + 1ms) - START), Micros(2 * REFRESH), 1.0);
 }
 
 TEST(TestDisplayPacing, StopsWhenFramesStopBeingTaken)
 {
   CDisplayPacing pacing;
-  const Clock::time_point last = TakeFrames(pacing, 40);
+  pacing.SetRefreshRateSource([] { return 60.0; });
+  pacing.OnFrameTaken(START);
 
-  EXPECT_NE(pacing.Interval(last + REFRESH), Clock::duration::zero());
-  EXPECT_EQ(pacing.Interval(last + REFRESH * 4), Clock::duration::zero());
+  EXPECT_NE(pacing.Interval(START + 2 * REFRESH), Clock::duration::zero());
+  EXPECT_EQ(pacing.Interval(START + 4 * REFRESH), Clock::duration::zero());
 }
 
-TEST(TestDisplayPacing, NeedsARunOfFramesBeforeAnInterval)
+TEST(TestDisplayPacing, IgnoresASecondFrameInTheSameRefresh)
 {
   CDisplayPacing pacing;
+  pacing.SetRefreshRateSource([] { return 60.0; });
+  pacing.OnFrameTaken(START);
+  pacing.OnFrameTaken(START + 1ms);
 
-  const Clock::time_point last = TakeFrames(pacing, 20);
-  EXPECT_EQ(pacing.Interval(last), Clock::duration::zero());
-}
-
-TEST(TestDisplayPacing, StartsAgainAfterALongGap)
-{
-  CDisplayPacing pacing;
-  const Clock::time_point last = TakeFrames(pacing, 40);
-
-  const Clock::time_point resumed = last + 500ms;
-  pacing.OnFrameTaken(resumed);
-  EXPECT_EQ(pacing.Interval(resumed), Clock::duration::zero());
-
-  Clock::time_point when;
-  for (int i = 1; i <= 31; ++i)
-  {
-    when = resumed + i * REFRESH;
-    pacing.OnFrameTaken(when);
-  }
-  EXPECT_NEAR(Micros(pacing.Interval(when)), Micros(REFRESH), 1.0);
-}
-
-TEST(TestDisplayPacing, KeepsTheIntervalThroughAnIrregularGap)
-{
-  CDisplayPacing pacing;
-  Clock::time_point when = TakeFrames(pacing, 120);
-
-  // A stall that isn't a whole number of refreshes, then a few regular frames
-  when += REFRESH * 5 / 2;
-  pacing.OnFrameTaken(when);
-  for (int i = 0; i < 10; ++i)
-  {
-    when += REFRESH;
-    pacing.OnFrameTaken(when);
-  }
-
-  EXPECT_NEAR(Micros(pacing.Interval(when)), Micros(REFRESH), 1.0);
-}
-
-TEST(TestDisplayPacing, IsNotSkewedByUnevenFramesAtTheStart)
-{
-  CDisplayPacing pacing;
-
-  // Opening a game takes frames unevenly before it settles
-  Clock::time_point when = START;
-  for (const auto gap : {90ms, 40ms, 70ms, 25ms})
-  {
-    when += gap;
-    pacing.OnFrameTaken(when);
-  }
-  for (int i = 0; i < 60; ++i)
-  {
-    when += REFRESH;
-    pacing.OnFrameTaken(when);
-  }
-
-  EXPECT_NEAR(Micros(pacing.Interval(when)), Micros(REFRESH), 1.0);
-}
-
-namespace
-{
-// Takes count frames from when at the given refresh, returning the last
-Clock::time_point TakeFramesAt(CDisplayPacing& pacing,
-                               Clock::time_point when,
-                               std::chrono::nanoseconds refresh,
-                               int count)
-{
-  for (int i = 0; i < count; ++i)
-  {
-    when += refresh;
-    pacing.OnFrameTaken(when);
-  }
-  return when;
-}
-} // namespace
-
-TEST(TestDisplayPacing, FollowsTheScreenToAHigherRefreshRate)
-{
-  CDisplayPacing pacing;
-  Clock::time_point when = TakeFrames(pacing, 1000);
-
-  when = TakeFramesAt(pacing, when, REFRESH / 2, 400);
-
-  EXPECT_NEAR(Micros(pacing.Interval(when)), Micros(REFRESH / 2), 1.0);
-}
-
-TEST(TestDisplayPacing, FollowsTheScreenToALowerRefreshRate)
-{
-  CDisplayPacing pacing;
-  Clock::time_point when = TakeFramesAt(pacing, START, REFRESH / 2, 1000);
-
-  // Every other refresh of the old rate, which a run at that rate takes for a
-  // refresh that passed without a frame
-  when = TakeFramesAt(pacing, when, REFRESH, 700);
-
-  EXPECT_NEAR(Micros(pacing.Interval(when)), Micros(REFRESH), 1.0);
-}
-
-TEST(TestDisplayPacing, FollowsASmallChangeInTheRefreshRate)
-{
-  CDisplayPacing pacing;
-  Clock::time_point when = TakeFrames(pacing, 1000);
-
-  // Close enough to the old rate for each gap to pass as a refresh
-  when = TakeFramesAt(pacing, when, 20ms, 700);
-
-  EXPECT_NEAR(Micros(pacing.Interval(when)), 20'000.0, 1.0);
-}
-
-TEST(TestDisplayPacing, ShowsEachFrameOnceAtTheGamesRate)
-{
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(REFRESH, 59.92, 0.02), 1);
-}
-
-TEST(TestDisplayPacing, ShowsEachFrameTwiceOnADoubleRateScreen)
-{
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(REFRESH / 2, 60.0, 0.02), 2);
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(REFRESH / 2, 59.92, 0.02), 2);
-}
-
-TEST(TestDisplayPacing, DoesNotPaceWhenTheSpeedWouldChangeTooMuch)
-{
-  // 144 Hz is 72 Hz shown twice, 20% fast for a 60 fps game
-  const auto refresh144 = std::chrono::nanoseconds(6'944'444);
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(refresh144, 60.0, 0.02), 0);
-
-  // A 50 Hz screen is 17% slow for a 60 fps game
-  const auto refresh50 = std::chrono::nanoseconds(20'000'000);
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(refresh50, 60.0, 0.02), 0);
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(refresh50, 60.0, 0.2), 1);
-}
-
-TEST(TestDisplayPacing, DoesNotPaceAGameFasterThanTheScreen)
-{
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(REFRESH, 120.0, 0.02), 0);
-  EXPECT_EQ(CDisplayPacing::RefreshesPerFrame(Clock::duration::zero(), 60.0, 0.02), 0);
+  EXPECT_NEAR(Micros(pacing.NextTake(START + 2ms) - START), Micros(REFRESH), 1.0);
 }

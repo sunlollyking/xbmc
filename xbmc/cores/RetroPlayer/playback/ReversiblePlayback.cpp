@@ -24,6 +24,7 @@
 #include "games/GameSettings.h"
 #include "games/GameUtils.h"
 #include "games/addons/GameClient.h"
+#include "games/addons/cheevos/GameClientCheevos.h"
 #include "games/addons/disc/GameClientDiscModel.h"
 #include "games/addons/disc/GameClientDiscs.h"
 #include "games/addons/input/GameClientInput.h"
@@ -52,15 +53,10 @@ namespace
  * cheats to be unavailable while hardcore is on. Saving a state is still
  * allowed, and so is fast forward.
  */
-bool HardcoreRestrictionsApply()
+bool HardcoreRestrictionsApply(GAME::CGameClient& gameClient)
 {
-  return CServiceBroker::GetGameServices().GameSettings().GetAchievementsHardcore();
+  return gameClient.Cheevos().IsHardcoreActive();
 }
-
-// Every run-ahead frame takes one state and puts it back, so the cost follows
-// the state size. States up to 1 MB were measured holding full speed three
-// frames ahead; an 11.5 MB state fell below full speed at one.
-constexpr size_t MAX_RUNAHEAD_STATE_SIZE = 2 * 1024 * 1024;
 } // namespace
 
 CReversiblePlayback::CReversiblePlayback(GAME::CGameClient* gameClient,
@@ -187,7 +183,7 @@ void CReversiblePlayback::SeekTimeMs(unsigned int timeMs)
     // RewindFrames() without passing through SetSpeed(). Reachable from
     // JSON-RPC and the Python player API, so it is guarded in its own right
     // rather than relying on the buffer being empty.
-    if (HardcoreRestrictionsApply())
+    if (HardcoreRestrictionsApply(*m_gameClient))
     {
       CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Refusing to seek backwards in hardcore mode");
       GAME::CGameUtils::NotifyBlockedByHardcore(35309); // "Rewind"
@@ -412,7 +408,7 @@ bool CReversiblePlayback::LoadSavestate(const std::string& savestatePath)
   // Every route that loads a state comes through here - the in-game dialog,
   // JSON-RPC, the Python player API - so hardcore is answered once, rather
   // than at each caller. Creating a state is still allowed.
-  if (HardcoreRestrictionsApply())
+  if (HardcoreRestrictionsApply(*m_gameClient))
   {
     CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Refusing to load a savestate in hardcore mode");
     GAME::CGameUtils::NotifyBlockedByHardcore(35308); // "Loading save states"
@@ -554,7 +550,10 @@ void CReversiblePlayback::FrameEvent()
   {
     if (const unsigned int runaheadFrames = PrepareRunahead(); runaheadFrames > 0)
     {
-      runaheadState = RunaheadFrame(runaheadFrames);
+      if (m_runaheadHeld)
+        RunHeldFrame();
+      else
+        runaheadState = RunaheadFrame(runaheadFrames);
       if (m_restoreFailed)
         return;
     }
@@ -573,7 +572,11 @@ void CReversiblePlayback::FrameEvent()
 unsigned int CReversiblePlayback::PrepareRunahead()
 {
   if (m_runaheadReset.exchange(false))
+  {
     m_runaheadStatus = RunaheadStatus::Ready;
+    m_runaheadRestoreChecked = false;
+    m_runaheadHeld = false;
+  }
 
   const unsigned int frames = m_runaheadFrames;
   if (frames == 0 || m_runaheadStatus == RunaheadStatus::Failed || m_gameLoop.GetSpeed() != 1.0)
@@ -597,22 +600,40 @@ unsigned int CReversiblePlayback::PrepareRunahead()
     return 0;
   }
 
-  const size_t memorySize = m_gameClient->GetSerializeSize();
-  if (memorySize == 0)
-    return 0;
-
-  // Refused rather than attempted, because a client that cannot keep up just
-  // runs slowly, which looks like a broken emulator
-  if (memorySize > MAX_RUNAHEAD_STATE_SIZE)
+  // Run-ahead restores a state every frame, which only works if running on
+  // from a restored state gives the same frames. libretro's core info says
+  // which cores do, and RetroArch holds run-ahead off for the rest.
+  using SavestateFeatures = GAME::CGameClient::SavestateFeatures;
+  const SavestateFeatures savestateFeatures = m_gameClient->GetSavestateFeatures();
+  if (savestateFeatures != SavestateFeatures::UNKNOWN &&
+      savestateFeatures != SavestateFeatures::DETERMINISTIC)
   {
-    if (m_runaheadStatus != RunaheadStatus::StateTooLarge)
+    if (m_runaheadStatus != RunaheadStatus::NotDeterministic)
     {
-      m_runaheadStatus = RunaheadStatus::StateTooLarge;
-      CLog::Log(LOGINFO, "RetroPlayer[SAVE]: Run-ahead held off: state is {} bytes, limit is {}",
-                memorySize, MAX_RUNAHEAD_STATE_SIZE);
+      m_runaheadStatus = RunaheadStatus::NotDeterministic;
+      CLog::Log(LOGINFO,
+                "RetroPlayer[SAVE]: Run-ahead held off: {} rates its states below deterministic",
+                m_gameClient->ID());
     }
     return 0;
   }
+
+  // Sound the client sends from its own thread can't be matched to a frame, so
+  // the sound of frames that are rolled back would be heard
+  if (m_streamManager.AudioSentOffFrameThread())
+  {
+    if (m_runaheadStatus != RunaheadStatus::AudioOffFrameThread)
+    {
+      m_runaheadStatus = RunaheadStatus::AudioOffFrameThread;
+      CLog::Log(LOGINFO,
+                "RetroPlayer[SAVE]: Run-ahead held off: {} sends sound from its own thread",
+                m_gameClient->ID());
+    }
+    return 0;
+  }
+
+  if (m_gameClient->GetSerializeSize() == 0)
+    return 0;
 
   return frames;
 }
@@ -631,11 +652,21 @@ const uint8_t* CReversiblePlayback::RunaheadFrame(unsigned int frames)
   m_gameClient->RunFrame(false);
 
   m_runaheadState.resize(memorySize);
-  const bool serialized = m_gameClient->Serialize(m_runaheadState.data(), memorySize);
+  const bool serialized = m_gameClient->SerializeSpeculative(m_runaheadState.data(), memorySize);
   bool ranAhead = serialized;
   bool restored = true;
 
-  if (serialized)
+  // A client that can't load back the state it saved would only find out after
+  // the frames ahead, past the real frame. Asked now, nothing has moved yet.
+  bool restoresState = true;
+  if (serialized && !m_runaheadRestoreChecked)
+  {
+    restoresState = m_gameClient->RestoreState(m_runaheadState.data(), memorySize);
+    m_runaheadRestoreChecked = restoresState;
+    ranAhead = restoresState;
+  }
+
+  if (serialized && restoresState)
   {
     unsigned int ran = 0;
 
@@ -672,19 +703,40 @@ const uint8_t* CReversiblePlayback::RunaheadFrame(unsigned int frames)
     return nullptr;
   }
 
+  // A client may refuse a state it couldn't load back yet, such as while a tape
+  // is loading. This frame's picture is lost, and the next ones run as they are
+  // until it gives one.
+  if (!serialized)
+  {
+    CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Run-ahead held off: the client refused a state");
+    m_runaheadHeld = true;
+    return nullptr;
+  }
+
   if (!ranAhead)
   {
     // A client that turned out not to support them is held off instead
     if (m_gameClient->SupportsSpeculativeFrames())
     {
       CLog::Log(LOGERROR, "RetroPlayer[SAVE]: Run-ahead disabled: client failed to {}",
-                serialized ? "run a speculative frame" : "serialize its state");
+                !restoresState ? "restore its state" : "run a speculative frame");
       m_runaheadStatus = RunaheadStatus::Failed;
     }
     return nullptr;
   }
 
   return m_runaheadState.data();
+}
+
+void CReversiblePlayback::RunHeldFrame()
+{
+  m_gameClient->RunFrame(false);
+
+  const size_t memorySize = m_gameClient->GetSerializeSize();
+  m_runaheadState.resize(memorySize);
+  m_runaheadHeld = !m_gameClient->SerializeSpeculative(m_runaheadState.data(), memorySize);
+  if (!m_runaheadHeld)
+    CLog::Log(LOGDEBUG, "RetroPlayer[SAVE]: Run-ahead resumed");
 }
 
 void CReversiblePlayback::UpdateRunahead()
@@ -745,7 +797,10 @@ void CReversiblePlayback::AddFrame(const uint8_t* runaheadState /* = nullptr */)
     const auto started =
         measure ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
 
-    if (runaheadState != nullptr && m_runaheadState.size() == m_memoryStream->FrameSize())
+    // A state saved for run-ahead may only be one the client can load back
+    // that way, and rewind loads its states as ordinary ones
+    if (runaheadState != nullptr && m_runaheadState.size() == m_memoryStream->FrameSize() &&
+        !m_gameClient->HasSpeculativeStates())
     {
       std::memcpy(m_memoryStream->BeginFrame(), runaheadState, m_runaheadState.size());
       serialized = true;
@@ -976,7 +1031,8 @@ void CReversiblePlayback::UpdateMemoryStream()
 
   // Hardcore forbids rewind, so the buffer isn't allocated at all. It costs a
   // fraction of the savestate size for every frame of the rewind window.
-  const bool rewindEnabled = gameSettings.RewindEnabled() && !HardcoreRestrictionsApply();
+  const bool rewindEnabled =
+      gameSettings.RewindEnabled() && !HardcoreRestrictionsApply(*m_gameClient);
   const size_t memorySize = rewindEnabled ? m_gameClient->GetSerializeSize() : 0;
 
   if (rewindEnabled && memorySize > 0)

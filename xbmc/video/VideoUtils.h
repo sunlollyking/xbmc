@@ -31,10 +31,23 @@ namespace KODI::VIDEO::UTILS
 /*! \brief
  *  Find a local trailer file for a given file item
  *  \param[in] item the file item
+ *  \param[in] movieFolder whether the movie has a folder of its own, its source's movies being in
+ *             separate folders, when a movie-trailer file there is its trailer. A disc folder
+ *             rip's folder is always its own.
  *  \param[in] optional Regexp cache to avoid recompilation
  *  \return non-empty string with path of trailer if found
  */
-std::string FindTrailer(const CFileItem& item, KODI::REGEXP::RegExpCache* cache = nullptr);
+std::string FindTrailer(const CFileItem& item,
+                        bool movieFolder,
+                        KODI::REGEXP::RegExpCache* cache = nullptr);
+
+/*! \brief Whether a movie has a folder of its own: its source has movies in separate folders, and it
+ *         isn't in the source's root. A disc's is that of its file, not of its playlist.
+ *  \param[in] database an open video database
+ *  \param[in] videoPath the path of the movie's video
+ *  \return true if the movie has a folder of its own
+ */
+bool HasMovieFolder(CVideoDatabase& database, const std::string& videoPath);
 
 /*!
  \brief Check whether an item is an optical media folder or its parent.
@@ -107,6 +120,20 @@ void SetEpisodeCounts(CFileItem& item, int total, int watched);
   \return std::nullopt if no nextpart tag, or the next part number if available.
   */
 std::optional<int> GetNextPartFromBookmark(const CBookmark& bookmark);
+
+/*! \brief Make the playerState of a bookmark that resumes a stack part.
+  \param part The stack part to resume (0-based)
+  \param playerState The player state within the part, or empty to resume from the start of the part
+  \return The playerState for the bookmark
+  */
+std::string MakeNextPartPlayerState(int part, const std::string& playerState);
+
+/*! \brief Get the player state within the part from a bookmark that resumes a stack part.
+  \param bookmark The bookmark to parse
+  \return std::nullopt if the bookmark doesn't resume within a part, otherwise the player state. The
+  bookmark time is then relative to the part.
+  */
+std::optional<std::string> GetNextPartPlayerStateFromBookmark(const CBookmark& bookmark);
 
 /*!
  \brief Get the resume offset and part number for the given stack item.

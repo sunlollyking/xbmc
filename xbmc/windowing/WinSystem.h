@@ -254,6 +254,7 @@ public:
    *
    */
   virtual bool SetHDR(const VideoPicture* videoPicture) { return false; }
+  // UWP refreshes cached HDR state on the UI thread when this is queried.
   virtual bool IsHDRDisplay() { return false; }
   virtual HDR_STATUS ToggleHDR() { return HDR_STATUS::HDR_UNSUPPORTED; }
   virtual HDR_STATUS GetOSHDRStatus() { return HDR_STATUS::HDR_UNSUPPORTED; }
@@ -287,8 +288,8 @@ public:
   // True when GUI is rendered to an FBO that is then color-transformed
   // (sRGB -> PQ/HLG) and composited against HDR video in that non-linear
   // space. Alpha blending assumes linear light; blending non-linear values
-  // yields wrong transparency. When true, GUI draws select a compensated
-  // alpha blend (see CGUIFontTTFGLES::FirstBegin).
+  // yields wrong transparency. The composite shader compensates by squaring
+  // the GUI coverage (see gles_gui_composite.frag).
   virtual bool IsHdrComposite() const { return false; }
 
   /*!

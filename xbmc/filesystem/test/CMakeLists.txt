@@ -9,6 +9,7 @@ set(SOURCES TestAddonsPaths.cpp
             TestFileCache.cpp
             TestFileFactory.cpp
             TestLibraryPaths.cpp
+            TestSourcesDirectory.cpp
             TestCurlHttpClient.cpp
             TestZipFile.cpp
             TestZipManager.cpp)
@@ -18,6 +19,7 @@ if(TARGET ${APP_NAME_LC}::Bluray)
                       TestBlurayDiscCache.cpp
                       TestBlurayPlaylistHints.cpp
                       TestDiscDirectoryHelperProject.cpp
+                      TestM2TSParser.cpp
                       TestMovieObjectParser.cpp
                       TestNavigationCommand.cpp
                       TestProjectParser.cpp

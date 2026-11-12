@@ -844,7 +844,7 @@ namespace
 {
 // capture tap: serve pending requests from the finished frame before it is
 // presented.
-void ServiceCaptureTaps()
+void ServiceCaptureTaps(CApplicationPlayer& player)
 {
   using namespace KODI::RENDERING::CAPTURE;
 
@@ -881,6 +881,12 @@ void ServiceCaptureTaps()
   result.format = surface->GetFormat();
   result.color = GetOutputColorMetadata(*winSystem);
   result.content = CaptureContent::COMPOSITE; // this tap is the composite half
+
+  if (!player.CompositeVideoCapture(result))
+  {
+    captureService->Fail(request);
+    return;
+  }
 
   captureService->Complete(request, result);
 }
@@ -952,7 +958,7 @@ void CApplication::Render()
   // could be served, so FrameComplete would kill live requests.
   if (hasRendered)
   {
-    ServiceCaptureTaps();
+    ServiceCaptureTaps(*appPlayer);
     if (const auto captureService = CServiceBroker::GetCaptureService())
       captureService->FrameComplete();
   }
@@ -1339,10 +1345,8 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
       CGUIDialogKaiToast *toast = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogKaiToast>(WINDOW_DIALOG_KAI_TOAST);
       if (toast && toast->DoWork())
       {
-        if (!toast->IsDialogRunning())
-        {
-          toast->Open();
-        }
+        // also reopens the dialog if it is still running its close animation
+        toast->Open();
       }
     }
 
@@ -1502,6 +1506,11 @@ void CApplication::WasmRunIteration()
   Cleanup();
   CLog::Log(LOGINFO, "Exiting the application...");
   CAppEnvironment::TearDown();
+  // The page keeps showing the last frame unless it closes itself; see kodi_pre.js.
+  MAIN_THREAD_ASYNC_EM_ASM({
+    if (Module.kodi && Module.kodi.onExit)
+      Module.kodi.onExit();
+  });
 }
 #endif
 
@@ -1762,8 +1771,6 @@ bool CApplication::Stop(int exitCode)
   }
 
   cleanup_emu_environ();
-
-  KODI::TIME::Sleep(200ms);
 
   return success;
 }

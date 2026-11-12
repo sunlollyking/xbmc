@@ -249,7 +249,7 @@ bool CGUIDialogVideoInfo::OnMessage(CGUIMessage& message)
             Open();
             m_hasUpdatedThumb = m_hasUpdatedThumb || hasUpdatedThumb;
             m_hasUpdatedUserrating = m_hasUpdatedUserrating || hasUpdatedUserrating;
-            m_hasUpdatedItems = m_hasUpdatedItems || hasUpdatedItems;
+            m_hasUpdatedItems = m_hasUpdatedItems || hasUpdatedItems || hasUpdatedThumb;
           }
           else
             OnSearch(strItem);
@@ -496,19 +496,25 @@ void CGUIDialogVideoInfo::SetMovie(const CFileItem *item)
     if (m_movieItem->GetVideoInfoTag()->m_strTrailer.empty() ||
         URIUtils::IsInternetStream(m_movieItem->GetVideoInfoTag()->m_strTrailer))
     {
-      std::string localTrailer = VIDEO::UTILS::FindTrailer(*m_movieItem);
+      CVideoDatabase database;
+      const bool databaseOpen{database.Open()};
+      // As a scan finds a movie's trailer, by whether its source has movies in folders of their own
+      const bool movieFolder{databaseOpen &&
+                             VIDEO::UTILS::HasMovieFolder(
+                                 database, m_movieItem->GetVideoInfoTag()->m_strFileNameAndPath)};
+      std::string localTrailer = VIDEO::UTILS::FindTrailer(*m_movieItem, movieFolder);
       if (!localTrailer.empty())
       {
         m_movieItem->GetVideoInfoTag()->m_strTrailer = localTrailer;
-        CVideoDatabase database;
-        if (database.Open())
+        if (databaseOpen)
         {
           database.SetTrailerForMovie(m_movieItem->GetVideoInfoTag()->m_iDbId,
                                       m_movieItem->GetVideoInfoTag()->m_strTrailer);
-          database.Close();
           CUtil::DeleteVideoDatabaseDirectoryCache();
         }
       }
+      if (databaseOpen)
+        database.Close();
     }
   }
 
@@ -775,7 +781,7 @@ void CGUIDialogVideoInfo::OnSearchItemFound(const CFileItem* pItem)
   Open();
   m_hasUpdatedThumb = m_hasUpdatedThumb || hasUpdatedThumb;
   m_hasUpdatedUserrating = m_hasUpdatedUserrating || hasUpdatedUserrating;
-  m_hasUpdatedItems = m_hasUpdatedItems || hasUpdatedItems;
+  m_hasUpdatedItems = m_hasUpdatedItems || hasUpdatedItems || hasUpdatedThumb;
 }
 
 void CGUIDialogVideoInfo::ClearCastList()
