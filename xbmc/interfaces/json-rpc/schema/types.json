@@ -1651,6 +1651,12 @@
       "disambiguation": {
         "type": "string"
       },
+      "datemodified": {
+        "type": "string"
+      },
+      "datenew": {
+        "type": "string"
+      },
       "sourceid": {
         "$ref": "Array.Integer"
       }
@@ -1700,6 +1706,12 @@
         "$ref": "Audio.Details.Genres"
       },
       "lastplayed": {
+        "type": "string"
+      },
+      "datemodified": {
+        "type": "string"
+      },
+      "datenew": {
         "type": "string"
       },
       "sourceid": {
@@ -1756,10 +1768,19 @@
       "musicbrainzartistid": {
         "$ref": "Array.String"
       },
+      "musicbrainzalbumid": {
+        "type": "string"
+      },
       "albumid": {
         "$ref": "Library.Id"
       },
       "lastplayed": {
+        "type": "string"
+      },
+      "datemodified": {
+        "type": "string"
+      },
+      "datenew": {
         "type": "string"
       },
       "disc": {
@@ -2106,6 +2127,20 @@
             },
             "channels": {
               "type": "integer"
+            },
+            "source": {
+              "type": "integer",
+              "description":
+                  "Where the stream details came from: 0 undefined, 10 an external source, 20 the media file, 30 an NFO file, 40 a database migrated from before sources were tracked"
+            },
+            "version": {
+              "type": "integer",
+              "description": "Version of the stream details record"
+            },
+            "flags": {
+              "type": "integer",
+              "description":
+                  "Bitmask of the stream's dispositions: 1 default, 2 dub, 4 original, 8 commentary, 16 lyrics, 32 karaoke, 64 forced, 128 hearing impaired, 256 visually impaired"
             }
           },
           "additionalProperties": false
@@ -2145,6 +2180,15 @@
             },
             "hdrdetail": {
               "type": "string"
+            },
+            "source": {
+              "type": "integer",
+              "description":
+                  "Where the stream details came from: 0 undefined, 10 an external source, 20 the media file, 30 an NFO file, 40 a database migrated from before sources were tracked"
+            },
+            "version": {
+              "type": "integer",
+              "description": "Version of the stream details record"
             }
           },
           "additionalProperties": false
@@ -2160,6 +2204,20 @@
               "type": "string",
               "description":
                   "BCP 47 language tag (e.g. en), a language only in library values, empty when the stream declares none, passed through unchanged when unrecognized"
+            },
+            "source": {
+              "type": "integer",
+              "description":
+                  "Where the stream details came from: 0 undefined, 10 an external source, 20 the media file, 30 an NFO file, 40 a database migrated from before sources were tracked"
+            },
+            "version": {
+              "type": "integer",
+              "description": "Version of the stream details record"
+            },
+            "flags": {
+              "type": "integer",
+              "description":
+                  "Bitmask of the stream's dispositions: 1 default, 2 dub, 4 original, 8 commentary, 16 lyrics, 32 karaoke, 64 forced, 128 hearing impaired, 256 visually impaired"
             }
           },
           "additionalProperties": false
@@ -2676,7 +2734,7 @@
         "type": "number"
       },
       "genre": {
-        "type": "string"
+        "$ref": "Array.String"
       },
       "episodename": {
         "type": "string"
@@ -2728,7 +2786,7 @@
         "type": "integer"
       },
       "imdbnumber": {
-        "type": "integer"
+        "type": "string"
       },
       "hastimerrule": {
         "type": "boolean"
@@ -3122,7 +3180,7 @@
         "type": "string"
       },
       "genre": {
-        "type": "string"
+        "$ref": "Array.String"
       },
       "playcount": {
         "type": "integer"

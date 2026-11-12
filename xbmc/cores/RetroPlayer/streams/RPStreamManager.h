@@ -10,6 +10,8 @@
 
 #include "IStreamManager.h"
 
+#include <vector>
+
 namespace KODI
 {
 namespace RETRO
@@ -36,6 +38,12 @@ public:
   void SuppressAudio(bool bSuppress);
 
   /*!
+   * \brief Whether the client has sent sound from a thread other than the one
+   *        running its frames, which can't be held back with a frame
+   */
+  bool AudioSentOffFrameThread() const;
+
+  /*!
    * \brief Whether frames the client produces reach the screen
    */
   void EnableVideo(bool bEnable);
@@ -54,10 +62,11 @@ private:
   CRPRenderManager& m_renderManager;
   CRPProcessInfo& m_processInfo;
 
-  // Stream parameters
-  CRetroPlayerAudio* m_audioStream = nullptr;
-  CRetroPlayerVideo* m_videoStream = nullptr;
-  CRetroPlayerRendering* m_renderingStream = nullptr;
+  // Stream parameters. A client can open a replacement before closing the
+  // stream it replaces, so every open stream is kept.
+  std::vector<CRetroPlayerAudio*> m_audioStreams;
+  std::vector<CRetroPlayerVideo*> m_videoStreams;
+  std::vector<CRetroPlayerRendering*> m_renderingStreams;
 
   // Applied to streams the client reopens partway through a frame too
   bool m_audioSuppressed = false;

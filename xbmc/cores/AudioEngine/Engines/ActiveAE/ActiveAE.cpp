@@ -465,7 +465,7 @@ void CActiveAE::StateMachine(int signal, Protocol *port, Message *msg)
           return;
         case CActiveAEDataProtocol::FREESTREAM:
           MsgStreamFree *msgStreamFree;
-          msgStreamFree = *(MsgStreamFree**)msg->data;
+          msgStreamFree = reinterpret_cast<MsgStreamFree*>(msg->data);
           DiscardStream(msgStreamFree->stream);
           msg->Reply(CActiveAEDataProtocol::ACC);
           return;
@@ -1444,8 +1444,10 @@ void CActiveAE::Configure(AEAudioFormat *desiredFmt)
         // if input format does not follow ffmpeg channel mask, we may need to remap channels
         (*it)->InitRemapper();
       }
+      double resampleRatio = 1.0;
       if (initSink && (*it)->m_processingBuffers)
       {
+        resampleRatio = (*it)->m_processingBuffers->GetRR();
         (*it)->m_processingBuffers->Flush();
         m_discardBufferPools.push_back((*it)->m_processingBuffers->GetResampleBuffers());
         m_discardBufferPools.push_back((*it)->m_processingBuffers->GetAtempoBuffers());
@@ -1459,6 +1461,10 @@ void CActiveAE::Configure(AEAudioFormat *desiredFmt)
 
         (*it)->m_processingBuffers->Create(MAX_CACHE_LEVEL * 1000, false, m_settings.stereoupmix,
                                            m_settings.normalizelevels, m_settings.mixSubLevel);
+
+        // A stream only sends its resample ratio when it changes, so keep it
+        // across a sink change
+        (*it)->m_processingBuffers->SetRR(resampleRatio, m_settings.atempoThreshold);
       }
       if (m_mode == MODE_TRANSCODE || m_streams.size() > 1)
         (*it)->m_processingBuffers->FillBuffer();
@@ -1734,17 +1740,11 @@ void CActiveAE::ClearDiscardedBuffers()
 
 void CActiveAE::SStopSound(CActiveAESound *sound)
 {
-  std::list<SoundState>::iterator it;
-  for (it=m_sounds_playing.begin(); it!=m_sounds_playing.end(); ++it)
-  {
-    if (it->sound == sound)
-    {
-      if (sound->GetChannel() != AE_CH_NULL)
-        m_aeGUISoundForce = false;
-      m_sounds_playing.erase(it);
-      return;
-    }
-  }
+  // A sound played again before it finished is in the list once for each play.
+  const auto removed = std::erase_if(m_sounds_playing, [sound](const SoundState& state)
+                                     { return state.sound == sound; });
+  if (removed > 0 && sound->GetChannel() != AE_CH_NULL)
+    m_aeGUISoundForce = false;
 }
 
 void CActiveAE::DiscardSound(CActiveAESound *sound)
@@ -2456,7 +2456,9 @@ bool CActiveAE::RunStages()
               CLog::Log(LOGWARNING, "ActiveAE::{} - viz ran out of free buffers", __FUNCTION__);
             AEDelayStatus status;
             m_stats.GetDelay(status);
-            int64_t now = std::chrono::steady_clock::now().time_since_epoch().count();
+            int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
+                              std::chrono::steady_clock::now().time_since_epoch())
+                              .count();
             int64_t timestamp = now + status.GetDelay() * 1000;
             busy |= m_vizBuffers->ResampleBuffers(timestamp);
             while(!m_vizBuffers->m_outputSamples.empty())
@@ -2664,9 +2666,11 @@ CSampleBuffer* CActiveAE::SyncStream(CActiveAEStream *stream)
     }
   }
 
-  // While the error is averaged, samples that will not be skipped stay audible.
+  // While the error is averaged, samples that will not be skipped stay audible. Not in passthrough,
+  // where the correction that follows interrupts the bitstream the receiver just locked on to.
   double errorSoFar{0.0};
-  const bool audible{stream->m_syncError.GetSoFar(errorSoFar) && keepAudible(errorSoFar)};
+  const bool audible{m_mode != MODE_RAW && stream->m_syncError.GetSoFar(errorSoFar) &&
+                     keepAudible(errorSoFar)};
   if (stream->m_syncState == CAESyncInfo::AESyncState::SYNC_MUTE && !audible)
   {
     CSampleBuffer *buf = stream->m_processingBuffers->m_outputSamples.front();

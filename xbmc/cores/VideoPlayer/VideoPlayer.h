@@ -132,6 +132,7 @@ public:
   int changes; // remembered counter from stream to track codec changes
   bool inited;
   bool demuxDisabled; // disabled in the demuxer since it was opened
+  bool replaying; // Demuxer re-reads what was already delivered, up to dts
   unsigned int packets;
   IDVDStreamPlayer::ESyncState syncState;
   double starttime;
@@ -171,6 +172,7 @@ public:
     changes = 0;
     inited = false;
     demuxDisabled = false;
+    replaying = false;
     packets = 0;
     syncState = IDVDStreamPlayer::SYNC_STARTING;
     starttime = DVD_NOPTS_VALUE;
@@ -302,6 +304,7 @@ public:
   bool CanSeek() const override;
   void Seek(bool bPlus, bool bLargeStep, bool bChapterOverride) override;
   bool SeekScene(Direction seekDirection) override;
+  void SeekChapterOrSceneOrBigStep(Direction direction) override;
   void SeekPercentage(float iPercent) override;
   float GetCachePercentage() const override;
 
@@ -377,6 +380,7 @@ public:
 
   void FrameMove() override;
   void Render(bool clear, uint32_t alpha = 255, bool gui = true) override;
+  bool CompositeVideoCapture(KODI::RENDERING::CAPTURE::CaptureResult& result) override;
   void FlushRenderer() override;
   void SetRenderViewMode(int mode, float zoom, float par, float shift, bool stretch) override;
   float GetRenderAspectRatio() const override;
@@ -427,6 +431,7 @@ protected:
   void Prepare();
   void ForgetSubtitleSelection();
   bool ShouldDeferSync(bool ready, std::chrono::steady_clock::time_point now);
+  bool ShouldWaitForSync(std::chrono::steady_clock::time_point now);
   bool OpenStream(CCurrentStream& current, int64_t demuxerId, int iStream, int source, bool reset = true);
   bool OpenAudioStream(CDVDStreamInfo& hint, bool reset = true);
   bool OpenVideoStream(CDVDStreamInfo& hint, bool reset = true);
@@ -442,6 +447,7 @@ protected:
   bool CloseStream(CCurrentStream& current, bool bWaitForBuffers);
 
   bool CheckIsCurrent(const CCurrentStream& current, CDemuxStream* stream, DemuxPacket* pkg);
+  bool IsReplayedPacket(CDemuxStream* stream, DemuxPacket* packet);
   void ProcessPacket(CDemuxStream* pStream, DemuxPacket* pPacket);
   void ProcessAudioData(CDemuxStream* pStream, DemuxPacket* pPacket);
   void ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket);
@@ -461,6 +467,7 @@ protected:
 
   void SetSubtitleVisibleInternal(bool bVisible);
   void ReopenSubtitleStream(const SelectionStream& stream);
+  bool RereadSubtitleData();
 
   enum SubtitleChange
   {
@@ -535,6 +542,7 @@ protected:
   void UpdateContentState();
 
   void UpdateFileItemStreamDetails(CFileItem& item, UpdateStreamDetails update);
+  void SaveInputStreamState();
   int GetPreviousChapter();
   std::optional<std::chrono::milliseconds> GetChapterPosMs(int chapterIdx = -1) const;
   // Translate a 1-based visible chapter number (as seen by GetChapter()/GetChapterCount())
@@ -566,6 +574,11 @@ protected:
                                                              SeekStep step);
   std::optional<SeekCandidate> GetChapterSeekCandidate(int64_t time, Direction direction);
   std::optional<SeekCandidate> GetBookmarkSeekCandidate(int64_t time, Direction direction);
+  std::optional<SeekCandidate> GetSceneSeekCandidate(int64_t time, Direction direction);
+  void SeekToNearestTarget(Direction direction,
+                           SeekStep step,
+                           bool includeChapters,
+                           bool includeScenes);
   void ExecuteTimeSeek(int64_t target, Direction direction, bool accurate);
   bool EvaluateIsStreaming() const;
 
@@ -688,6 +701,8 @@ protected:
   XbmcThreads::EndTime<> m_syncTimer;
 
   std::optional<std::chrono::steady_clock::time_point> m_syncStartPtsWait;
+
+  std::optional<std::chrono::steady_clock::time_point> m_syncWait;
 
   CEdl m_Edl;
   bool m_SkipCommercials;

@@ -19,6 +19,7 @@
 #include "filesystem/MusicDatabaseDirectory.h"
 #include "filesystem/MusicDatabaseDirectory/DirectoryNode.h"
 #include "filesystem/MusicDatabaseDirectory/QueryParams.h"
+#include "filesystem/SourcesDirectory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "filesystem/VideoDatabaseDirectory.h"
 #include "filesystem/VideoDatabaseDirectory/DirectoryNode.h"
@@ -725,14 +726,16 @@ NPT_Result CUPnPServer::OnBrowseMetadata(PLT_ActionReference& action,
         parent = MUSIC::DB_PATH::ROOT;
       else if (StringUtils::StartsWithNoCase(child_id, "special://videoplaylists/"))
         parent = MEDIA::LIBRARY_PATH::VIDEO;
-      else if (StringUtils::StartsWithNoCase(child_id, "sources://video/"))
+      else if (StringUtils::StartsWithNoCase(
+                   child_id, CSourcesDirectory::PathOf(KODI::MEDIA::MediaSection::VIDEO)))
         parent = MEDIA::LIBRARY_PATH::VIDEO;
       else if (CUtil::IsInPlaylistsFolder(child_id, KODI::MEDIA::MediaSection::MUSIC))
         parent = "special://musicplaylists/";
       else if (CUtil::IsInPlaylistsFolder(child_id, KODI::MEDIA::MediaSection::VIDEO))
         parent = "special://videoplaylists/";
       else
-        parent = "sources://video/"; // this can only match video sources
+        parent = CSourcesDirectory::PathOf(
+            KODI::MEDIA::MediaSection::VIDEO); // this can only match video sources
     }
 
     if (IsVideoDb(*item))
@@ -1473,8 +1476,12 @@ failure:
 NPT_Result CUPnPServer::ServeFile(const NPT_HttpRequest& request,
                                   const NPT_HttpRequestContext& context,
                                   NPT_HttpResponse& response,
-                                  const NPT_String& md5)
+                                  const NPT_String& requested_path)
 {
+  // Platinum joins the requested hash to the "/" file root
+  const NPT_String md5(requested_path.StartsWith("/") ? requested_path.SubString(1)
+                                                      : requested_path);
+
   // Translate hash to filename
   NPT_String file_path(md5), *file_path2;
   {

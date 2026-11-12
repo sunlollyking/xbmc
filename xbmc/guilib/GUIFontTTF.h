@@ -12,6 +12,7 @@
 #include "utils/ColorUtils.h"
 #include "utils/Geometry.h"
 
+#include <array>
 #include <memory>
 #include <stdint.h>
 #include <string>
@@ -86,7 +87,6 @@ class CGUIFontTTF
   // use lookup table for the first 4096 glyphs (almost any letter or symbol) to
   // speed up GUI rendering and decrease CPU usage and less memory reallocations
   static constexpr int MAX_GLYPH_IDX = 4096;
-  static constexpr size_t LOOKUPTABLE_SIZE = MAX_GLYPH_IDX * FONT_STYLES_COUNT;
 
   friend class CGUIFont;
 
@@ -172,6 +172,9 @@ protected:
 
   float GetTextWidthInternal(std::span<const character_t> text);
   float GetTextWidthInternal(std::span<const character_t> text, const std::vector<Glyph>& glyph);
+  // Returns how many characters from the start of text fit into maxPixelWidth, without splitting
+  // a cluster
+  size_t GetFittingLengthInternal(std::span<const character_t> text, float maxPixelWidth);
   float GetCharWidthInternal(character_t ch);
   float GetTextHeight(float lineSpacing, int numLines) const;
   float GetTextBaseLine() const { return static_cast<float>(m_cellBaseLine); }
@@ -222,12 +225,24 @@ protected:
 
   // Fills RGBA pixels with transparent white, so that filtering at glyph edges keeps the color
   static void ClearTexturePixels(uint8_t* pixels, size_t size);
+  // Clears newTexture and copies the glyphs of m_texture into it, converting them to RGBA if
+  // m_texture is alpha only and newTexture is not
+  void FillNewTexture(CTexture& newTexture) const;
+  // Writes RGBA glyph pixels to m_texture, only their alpha if m_texture is alpha only
+  void WriteCharPixels(const uint8_t* pixels,
+                       unsigned int pitch,
+                       unsigned int x1,
+                       unsigned int y1,
+                       unsigned int x2,
+                       unsigned int y2);
 
   // modifying glyphs
   void SetGlyphStrength(FT_GlyphSlot slot, int glyphStrength);
   static void ObliqueGlyph(FT_GlyphSlot slot);
 
-  std::unique_ptr<CTexture> m_texture; // texture that holds our rendered characters (RGBA)
+  std::unique_ptr<CTexture> m_texture; // texture that holds our rendered characters
+  // m_texture is RGBA once it holds color glyphs, and alpha only before
+  bool m_colorTexture{false};
 
   unsigned int m_textureWidth{0}; // width of our texture
   unsigned int m_textureHeight{0}; // height of our texture
@@ -244,8 +259,8 @@ protected:
 
   std::vector<Character> m_char; // our characters
 
-  // room for the first MAX_GLYPH_IDX glyphs in 7 styles
-  Character* m_charquick[LOOKUPTABLE_SIZE]{nullptr};
+  // room for the first MAX_GLYPH_IDX glyphs of each style, allocated when the style is first used
+  std::array<std::unique_ptr<Character*[]>, FONT_STYLES_COUNT> m_charquick;
 
   bool m_ellipseCached{false};
   float m_ellipsesWidth{0.0f}; // this is used every character (width of '.')
