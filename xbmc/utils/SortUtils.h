@@ -176,6 +176,15 @@ enum class SortBy
   /// __59__ : Sort by user preference            <em>(String: <b><c>UserPreference</c></b>)</em>
   /// @skinning_v20 <b>SortByUserPreference</b> New sort method added.
   USER_PREFERENCE,
+  /// __60__ : Sort by platform                   <em>(String: <b><c>Platform</c></b>)</em>
+  /// @skinning_v23 <b>SortByPlatform</b> New sort method added.
+  PLATFORM,
+  /// __61__ : Sort by developer                  <em>(String: <b><c>Developer</c></b>)</em>
+  /// @skinning_v23 <b>SortByDeveloper</b> New sort method added.
+  DEVELOPER,
+  /// __62__ : Sort by number of players          <em>(String: <b><c>Players</c></b>)</em>
+  /// @skinning_v23 <b>SortByPlayers</b> New sort method added.
+  PLAYERS,
 };
 ///@}
 

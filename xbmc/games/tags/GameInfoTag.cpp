@@ -612,6 +612,15 @@ void CGameInfoTag::ToSortable(SortItem& sortable, Field field) const
     case Field::STUDIO:
       sortable[Field::STUDIO] = m_publishers;
       break;
+    case Field::PLATFORM:
+      sortable[Field::PLATFORM] = m_strPlatform;
+      break;
+    case Field::DEVELOPER:
+      sortable[Field::DEVELOPER] = m_developers;
+      break;
+    case Field::PLAYERS:
+      sortable[Field::PLAYERS] = m_playersMax;
+      break;
     case Field::PLOT:
       sortable[Field::PLOT] = m_strOverview;
       break;

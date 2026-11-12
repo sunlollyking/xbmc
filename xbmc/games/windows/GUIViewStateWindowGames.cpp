@@ -61,13 +61,20 @@ CGUIViewStateWindowGames::CGUIViewStateWindowGames(const CFileItemList& items)
     {
       AddSortMethod(SortBy::LABEL, 551, LABEL_MASKS("%T", "%Y", "%T", "%Y"), byTitle); // Title, Year
       AddSortMethod(SortBy::YEAR, 562, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+      AddSortMethod(SortBy::PLATFORM, 35549, LABEL_MASKS("%T", "%U", "%T", "%U")); // Platform
+      AddSortMethod(SortBy::GENRE, 515, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+      AddSortMethod(SortBy::DEVELOPER, 35728, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Developer
+      AddSortMethod(SortBy::STUDIO, 35727, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Publisher
+      AddSortMethod(SortBy::PLAYERS, 35525, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Players
+      AddSortMethod(SortBy::MPAA, 35526, LABEL_MASKS("%T", "%Y", "%T", "%Y")); // Age ratings
       AddSortMethod(SortBy::RATING, 563, LABEL_MASKS("%T", "%R", "%T", "%R"));
       AddSortMethod(SortBy::USER_RATING, 38018, LABEL_MASKS("%T", "%r", "%T", "%r"));
       AddSortMethod(SortBy::PLAYCOUNT, 567, LABEL_MASKS("%T", "%V", "%T", "%V"));
       AddSortMethod(SortBy::LAST_PLAYED, 568, LABEL_MASKS("%T", "%p", "%T", "%p"));
       AddSortMethod(SortBy::TIME, 35671, LABEL_MASKS("%T", "", "%T", "")); // Time played
       AddSortMethod(SortBy::DATE_ADDED, 570, LABEL_MASKS("%T", "%a", "%T", "%a"));
-      AddSortMethod(SortBy::STUDIO, 35549, LABEL_MASKS("%T", "%U", "%T", "%U")); // Platform
+      AddSortMethod(SortBy::ORIGINAL_TITLE, 20376, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
+      AddSortMethod(SortBy::RANDOM, 590, LABEL_MASKS("%T", "%Y", "%T", "%Y"));
       SetSortMethod(SortBy::LABEL);
     }
     else

@@ -484,6 +484,23 @@ std::string ByUserPreference(SortAttribute attributes, const SortItem& values)
   return values.at(Field::USER_PREFERENCE).asString();
 }
 
+std::string ByPlatform(SortAttribute attributes, const SortItem& values)
+{
+  return values.at(Field::PLATFORM).asString() + " " + ByLabel(attributes, values);
+}
+
+std::string ByDeveloper(SortAttribute attributes, const SortItem& values)
+{
+  return ArrayToString(attributes, values.at(Field::DEVELOPER)) + " " +
+         ByLabel(attributes, values);
+}
+
+std::string ByPlayers(SortAttribute attributes, const SortItem& values)
+{
+  return StringUtils::Format("{} {}", values.at(Field::PLAYERS).asInteger(),
+                             ByLabel(attributes, values));
+}
+
 std::string ByDateTaken(SortAttribute attributes, const SortItem &values)
 {
   return values.at(Field::DATE_TAKEN).asString();
@@ -708,6 +725,9 @@ std::map<SortBy, SortUtils::SortPreparator> fillPreparators()
     {SortBy::CLIENT_CHANNEL_ORDER,       ByClientChannelOrder},
     {SortBy::PROVIDER,                   ByProvider},
     {SortBy::USER_PREFERENCE,            ByUserPreference},
+    {SortBy::PLATFORM,                   ByPlatform},
+    {SortBy::DEVELOPER,                  ByDeveloper},
+    {SortBy::PLAYERS,                    ByPlayers},
     {SortBy::DATE_TAKEN,                 ByDateTaken},
     {SortBy::RELEVANCE,                  ByRelevance},
     {SortBy::INSTALL_DATE,               ByInstallDate},
@@ -777,6 +797,9 @@ std::map<SortBy, Fields> fillSortingFields()
     {SortBy::CLIENT_CHANNEL_ORDER,       {Field::CLIENT_CHANNEL_ORDER}},
     {SortBy::PROVIDER,                   {Field::PROVIDER}},
     {SortBy::USER_PREFERENCE,            {Field::USER_PREFERENCE}},
+    {SortBy::PLATFORM,                   {Field::PLATFORM}},
+    {SortBy::DEVELOPER,                  {Field::DEVELOPER}},
+    {SortBy::PLAYERS,                    {Field::PLAYERS}},
     {SortBy::DATE_TAKEN,                 {Field::DATE_TAKEN}},
     {SortBy::RELEVANCE,                  {Field::RELEVANCE}},
     {SortBy::INSTALL_DATE,               {Field::INSTALL_DATE}},
@@ -1085,6 +1108,9 @@ const auto table = std::array{
   sort_map{SortBy::CHANNEL,                     SortMethod::CLIENT_CHANNEL_ORDER,            SortAttributeNone,          19315 },
   sort_map{SortBy::PROVIDER,                    SortMethod::PROVIDER,                        SortAttributeNone,          19348 },
   sort_map{SortBy::USER_PREFERENCE,             SortMethod::USER_PREFERENCE,                 SortAttributeNone,          19349 },
+  sort_map{SortBy::PLATFORM,                    SortMethod::PLATFORM,                        SortAttributeNone,          35549 },
+  sort_map{SortBy::DEVELOPER,                   SortMethod::DEVELOPER,                       SortAttributeNone,          35728 },
+  sort_map{SortBy::PLAYERS,                     SortMethod::PLAYERS,                         SortAttributeNone,          35525 },
   sort_map{SortBy::DATE_TAKEN,                  SortMethod::DATE_TAKEN,                      SortAttributeIgnoreFolders, 577 },
   sort_map{SortBy::NONE,                        SortMethod::NONE,                            SortAttributeNone,          16018 },
   sort_map{SortBy::TOTAL_DISCS,                 SortMethod::TOTAL_DISCS,                     SortAttributeNone,          38077 },
@@ -1225,6 +1251,9 @@ const std::map<std::string, SortBy> sortMethods{
     {"clientchannelorder", SortBy::CLIENT_CHANNEL_ORDER},
     {"provider", SortBy::PROVIDER},
     {"userpreference", SortBy::USER_PREFERENCE},
+    {"platform", SortBy::PLATFORM},
+    {"developer", SortBy::DEVELOPER},
+    {"players", SortBy::PLAYERS},
     {"datetaken", SortBy::DATE_TAKEN},
     {"userrating", SortBy::USER_RATING},
     {"installdate", SortBy::INSTALL_DATE},
