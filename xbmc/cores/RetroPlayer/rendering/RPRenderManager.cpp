@@ -29,9 +29,6 @@
 #include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h"
 #include "games/GameServices.h"
 #include "games/GameSettings.h"
-#include "guilib/GUIComponent.h"
-#include "guilib/GUIWindowManager.h"
-#include "guilib/WindowIDs.h"
 #include "jobs/JobManager.h"
 #include "pictures/Picture.h"
 #include "rendering/capture/CaptureReadback.h"
@@ -769,16 +766,7 @@ void CRPRenderManager::RenderWindow(bool bClear,
       renderer->SetBezelWindow(bezel->GetWindowRect(screen));
 
     if (m_hdrOutput)
-    {
-      // Kodi lays the GUI over HDR less opaquely than over SDR, and a game's
-      // highlights showed through a menu brighter than the menu's text. With
-      // a menu open, nothing in the game is brighter than paper white.
-      const CGUIWindowManager& windowManager = CServiceBroker::GetGUI()->GetWindowManager();
-      const bool menuOpen = windowManager.HasVisibleModalDialog() ||
-                            windowManager.IsWindowVisible(WINDOW_DIALOG_GAME_OSD);
-
-      renderer->SetHdrLuminance(HDR_REFERENCE_WHITE, menuOpen ? HDR_REFERENCE_WHITE : m_hdrPeak);
-    }
+      renderer->SetHdrLuminance(HDR_REFERENCE_WHITE, m_hdrPeak);
 
     RenderInternal(renderer, renderBuffer, bClear, 255);
 
