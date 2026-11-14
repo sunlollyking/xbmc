@@ -10,6 +10,7 @@
 
 #include "ServiceBroker.h"
 #include "utils/BufferObject.h"
+#include "utils/BufferObjectFactory.h"
 #if defined(HAVE_LINUX_DMA_HEAP)
 #include "utils/DMAHeapBufferObject.h"
 #endif
@@ -23,6 +24,13 @@
 
 using namespace KODI;
 using namespace RETRO;
+
+namespace
+{
+// From this size up, uploading a frame costs more than it is worth when a buffer
+// type is available that the GPU can sample in place
+constexpr unsigned int DIRECT_IMPORT_MIN_PIXELS = 1280 * 720;
+} // namespace
 
 CRenderBufferDMA::CRenderBufferDMA(int fourcc)
   : m_fourcc(fourcc),
@@ -52,6 +60,16 @@ bool CRenderBufferDMA::Allocate(AVPixelFormat format, unsigned int width, unsign
   m_format = format;
   m_width = width;
   m_height = height;
+
+  if (RequiresCoherencyWorkaround() && m_width * m_height >= DIRECT_IMPORT_MIN_PIXELS)
+  {
+    auto bo = CBufferObjectFactory::CreateBufferObjectByName("CGBMBufferObject");
+    if (bo != nullptr && bo->CreateBufferObject(m_fourcc, m_width, m_height))
+    {
+      m_bo = std::move(bo);
+      return true;
+    }
+  }
 
   m_bo->CreateBufferObject(m_fourcc, m_width, m_height);
 
