@@ -28,7 +28,7 @@ class CShaderTextureGLRef;
 namespace RETRO
 {
 class CRenderBufferOpenGL;
-class CRPHdrShaderGL;
+class CRPHdrShader;
 
 class CRendererFactoryOpenGL : public IRendererFactory
 {
@@ -109,7 +109,7 @@ protected:
 private:
   bool LoadHdrShader();
 
-  std::unique_ptr<CRPHdrShaderGL> m_hdrShader;
+  std::unique_ptr<CRPHdrShader> m_hdrShader;
   bool m_hdrShaderFailed{false};
   GLuint m_hdrVAO{0};
   GLuint m_hdrVBO{0};

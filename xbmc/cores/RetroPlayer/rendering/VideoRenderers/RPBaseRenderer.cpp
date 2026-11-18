@@ -157,6 +157,14 @@ void CRPBaseRenderer::RenderFrame(bool clear, uint8_t alpha)
   m_renderBuffer->SetRendered(true);
 }
 
+void CRPBaseRenderer::UpdateRenderArea()
+{
+  m_bezelShown = false;
+
+  if (m_bConfigured && m_renderBuffer != nullptr)
+    ManageRenderArea(*m_renderBuffer);
+}
+
 void CRPBaseRenderer::Flush()
 {
   SetBuffer(nullptr);

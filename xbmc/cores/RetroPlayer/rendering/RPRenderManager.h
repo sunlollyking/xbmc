@@ -197,6 +197,12 @@ private:
                       uint32_t alpha);
 
   /*!
+   * \brief Give a renderer a new frame to draw, uploading it first if needed
+   */
+  void SetRendererBuffer(const std::shared_ptr<CRPBaseRenderer>& renderer,
+                         IRenderBuffer* renderBuffer);
+
+  /*!
    * \brief Return true if we have a render buffer belonging to the specified pool
    */
   bool HasRenderBuffer(IRenderBufferPool* bufferPool);

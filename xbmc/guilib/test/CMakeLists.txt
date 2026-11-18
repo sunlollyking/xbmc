@@ -1,4 +1,7 @@
-set(SOURCES TestGUIControlFactory.cpp
+set(SOURCES TestFFmpegImage.cpp
+            TestGUIColorManager.cpp
+            TestGUIControlFactory.cpp
+            TestGUIControlProfiler.cpp
             TestGUIControlGroup.cpp
             TestGUIControlGroupMask.cpp
             TestGUIControlGroupMaskD3D.cpp

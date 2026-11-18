@@ -4,6 +4,7 @@ set(SOURCES TestAlarmClock.cpp
             TestArtUtils.cpp
             TestAspectRatioVocabulary.cpp
             TestBase64.cpp
+            TestBitReader.cpp
             TestBitstreamConverter.cpp
             TestBitstreamStats.cpp
             TestCharsetConverter.cpp
@@ -23,6 +24,7 @@ set(SOURCES TestAlarmClock.cpp
             TestGlobalsHandling.cpp
             TestGroupUtils.cpp
             TestGPUInfo.cpp
+            TestHevcSei.cpp
             TestHTMLUtil.cpp
             TestHttpHeader.cpp
             TestHttpParser.cpp
@@ -48,6 +50,7 @@ set(SOURCES TestAlarmClock.cpp
             TestRssReader.cpp
             TestScraperParser.cpp
             TestScraperUrl.cpp
+            TestScreenshot.cpp
             TestSet.cpp
             TestSortUtils.cpp
             TestStopwatch.cpp

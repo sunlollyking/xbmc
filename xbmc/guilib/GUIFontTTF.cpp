@@ -390,7 +390,9 @@ void CGUIFontTTF::ClearCharacterCache()
   m_texture = nullptr;
   m_char.clear();
   m_char.reserve(CHAR_CHUNK);
-  memset(m_charquick, 0, sizeof(m_charquick));
+  for (auto& table : m_charquick)
+    table.reset();
+  m_colorTexture = false;
   // set the posX and posY so that our texture will be created on first character write.
   m_posX = m_textureWidth;
   m_posY = -static_cast<int>(GetTextureLineHeight());
@@ -401,7 +403,9 @@ void CGUIFontTTF::Clear()
 {
   m_texture.reset();
   m_texture = nullptr;
-  memset(m_charquick, 0, sizeof(m_charquick));
+  for (auto& table : m_charquick)
+    table.reset();
+  m_colorTexture = false;
   m_posX = 0;
   m_posY = 0;
   m_nestedBeginCount = 0;
@@ -934,6 +938,39 @@ float CGUIFontTTF::GetTextWidthInternal(std::span<const character_t> text,
   return width;
 }
 
+size_t CGUIFontTTF::GetFittingLengthInternal(std::span<const character_t> text, float maxPixelWidth)
+{
+  const std::vector<Glyph> glyphs = GetHarfBuzzShapedGlyphs(text);
+  size_t length = 0;
+  float width = 0;
+  for (auto it = glyphs.begin(); it != glyphs.end(); ++it)
+  {
+    const character_t ch = text[it->m_glyphInfo.cluster];
+    const Character* c = GetCharacter(ch, it->m_glyphInfo.codepoint, it->m_fontFace);
+    float advance = 0;
+    float renderWidth = 0;
+    if (c)
+    {
+      advance =
+          (ch & 0xffffffff) == static_cast<character_t>('\t') ? GetTabSpaceLength() : c->m_advance;
+      renderWidth = std::max(c->m_right - c->m_left + c->m_offsetX, c->m_advance);
+    }
+
+    // Like GetTextWidthInternal(), the last glyph of the prefix counts with its render width
+    const auto next = std::next(it);
+    const size_t clusterEnd = next == glyphs.end() ? text.size() : next->m_glyphInfo.cluster;
+    if (clusterEnd != it->m_glyphInfo.cluster)
+    {
+      if (width + renderWidth > maxPixelWidth)
+        break;
+      length = clusterEnd;
+    }
+    width += advance;
+  }
+
+  return length;
+}
+
 float CGUIFontTTF::GetCharWidthInternal(character_t ch)
 {
   Character* c = GetCharacter(ch, 0);
@@ -1138,12 +1175,11 @@ CGUIFontTTF::Character* CGUIFontTTF::GetCharacter(character_t chr,
     glyphIndex = FT_Get_Char_Index(GetFace(fontFace), letter);
 
   // quick access to the most frequently used glyphs
-  if (fontFace == FontFace::Primary && glyphIndex < MAX_GLYPH_IDX)
+  if (fontFace == FontFace::Primary && glyphIndex < MAX_GLYPH_IDX && style < m_charquick.size())
   {
-    character_t ch = (style << 12) | glyphIndex; // 2^12 = 4096
-
-    if (ch < LOOKUPTABLE_SIZE && m_charquick[ch])
-      return m_charquick[ch];
+    const auto& table = m_charquick[style];
+    if (table && table[glyphIndex])
+      return table[glyphIndex];
   }
 
   // letters are stored based on style and glyph
@@ -1209,11 +1245,14 @@ CGUIFontTTF::Character* CGUIFontTTF::GetCharacter(character_t chr,
   {
     if (!(m_char[i].m_glyphAndStyle & FONT_FACE_MASK) && m_char[i].m_glyphIndex < MAX_GLYPH_IDX)
     {
-      // >> 16 is style (0-6), then 16 - 12 (>> 4) is equivalent to style * 4096
-      character_t ch = ((m_char[i].m_glyphAndStyle & 0xffff0000) >> 4) | m_char[i].m_glyphIndex;
-
-      if (ch < LOOKUPTABLE_SIZE)
-        m_charquick[ch] = m_char.data() + i;
+      const size_t charStyle = (m_char[i].m_glyphAndStyle & 0xffff0000) >> 16;
+      if (charStyle < m_charquick.size())
+      {
+        auto& table = m_charquick[charStyle];
+        if (!table)
+          table = std::make_unique<Character*[]>(MAX_GLYPH_IDX);
+        table[m_char[i].m_glyphIndex] = m_char.data() + i;
+      }
     }
   }
 
@@ -1281,6 +1320,24 @@ bool CGUIFontTTF::CacheCharacter(
     bitmap.rows += 2 * m_borderRadius;
     bitGlyph->left -= m_borderRadius;
     bitGlyph->top += m_borderRadius;
+  }
+
+  if (emoji && !silhouette && !isEmptyGlyph && !m_colorTexture)
+  {
+    m_colorTexture = true;
+    if (m_texture)
+    {
+      unsigned int height = m_textureHeight;
+      std::unique_ptr<CTexture> newTexture = ReallocTexture(height);
+      if (!newTexture)
+      {
+        m_colorTexture = false;
+        FT_Done_Glyph(glyph);
+        CLog::LogF(LOGDEBUG, "Failed to allocate a color texture of height {}", height);
+        return false;
+      }
+      m_texture = std::move(newTexture);
+    }
   }
 
   if (!isEmptyGlyph)
@@ -1370,6 +1427,58 @@ void CGUIFontTTF::ClearTexturePixels(uint8_t* pixels, size_t size)
   {
     pixels[i] = pixels[i + 1] = pixels[i + 2] = 255;
     pixels[i + 3] = 0;
+  }
+}
+
+void CGUIFontTTF::FillNewTexture(CTexture& newTexture) const
+{
+  if (m_colorTexture)
+    ClearTexturePixels(newTexture.GetPixels(), newTexture.GetRows() * newTexture.GetPitch());
+  else
+    memset(newTexture.GetPixels(), 0, newTexture.GetRows() * newTexture.GetPitch());
+
+  if (!m_texture)
+    return;
+
+  const bool expand = m_colorTexture && m_texture->GetPitch() < m_texture->GetWidth() * 4;
+  const unsigned int width = std::min(m_texture->GetWidth(), newTexture.GetWidth());
+  const unsigned int rows = std::min(m_texture->GetRows(), newTexture.GetRows());
+  for (unsigned int y = 0; y < rows; y++)
+  {
+    const uint8_t* src = m_texture->GetPixels() + y * m_texture->GetPitch();
+    uint8_t* dst = newTexture.GetPixels() + y * newTexture.GetPitch();
+    if (!expand)
+    {
+      memcpy(dst, src, std::min(m_texture->GetPitch(), newTexture.GetPitch()));
+      continue;
+    }
+    for (unsigned int x = 0; x < width; x++)
+      dst[4 * x + 3] = src[x];
+  }
+}
+
+void CGUIFontTTF::WriteCharPixels(const uint8_t* pixels,
+                                  unsigned int pitch,
+                                  unsigned int x1,
+                                  unsigned int y1,
+                                  unsigned int x2,
+                                  unsigned int y2)
+{
+  const unsigned int bpp = m_colorTexture ? 4 : 1;
+  uint8_t* target = m_texture->GetPixels() + y1 * m_texture->GetPitch() + x1 * bpp;
+  for (unsigned int y = y1; y < y2; y++)
+  {
+    if (m_colorTexture)
+    {
+      memcpy(target, pixels, (x2 - x1) * 4);
+    }
+    else
+    {
+      for (unsigned int x = 0; x < x2 - x1; x++)
+        target[x] = pixels[4 * x + 3];
+    }
+    pixels += pitch;
+    target += m_texture->GetPitch();
   }
 }
 

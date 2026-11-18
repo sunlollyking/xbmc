@@ -28,7 +28,7 @@ class CShaderTextureGLESRef;
 namespace RETRO
 {
 class CRenderBufferOpenGLES;
-class CRPHdrShaderGLES;
+class CRPHdrShader;
 
 class CRendererFactoryOpenGLES : public IRendererFactory
 {
@@ -56,21 +56,19 @@ public:
   SCALINGMETHOD GetDefaultScalingMethod() const override { return SCALINGMETHOD::NEAREST; }
 
   static bool SupportsScalingMethod(SCALINGMETHOD method);
-  bool SupportsHdr() const override { return true; }
+  bool SupportsHdr() const override { return !m_hdrShaderFailed; }
 
 protected:
   struct RenderBufferTextures
   {
     std::shared_ptr<SHADER::CShaderTextureGLESRef> sourceTexture;
     std::shared_ptr<SHADER::CShaderTextureGLES> targetTexture;
-    std::shared_ptr<SHADER::CShaderTextureGLES> hdrTargetTexture;
   };
 
   /*!
-   * \brief The texture a shader preset's last pass renders into
+   * \brief Make the texture a shader preset's last pass renders into, deeper than 8 bits in HDR
    */
-  SHADER::CShaderTextureGLES& GetTargetTexture(RenderBufferTextures& textures,
-                                               const CSize& size);
+  std::shared_ptr<SHADER::CShaderTextureGLES> CreateTargetTexture(const CSize& size) const;
 
   /*!
    * \brief Draw the texture bound to unit 0 into the destination, for SDR or HDR
@@ -87,13 +85,14 @@ protected:
   virtual void Render(uint8_t alpha);
 
   std::map<CRenderBufferOpenGLES*, std::unique_ptr<RenderBufferTextures>> m_RBTexturesMap;
+  bool m_lastTargetHdr{false};
 
   const GLenum m_textureTarget = GL_TEXTURE_2D;
 
 private:
   bool LoadHdrShader();
 
-  std::unique_ptr<CRPHdrShaderGLES> m_hdrShader;
+  std::unique_ptr<CRPHdrShader> m_hdrShader;
   bool m_hdrShaderFailed{false};
 };
 } // namespace RETRO

@@ -1,8 +1,10 @@
 xbmc/addons/gui/skin/test         test/skin
 xbmc/addons/test                  test/addons
+xbmc/application/test             test/application
 xbmc/cores/AudioEngine/Engines/ActiveAE/test test/audioengine_activeae
 xbmc/cores/AudioEngine/Sinks/test test/audioengine_sinks
 xbmc/cores/AudioEngine/Utils/test test/audioengine_utils
+xbmc/cores/playercorefactory/test test/playercorefactory
 xbmc/cores/RetroPlayer/playback/test test/retroplayer_playback
 xbmc/cores/RetroPlayer/process/test test/retroplayer_process
 xbmc/cores/RetroPlayer/rendering/test test/retroplayer_rendering
@@ -14,6 +16,7 @@ xbmc/cores/VideoPlayer/Buffers/test test/videoplayer_buffers
 xbmc/cores/VideoPlayer/test       test/videoplayer
 xbmc/cores/VideoPlayer/DVDDemuxers/test test/dvddemuxers
 xbmc/cores/VideoPlayer/DVDCodecs/Overlay/test test/dvdoverlaycodecs
+xbmc/cores/VideoPlayer/DVDCodecs/Video/test test/dvdvideocodecs
 xbmc/cores/VideoPlayer/Edl/test   test/edl
 xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/test test/videoshaders
 xbmc/dbwrappers/test              test/dbwrappers
@@ -33,6 +36,7 @@ xbmc/games/dialogs/disc/test      test/games/dialogs/disc
 xbmc/games/library/test           test/games/library
 xbmc/games/ports/test             test/games/ports
 xbmc/games/library/naming/test    test/games/library/naming
+xbmc/games/ports/input/test       test/games/ports/input
 xbmc/games/tags/test              test/games/tags
 xbmc/games/test                   test/games
 xbmc/guilib/test                  test/guilib

@@ -12,6 +12,7 @@
 #include "language/LangInfo.h"
 #include "language/LanguageTag.h"
 #include "utils/Archive.h"
+#include "utils/AspectRatioVocabulary.h"
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
@@ -227,7 +228,7 @@ bool CStreamDetailSubtitle::IsWorseThan(const CStreamDetail& that) const
 
   // the best subtitle should be the one in the user's preferred language
   // If preferred language is set to "original" this is "eng"
-  return language.IsEmpty() || g_langInfo.GetSubtitleLanguage(true).Matches(other);
+  return language.IsUndetermined() || g_langInfo.GetSubtitleLanguage(true).Matches(other);
 }
 
 CStreamDetailVideo& CStreamDetailVideo::operator=(const CStreamDetailVideo& that)
@@ -840,25 +841,10 @@ std::string CStreamDetails::VideoDimsToResolutionDescription(int iWidth, int iHe
 
 std::string CStreamDetails::VideoAspectToAspectDescription(float fAspect)
 {
-  if (fAspect <= 0.0f)
-    return "";
-
   // Given that we're never going to be able to handle every single possibility in
   // aspect ratios, particularly when cropping prior to video encoding is taken into account
   // the best we can do is take the "common" aspect ratios, and return the closest one available.
-  // The cutoff between two adjacent ratios is their geometric mean.
-  //
-  // Comparing squares avoids a square root per entry, and keeps the cutoffs derived from the
-  // table rather than hand-computed alongside it: for positive values,
-  //   fAspect < sqrt(a*b)  is equivalent to  fAspect*fAspect < a*b
-  const float squared = fAspect * fAspect;
-  for (size_t i = 0; i + 1 < COMMON_ASPECT_RATIOS.size(); ++i)
-  {
-    if (squared < COMMON_ASPECT_RATIOS[i].ratio * COMMON_ASPECT_RATIOS[i + 1].ratio)
-      return std::string(COMMON_ASPECT_RATIOS[i].label);
-  }
-
-  return std::string(COMMON_ASPECT_RATIOS.back().label);
+  return KODI::UTILS::CAspectRatioVocabulary::Label(fAspect);
 }
 
 bool CStreamDetails::SetStreams(const VideoStreamInfo& videoInfo,

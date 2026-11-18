@@ -39,6 +39,7 @@
 #include "programs/GUIWindowPrograms.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
+#include "settings/windows/GUIWindowScreenAlignment.h"
 #include "settings/windows/GUIWindowSettings.h"
 #include "settings/windows/GUIWindowSettingsCategory.h"
 #include "settings/windows/GUIWindowSettingsScreenCalibration.h"
@@ -229,6 +230,7 @@ void CGUIWindowManager::CreateWindows()
   Add(new CGUIWindowSettings);
   Add(new CGUIWindowSystemInfo);
   Add(new CGUIWindowSettingsScreenCalibration);
+  Add(new CGUIWindowScreenAlignment);
   Add(new CGUIWindowSettingsCategory);
   Add(new CGUIWindowVideoNav);
   Add(new CGUIWindowVideoPlaylist);
@@ -477,6 +479,7 @@ bool CGUIWindowManager::DestroyWindows()
     DestroyWindow(WINDOW_SETTINGS_MENU);
     DestroyWindow(WINDOW_SETTINGS_PROFILES);
     DestroyWindow(WINDOW_SCREEN_CALIBRATION);
+    DestroyWindow(WINDOW_SCREEN_ALIGNMENT);
     DestroyWindow(WINDOW_SYSTEM_INFORMATION);
     DestroyWindow(WINDOW_SCREENSAVER);
     DestroyWindow(WINDOW_DIALOG_VIDEO_OSD);
@@ -1297,7 +1300,10 @@ void CGUIWindowManager::Process(unsigned int currentTime)
 
   CGUIWindow* pWindow = GetWindow(GetActiveWindow());
   if (pWindow)
+  {
     pWindow->DoProcess(currentTime, m_dirtyregions);
+    m_guiSurround.Process(currentTime, m_dirtyregions);
+  }
 
   // process all dialogs - visibility may change etc.
   // copy shared_ptrs to ensure windows stay alive during iteration even if map is modified
@@ -1351,21 +1357,30 @@ void CGUIWindowManager::MarkDirty(const CRect& rect)
 
 void CGUIWindowManager::RenderPass() const
 {
-  CServiceBroker::GetWinSystem()->GetGfxContext().ClearStencilBuckets();
+  CGraphicContext& context = CServiceBroker::GetWinSystem()->GetGfxContext();
+  context.ClearStencilBuckets();
+
+  // The clear and the surround fill what the confined interface leaves uncovered.
+  CGUIWindow* pWindow = GetWindow(GetActiveWindow());
+  if (pWindow)
+  {
+    pWindow->ClearBackground();
+    m_guiSurround.Render();
+  }
+
+  const CRect clip = context.ClipToGui();
   if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_guiFrontToBackRendering)
     RenderPassDual();
   else
     RenderPassSingle();
+  context.SetClip(clip);
 }
 
 void CGUIWindowManager::RenderPassSingle() const
 {
   CGUIWindow* pWindow = GetWindow(GetActiveWindow());
   if (pWindow)
-  {
-    pWindow->ClearBackground();
     pWindow->DoRender();
-  }
 
   // we render the dialogs based on their render order.
   auto renderList = m_activeDialogs;
@@ -1381,8 +1396,6 @@ void CGUIWindowManager::RenderPassSingle() const
 void CGUIWindowManager::RenderPassDual() const
 {
   CGUIWindow* pWindow = GetWindow(GetActiveWindow());
-  if (pWindow)
-    pWindow->ClearBackground();
 
   auto renderList = m_activeDialogs;
   stable_sort(renderList.begin(), renderList.end(), RenderOrderSortFunction);
@@ -1481,7 +1494,12 @@ bool CGUIWindowManager::Render()
       if (!hasRendered)
         CServiceBroker::GetWinSystem()->SetDirtyRegions(dirtyRegions);
 
-      CServiceBroker::GetWinSystem()->GetGfxContext().SetScissors(i);
+      // Bounded by the display only, so the clear and the surround reach the whole region.
+      // RenderPass() confines the interface.
+      CGraphicContext& context = CServiceBroker::GetWinSystem()->GetGfxContext();
+      CRect region = i;
+      region.Intersect(CRect(0, 0, float(context.GetWidth()), float(context.GetHeight())));
+      context.SetClip(region);
       RenderPass();
       hasRendered = true;
     }
@@ -1618,6 +1636,11 @@ void CGUIWindowManager::SetCallback(IWindowManagerCallback& callback)
 void CGUIWindowManager::DeInitialize()
 {
   std::unique_lock lock(CServiceBroker::GetWinSystem()->GetGfxContext());
+
+  // Unloading the skin is what brings us here, and the skin is one of the two things the
+  // surround is painted from.
+  m_guiSurround.ReleaseResources();
+  m_guiSurround.Invalidate();
 
   // Need a copy because addon-dialogs removes itself on Close()
   // Copy shared_ptrs to keep windows alive during cleanup

@@ -9,6 +9,7 @@ set(SOURCES TestAddonsPaths.cpp
             TestFileCache.cpp
             TestFileFactory.cpp
             TestLibraryPaths.cpp
+            TestSourcesDirectory.cpp
             TestCurlHttpClient.cpp
             TestZipFile.cpp
             TestZipManager.cpp)
@@ -18,6 +19,7 @@ if(TARGET ${APP_NAME_LC}::Bluray)
                       TestBlurayDiscCache.cpp
                       TestBlurayPlaylistHints.cpp
                       TestDiscDirectoryHelperProject.cpp
+                      TestM2TSParser.cpp
                       TestMovieObjectParser.cpp
                       TestNavigationCommand.cpp
                       TestProjectParser.cpp
@@ -25,7 +27,8 @@ if(TARGET ${APP_NAME_LC}::Bluray)
 endif()
 
 if(TARGET ${APP_NAME_LC}::Udfread)
-  list(APPEND SOURCES TestUDFBlockInput.cpp)
+  list(APPEND SOURCES TestUDFBlockInput.cpp
+                      TestUDFContext.cpp)
 endif()
 
 if(TARGET ${APP_NAME_LC}::MicroHttpd)

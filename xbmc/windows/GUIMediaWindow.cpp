@@ -23,6 +23,7 @@
 #include "addons/PluginSource.h"
 #include "addons/addoninfo/AddonType.h"
 #include "application/Application.h"
+#include "filesystem/SourcesDirectory.h"
 #include "media/MediaSection.h"
 #include "messaging/ApplicationMessenger.h"
 #include "network/NetworkFileItemClassify.h"
@@ -35,6 +36,7 @@
 #include "dialogs/GUIDialogMediaFilter.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
+#include "filesystem/Directory.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/MultiPathDirectory.h"
 #include "filesystem/PluginDirectory.h"
@@ -91,6 +93,7 @@
 using namespace ADDON;
 using namespace KODI;
 using namespace KODI::MESSAGING;
+using KODI::MEDIA::MediaSection;
 using namespace std::chrono_literals;
 
 CGUIMediaWindow::CGUIMediaWindow(int id, const char *xmlFile)
@@ -314,6 +317,8 @@ bool CGUIMediaWindow::OnMessage(CGUIMessage& message)
       if (message.GetParam1() == GUI_MSG_WINDOW_RESET)
       {
         m_vecItems->SetPath("?");
+        m_libraryFilterNodePath.clear();
+        m_libraryFilterDbPath.clear();
         return true;
       }
       else if ( message.GetParam1() == GUI_MSG_REFRESH_THUMBS )
@@ -541,6 +546,8 @@ bool CGUIMediaWindow::OnMessage(CGUIMessage& message)
         }
         if (resetHistory)
         {
+          m_libraryFilterNodePath.clear();
+          m_libraryFilterDbPath.clear();
           m_vecItems->RemoveDiscCache(GetID());
           // only compute the history for the provided path if "return" is not defined
           // (otherwise the root level for the path will be added by default to the path history
@@ -752,11 +759,32 @@ bool CGUIMediaWindow::GetDirectory(const std::string &strDirectory, CFileItemLis
       SetupShares();
 
     CFileItemList dirItems;
-    if (!GetDirectoryItems(pathToUrl, dirItems, UseFileDirectories()))
+    CFileItemList nodeItems;
+    bool viaNode{false};
+    if (!m_libraryFilterDbPath.empty() && strDirectory == m_libraryFilterDbPath)
+    {
+      CURL nodeUrl{m_libraryFilterNodePath};
+      viaNode = GetDirectoryItems(nodeUrl, nodeItems, UseFileDirectories());
+      if (viaNode)
+      {
+        m_libraryFilterDbPath = nodeItems.GetPath();
+      }
+      else if (XFILE::CDirectory::Exists(m_libraryFilterNodePath, false))
+      {
+        // still there, so cancelled or hidden: don't load the db path in its place
+        return false;
+      }
+      else
+      {
+        m_libraryFilterNodePath.clear();
+        m_libraryFilterDbPath.clear();
+      }
+    }
+    if (!viaNode && !GetDirectoryItems(pathToUrl, dirItems, UseFileDirectories()))
       return false;
 
     // assign fetched directory items
-    items.Assign(dirItems);
+    items.Assign(viaNode ? nodeItems : dirItems);
 
     // took over a second, and not normally cached, so cache it
     auto end = std::chrono::steady_clock::now();
@@ -864,6 +892,14 @@ bool CGUIMediaWindow::Update(const std::string &strDirectory, bool updateFilterP
     return false;
   }
 
+  if (URIUtils::IsLibraryFolder(pathNoFilter) &&
+      m_vecItems->GetProperty(ITEM::PROPERTY::LIBRARY_FILTER).asBoolean() &&
+      m_vecItems->GetPath() != pathNoFilter)
+  {
+    m_libraryFilterNodePath = pathNoFilter;
+    m_libraryFilterDbPath = m_vecItems->GetPath();
+  }
+
   if (m_vecItems->GetLabel().empty())
   {
     // Removable sources
@@ -901,16 +937,30 @@ bool CGUIMediaWindow::Update(const std::string &strDirectory, bool updateFilterP
     else if (iWindow == WINDOW_GAMES)
       showLabel = 35250; // "Add games..."
   }
-  if (m_vecItems->IsPath("sources://video/"))
-    showLabel = 999;
-  else if (m_vecItems->IsPath("sources://music/"))
-    showLabel = 998;
-  else if (m_vecItems->IsPath("sources://pictures/"))
-    showLabel = 997;
-  else if (m_vecItems->IsPath("sources://files/"))
-    showLabel = 1026;
-  else if (m_vecItems->IsPath("sources://games/"))
-    showLabel = 35250; // "Add games..."
+  if (const std::optional<MediaSection> section{
+          XFILE::CSourcesDirectory::SectionOf(m_vecItems->GetPath())})
+  {
+    switch (*section)
+    {
+      case MediaSection::VIDEO:
+        showLabel = 999;
+        break;
+      case MediaSection::MUSIC:
+        showLabel = 998;
+        break;
+      case MediaSection::PICTURES:
+        showLabel = 997;
+        break;
+      case MediaSection::FILES:
+        showLabel = 1026;
+        break;
+      case MediaSection::GAMES:
+        showLabel = 35250; // "Add games..."
+        break;
+      case MediaSection::PROGRAMS:
+        break;
+    }
+  }
    // Add 'Add source ' item
   if (showLabel && (m_vecItems->Size() == 0 || !m_guiState->DisableAddSourceButtons()) &&
       iWindow != WINDOW_MUSIC_PLAYLIST_EDITOR)

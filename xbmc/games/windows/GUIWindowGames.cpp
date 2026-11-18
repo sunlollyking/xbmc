@@ -21,6 +21,7 @@
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "filesystem/AddonsDirectory.h"
 #include "filesystem/Directory.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/GameDatabaseDirectory.h"
@@ -582,7 +583,7 @@ std::string CGUIWindowGames::GetStartFolder(const std::string& dir)
 
   if (StringUtils::EqualsNoCase(dir, "plugins") || StringUtils::EqualsNoCase(dir, "addons"))
   {
-    return "addons://sources/game/";
+    return XFILE::CAddonsDirectory::SourcesPathOf(MEDIA::MediaSection::GAMES);
   }
 
   SetupShares();

@@ -3,6 +3,7 @@ if(TARGET ${APP_NAME_LC}::OpenGLES)
               ScreenshotSurfaceGLES.cpp
               GainMapShaderGLES.cpp
               GLESShader.cpp
+              GuiCompositeGLES.cpp
               GuiCompositeShaderGLES.cpp)
 
   set(HEADERS RenderSystemGLES.h
@@ -10,6 +11,7 @@ if(TARGET ${APP_NAME_LC}::OpenGLES)
               ScreenshotSurfaceGLES.h
               GainMapShaderGLES.h
               GLESShader.h
+              GuiCompositeGLES.h
               GuiCompositeShaderGLES.h)
 
 if("webos" IN_LIST CORE_PLATFORM_NAME_LC)

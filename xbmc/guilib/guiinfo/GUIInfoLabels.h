@@ -83,7 +83,9 @@ constexpr uint32_t PLAYER_SCENE_MARKERS              = 71;
 constexpr uint32_t PLAYER_HAS_SCENE_MARKERS          = 72;
 constexpr uint32_t PLAYER_BOOKMARKS                  = 73;
 constexpr uint32_t PLAYER_HAS_BOOKMARKS              = 74;
-// unused id 75 to 80
+constexpr uint32_t PLAYER_WAITING_FOR_AUDIO          = 75;
+constexpr uint32_t PLAYER_WAITING_FOR_AUDIO_REMAINING = 76;
+// unused id 77 to 80
 
 // Keep player infolabels that work with offset and position together
 constexpr uint32_t PLAYER_PATH                       = 81;
@@ -302,6 +304,13 @@ constexpr uint32_t VIDEOPLAYER_AUDIOSTREAMCOUNT      = 295;
 constexpr uint32_t VIDEOPLAYER_VIDEOVERSION_NAME     = 296;
 constexpr uint32_t VIDEOPLAYER_VIDEOSTREAMCOUNT      = 297;
 constexpr uint32_t VIDEOPLAYER_HDR_DETAIL            = 298;
+constexpr uint32_t VIDEOPLAYER_VIDEO_ASPECT_NAME     = 299;
+
+// The infolabel numbering is one flat space shared by every group.
+constexpr uint32_t VIDEOPLAYER_CONTENT_ASPECT        = 425;
+constexpr uint32_t VIDEOPLAYER_CONTENT_ASPECT_NAME   = 426;
+constexpr uint32_t VIDEOPLAYER_CONTENT_ASPECT_COUNT  = 427;
+constexpr uint32_t VIDEOPLAYER_CONTENT_ASPECT_SOURCE = 428;
 
 // Videoplayer infobools
 constexpr uint32_t VIDEOPLAYER_HASSUBTITLES          = 300;
@@ -316,6 +325,7 @@ constexpr uint32_t VIDEOPLAYER_HAS_INFO              = 308;
 constexpr uint32_t VIDEOPLAYER_HASTELETEXT           = 309;
 constexpr uint32_t VIDEOPLAYER_IS_STEREOSCOPIC       = 310;
 constexpr uint32_t VIDEOPLAYER_HAS_VIDEOVERSIONS     = 311;
+constexpr uint32_t VIDEOPLAYER_CONTENT_ASPECT_VARIES = 429;
 
 // PVR infolabels
 constexpr uint32_t VIDEOPLAYER_TITLE_EXTRAINFO       = 312;
@@ -1092,15 +1102,21 @@ constexpr uint32_t LISTITEM_DEVELOPER                = LISTITEM_START + 234;
 constexpr uint32_t LISTITEM_PUBLISHER                = LISTITEM_START + 235;
 constexpr uint32_t LISTITEM_PLAYERS                  = LISTITEM_START + 236;
 constexpr uint32_t LISTITEM_AGERATING                = LISTITEM_START + 237;
-constexpr uint32_t LISTITEM_REGION                   = LISTITEM_START + 238;
-constexpr uint32_t LISTITEM_RELEASE_COUNT            = LISTITEM_START + 239;
-constexpr uint32_t LISTITEM_ACHIEVEMENTS_TOTAL       = LISTITEM_START + 240;
-constexpr uint32_t LISTITEM_ACHIEVEMENTS_EARNED      = LISTITEM_START + 241;
-constexpr uint32_t LISTITEM_GAME_CATEGORY            = LISTITEM_START + 242;
-constexpr uint32_t LISTITEM_GAME_CLIENT              = LISTITEM_START + 243;
-constexpr uint32_t LISTITEM_ACHIEVEMENTS_PERCENT     = LISTITEM_START + 244;
-constexpr uint32_t LISTITEM_ACHIEVEMENTS_PROGRESS    = LISTITEM_START + 245;
-constexpr uint32_t LISTITEM_ACHIEVEMENTS_GAME_ID     = LISTITEM_START + 246;
+constexpr uint32_t LISTITEM_VIDEO_ASPECT_NAME        = LISTITEM_START + 238;
+constexpr uint32_t LISTITEM_CONTENT_ASPECT           = LISTITEM_START + 239;
+constexpr uint32_t LISTITEM_CONTENT_ASPECT_NAME      = LISTITEM_START + 240;
+constexpr uint32_t LISTITEM_CONTENT_ASPECT_COUNT     = LISTITEM_START + 241;
+constexpr uint32_t LISTITEM_CONTENT_ASPECT_SOURCE    = LISTITEM_START + 242;
+constexpr uint32_t LISTITEM_CONTENT_ASPECT_VARIES    = LISTITEM_START + 243;
+constexpr uint32_t LISTITEM_REGION                   = LISTITEM_START + 244;
+constexpr uint32_t LISTITEM_RELEASE_COUNT            = LISTITEM_START + 245;
+constexpr uint32_t LISTITEM_ACHIEVEMENTS_TOTAL       = LISTITEM_START + 246;
+constexpr uint32_t LISTITEM_ACHIEVEMENTS_EARNED      = LISTITEM_START + 247;
+constexpr uint32_t LISTITEM_GAME_CATEGORY            = LISTITEM_START + 248;
+constexpr uint32_t LISTITEM_GAME_CLIENT              = LISTITEM_START + 249;
+constexpr uint32_t LISTITEM_ACHIEVEMENTS_PERCENT     = LISTITEM_START + 250;
+constexpr uint32_t LISTITEM_ACHIEVEMENTS_PROGRESS    = LISTITEM_START + 251;
+constexpr uint32_t LISTITEM_ACHIEVEMENTS_GAME_ID     = LISTITEM_START + 252;
 
 constexpr int      LISTITEM_END                      = LISTITEM_START + 2500;
 

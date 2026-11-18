@@ -16,6 +16,7 @@
 #include "utils/Artwork.h"
 #include "utils/SortUtils.h"
 #include "utils/UrlOptions.h"
+#include "video/geometry/ContentGeometryRecord.h"
 
 #include <array>
 #include <functional>
@@ -152,6 +153,14 @@ using EpisodeFileMap = std::multimap<std::string, EpisodeInformation, std::less<
 using EpisodeFileMapEntry = EpisodeFileMap::value_type;
 
 static constexpr const char* MULTIPLE_EPISODES{"multiple_episodes"};
+
+//! \brief One file the content geometry sweep may have to measure, and what it already holds.
+struct ContentGeometryCandidate
+{
+  int idFile{-1};
+  std::string path;
+  std::optional<KODI::VIDEO::GEOMETRY::ContentGeometryRecord> stored;
+};
 
 class CVideoDatabase : public CDatabase
 {
@@ -305,15 +314,67 @@ public:
                      CFileItem* item = nullptr,
                      int getDetails = VideoDbDetailsAll);
   bool GetSeasonInfo(const std::string& path, int season, CVideoInfoTag& details, CFileItem* item);
-  bool GetSeasonInfo(int idSeason, CVideoInfoTag& details, CFileItem* item);
-  bool GetSeasonInfo(int idSeason, CVideoInfoTag& details, bool allDetails = true);
+  bool GetSeasonInfo(int idSeason,
+                     CVideoInfoTag& details,
+                     CFileItem* item = nullptr,
+                     bool allDetails = true);
   bool GetEpisodeBasicInfo(const std::string& strFilenameAndPath, CVideoInfoTag& details, int idEpisode  = -1);
   bool GetEpisodeInfo(const std::string& strFilenameAndPath, CVideoInfoTag& details, int idEpisode = -1, int getDetails = VideoDbDetailsAll);
   bool GetMusicVideoInfo(const std::string& strFilenameAndPath, CVideoInfoTag& details, int idMVideo = -1, int getDetails = VideoDbDetailsAll);
   bool GetSetInfo(int idSet, CVideoInfoTag& details, CFileItem* item = nullptr);
   bool GetFileInfo(const std::string& strFilenameAndPath, CVideoInfoTag& details, int idFile = -1);
 
+  // Asked by path, these answer NotFound for a path they cannot resolve to an id, even when it
+  // is that lookup which failed.
+
+  //! With idMovie given, the path only picks the version, when neither idVersion nor idFile does.
+  GetResult TryGetMovieInfo(const std::string& strFilenameAndPath,
+                            CVideoInfoTag& details,
+                            int idMovie = -1,
+                            int idVersion = -1,
+                            int idFile = -1,
+                            int getDetails = VideoDbDetailsAll);
+
+  //! The path is ignored when idTvShow is given.
+  GetResult TryGetTvShowInfo(const std::string& strPath,
+                             CVideoInfoTag& details,
+                             int idTvShow = -1,
+                             CFileItem* item = nullptr,
+                             int getDetails = VideoDbDetailsAll);
+
+  //! allDetails fills from the season view rather than the season row.
+  GetResult TryGetSeasonInfo(int idSeason,
+                             CVideoInfoTag& details,
+                             CFileItem* item = nullptr,
+                             bool allDetails = true);
+
+  //! The path is ignored when idEpisode is given.
+  GetResult TryGetEpisodeInfo(const std::string& strFilenameAndPath,
+                              CVideoInfoTag& details,
+                              int idEpisode = -1,
+                              int getDetails = VideoDbDetailsAll);
+
+  //! The path is ignored when idMVideo is given.
+  GetResult TryGetMusicVideoInfo(const std::string& strFilenameAndPath,
+                                 CVideoInfoTag& details,
+                                 int idMVideo = -1,
+                                 int getDetails = VideoDbDetailsAll);
+
+  GetResult TryGetSetInfo(int idSet, CVideoInfoTag& details, CFileItem* item = nullptr);
+
+  //! The path is ignored when idFile is given. Adds to details rather than replacing them.
+  GetResult TryGetFileInfo(const std::string& strFilenameAndPath,
+                           CVideoInfoTag& details,
+                           int idFile = -1);
+
   int GetPathId(const std::string& strPath);
+
+  /*! \brief Get the id of this fileitem
+   Works for both videodb:// items and normal fileitems
+   \param item CFileItem to grab the fileid of
+   \return id of the file, -1 if it is not in the db.
+   */
+  int GetFileId(const CFileItem& item);
   /*! \brief Get the id of a path, also accepting the zip:// or archive:// equivalent of an
    *         archive path (AddPath() stores these interchangeably).
    */
@@ -588,8 +649,48 @@ public:
    */
   bool GetFileMetadataForPath(const std::string& strPath,
                               std::map<std::string, CVideoInfoTag>& metadata);
+  /*! \brief The details of the library item of \p type with \p id.
+   \param item when given, filled as the library lists a set, show or season
+   \param idVersion, idFile for a movie, the version to read, as TryGetMovieInfo takes them
+   */
+  GetResult TryGetDetailsByTypeAndId(KODI::MEDIA::TYPE type,
+                                     int id,
+                                     CVideoInfoTag& details,
+                                     CFileItem* item = nullptr,
+                                     int getDetails = VideoDbDetailsAll,
+                                     int idVersion = -1,
+                                     int idFile = -1);
   bool GetDetailsByTypeAndId(CFileItem& item, VideoDbContentType type, int id);
   CVideoInfoTag GetDetailsByTypeAndId(VideoDbContentType type, int id);
+
+  /*! \name Content geometry
+   * The measured picture rectangle of a file. Detection results only; a declared ratio
+   * lives in the settings table.
+   */
+  ///@{
+
+  //! \brief Store the content geometry of a file, replacing any previous one.
+  bool SetContentGeometry(int idFile, const KODI::VIDEO::GEOMETRY::ContentGeometryRecord& geometry);
+
+  //! \brief Look up the content geometry of a file, checking it still describes that file.
+  //! MISSING both when there is none and when what is stored was measured from other content.
+  KODI::VIDEO::GEOMETRY::ContentGeometryLookup GetContentGeometry(
+      int idFile, const KODI::VIDEO::GEOMETRY::FileIdentity& identity);
+
+  //! \brief GetContentGeometry() for the file at \p path, which is asked for its identity only
+  //! when a measurement is stored to check it against.
+  KODI::VIDEO::GEOMETRY::ContentGeometryLookup GetContentGeometryOfFile(int idFile,
+                                                                        const std::string& path);
+
+  //! \brief What is stored for a file, including a record that found nothing, without checking
+  //! it still describes the file. Anything acting on the rectangle uses GetContentGeometry().
+  std::optional<KODI::VIDEO::GEOMETRY::ContentGeometryRecord> GetStoredContentGeometry(int idFile);
+
+  //! \brief Every file in the library with whatever content geometry is stored for it,
+  //! unfiltered.
+  std::vector<ContentGeometryCandidate> GetContentGeometryCandidates();
+
+  ///@}
 
   // scraper settings
   struct StringHash
@@ -1125,6 +1226,15 @@ public:
    */
   int GetMovieIdInFolder(const std::string& folder, const std::string& excludedFolder);
 
+  /*!
+   \brief Work out the date a file, or a show's folder, is added to the library with, where nothing
+   gives it one, before the transaction it is added in, so that the file system isn't asked while the
+   database is held
+   \param fileAndPath the file or folder, as it is added
+   */
+  void PrepareDateAdded(const std::string& fileAndPath);
+  void ForgetPreparedDatesAdded();
+
   std::string GetMovieTitle(int idMovie);
 
   enum MatchingMask : uint8_t
@@ -1160,12 +1270,6 @@ protected:
 
   int GetMusicVideoId(const std::string& strFilenameAndPath);
 
-  /*! \brief Get the id of this fileitem
-   Works for both videodb:// items and normal fileitems
-   \param item CFileItem to grab the fileid of
-   \return id of the file, -1 if it is not in the db.
-   */
-  int GetFileId(const CFileItem &item);
   int GetFileId(const CVideoInfoTag& details);
 
   /*! \brief Get the id of the file of this item and store it in the item
@@ -1368,8 +1472,6 @@ private:
    */
   static bool AddStreamDetailFromRow(dbiplus::Dataset& ds, CStreamDetails& details);
 
-  bool GetSeasonInfo(int idSeason, CVideoInfoTag& details, bool allDetails, CFileItem* item);
-
   int GetMinSchemaVersion() const override { return 75; }
   int GetSchemaVersion() const override;
   virtual int GetExportVersion() const { return 1; }
@@ -1400,4 +1502,9 @@ private:
   static void AnnounceRemove(KODI::MEDIA::TYPE content, int id, bool scanning = false);
 
   static CDateTime GetDateAdded(const std::string& filename, CDateTime dateAdded = CDateTime());
+
+  //! The dates added of files and folders about to be added \sa PrepareDateAdded
+  std::map<std::string, CDateTime, std::less<>> m_preparedDatesAdded;
+  //! \brief The date \p path is added with: \p dateAdded, else the one prepared, else read now
+  CDateTime DateAddedOf(const std::string& path, const CDateTime& dateAdded) const;
 };

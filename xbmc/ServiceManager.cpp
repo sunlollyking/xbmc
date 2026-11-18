@@ -27,6 +27,7 @@
 #include "input/InputManager.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "interfaces/python/XBPython.h"
+#include "language/LangInfo.h"
 #include "network/Network.h"
 #include "peripherals/Peripherals.h"
 #if defined(HAS_FILESYSTEM_SMB)
@@ -158,6 +159,9 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
     CLog::Log(LOGFATAL, "CServiceManager::{}: Unable to start CAddonMgr", __FUNCTION__);
     return false;
   }
+
+  m_addonMgr->Events().Subscribe(&g_langInfo, [](const ADDON::AddonEvent& event)
+                                 { g_langInfo.OnAddonEvent(event); });
 
   m_repositoryUpdater = std::make_unique<ADDON::CRepositoryUpdater>(*m_addonMgr);
 
@@ -296,6 +300,7 @@ void CServiceManager::DeinitStageTwo()
   m_vfsAddonCache.reset();
   m_repositoryUpdater.reset();
   m_binaryAddonManager.reset();
+  m_addonMgr->Events().Unsubscribe(&g_langInfo);
   m_addonMgr.reset();
   m_databaseManager.reset();
 
@@ -317,7 +322,11 @@ void CServiceManager::DeinitStageOne()
   m_slideShowDelegator.reset();
 #ifdef HAS_PYTHON
   CScriptInvocationManager::GetInstance().UnregisterLanguageInvocationHandler(m_XBPython.get());
-  m_XBPython.reset();
+  // a script left running can still call into it from its own thread
+  if (m_XBPython->IsPythonLeftRunning())
+    static_cast<void>(m_XBPython.release());
+  else
+    m_XBPython.reset();
 #endif
 
   m_Platform->DeinitStageOne();

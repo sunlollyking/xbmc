@@ -72,13 +72,6 @@ public:
   void SetShaderPreset(const std::string& presetPath);
 
   /*!
-   * \brief Draw the game inside a bezel's window, where the bezel frames it well
-   *
-   * \param window The window on screen, or an empty rectangle for no bezel
-   */
-  void SetBezelWindow(const CRect& window) { m_bezelWindow = window; }
-
-  /*!
    * \brief True if the renderer can draw frames for an HDR10 output
    */
   virtual bool SupportsHdr() const { return false; }
@@ -95,14 +88,26 @@ public:
     m_hdrPeak = peak;
   }
 
+  /*!
+   * \brief Draw the game inside a bezel's window, where the bezel frames it well
+   *
+   * \param window The window on screen, or an empty rectangle for no bezel
+   */
+  void SetBezelWindow(const CRect& window) { m_bezelWindow = window; }
+
+  /*!
+   * \brief Work out where the current frame goes without drawing it
+   */
+  void UpdateRenderArea();
+
+  /*!
+   * \brief True if the current frame goes inside the bezel's window
+   */
+  bool IsBezelShown() const { return m_bezelShown; }
+
   // Rendering properties
   bool IsVisible() const;
   IRenderBuffer* GetRenderBuffer() const;
-
-  /*!
-   * \brief True if the last frame was drawn inside the bezel's window
-   */
-  bool IsBezelShown() const { return m_bezelShown; }
 
   /*!
    * \brief Record that the renderer was asked for in the current frame
@@ -146,10 +151,10 @@ protected:
   float m_lastTargetWidth{0.0f};
   float m_lastTargetHeight{0.0f};
   ViewportCoordinates m_rotatedDestCoords{};
-  CRect m_bezelWindow;
-  bool m_bezelShown{false};
   unsigned int m_hdrPaperWhite{0};
   unsigned int m_hdrPeak{0}; // 0 for SDR
+  CRect m_bezelWindow;
+  bool m_bezelShown{false};
 
   // Video shaders
   void UpdateShaders();

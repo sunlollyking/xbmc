@@ -8,18 +8,19 @@ if(CORE_SYSTEM_NAME STREQUAL windows)
   list(APPEND HEADERS RPWinRenderer.h)
 endif()
 
+if(TARGET ${APP_NAME_LC}::OpenGl OR TARGET ${APP_NAME_LC}::OpenGLES)
+  list(APPEND SOURCES RPHdrShader.cpp)
+  list(APPEND HEADERS RPHdrShader.h)
+endif()
+
 if(TARGET ${APP_NAME_LC}::OpenGl)
-  list(APPEND SOURCES RPHdrShaderGL.cpp
-                      RPRendererOpenGL.cpp)
-  list(APPEND HEADERS RPHdrShaderGL.h
-                      RPRendererOpenGL.h)
+  list(APPEND SOURCES RPRendererOpenGL.cpp)
+  list(APPEND HEADERS RPRendererOpenGL.h)
 endif()
 
 if(TARGET ${APP_NAME_LC}::OpenGLES)
-  list(APPEND SOURCES RPHdrShaderGLES.cpp
-                      RPRendererOpenGLES.cpp)
-  list(APPEND HEADERS RPHdrShaderGLES.h
-                      RPRendererOpenGLES.h)
+  list(APPEND SOURCES RPRendererOpenGLES.cpp)
+  list(APPEND HEADERS RPRendererOpenGLES.h)
 endif()
 
 if(("gbm" IN_LIST CORE_PLATFORM_NAME_LC OR "wayland" IN_LIST CORE_PLATFORM_NAME_LC) AND TARGET ${APP_NAME_LC}::EGL)

@@ -13,6 +13,7 @@
 #include "Util.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
+#include "video/geometry/ContentGeometryScanner.h"
 #include "video/jobs/VideoLibraryCleaningJob.h"
 #include "video/jobs/VideoLibraryJob.h"
 #include "video/jobs/VideoLibraryMarkWatchedJob.h"
@@ -53,6 +54,9 @@ bool CVideoLibraryQueue::IsScanningLibrary() const
   // check if the library is being cleaned synchronously
   if (m_cleaning)
     return true;
+
+  // The jobs are added and removed on other threads
+  std::unique_lock lock(m_critical);
 
   // check if the library is being scanned asynchronously
   VideoLibraryJobMap::const_iterator scanningJobs = m_jobs.find(CVideoLibraryScanningJob::TYPE);
@@ -300,6 +304,9 @@ void CVideoLibraryQueue::OnJobComplete(unsigned int jobID, bool success, CJob *j
   {
     if (QueueEmpty())
       Refresh();
+
+    if (std::strcmp(job->GetType(), CVideoLibraryScanningJob::TYPE) == 0)
+      KODI::VIDEO::GEOMETRY::CContentGeometryScanner::GetInstance().Sweep();
   }
 
   {

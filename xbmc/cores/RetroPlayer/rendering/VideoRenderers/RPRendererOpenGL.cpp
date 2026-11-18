@@ -8,7 +8,7 @@
 
 #include "RPRendererOpenGL.h"
 
-#include "RPHdrShaderGL.h"
+#include "RPHdrShader.h"
 #include "cores/RetroPlayer/buffers/RenderBufferOpenGL.h"
 #include "cores/RetroPlayer/buffers/RenderBufferPoolOpenGL.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
@@ -243,7 +243,7 @@ bool CRPRendererOpenGL::LoadHdrShader()
   if (m_context.UseLimitedColor())
     defines += "#define KODI_LIMITED_RANGE 1\n";
 
-  auto shader = std::make_unique<CRPHdrShaderGL>(defines);
+  auto shader = std::make_unique<CRPHdrShader>(defines);
   if (!shader->CompileAndLink() || shader->GetPosLoc() < 0)
   {
     CLog::Log(LOGERROR, "RetroPlayer[RENDER]: Failed to compile the HDR shader");

@@ -164,7 +164,7 @@ bool CSkinSettingBool::SerializeSetting(TiXmlElement* element) const
 }
 
 //! \brief The ratio a layout's aspect attribute declares; zero when nothing usable is stated.
-static float ParseDeclaredAspect(const std::string& strAspect, const std::string& skinId)
+static float ParseDeclaredAspect(const std::string& strAspect)
 {
   float aspect = 0;
 
@@ -178,10 +178,6 @@ static float ParseDeclaredAspect(const std::string& strAspect, const std::string
       if (h > 0.0f)
         aspect = w / h;
     }
-
-    if (aspect > 0.0f)
-      CLog::Log(LOGDEBUG, "Skin {}: aspect \"{}\" is a fraction, use \"{:.2f}\"", skinId, strAspect,
-                aspect);
   }
   else if (!strAspect.empty())
   {
@@ -193,13 +189,7 @@ static float ParseDeclaredAspect(const std::string& strAspect, const std::string
       aspect = canonical;
   }
 
-  if (aspect > 0.0f)
-    return aspect;
-
-  if (!strAspect.empty())
-    CLog::Log(LOGDEBUG, "Skin {}: aspect \"{}\" is not a ratio", skinId, strAspect);
-
-  return 0.0f;
+  return aspect > 0.0f ? aspect : 0.0f;
 }
 
 CSkinInfo::CSkinInfo(const AddonInfoPtr& addonInfo,
@@ -216,6 +206,13 @@ CSkinInfo::CSkinInfo(const AddonInfoPtr& addonInfo) : CAddon(addonInfo, AddonTyp
 {
   for (const auto& [name, values] : Type(AddonType::SKIN)->GetValues())
   {
+    if (name == "surround")
+    {
+      m_surroundColour = values.GetValue("surround@colour").asString();
+      m_surroundImage = values.GetValue("surround@image").asString();
+      continue;
+    }
+
     if (name != "res")
       continue;
 
@@ -224,7 +221,7 @@ CSkinInfo::CSkinInfo(const AddonInfoPtr& addonInfo) : CAddon(addonInfo, AddonTyp
     const bool defRes = values.GetValue("res@default").asBoolean();
     const std::string folder = values.GetValue("res@folder").asString();
     const std::string strAspect = values.GetValue("res@aspect").asString();
-    const float aspect = ParseDeclaredAspect(strAspect, ID());
+    const float aspect = ParseDeclaredAspect(strAspect);
 
     if (width > 0 && height > 0)
     {
@@ -276,6 +273,20 @@ void CSkinInfo::Start()
   if (!LoadUserSettings())
     CLog::Log(LOGWARNING, "CSkinInfo: failed to load skin settings");
 
+  for (const RESOLUTION_INFO& res : m_resolutions)
+  {
+    const std::string& declared = res.strId;
+    if (declared.empty())
+      continue;
+
+    const float aspect = ParseDeclaredAspect(declared);
+    if (aspect <= 0.0f)
+      CLog::Log(LOGDEBUG, "Skin {}: aspect \"{}\" is not a ratio", ID(), declared);
+    else if (m_debugging && declared.find(':') != std::string::npos)
+      CLog::Log(LOGDEBUG, "Skin {}: aspect \"{}\" is a fraction, use \"{:.2f}\"", ID(), declared,
+                aspect);
+  }
+
   if (m_resolutions.empty())
   { // try falling back to whatever resolutions exist in the directory
     CFileItemList items;
@@ -290,11 +301,24 @@ void CSkinInfo::Start()
 
   if (!m_resolutions.empty())
   {
-    // find the closest resolution
-    const RESOLUTION_INFO& target = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
-    const RESOLUTION_INFO& res = *std::ranges::min_element(m_resolutions, closestRes(target));
-    m_currentAspect = res.strId;
+    const RESOLUTION_INFO target =
+        CServiceBroker::GetWinSystem()->GetGfxContext().GetRasterResInfo();
+    const auto res = std::ranges::min_element(m_resolutions, closestRes(target));
+    m_currentAspect = res->strId;
+    m_currentResolution = std::ranges::distance(m_resolutions.begin(), res);
   }
+}
+
+bool CSkinInfo::IsResolutionChanged() const
+{
+  if (m_resolutions.empty())
+    return false;
+
+  // compare the entry, resolutions found in the skin directory have no aspect string
+  const RESOLUTION_INFO target = CServiceBroker::GetWinSystem()->GetGfxContext().GetRasterResInfo();
+  return std::ranges::distance(m_resolutions.begin(),
+                               std::ranges::min_element(m_resolutions, closestRes(target))) !=
+         m_currentResolution;
 }
 
 std::string CSkinInfo::GetSkinPath(const std::string& strFile,
@@ -313,8 +337,7 @@ std::string CSkinInfo::GetSkinPath(const std::string& strFile,
   if (!res)
     res = &tempRes;
 
-  // find the closest resolution
-  const RESOLUTION_INFO &target = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
+  const RESOLUTION_INFO target = CServiceBroker::GetWinSystem()->GetGfxContext().GetRasterResInfo();
   *res = *std::ranges::min_element(m_resolutions, closestRes(target));
 
   std::string strPath = URIUtils::AddFileToFolder(strPathToUse, res->strMode, strFile);

@@ -12,6 +12,7 @@
 #include "OverlayRendererUtil.h"
 #include "ServiceBroker.h"
 #include "application/ApplicationComponents.h"
+#include "application/ApplicationContentGeometry.h"
 #include "application/ApplicationPlayer.h"
 #include "cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlay.h"
 #include "cores/VideoPlayer/DVDCodecs/Overlay/DVDOverlayImage.h"
@@ -98,12 +99,12 @@ void CRenderer::Flush()
   for(std::vector<SElement>& buffer : m_buffers)
     Release(buffer);
 
-  ReleaseCache();
   Reset();
 }
 
 void CRenderer::Reset()
 {
+  ReleaseCache();
   m_subtitlePosition = 0;
   m_subtitlePosResInfo = -1;
 }
@@ -330,6 +331,19 @@ bool CRenderer::HasVisibleOverlay(int idx) const
   return false;
 }
 
+void CRenderer::SetContentRect(SUBTITLES::STYLE::renderOpts& opts) const
+{
+  if (!m_subtitleAlignToContent)
+    return;
+
+  const auto geometry =
+      CServiceBroker::GetAppComponents().GetComponent<CApplicationContentGeometry>();
+  const CRect picture =
+      KODI::VIDEO::GEOMETRY::PictureOnScreen(geometry->GetRenderInputs().geometry, m_rs, m_rd);
+  opts.contentWidth = picture.Width();
+  opts.contentHeight = picture.Height();
+}
+
 void CRenderer::SetVideoRect(CRect &source, CRect &dest, CRect &view)
 {
   if (m_rv != view) // Screen resolution is changed
@@ -479,6 +493,7 @@ void CRenderer::PrepareOverlays(int idx)
 
   bool doMarkDirty = false;
   bool hasImageSpu = false;
+  bool hasLibassImages = false;
   for (auto& e : m_buffers[idx])
   {
     // Clear last frame's cached output; libass may have invalidated the
@@ -520,6 +535,8 @@ void CRenderer::PrepareOverlays(int idx)
     int currentChange = 0;
     e.renderedImages =
         ovAss.GetLibassHandler()->RenderImage(e.pts, rOpts, m_overlayStyle, &currentChange);
+    if (e.renderedImages)
+      hasLibassImages = true;
     if (currentChange > 0)
     {
       // Persist on the overlay so a skipped GUI render does not drop the change.
@@ -531,9 +548,12 @@ void CRenderer::PrepareOverlays(int idx)
   // PGS/DVB/SPU disappearance: arrival is caught by m_textureid==0 in
   // the loop above. Without this, a PGS subtitle ending leaves its
   // cached bitmap on the GUI plane until something else dirties.
-  if (hasImageSpu != m_prevHadImageSpu)
+  // Likewise libass output once its overlay is no longer added.
+  if (hasImageSpu != m_prevHadImageSpu || hasLibassImages != m_prevHadLibassImages)
     doMarkDirty = true;
+
   m_prevHadImageSpu = hasImageSpu;
+  m_prevHadLibassImages = hasLibassImages;
 
   if (doMarkDirty)
     MarkDirty();
@@ -639,6 +659,8 @@ void CRenderer::LoadSettings()
   const auto settings{CServiceBroker::GetSettingsComponent()->GetSubtitlesSettings()};
   m_subtitleHorizontalAlign = settings->GetHorizontalAlignment();
   m_subtitleAlign = settings->GetAlignment();
+  m_subtitleAlignToContent = settings->IsAlignedToContent();
+  m_subtitleKeepAuthoredPositions = settings->IsKeepingAuthoredPositions();
   ResetSubtitlePosition();
 }
 
@@ -657,6 +679,8 @@ SUBTITLES::STYLE::renderOpts CRenderer::GetRenderOptions(const CDVDOverlayLibass
   rOpts.videoHeight = m_rd.Height();
   rOpts.frameWidth = m_rv.Width();
   rOpts.frameHeight = m_rv.Height();
+  SetContentRect(rOpts);
+  rOpts.keepAuthoredPositions = m_subtitleKeepAuthoredPositions;
 
   // Render subtitle of half-sbs and half-ou video in full screen, not in half screen
   if (m_stereomode == "left_right" || m_stereomode == "right_left")

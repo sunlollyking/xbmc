@@ -47,6 +47,10 @@ public:
                 const CPlayerCoreFactory &factory,
                 const std::string &playerName, IPlayerCallback& callback);
   void OpenNext(const CPlayerCoreFactory &factory);
+  /*!
+   \brief Whether a file waits to be opened once the playing one is closed.
+   */
+  bool HasNextItem() const { return m_nextItem.pItem != nullptr; }
   void SetPlaySpeed(float speed);
   void SetTempo(float tempo);
   void FrameAdvance(int frames);
@@ -112,6 +116,7 @@ public:
   int GetVideoStream();
   int GetVideoStreamCount() const;
   void GetVideoStreamInfo(int streamId, VideoStreamInfo& info) const;
+  int GetWaitingForAudioRemaining() const;
   int GetPrograms(std::vector<ProgramInfo>& programs);
   void SetProgram(int progId);
   int GetProgramsCount() const;
@@ -138,6 +143,7 @@ public:
   bool IsPlayingRDS() const;
   bool IsLiveStream() const;
   bool IsStreaming() const;
+  bool IsWaitingForAudio() const;
   void LoadPage(int p, int sp, unsigned char* buffer);
   bool OnAction(const CAction &action);
 
@@ -166,6 +172,7 @@ public:
   void SetAVDelay(float fValue = 0.0f);
   void SetBookmarks(const std::vector<std::chrono::milliseconds>& bookmarks);
   void SetDynamicRangeCompression(long drc);
+  void NotifyAudioChainReady();
   void SetMute(bool bOnOff);
   bool SetPlayerState(const std::string& state);
   void SetSubtitle(int iStream);

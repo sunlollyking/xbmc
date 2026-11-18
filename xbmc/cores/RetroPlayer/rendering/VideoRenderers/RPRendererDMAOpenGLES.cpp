@@ -72,12 +72,15 @@ void CRPRendererDMAOpenGLES::Render(uint8_t alpha)
 
     const CSize targetSize = GetShaderTargetSize();
 
-    // Drop cached textures if target size is changed
-    if (targetSize.Width() != m_lastTargetWidth || targetSize.Height() != m_lastTargetHeight)
+    // Drop cached textures if target size or HDR state is changed
+    const bool hdr = m_hdrPeak != 0;
+    if (targetSize.Width() != m_lastTargetWidth || targetSize.Height() != m_lastTargetHeight ||
+        hdr != m_lastTargetHdr)
     {
       m_RBTexturesMap.clear();
       m_lastTargetWidth = targetSize.Width();
       m_lastTargetHeight = targetSize.Height();
+      m_lastTargetHdr = hdr;
     }
 
     const auto it = m_RBTexturesMap.find(renderBuffer);
@@ -99,18 +102,13 @@ void CRPRendererDMAOpenGLES::Render(uint8_t alpha)
               static_cast<unsigned int>(renderBuffer->GetWidth()),
               static_cast<unsigned int>(renderBuffer->GetHeight()), renderBuffer->TextureID()),
           // Target texture
-          std::make_shared<SHADER::CShaderTextureGLES>(
-              static_cast<unsigned int>(targetSize.Width()),
-              static_cast<unsigned int>(targetSize.Height()), GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA,
-              false),
-          // HDR target texture, made when first needed
-          nullptr};
+          CreateTargetTexture(targetSize)};
       rbTextures->targetTexture->CreateTexture(); // Create new internal texture
       m_RBTexturesMap.emplace(renderBuffer, rbTextures);
     }
 
     std::shared_ptr<SHADER::CShaderTextureGLESRef> sourceTexture = rbTextures->sourceTexture;
-    SHADER::CShaderTextureGLES& targetTexture = GetTargetTexture(*rbTextures, targetSize);
+    std::shared_ptr<SHADER::CShaderTextureGLES> targetTexture = rbTextures->targetTexture;
 
     GLint filter = GL_NEAREST;
     if (m_shaderPreset->GetPasses().front().filterType == SHADER::FilterType::LINEAR)
@@ -122,11 +120,11 @@ void CRPRendererDMAOpenGLES::Render(uint8_t alpha)
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    if (m_shaderPreset->RenderUpdate(*sourceTexture, targetTexture,
+    if (m_shaderPreset->RenderUpdate(*sourceTexture, *targetTexture,
                                      {m_fullDestWidth, m_fullDestHeight}))
     {
       glActiveTexture(GL_TEXTURE0); // GUI shader samples from texture unit 0
-      glBindTexture(m_textureTarget, targetTexture.GetTextureID());
+      glBindTexture(m_textureTarget, targetTexture->GetTextureID());
     }
     else
     {

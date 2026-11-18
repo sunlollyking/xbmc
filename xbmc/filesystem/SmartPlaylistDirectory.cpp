@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "FileItemList.h"
 #include "ServiceBroker.h"
+#include "Util.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/FileDirectoryFactory.h"
@@ -382,9 +383,13 @@ namespace XFILE
       filesExist =
           CDirectory::GetDirectory("special://gameplaylists/", list, ".xsp", DIR_FLAG_DEFAULTS);
     else if (PLAYLIST::CSmartPlaylist::IsMusicType(playlistType))
-      filesExist = CDirectory::GetDirectory("special://musicplaylists/", list, ".xsp", DIR_FLAG_DEFAULTS);
+      filesExist =
+          CDirectory::GetDirectory(CUtil::PlaylistsPathOf(KODI::MEDIA::MediaSection::MUSIC), list,
+                                   ".xsp", DIR_FLAG_DEFAULTS);
     else // all others are video
-      filesExist = CDirectory::GetDirectory("special://videoplaylists/", list, ".xsp", DIR_FLAG_DEFAULTS);
+      filesExist =
+          CDirectory::GetDirectory(CUtil::PlaylistsPathOf(KODI::MEDIA::MediaSection::VIDEO), list,
+                                   ".xsp", DIR_FLAG_DEFAULTS);
     if (filesExist)
     {
       for (int i = 0; i < list.Size(); i++)

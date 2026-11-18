@@ -19,6 +19,7 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonInfoBuilder.h"
 #include "addons/addoninfo/AddonType.h"
+#include "events/EventLog.h"
 #include "filesystem/BlurayDiscCache.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
@@ -32,8 +33,10 @@
 #include "settings/MediaSourceSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "test/TestUtils.h"
 #include "utils/Artwork.h"
 #include "utils/URIUtils.h"
+#include "video/FilenameAttributes.h"
 #include "video/SetInfoTag.h"
 #include "video/VideoDatabase.h"
 #include "video/VideoInfoScanner.h"
@@ -45,9 +48,11 @@
 
 #include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -229,7 +234,11 @@ public:
   }
 
   using CVideoInfoScanner::EnumerateSeriesFolder;
+  using CVideoInfoScanner::GetMovieIdentifier;
   using EpisodeResult = CVideoInfoScanner::EpisodeResult;
+  using ScanSummary = CVideoInfoScanner::ScanSummary;
+
+  const ScanSummary& Summary() const { return m_summary; }
 
   CVideoDatabase& Database() { return m_database; }
 };
@@ -294,6 +303,8 @@ protected:
         m_fastHash;
     CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_bVideoScannerIgnoreErrors =
         m_ignoreErrors;
+    CServiceBroker::GetSettingsComponent()->GetSettings()->SetBool(
+        CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS, m_extractFlags);
     if (!m_installedScraper.empty())
     {
       CServiceBroker::GetAddonMgr().UnloadAddon(SCRAPER_ID);
@@ -310,8 +321,6 @@ protected:
           CSettings::SETTING_VIDEOLIBRARY_SIMILARVIDEOACTION, m_similarVideoAction);
     if (m_scraperInfo)
     {
-      CServiceBroker::GetSettingsComponent()->GetSettings()->SetBool(
-          CSettings::SETTING_EVENTLOG_ENABLED, m_eventLog);
       XFILE::CDirectory::RemoveRecursive(m_scraperInfo->Path());
       XFILE::CDirectory::RemoveRecursive(ScraperCacheFolder());
     }
@@ -412,6 +421,23 @@ protected:
     return index;
   }
 
+  //! An AVCHD folder rip, with the backup copies that its BDMV folder holds. Its index, movie
+  //! object, playlists and streams all have video extensions.
+  //! \return the rip's INDEX.BDM
+  static std::string AvchdRip(const std::string& folder)
+  {
+    const std::string bdmv{Folder(folder, "BDMV")};
+    const std::string index{File(bdmv, "INDEX.BDM")};
+    File(bdmv, "MOVIEOBJ.BDM");
+    File(Folder(bdmv, "PLAYLIST"), "00000.MPL");
+    File(Folder(bdmv, "STREAM"), "00001.MTS");
+    const std::string backup{Folder(bdmv, "BACKUP")};
+    File(backup, "INDEX.BDM");
+    File(backup, "MOVIEOBJ.BDM");
+    File(Folder(backup, "PLAYLIST"), "00000.MPL");
+    return index;
+  }
+
   //! Moves a folder's modified time on, as adding or removing a file does, a second or more later.
   //! A day on, as an hour on in the hour before the clocks go back is the same local time, which
   //! the hash of the folder holding it uses.
@@ -423,7 +449,10 @@ protected:
                                      std::filesystem::last_write_time(path) + std::chrono::days{1});
   }
 
-  void Scan(bool ignoreVideoExtras = false, bool clean = false, const std::string& path = {})
+  //! \return What the scan did
+  TestScanner::ScanSummary Scan(bool ignoreVideoExtras = false,
+                                bool clean = false,
+                                const std::string& path = {})
   {
     TestScanner scanner{m_settings, ignoreVideoExtras, clean};
     if (m_scraperInfo)
@@ -431,6 +460,7 @@ protected:
     if (m_similarVideoAction >= 0)
       scanner.GroupSimilarVideos();
     scanner.Scan(path.empty() ? m_root : path);
+    return scanner.Summary();
   }
 
   //! Looks the source's videos up with the test scraper, rather than reading them only from their
@@ -450,12 +480,6 @@ protected:
                         SCRAPER_ID, m_db.GetPathId(m_root))));
     CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_bVideoScannerIgnoreErrors =
         true;
-    // A video with no information found is logged as an event, which is sent to the GUI a test
-    // doesn't have
-    m_eventLog = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-        CSettings::SETTING_EVENTLOG_ENABLED);
-    CServiceBroker::GetSettingsComponent()->GetSettings()->SetBool(
-        CSettings::SETTING_EVENTLOG_ENABLED, false);
   }
 
   //! Installs the test scraper, as a refresh finds the scraper of a path through the add-on manager
@@ -693,9 +717,10 @@ protected:
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_bVideoLibraryUseFastHash};
   const bool m_ignoreErrors{
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_bVideoScannerIgnoreErrors};
+  const bool m_extractFlags{CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+      CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS)};
   ADDON::AddonInfoPtr m_scraperInfo;
   ADDON::AddonType m_scraperType{ADDON::AddonType::SCRAPER_MOVIES};
-  bool m_eventLog{false};
   std::string m_otherScraper;
   std::string m_installedScraper;
   int m_similarVideoAction{-1};
@@ -716,6 +741,23 @@ TEST_F(TestVideoInfoScanner, ABlurayRipOfADatedEpisodeIsOneEpisode)
             scanner.EnumerateSeriesFolder(&item, episodes));
 
   EXPECT_EQ(1U, episodes.size());
+}
+
+// The backup copy of the index is matched too by the date in its path, so it is passed over as a
+// Blu-ray's is
+TEST_F(TestVideoInfoScanner, AnAvchdRipOfADatedEpisodeIsOneEpisode)
+{
+  const std::string show{Folder(m_root, "Show")};
+  AvchdRip(Folder(show, "Show.2023-11-05"));
+
+  TestScanner scanner{m_settings};
+  CFileItem item{show, true};
+  EPISODELIST episodes;
+  EXPECT_EQ(TestScanner::EpisodeResult::FOUND_EPISODES,
+            scanner.EnumerateSeriesFolder(&item, episodes));
+
+  ASSERT_EQ(1U, episodes.size());
+  EXPECT_EQ("2023-11-05", episodes[0].cDate.GetAsDBDate());
 }
 
 TEST_F(TestVideoInfoScanner, AddingASetLeavesTheDatabaseAsItWas)
@@ -767,10 +809,14 @@ TEST_F(TestVideoInfoScanner, AMovieAddedToAScannedFolderIsFound)
   Nfo(m_root, "Second.nfo", "Second");
   const std::string second{File(m_root, "Second.mkv")};
   Touch(m_root);
-  Scan();
+  const auto summary{Scan()};
 
   EXPECT_GT(m_db.GetMovieId(second), 0);
   EXPECT_EQ(2, CountMovies());
+  ASSERT_EQ(1u, summary.added.size());
+  EXPECT_EQ(TestScanner::ScanSummary::Type::MOVIE, summary.added[0].type);
+  ASSERT_EQ(1u, summary.existing.size());
+  EXPECT_EQ(TestScanner::ScanSummary::Type::MOVIE, summary.existing[0].type);
 }
 
 TEST_F(TestVideoInfoScanner, AnUnchangedFolderAddsNothingAgain)
@@ -872,6 +918,70 @@ TEST_F(TestVideoInfoScanner, ABlurayFolderRipIsOneMovie)
   EXPECT_GT(m_db.GetMovieId(disc), 0);
 }
 #endif
+
+// A bluray's streams are read from its playlist as the scan chooses it, so the disc isn't probed.
+// Its subtitles are looked for all the same, as the player looks for them: beside the folder
+// holding the disc, named by that folder.
+TEST_F(TestVideoInfoScanner, ABlurayRipHasTheSubtitleBesideIt)
+{
+  CServiceBroker::GetSettingsComponent()->GetSettings()->SetBool(
+      CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS, true);
+  const std::string folder{Folder(m_root, "Film (2010)")};
+  const std::string disc{BlurayRip(folder)};
+  File(folder, "Film (2010).en.srt", "1\n00:00:00,000 --> 00:00:01,000\nHello\n");
+  // The disc's main playlist, with the streams the scan has read from it
+  const auto playlist{std::make_shared<CFileItem>(URIUtils::GetBlurayPlaylistPath(disc, 0), false)};
+  playlist->GetVideoInfoTag()->SetTitle("Film");
+  auto* video{new CStreamDetailVideo()};
+  video->m_iWidth = 1920;
+  playlist->GetVideoInfoTag()->m_streamDetails.AddStream(video);
+  CFileItemList playlists;
+  playlists.Add(playlist);
+
+  TestScanner scanner{m_settings};
+  ASSERT_EQ(CInfoScanner::InfoRet::ADDED, scanner.AddPlaylists(playlists));
+
+  CVideoInfoTag tag;
+  ASSERT_TRUE(m_db.GetMovieInfo({}, tag, m_db.GetMovieId(playlist->GetDynPath())));
+  ASSERT_TRUE(m_db.GetStreamDetails(tag));
+  EXPECT_EQ(1920, tag.m_streamDetails.GetVideoWidth());
+  EXPECT_EQ(1, tag.m_streamDetails.GetSubtitleStreamCount());
+  EXPECT_EQ("eng", tag.m_streamDetails.GetSubtitleLanguage(1));
+}
+
+// A stack of bluray rips has the streams of its first disc's playlist, and the subtitle the player
+// loads as it plays that disc: beside the folder holding the disc, named by that folder
+TEST_F(TestVideoInfoScanner, ABlurayStackHasItsFirstDiscsSubtitle)
+{
+  CServiceBroker::GetSettingsComponent()->GetSettings()->SetBool(
+      CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS, true);
+  const std::string first{Folder(m_root, "Film (2010) Disc 1")};
+  const std::string second{Folder(m_root, "Film (2010) Disc 2")};
+  const std::string firstDisc{BlurayRip(first)};
+  const std::string secondDisc{BlurayRip(second)};
+  File(first, "Film (2010) Disc 1.en.srt", "1\n00:00:00,000 --> 00:00:01,000\nHello\n");
+  File(second, "Film (2010) Disc 2.de.srt", "1\n00:00:00,000 --> 00:00:01,000\nHallo\n");
+  // The stack of the discs' main playlists, with the streams the scan has read from the first
+  const std::string playlists{"stack://" + URIUtils::GetBlurayPlaylistPath(firstDisc, 0) + " , " +
+                              URIUtils::GetBlurayPlaylistPath(secondDisc, 0)};
+  const auto stack{std::make_shared<CFileItem>(playlists, false)};
+  stack->GetVideoInfoTag()->SetTitle("Film");
+  auto* video{new CStreamDetailVideo()};
+  video->m_iWidth = 1920;
+  stack->GetVideoInfoTag()->m_streamDetails.AddStream(video);
+  CFileItemList stacks;
+  stacks.Add(stack);
+
+  TestScanner scanner{m_settings};
+  ASSERT_EQ(CInfoScanner::InfoRet::ADDED, scanner.AddPlaylists(stacks));
+
+  CVideoInfoTag tag;
+  ASSERT_TRUE(m_db.GetMovieInfo({}, tag, m_db.GetMovieId(stack->GetDynPath())));
+  ASSERT_TRUE(m_db.GetStreamDetails(tag));
+  EXPECT_EQ(1920, tag.m_streamDetails.GetVideoWidth());
+  EXPECT_EQ(1, tag.m_streamDetails.GetSubtitleStreamCount());
+  EXPECT_EQ("eng", tag.m_streamDetails.GetSubtitleLanguage(1));
+}
 
 TEST_F(TestVideoInfoScanner, PlaylistsOfADiscAlreadyInTheLibraryKeepTheirMovie)
 {
@@ -1097,6 +1207,74 @@ TEST_F(TestVideoInfoScanner, AnEditionInTheFileNameNamesTheMoviesVersion)
   EXPECT_EQ("Director's Cut", m_db.GetVideoVersionInfo(movie).m_assetTypeName);
 }
 
+// The identifier a movie is looked up by. Only a python scraper is given one, which the test
+// scraper isn't, so the identifier is asked for directly.
+
+namespace
+{
+class TestVideoInfoScannerMovieIdentifier : public TestVideoInfoScanner
+{
+protected:
+  void SetUp() override
+  {
+    TestVideoInfoScanner::SetUp();
+    m_metadataSources = AdvancedSettings()->m_videoScannerMetadataSources;
+    AdvancedSettings()->m_videoScannerMetadataSources = {"tmdb", "imdb"};
+  }
+
+  void TearDown() override
+  {
+    AdvancedSettings()->m_videoScannerMetadataSources = m_metadataSources;
+    TestVideoInfoScanner::TearDown();
+  }
+
+  static std::shared_ptr<CAdvancedSettings> AdvancedSettings()
+  {
+    return CServiceBroker::GetSettingsComponent()->GetAdvancedSettings();
+  }
+
+  bool GetMovieIdentifier(const std::string& path, bool bDirNames)
+  {
+    const TestScanner scanner{m_settings};
+    return scanner.GetMovieIdentifier(CFileItem{path, false}, bDirNames,
+                                      CFilenameAttributes{URIUtils::GetFileName(path), nullptr},
+                                      m_identifierType, m_identifier);
+  }
+
+  std::string m_identifierType;
+  std::string m_identifier;
+
+private:
+  std::unordered_set<std::string> m_metadataSources;
+};
+} // namespace
+
+TEST_F(TestVideoInfoScannerMovieIdentifier, TheFolderNameGivesTheIdentifierWhenFolderNamesAreUsed)
+{
+  const std::string movie{URIUtils::AddFileToFolder(m_root, "Film (2010) {tmdb=603}", "ww.mkv")};
+
+  ASSERT_TRUE(GetMovieIdentifier(movie, true));
+  EXPECT_EQ("tmdb", m_identifierType);
+  EXPECT_EQ("603", m_identifier);
+}
+
+TEST_F(TestVideoInfoScannerMovieIdentifier, TheFolderNameGivesNoIdentifierWhenFolderNamesAreNotUsed)
+{
+  const std::string movie{URIUtils::AddFileToFolder(m_root, "Film (2010) {tmdb=603}", "ww.mkv")};
+
+  EXPECT_FALSE(GetMovieIdentifier(movie, false));
+}
+
+TEST_F(TestVideoInfoScannerMovieIdentifier, TheFileNameGivesTheIdentifierBeforeTheFolderName)
+{
+  const std::string movie{URIUtils::AddFileToFolder(m_root, "Film (2010) {tmdb=603}",
+                                                    "Film (2010) {imdb=tt0133093}.mkv")};
+
+  ASSERT_TRUE(GetMovieIdentifier(movie, true));
+  EXPECT_EQ("imdb", m_identifierType);
+  EXPECT_EQ("tt0133093", m_identifier);
+}
+
 // Movies looked up with a scraper
 
 TEST_F(TestVideoInfoScanner, AMovieIsAddedFromTheScraper)
@@ -1195,6 +1373,40 @@ TEST_F(TestVideoInfoScanner, ARefreshKeepsTheHashesOfTheMoviesFolders)
   std::string hash;
   EXPECT_TRUE(m_db.GetPathHash(m_root, hash));
   EXPECT_EQ(root, hash);
+}
+
+// A refresh, which hasn't listed the movie's folder itself, lists it afresh to find the movie's
+// subtitles, though the cache holds the listing the scan took. The movie has an nfo, which is found
+// by its name: without one, a listing of the folder is taken to look for any nfo in it.
+TEST_F(TestVideoInfoScanner, ARefreshFindsASubtitleAddedSinceTheScan)
+{
+  CServiceBroker::GetSettingsComponent()->GetSettings()->SetBool(
+      CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS, true);
+  const std::string folder{Folder(m_root, "Afilm")};
+  Nfo(folder, "movie.nfo", "Afilm");
+  const std::string film{URIUtils::AddFileToFolder(folder, "Afilm.mkv")};
+  ASSERT_TRUE(XFILE::CFile::Copy(
+      XBMC_REF_FILE_PATH("xbmc/cores/VideoPlayer/test/testdata/h264_8bit_320x240.mkv"), film));
+  Scan();
+  CVideoInfoTag tag;
+  ASSERT_TRUE(m_db.GetMovieInfo({}, tag, m_db.GetMovieId(film)));
+  ASSERT_TRUE(m_db.GetStreamDetails(tag));
+  ASSERT_EQ(0, tag.m_streamDetails.GetSubtitleStreamCount());
+  // Added as another program adds it, unseen by the directory cache
+  const std::string subtitle{URIUtils::AddFileToFolder(folder, "Afilm.en.srt")};
+  {
+    std::ofstream file{std::filesystem::path{
+        std::u8string{reinterpret_cast<const char8_t*>(subtitle.data()), subtitle.size()}}};
+    file << "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+    ASSERT_TRUE(file.good());
+  }
+
+  ASSERT_TRUE(Refresh(tag));
+
+  CVideoInfoTag refreshed;
+  ASSERT_TRUE(m_db.GetMovieInfo({}, refreshed, m_db.GetMovieId(film)));
+  ASSERT_TRUE(m_db.GetStreamDetails(refreshed));
+  EXPECT_EQ(1, refreshed.m_streamDetails.GetSubtitleStreamCount());
 }
 
 // A refresh adds a disc of a movie again, which is titled with its disc, and gives it back the
@@ -1684,6 +1896,25 @@ TEST_F(TestVideoInfoScanner, ARefreshOfAMovieWithAnExportedNfoAddsItsExtras)
   EXPECT_TRUE(IsExtraOf(trailer, idRefreshed));
 }
 
+// Music videos
+
+TEST_F(TestVideoInfoScanner, AFolderOfAMusicVideoSourceIsNotReportedAsNotFound)
+{
+  ASSERT_TRUE(m_db.ExecuteQuery(
+      m_db.PrepareSQL("UPDATE path SET strContent='musicvideos', useFolderNames=0 WHERE idPath=%i",
+                      m_db.GetPathId(m_root))));
+  const std::string folder{Folder(m_root, "Artist")};
+  File(folder, "Video.nfo", "<musicvideo><title>Video</title><artist>Artist</artist></musicvideo>");
+  File(folder, "Video.mkv");
+
+  const auto summary{Scan()};
+
+  EXPECT_EQ(1, m_db.GetSingleValueInt("SELECT COUNT(*) FROM musicvideo"));
+  ASSERT_EQ(1u, summary.added.size());
+  EXPECT_EQ(TestScanner::ScanSummary::Type::MUSIC_VIDEO, summary.added[0].type);
+  EXPECT_TRUE(summary.notFound.empty());
+}
+
 // TV shows
 
 namespace
@@ -1824,10 +2055,14 @@ TEST_F(TestVideoInfoScannerTvShows, AnEpisodeAddedToAScannedSeasonIsFound)
 
   const std::string second{Episode(season, "Show S01E02.mkv")};
   Touch(season);
-  Scan();
+  const auto summary{Scan()};
 
   EXPECT_GT(m_db.GetEpisodeId(second, 2, 1), 0);
   EXPECT_EQ(2, CountEpisodes());
+  ASSERT_EQ(1u, summary.added.size());
+  EXPECT_EQ(TestScanner::ScanSummary::Type::EPISODE, summary.added[0].type);
+  ASSERT_EQ(1u, summary.existing.size());
+  EXPECT_EQ(TestScanner::ScanSummary::Type::EPISODE, summary.existing[0].type);
 }
 
 TEST_F(TestVideoInfoScannerTvShows, AnUnchangedShowAddsNothingAgain)
@@ -1837,10 +2072,13 @@ TEST_F(TestVideoInfoScannerTvShows, AnUnchangedShowAddsNothingAgain)
   Episode(season, "Show S01E02.mkv");
   Scan();
 
-  Scan();
+  const auto summary{Scan()};
 
   EXPECT_EQ(1, CountShows());
   EXPECT_EQ(2, CountEpisodes());
+  EXPECT_EQ(1u, summary.unchangedDirectories);
+  EXPECT_TRUE(summary.existing.empty());
+  EXPECT_TRUE(summary.added.empty());
 }
 
 TEST_F(TestVideoInfoScannerTvShows, AFileOfTwoEpisodesIsTwoEpisodes)
@@ -1852,6 +2090,33 @@ TEST_F(TestVideoInfoScannerTvShows, AFileOfTwoEpisodesIsTwoEpisodes)
   EXPECT_GT(m_db.GetEpisodeId(episodes, 1, 1), 0);
   EXPECT_GT(m_db.GetEpisodeId(episodes, 2, 1), 0);
   EXPECT_EQ(1, m_db.GetSingleValueInt("SELECT COUNT(DISTINCT idFile) FROM episode"));
+}
+
+// The file is probed for its first episode only; the second has the same streams, and its subtitles
+// are still looked for
+TEST_F(TestVideoInfoScannerTvShows, TheEpisodesOfAFileHaveItsStreamsAndSubtitles)
+{
+  Settings()->SetBool(CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS, true);
+  const std::string season{Folder(Show("Show"), "Season 1")};
+  const std::string episodes{URIUtils::AddFileToFolder(season, "Show S01E01E02.mkv")};
+  ASSERT_TRUE(XFILE::CFile::Copy(
+      XBMC_REF_FILE_PATH("xbmc/cores/VideoPlayer/test/testdata/h264_8bit_320x240.mkv"), episodes));
+  // Each episode of a file of several has an nfo of its own, named by its season and episode
+  File(season, "Show S01E01E02-S01E01.nfo", "<episodedetails><title>1</title></episodedetails>");
+  File(season, "Show S01E01E02-S01E02.nfo", "<episodedetails><title>2</title></episodedetails>");
+  File(season, "Show S01E01E02.en.srt", "1\n00:00:00,000 --> 00:00:01,000\nHello\n");
+
+  Scan();
+
+  for (const int episode : {1, 2})
+  {
+    CVideoInfoTag tag;
+    ASSERT_TRUE(m_db.GetEpisodeInfo(episodes, tag, m_db.GetEpisodeId(episodes, episode, 1)));
+    EXPECT_EQ(std::to_string(episode), tag.m_strTitle);
+    ASSERT_TRUE(m_db.GetStreamDetails(tag));
+    EXPECT_EQ(320, tag.m_streamDetails.GetVideoWidth()) << episode;
+    EXPECT_EQ(1, tag.m_streamDetails.GetSubtitleStreamCount()) << episode;
+  }
 }
 
 TEST_F(TestVideoInfoScannerTvShows, ASpecialIsInSeasonZero)
@@ -1879,6 +2144,25 @@ TEST_F(TestVideoInfoScannerTvShows, ABlurayRipInAShowIsOneEpisode)
   EXPECT_EQ(1, episodes[0].iEpisode);
 }
 
+// Read file by file, the rip's index and movie object were each the episode, and its playlists and
+// stream were specials
+TEST_F(TestVideoInfoScannerTvShows, AnAvchdRipOfAnEpisodeIsOneEpisode)
+{
+  const std::string show{Show("Show")};
+  const std::string index{AvchdRip(Folder(show, "Show.S01E01"))};
+
+  TestScanner scanner{m_settings};
+  CFileItem item{show, true};
+  EPISODELIST episodes;
+  EXPECT_EQ(TestScanner::EpisodeResult::FOUND_EPISODES,
+            scanner.EnumerateSeriesFolder(&item, episodes));
+
+  ASSERT_EQ(1U, episodes.size());
+  EXPECT_EQ(1, episodes[0].iSeason);
+  EXPECT_EQ(1, episodes[0].iEpisode);
+  EXPECT_EQ(index, episodes[0].strPath);
+}
+
 TEST_F(TestVideoInfoScannerTvShows, AShowsCastHaveTheThumbsInItsActorsFolder)
 {
   UseTextureCache();
@@ -1902,9 +2186,16 @@ TEST_F(TestVideoInfoScannerTvShows, AShowWhoseDetailsFailedIsLookedUpAgain)
   UseTestScraper(ADDON::AddonType::SCRAPER_TVSHOWS);
   DetailsFail("Show");
   const std::string episode{Episode(Folder(Folder(m_root, "Show"), "Season 1"), "Show S01E01.mkv")};
-  Scan();
+  CEventLog* eventLog{CServiceBroker::GetEventLog()};
+  ASSERT_NE(nullptr, eventLog);
+  const size_t warnings{eventLog->Get(EventLevel::Warning).size()};
+  const auto summary{Scan()};
   ASSERT_EQ(0, CountShows());
   EXPECT_EQ(0, CountEpisodes());
+  ASSERT_EQ(1u, summary.failed.size());
+  EXPECT_EQ(TestScanner::ScanSummary::Type::TV_SHOW, summary.failed[0].type);
+  EXPECT_TRUE(summary.notFound.empty());
+  EXPECT_EQ(warnings + 1, eventLog->Get(EventLevel::Warning).size());
 
   Details("Show", "<details><title>Show</title></details>");
   Scan();
