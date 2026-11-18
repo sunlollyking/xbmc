@@ -34,13 +34,6 @@ std::string PlatformScope(const CVariant& parameterObject)
   return "gamedb://";
 }
 
-// The facet a method name asks for, as the path segment the library lists it by
-std::string FacetSegment(const std::string& method)
-{
-  const std::string facet = StringUtils::ToLower(method.substr(method.find('.') + 4));
-  return facet; // "genres", "developers", ...
-}
-
 void FillPlatformItem(CFileItem& item, const PlatformInfo& platform)
 {
   CGameInfoTag* tag = item.GetGameInfoTag();
@@ -57,11 +50,7 @@ void FillPlatformItem(CFileItem& item, const PlatformInfo& platform)
 }
 } // namespace
 
-JSONRPC_STATUS CGameLibrary::GetPlatforms(const std::string& method,
-                                          ITransportLayer* transport,
-                                          IClient* client,
-                                          const CVariant& parameterObject,
-                                          CVariant& result)
+JSONRPC_STATUS CGameLibrary::GetPlatforms(const CVariant& parameterObject, CVariant& result)
 {
   CGameDatabase db;
   if (!db.Open())
@@ -88,11 +77,7 @@ JSONRPC_STATUS CGameLibrary::GetPlatforms(const std::string& method,
   return OK;
 }
 
-JSONRPC_STATUS CGameLibrary::GetPlatformDetails(const std::string& method,
-                                                ITransportLayer* transport,
-                                                IClient* client,
-                                                const CVariant& parameterObject,
-                                                CVariant& result)
+JSONRPC_STATUS CGameLibrary::GetPlatformDetails(const CVariant& parameterObject, CVariant& result)
 {
   CGameDatabase db;
   if (!db.Open())
@@ -115,11 +100,7 @@ JSONRPC_STATUS CGameLibrary::GetPlatformDetails(const std::string& method,
   return OK;
 }
 
-JSONRPC_STATUS CGameLibrary::GetGames(const std::string& method,
-                                      ITransportLayer* transport,
-                                      IClient* client,
-                                      const CVariant& parameterObject,
-                                      CVariant& result)
+JSONRPC_STATUS CGameLibrary::GetGames(const CVariant& parameterObject, CVariant& result)
 {
   CGameDatabase db;
   if (!db.Open())
@@ -169,11 +150,7 @@ JSONRPC_STATUS CGameLibrary::GetGames(const std::string& method,
   return OK;
 }
 
-JSONRPC_STATUS CGameLibrary::GetGameDetails(const std::string& method,
-                                            ITransportLayer* transport,
-                                            IClient* client,
-                                            const CVariant& parameterObject,
-                                            CVariant& result)
+JSONRPC_STATUS CGameLibrary::GetGameDetails(const CVariant& parameterObject, CVariant& result)
 {
   CGameDatabase db;
   if (!db.Open())
@@ -198,9 +175,7 @@ JSONRPC_STATUS CGameLibrary::GetGameDetails(const std::string& method,
   return OK;
 }
 
-JSONRPC_STATUS CGameLibrary::GetFacet(const std::string& method,
-                                      ITransportLayer* transport,
-                                      IClient* client,
+JSONRPC_STATUS CGameLibrary::GetFacet(const std::string& facet,
                                       const CVariant& parameterObject,
                                       CVariant& result)
 {
@@ -208,7 +183,6 @@ JSONRPC_STATUS CGameLibrary::GetFacet(const std::string& method,
   if (!db.Open())
     return InternalError;
 
-  const std::string facet = FacetSegment(method);
   const std::string path = PlatformScope(parameterObject) + facet + "/";
 
   CFileItemList items;
@@ -233,11 +207,42 @@ JSONRPC_STATUS CGameLibrary::GetFacet(const std::string& method,
   return OK;
 }
 
-JSONRPC_STATUS CGameLibrary::SetGameDetails(const std::string& method,
-                                            ITransportLayer* transport,
-                                            IClient* client,
-                                            const CVariant& parameterObject,
-                                            CVariant& result)
+JSONRPC_STATUS CGameLibrary::GetGenres(const CVariant& parameterObject, CVariant& result)
+{
+  return GetFacet("genres", parameterObject, result);
+}
+
+JSONRPC_STATUS CGameLibrary::GetDevelopers(const CVariant& parameterObject, CVariant& result)
+{
+  return GetFacet("developers", parameterObject, result);
+}
+
+JSONRPC_STATUS CGameLibrary::GetPublishers(const CVariant& parameterObject, CVariant& result)
+{
+  return GetFacet("publishers", parameterObject, result);
+}
+
+JSONRPC_STATUS CGameLibrary::GetCollections(const CVariant& parameterObject, CVariant& result)
+{
+  return GetFacet("collections", parameterObject, result);
+}
+
+JSONRPC_STATUS CGameLibrary::GetTags(const CVariant& parameterObject, CVariant& result)
+{
+  return GetFacet("tags", parameterObject, result);
+}
+
+JSONRPC_STATUS CGameLibrary::GetYears(const CVariant& parameterObject, CVariant& result)
+{
+  return GetFacet("years", parameterObject, result);
+}
+
+JSONRPC_STATUS CGameLibrary::GetRegions(const CVariant& parameterObject, CVariant& result)
+{
+  return GetFacet("regions", parameterObject, result);
+}
+
+JSONRPC_STATUS CGameLibrary::SetGameDetails(const CVariant& parameterObject, CVariant& result)
 {
   CGameDatabase db;
   if (!db.Open())
@@ -267,11 +272,7 @@ JSONRPC_STATUS CGameLibrary::SetGameDetails(const std::string& method,
   return ACK;
 }
 
-JSONRPC_STATUS CGameLibrary::RefreshGame(const std::string& method,
-                                         ITransportLayer* transport,
-                                         IClient* client,
-                                         const CVariant& parameterObject,
-                                         CVariant& result)
+JSONRPC_STATUS CGameLibrary::RefreshGame(const CVariant& parameterObject, CVariant& result)
 {
   const int idGame = static_cast<int>(parameterObject["gameid"].asInteger());
   CGameDatabase db;
@@ -283,11 +284,7 @@ JSONRPC_STATUS CGameLibrary::RefreshGame(const std::string& method,
   return ACK;
 }
 
-JSONRPC_STATUS CGameLibrary::RemoveGame(const std::string& method,
-                                        ITransportLayer* transport,
-                                        IClient* client,
-                                        const CVariant& parameterObject,
-                                        CVariant& result)
+JSONRPC_STATUS CGameLibrary::RemoveGame(const CVariant& parameterObject, CVariant& result)
 {
   const int idGame = static_cast<int>(parameterObject["gameid"].asInteger());
   CGameDatabase db;
@@ -304,22 +301,14 @@ JSONRPC_STATUS CGameLibrary::RemoveGame(const std::string& method,
   return ACK;
 }
 
-JSONRPC_STATUS CGameLibrary::Scan(const std::string& method,
-                                  ITransportLayer* transport,
-                                  IClient* client,
-                                  const CVariant& parameterObject,
-                                  CVariant& result)
+JSONRPC_STATUS CGameLibrary::Scan(const CVariant& parameterObject, CVariant& result)
 {
   CGameLibraryQueue::GetInstance().ScanLibrary(parameterObject["directory"].asString(),
                                                parameterObject["showdialogs"].asBoolean());
   return ACK;
 }
 
-JSONRPC_STATUS CGameLibrary::Clean(const std::string& method,
-                                   ITransportLayer* transport,
-                                   IClient* client,
-                                   const CVariant& parameterObject,
-                                   CVariant& result)
+JSONRPC_STATUS CGameLibrary::Clean(const CVariant& parameterObject, CVariant& result)
 {
   if (!CGameLibraryQueue::GetInstance().CleanLibrary({}, false))
     return FailedToExecute;

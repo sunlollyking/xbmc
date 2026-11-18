@@ -27,55 +27,26 @@ namespace JSONRPC
 class CGameLibrary : public CFileItemHandler
 {
 public:
-  static JSONRPC_STATUS GetPlatforms(const std::string& method,
-                                     ITransportLayer* transport,
-                                     IClient* client,
-                                     const CVariant& parameterObject,
-                                     CVariant& result);
-  static JSONRPC_STATUS GetPlatformDetails(const std::string& method,
-                                           ITransportLayer* transport,
-                                           IClient* client,
-                                           const CVariant& parameterObject,
-                                           CVariant& result);
-  static JSONRPC_STATUS GetGames(const std::string& method,
-                                 ITransportLayer* transport,
-                                 IClient* client,
+  static JSONRPC_STATUS GetPlatforms(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetPlatformDetails(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetGames(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetGameDetails(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetGenres(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetDevelopers(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetPublishers(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetCollections(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetTags(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetYears(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS GetRegions(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS SetGameDetails(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS RefreshGame(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS RemoveGame(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS Scan(const CVariant& parameterObject, CVariant& result);
+  static JSONRPC_STATUS Clean(const CVariant& parameterObject, CVariant& result);
+
+private:
+  static JSONRPC_STATUS GetFacet(const std::string& facet,
                                  const CVariant& parameterObject,
                                  CVariant& result);
-  static JSONRPC_STATUS GetGameDetails(const std::string& method,
-                                       ITransportLayer* transport,
-                                       IClient* client,
-                                       const CVariant& parameterObject,
-                                       CVariant& result);
-  static JSONRPC_STATUS GetFacet(const std::string& method,
-                                 ITransportLayer* transport,
-                                 IClient* client,
-                                 const CVariant& parameterObject,
-                                 CVariant& result);
-  static JSONRPC_STATUS SetGameDetails(const std::string& method,
-                                       ITransportLayer* transport,
-                                       IClient* client,
-                                       const CVariant& parameterObject,
-                                       CVariant& result);
-  static JSONRPC_STATUS RefreshGame(const std::string& method,
-                                    ITransportLayer* transport,
-                                    IClient* client,
-                                    const CVariant& parameterObject,
-                                    CVariant& result);
-  static JSONRPC_STATUS RemoveGame(const std::string& method,
-                                   ITransportLayer* transport,
-                                   IClient* client,
-                                   const CVariant& parameterObject,
-                                   CVariant& result);
-  static JSONRPC_STATUS Scan(const std::string& method,
-                             ITransportLayer* transport,
-                             IClient* client,
-                             const CVariant& parameterObject,
-                             CVariant& result);
-  static JSONRPC_STATUS Clean(const std::string& method,
-                              ITransportLayer* transport,
-                              IClient* client,
-                              const CVariant& parameterObject,
-                              CVariant& result);
 };
 } // namespace JSONRPC
