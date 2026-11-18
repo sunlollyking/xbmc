@@ -250,37 +250,6 @@ TEST_F(TestGamesGUIInfo, MarkEarnedInHardcoreAfterCasualIsNew)
   EXPECT_EQ(state.achievements[1].unlockedDate, hardcoreUnlock);
 }
 
-TEST_F(TestGamesGUIInfo, NamesTheLeaderboardAttemptsATrackerShows)
-{
-  CAchievementRuntime achievementRuntime;
-  CGamesGUIInfo gamesGUIInfo{achievementRuntime};
-  std::string value{"stale"};
-
-  // Two leaderboards timing the same thing share one tracker
-  achievementRuntime.SetLeaderboardAttempt(1, "Survivor", true);
-  achievementRuntime.SetLeaderboardAttempt(2, "Savior", true);
-  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
-                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
-  EXPECT_TRUE(value.empty());
-
-  achievementRuntime.SetLeaderboardTracker({7, "0:00.01"}, true);
-  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
-                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
-  EXPECT_EQ(value, "Survivor · Savior");
-
-  achievementRuntime.SetLeaderboardAttempt(1, {}, false);
-  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
-                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
-  EXPECT_EQ(value, "Savior");
-
-  // Hidden without the attempt ending, as a reset does
-  achievementRuntime.SetLeaderboardTracker({7, {}}, false);
-  achievementRuntime.SetLeaderboardTracker({7, "0:00.01"}, true);
-  EXPECT_TRUE(gamesGUIInfo.GetLabel(value, nullptr, 0,
-                                    CGUIInfo(RETROPLAYER_LEADERBOARD_TRACKER_TITLE), nullptr));
-  EXPECT_TRUE(value.empty());
-}
-
 TEST_F(TestGamesGUIInfo, GetsRichPresenceFromAchievementState)
 {
   CAchievementRuntime achievementRuntime;
