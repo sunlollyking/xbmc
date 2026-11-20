@@ -21,6 +21,7 @@
 #include "platform/linux/input/LibInputHandler.h"
 
 #include <atomic>
+#include <optional>
 #include <utility>
 
 #include <gbm.h>
@@ -143,7 +144,8 @@ private:
   CDRMPropertyBlob m_hdrBlob;
   KODI::UTILS::Eotf m_eotf = KODI::UTILS::Eotf::TRADITIONAL_SDR;
   KODI::UTILS::Colorimetry m_colorimetry = KODI::UTILS::Colorimetry::DEFAULT;
-  bool m_gameContentType = false;
+  std::optional<uint64_t> m_contentTypeRequested;
+  int m_contentTypeAttempts = 0;
   bool m_hdrOutput = false;
 
   std::unique_ptr<UTILS::CDisplayInfo> m_info;

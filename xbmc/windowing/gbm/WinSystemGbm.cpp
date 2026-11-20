@@ -97,6 +97,9 @@ constexpr auto ColorimetryMap = make_map<KODI::UTILS::Colorimetry, std::string_v
     {KODI::UTILS::Colorimetry::ST2113_RGB, "Default"},
     {KODI::UTILS::Colorimetry::ICTCP, "Default"},
 });
+
+// How often a content type the kernel refuses is asked for again
+constexpr int MAX_CONTENT_TYPE_ATTEMPTS = 3;
 } // namespace
 
 CWinSystemGbm::CWinSystemGbm()
@@ -729,12 +732,6 @@ void CWinSystemGbm::HoldAfterHdrChange()
 
 void CWinSystemGbm::UpdateContentType()
 {
-  const bool game = m_lowLatencyPresentation;
-  if (game == m_gameContentType)
-    return;
-
-  m_gameContentType = game;
-
   auto drm = std::dynamic_pointer_cast<CDRMAtomic>(m_DRM);
   CDRMConnector* connector = m_DRM->GetConnector();
   if (!drm || !connector)
@@ -742,14 +739,34 @@ void CWinSystemGbm::UpdateContentType()
 
   // A display that is told a game is on screen can switch to its own game
   // mode, which drops the picture processing that delays what it shows
-  const char* name = game ? "Game" : "No Data";
-  std::optional<uint64_t> contentType = connector->GetPropertyEnumValue("content type", name);
+  const char* name = m_lowLatencyPresentation ? "Game" : "No Data";
+  const std::optional<uint64_t> contentType = connector->GetPropertyEnumValue("content type", name);
   if (!contentType)
     return;
 
+  // The connector holds what the last successful commit set, so a change the
+  // kernel refused is asked for again, a few times
+  if (connector->GetPropertyValue("content type") == contentType)
+  {
+    // An earlier request that never got committed mustn't undo this one
+    if (m_contentTypeRequested != contentType)
+      drm->AddProperty(connector, "content type", *contentType);
+    m_contentTypeRequested = contentType;
+    m_contentTypeAttempts = 0;
+    return;
+  }
+  if (contentType != m_contentTypeRequested)
+  {
+    m_contentTypeRequested = contentType;
+    m_contentTypeAttempts = 0;
+  }
+  if (m_contentTypeAttempts >= MAX_CONTENT_TYPE_ATTEMPTS)
+    return;
+
+  ++m_contentTypeAttempts;
   CLog::LogF(LOGDEBUG, "setting connector content type to {}", name);
-  drm->AddProperty(connector, "content type", contentType.value());
-  drm->SetActive(true);
+  drm->AddProperty(connector, "content type", *contentType);
+  drm->RequestModeset();
 }
 
 bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)
