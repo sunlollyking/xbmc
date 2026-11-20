@@ -606,6 +606,8 @@ bool CGameClient::InitializeGameplay(const std::string& gamePath,
 
   m_bIsPlaying = true;
   m_hasFrameRun = false;
+  m_framesRun = 0;
+  m_noSerializeSize = false;
   m_gamePath = gamePath;
   m_input = input;
 
@@ -1034,8 +1036,10 @@ void CGameClient::CloseFile()
 
     m_bIsPlaying = false;
     m_hasFrameRun = false;
+    m_framesRun = 0;
     m_gamePath.clear();
     m_serializeSize = 0;
+    m_noSerializeSize = false;
     m_input = nullptr;
     m_fastForward->Reset();
 
@@ -1151,6 +1155,8 @@ void CGameClient::RunFrame(bool pollInput)
             !LogError(m_ifc.game->toAddon->RunFrame(m_ifc.game), "RunFrame()"))
           return;
         m_hasFrameRun = true;
+        if (m_framesRun < SAVESTATE_SIZE_FRAMES)
+          ++m_framesRun;
 
         // A client using the asynchronous audio interface produces no audio of
         // its own accord: it waits to be asked, once per frame, and writes what
@@ -1172,9 +1178,6 @@ void CGameClient::RunFrame(bool pollInput)
 
 size_t CGameClient::GetSerializeSize(SerializeSizeMode mode) const
 {
-  if (mode == SerializeSizeMode::Cached)
-    return m_serializeSize;
-
   std::unique_lock lock(m_critSection);
 
   // A zero size during boot may become usable after another frame.
@@ -1189,9 +1192,10 @@ size_t CGameClient::GetSerializeSize(SerializeSizeMode mode) const
         return 0;
 
       m_serializeSize = m_ifc.game->toAddon->SerializeSize(m_ifc.game);
+      m_noSerializeSize = m_serializeSize == 0 && m_framesRun >= SAVESTATE_SIZE_FRAMES;
 
       if (m_serializeSize > 0)
-        CLog::Log(LOGINFO, "GAME: Savestate size: {}", m_serializeSize.load());
+        CLog::Log(LOGINFO, "GAME: Savestate size: {}", m_serializeSize);
     }
     catch (...)
     {

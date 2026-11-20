@@ -704,8 +704,7 @@ bool CGamesGUIInfo::GetBool(bool& value,
     case RETROPLAYER_SUPPORTS_SAVESTATES:
     {
       const GameClientPtr gameClient = CGameUtils::GetPlayingGameClient();
-      value =
-          gameClient && gameClient->GetSerializeSize(CGameClient::SerializeSizeMode::Cached) > 0;
+      value = gameClient && gameClient->SupportsSavestates();
       return true;
     }
     case RETROPLAYER_HAS_CHEATS:

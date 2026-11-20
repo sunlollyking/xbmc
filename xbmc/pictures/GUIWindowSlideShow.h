@@ -16,6 +16,7 @@
 #include "threads/Event.h"
 #include "threads/Thread.h"
 
+#include <atomic>
 #include <map>
 #include <memory>
 #include <set>
@@ -146,6 +147,9 @@ private:
   bool IsShowingVideo() const;
   std::string GetMotionClip(const CFileItem& item) const;
   void SetHdrOutput(bool hdr);
+  bool ShowsHdr() const; //!< Whether this slideshow switches the display to HDR for HDR pictures
+  void ReplacePictures();
+  void ReplacePicturesIfPending();
   CSlideShowPic::DISPLAY_EFFECT GetDisplayEffect(int iSlideNumber) const;
   void RenderPause();
   void RenderErrorMessage();
@@ -188,6 +192,10 @@ private:
   bool m_showHdr = false; //!< HDR pictures switch the display to HDR
   bool m_hdrOutput = false;
   bool m_hdrEntered = false; //!< An HDR picture has been shown in this slideshow
+  //! Reset() has replaced the slideshow since its HDR state was set
+  std::atomic_bool m_hdrStale{false};
+  //! Reset() ran on another thread and left replacing the pictures to the GUI thread
+  std::atomic_bool m_replacePictures{false};
 
   std::vector<CFileItemPtr> m_slides;
 

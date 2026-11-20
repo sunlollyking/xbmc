@@ -31,6 +31,7 @@
 #include "input/actions/ActionIDs.h"
 #include "input/mouse/MouseEvent.h"
 #include "interfaces/AnnouncementManager.h"
+#include "messaging/ApplicationMessenger.h"
 #include "pictures/GUIViewStatePictures.h"
 #include "pictures/MotionPhoto.h"
 #include "pictures/PictureThumbLoader.h"
@@ -280,15 +281,17 @@ void CGUIWindowSlideShow::Reset()
     m_Image[0]->Close();
   }
 
-  m_Image[0] = CSlideShowPic::CreateSlideShowPicture();
-
   if (m_Image[1])
   {
     m_Image[1]->UnLoad();
     m_Image[1]->Close();
   }
 
-  m_Image[1] = CSlideShowPic::CreateSlideShowPicture();
+  // The pictures can own GL resources, so only the GUI thread destroys them
+  if (!m_Image[0] || CServiceBroker::GetAppMessenger()->IsProcessThread())
+    ReplacePictures();
+  else
+    m_replacePictures = true;
 
   m_fRotate = 0.0f;
   m_fInitialRotate = 0.0f;
@@ -302,7 +305,23 @@ void CGUIWindowSlideShow::Reset()
   m_iLastFailedNextSlide = -1;
   m_slides.clear();
   AnnouncePlaylistClear();
+  // Reset() can run on another thread, so Process() switches the display
+  m_hdrStale = true;
   m_Resolution = CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution();
+}
+
+void CGUIWindowSlideShow::ReplacePictures()
+{
+  m_replacePictures = false;
+  m_Image[0] = CSlideShowPic::CreateSlideShowPicture();
+  m_Image[1] = CSlideShowPic::CreateSlideShowPicture();
+}
+
+void CGUIWindowSlideShow::ReplacePicturesIfPending()
+{
+  // The background loader fills the pictures from its own thread
+  if (m_replacePictures && !(m_pBackgroundLoader && m_pBackgroundLoader->IsLoading()))
+    ReplacePictures();
 }
 
 void CGUIWindowSlideShow::OnDeinitWindow(int nextWindowID)
@@ -476,9 +495,15 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   if (m_bSlideShow && !m_bPause && !appPower->IsInScreenSaver())
     appPower->ResetScreenSaver();
-  // A slideshow that Reset() emptied, with its window still open, has nothing to show in HDR
-  if (m_hdrOutput && m_slides.empty())
+  // A slideshow that Reset() replaced or emptied with its window still open starts again in
+  // SDR, allowed HDR by what the new one holds
+  if (m_hdrStale.exchange(false))
+  {
     SetHdrOutput(false);
+    m_hdrEntered = false;
+    m_showHdr = ShowsHdr();
+  }
+  ReplacePicturesIfPending();
   int iSlides = m_slides.size();
   if (!iSlides)
     return;
@@ -1201,13 +1226,10 @@ bool CGUIWindowSlideShow::OnMessage(CGUIMessage& message)
       else
         m_Resolution = CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution();
 
-      // A slideshow with videos in it stays out of HDR: the display would change mode, and go
-      // blank for a moment, on the way into and out of every video
-      m_showHdr = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
-                      CSettings::SETTING_SLIDESHOW_HDRPICTURES) &&
-                  m_Image[0]->SupportsHdr() && CServiceBroker::GetWinSystem()->IsHDRDisplay() &&
-                  std::ranges::none_of(m_slides, [](const auto& slide) { return IsVideo(*slide); });
+      m_showHdr = ShowsHdr();
       m_hdrEntered = false;
+      m_hdrStale = false;
+      ReplacePicturesIfPending();
 
       CGUIDialog::OnMessage(message);
 
@@ -1481,6 +1503,16 @@ std::string CGUIWindowSlideShow::GetMotionClip(const CFileItem& item) const
   std::unique_lock lock(m_motionClipsSection);
   const auto clip = m_motionClips.find(item.GetDynPath());
   return clip != m_motionClips.end() ? clip->second : "";
+}
+
+bool CGUIWindowSlideShow::ShowsHdr() const
+{
+  // A slideshow with videos in it stays out of HDR: the display would change mode, and go
+  // blank for a moment, on the way into and out of every video
+  return CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+             CSettings::SETTING_SLIDESHOW_HDRPICTURES) &&
+         m_Image[0]->SupportsHdr() && CServiceBroker::GetWinSystem()->IsHDRDisplay() &&
+         std::ranges::none_of(m_slides, [](const auto& slide) { return IsVideo(*slide); });
 }
 
 void CGUIWindowSlideShow::SetHdrOutput(bool hdr)
