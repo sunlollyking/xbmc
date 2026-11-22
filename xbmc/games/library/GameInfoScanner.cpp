@@ -936,8 +936,20 @@ const GameScrapeCandidate* CGameInfoScanner::ChooseCandidate(
   if (dialog == nullptr)
     return candidates.empty() ? nullptr : &candidates.front();
 
-  while (!candidates.empty())
+  while (true)
   {
+    // As the video library does, a search that found nothing asks for another name
+    if (candidates.empty())
+    {
+      std::string title = request.title;
+      if (!CGUIKeyboardFactory::ShowAndGetInput(title, Localize(35561), false) || title.empty())
+        return nullptr;
+
+      request.title = title;
+      candidates = scraper.Find(request);
+      continue;
+    }
+
     dialog->Reset();
     dialog->SetHeading(CVariant{35560}); // "Select game:"
     dialog->SetUseDetails(true);
@@ -980,8 +992,6 @@ const GameScrapeCandidate* CGameInfoScanner::ChooseCandidate(
     request.title = title;
     candidates = scraper.Find(request);
   }
-
-  return nullptr;
 }
 
 bool CGameInfoScanner::RefreshGame(int idGame)
@@ -1556,18 +1566,13 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       candidates = std::move(asked->second);
     else
       candidates = scraper->Find(request);
+    // A refresh the user asked for always lets them pick, or name the game, as the video
+    // library does, since they may be refreshing because the match is wrong
     const GameScrapeCandidate* chosen = nullptr;
-    if (!candidates.empty())
-    {
-      const GameScrapeCandidate& best = candidates.front();
-      if (best.matchedBy == MatchMethod::HASH || best.matchedBy == MatchMethod::SERIAL ||
-          candidates.size() == 1)
-        chosen = &best;
-      else if (m_interactive)
-        chosen = ChooseCandidate(*scraper, request, candidates);
-      else
-        chosen = &best; // the provider put its best first; the game is marked matched by name
-    }
+    if (m_interactive)
+      chosen = ChooseCandidate(*scraper, request, candidates);
+    else if (!candidates.empty())
+      chosen = &candidates.front(); // the provider put its best first
 
     if (chosen != nullptr)
     {
