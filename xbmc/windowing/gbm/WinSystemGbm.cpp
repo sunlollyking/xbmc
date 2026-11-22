@@ -233,6 +233,8 @@ bool CWinSystemGbm::DestroyWindowSystem()
 {
   CLog::Log(LOGDEBUG, "CWinSystemGbm::{} - deinitialized DRM", __FUNCTION__);
 
+  ResetContentType();
+
   m_libinput.reset();
 
   return true;
@@ -708,7 +710,9 @@ void CWinSystemGbm::SetColorimetry(const VideoPicture* videoPicture)
 
 void CWinSystemGbm::HoldAfterHdrChange()
 {
-  const bool hdr = m_hdrBlob.IsValid();
+  // Read back what was committed: a request the driver rejects leaves the display as it was
+  const CDRMConnector* connector = m_DRM ? m_DRM->GetConnector() : nullptr;
+  const bool hdr = connector && connector->GetPropertyValue("HDR_OUTPUT_METADATA").value_or(0) != 0;
   if (hdr == m_hdrOutput)
     return;
 
@@ -767,6 +771,23 @@ void CWinSystemGbm::UpdateContentType()
   CLog::LogF(LOGDEBUG, "setting connector content type to {}", name);
   drm->AddProperty(connector, "content type", *contentType);
   drm->RequestModeset();
+}
+
+void CWinSystemGbm::ResetContentType()
+{
+  auto drm = std::dynamic_pointer_cast<CDRMAtomic>(m_DRM);
+  CDRMConnector* connector = drm ? drm->GetConnector() : nullptr;
+  if (!connector)
+    return;
+
+  // No frame follows to carry the change, and a display left in its game mode would stay in it
+  // for whatever uses it after Kodi
+  const std::optional<uint64_t> noData = connector->GetPropertyEnumValue("content type", "No Data");
+  if (!noData || connector->GetPropertyValue("content type") == noData)
+    return;
+
+  CLog::LogF(LOGDEBUG, "setting connector content type to No Data");
+  drm->CommitProperty(connector, "content type", *noData);
 }
 
 bool CWinSystemGbm::SetHDR(const VideoPicture* videoPicture)

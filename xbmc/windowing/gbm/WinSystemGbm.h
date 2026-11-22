@@ -114,6 +114,7 @@ protected:
 
 private:
   void UpdateContentType();
+  void ResetContentType();
   void HoldAfterHdrChange();
   static void ApplyLimitGuiSize(void* userptr);
   static void ApplyColorRangeSetting(void* userptr);
