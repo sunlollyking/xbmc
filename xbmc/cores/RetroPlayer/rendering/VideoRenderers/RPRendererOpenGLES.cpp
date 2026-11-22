@@ -106,16 +106,14 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
   {
     RenderBufferTextures* rbTextures;
 
-    const CSize targetSize = GetShaderTargetSize();
-
     // Drop cached textures if target size or HDR state is changed
     const bool hdr = m_hdrPeak != 0;
-    if (targetSize.Width() != m_lastTargetWidth || targetSize.Height() != m_lastTargetHeight ||
+    if (m_fullDestWidth != m_lastTargetWidth || m_fullDestHeight != m_lastTargetHeight ||
         hdr != m_lastTargetHdr)
     {
       m_RBTexturesMap.clear();
-      m_lastTargetWidth = targetSize.Width();
-      m_lastTargetHeight = targetSize.Height();
+      m_lastTargetWidth = m_fullDestWidth;
+      m_lastTargetHeight = m_fullDestHeight;
       m_lastTargetHdr = hdr;
     }
 
@@ -138,7 +136,7 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
               static_cast<unsigned int>(renderBuffer->GetWidth()),
               static_cast<unsigned int>(renderBuffer->GetHeight()), renderBuffer->TextureID()),
           // Target texture
-          CreateTargetTexture(targetSize)};
+          CreateTargetTexture()};
       rbTextures->targetTexture->CreateTexture(); // Create new internal texture
       m_RBTexturesMap.emplace(renderBuffer, rbTextures);
     }
@@ -156,8 +154,7 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    if (m_shaderPreset->RenderUpdate(*sourceTexture, *targetTexture,
-                                     {m_fullDestWidth, m_fullDestHeight}))
+    if (m_shaderPreset->RenderUpdate(*sourceTexture, *targetTexture))
     {
       glActiveTexture(GL_TEXTURE0); // GUI shader samples from texture unit 0
       glBindTexture(m_textureTarget, targetTexture->GetTextureID());
@@ -186,8 +183,7 @@ void CRPRendererOpenGLES::Render(uint8_t alpha)
   DrawFrame(alpha, renderBuffer->GetWidth(), renderBuffer->GetHeight());
 }
 
-std::shared_ptr<SHADER::CShaderTextureGLES> CRPRendererOpenGLES::CreateTargetTexture(
-    const CSize& size) const
+std::shared_ptr<SHADER::CShaderTextureGLES> CRPRendererOpenGLES::CreateTargetTexture() const
 {
   GLuint pixelType = GL_UNSIGNED_BYTE;
   GLuint internalFormat = GL_RGBA;
@@ -212,8 +208,8 @@ std::shared_ptr<SHADER::CShaderTextureGLES> CRPRendererOpenGLES::CreateTargetTex
     }
   }
 #endif
-  return std::make_shared<SHADER::CShaderTextureGLES>(static_cast<unsigned int>(size.Width()),
-                                                      static_cast<unsigned int>(size.Height()),
+  return std::make_shared<SHADER::CShaderTextureGLES>(static_cast<unsigned int>(m_fullDestWidth),
+                                                      static_cast<unsigned int>(m_fullDestHeight),
                                                       pixelType, internalFormat, GL_RGBA, false);
 }
 

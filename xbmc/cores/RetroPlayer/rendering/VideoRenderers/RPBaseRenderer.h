@@ -158,7 +158,6 @@ protected:
 
   // Video shaders
   void UpdateShaders();
-  CSize GetShaderTargetSize() const;
   std::unique_ptr<SHADER::IShaderPreset> m_shaderPreset;
 
   bool m_bShadersNeedUpdate = true;

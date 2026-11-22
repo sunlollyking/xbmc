@@ -40,16 +40,14 @@ bool CShaderPreset::ReadPresetFile(const std::string& presetPath)
   return CServiceBroker::GetGameServices().VideoShaders().LoadPreset(presetPath, *this);
 }
 
-bool CShaderPreset::RenderUpdate(IShaderTexture& sourceTexture,
-                                 IShaderTexture& targetTexture,
-                                 const float2& viewportSize)
+bool CShaderPreset::RenderUpdate(IShaderTexture& sourceTexture, IShaderTexture& targetTexture)
 {
   // Save the viewport
   CRect viewPort;
   m_context.GetViewPort(viewPort);
 
   // Handle target resizing
-  UpdateOutputSize({targetTexture.GetWidth(), targetTexture.GetHeight()}, viewportSize);
+  UpdateOutputSize({targetTexture.GetWidth(), targetTexture.GetHeight()});
 
   // Update shaders/shader textures if required
   if (!Update())
@@ -163,7 +161,7 @@ bool CShaderPreset::Update()
   return true;
 }
 
-void CShaderPreset::UpdateOutputSize(const float2 outputSize, const float2 viewportSize)
+void CShaderPreset::UpdateOutputSize(const float2 outputSize)
 {
   if (outputSize != m_outputSize)
   {
@@ -175,13 +173,8 @@ void CShaderPreset::UpdateOutputSize(const float2 outputSize, const float2 viewp
       m_pShaders.back()->SetSizes(outputSize);
       m_pShaders.back()->UpdateMVP();
     }
-  }
 
-  if (viewportSize != m_viewportSize)
-  {
-    m_viewportSize = viewportSize;
-
-    // If intermediate textures depend on viewport size, full update is needed
+    // If intermediate textures depend on output size, full update is needed
     if (m_bTexturesNeedSizeUpdate)
       m_bPresetNeedsUpdate = true;
   }
@@ -217,8 +210,8 @@ void CShaderPreset::CalculateScaledSize(const KODI::SHADER::ShaderPass& pass,
       scaledSize.x = static_cast<float>(pass.fbo.scaleX.abs);
       break;
     case ScaleType::VIEWPORT:
-      scaledSize.x = pass.fbo.scaleX.scale != 0.0f ? pass.fbo.scaleX.scale * m_viewportSize.x
-                                                   : m_viewportSize.x;
+      scaledSize.x =
+          pass.fbo.scaleX.scale != 0.0f ? pass.fbo.scaleX.scale * m_outputSize.x : m_outputSize.x;
       m_bTexturesNeedSizeUpdate = true;
       break;
     case ScaleType::INPUT:
@@ -234,8 +227,8 @@ void CShaderPreset::CalculateScaledSize(const KODI::SHADER::ShaderPass& pass,
       scaledSize.y = static_cast<float>(pass.fbo.scaleY.abs);
       break;
     case ScaleType::VIEWPORT:
-      scaledSize.y = pass.fbo.scaleY.scale != 0.0f ? pass.fbo.scaleY.scale * m_viewportSize.y
-                                                   : m_viewportSize.y;
+      scaledSize.y =
+          pass.fbo.scaleY.scale != 0.0f ? pass.fbo.scaleY.scale * m_outputSize.y : m_outputSize.y;
       m_bTexturesNeedSizeUpdate = true;
       break;
     case ScaleType::INPUT:

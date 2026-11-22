@@ -68,7 +68,7 @@ protected:
   /*!
    * \brief Make the texture a shader preset's last pass renders into, deeper than 8 bits in HDR
    */
-  std::shared_ptr<SHADER::CShaderTextureGLES> CreateTargetTexture(const CSize& size) const;
+  std::shared_ptr<SHADER::CShaderTextureGLES> CreateTargetTexture() const;
 
   /*!
    * \brief Draw the texture bound to unit 0 into the destination, for SDR or HDR
