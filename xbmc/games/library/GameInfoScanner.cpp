@@ -994,26 +994,6 @@ const GameScrapeCandidate* CGameInfoScanner::ChooseCandidate(
   }
 }
 
-void CGameInfoScanner::DropMatchesBeforePlatform(std::vector<GameScrapeCandidate>& candidates,
-                                                 const PlatformInfo& platform)
-{
-  if (platform.released <= 0)
-    return;
-
-  std::erase_if(candidates,
-                [&platform](const GameScrapeCandidate& candidate)
-                {
-                  const bool early = candidate.year > 0 && candidate.year < platform.released &&
-                                     candidate.matchedBy != MatchMethod::HASH &&
-                                     candidate.matchedBy != MatchMethod::SERIAL;
-                  if (early)
-                    CLog::Log(LOGINFO, "GAME: Not matching \"{}\" ({}, {}): {} came out in {}",
-                              candidate.title, candidate.year, candidate.provider, platform.name,
-                              platform.released);
-                  return early;
-                });
-}
-
 bool CGameInfoScanner::RefreshGame(int idGame)
 {
   if (!m_database.IsOpen() && !m_database.Open())
@@ -1586,10 +1566,6 @@ bool CGameInfoScanner::ScanEntry(const Entry& entry,
       candidates = std::move(asked->second);
     else
       candidates = scraper->Find(request);
-    // The user picking from the list may know better than the catalogue's date
-    if (!m_interactive)
-      DropMatchesBeforePlatform(candidates, platform);
-
     // A refresh the user asked for always lets them pick, or name the game, as the video
     // library does, since they may be refreshing because the match is wrong
     const GameScrapeCandidate* chosen = nullptr;

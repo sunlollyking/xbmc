@@ -12,7 +12,6 @@
 #include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/library/GameInfoScanner.h"
-#include "games/library/GameScraper.h"
 #include "utils/URIUtils.h"
 
 #include <string>
@@ -165,47 +164,4 @@ TEST_F(TestGameFolderGames, FindsTheFolderGameAFilePlays)
   EXPECT_FALSE(
       CGameInfoScanner::FolderGameOf(URIUtils::AddFileToFolder(m_root, "Loose/game.rpx"), platform)
           .has_value());
-}
-
-namespace
-{
-GameScrapeCandidate Candidate(const std::string& title, int year, MatchMethod matchedBy)
-{
-  GameScrapeCandidate candidate;
-  candidate.title = title;
-  candidate.year = year;
-  candidate.matchedBy = matchedBy;
-  return candidate;
-}
-} // namespace
-
-TEST(TestGameInfoScanner, DropsNameMatchesDatedBeforeThePlatform)
-{
-  PlatformInfo platform;
-  platform.name = "Nintendo Switch";
-  platform.released = 2017;
-  std::vector<GameScrapeCandidate> candidates{
-      Candidate("Super Mario RPG - Legend Of The Seven Stars", 2015, MatchMethod::NAME),
-      Candidate("Super Mario RPG", 2023, MatchMethod::NAME),
-      Candidate("Launch title", 2017, MatchMethod::NAME),
-      Candidate("Undated", 0, MatchMethod::NAME),
-      Candidate("By hash", 2015, MatchMethod::HASH),
-      Candidate("By serial", 2015, MatchMethod::SERIAL)};
-
-  CGameInfoScanner::DropMatchesBeforePlatform(candidates, platform);
-
-  std::vector<std::string> kept;
-  for (const GameScrapeCandidate& candidate : candidates)
-    kept.emplace_back(candidate.title);
-  EXPECT_EQ(kept, (std::vector<std::string>{"Super Mario RPG", "Launch title", "Undated", "By hash",
-                                            "By serial"}));
-}
-
-TEST(TestGameInfoScanner, KeepsMatchesWhenThePlatformDateIsUnknown)
-{
-  std::vector<GameScrapeCandidate> candidates{Candidate("Any", 1980, MatchMethod::NAME)};
-
-  CGameInfoScanner::DropMatchesBeforePlatform(candidates, PlatformInfo{});
-
-  EXPECT_EQ(candidates.size(), 1u);
 }
