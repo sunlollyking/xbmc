@@ -136,6 +136,17 @@ public:
                           struct GameScrapeRequest& request);
 
   /*!
+   * \brief Drop the name matches dated before their platform came out
+   *
+   * A game can't come out before the machine it runs on, so such a match is
+   * another game: ScreenScraper keeps the 1996 SNES Super Mario RPG under the
+   * Switch, which came out in 2017. A match by hash or serial is the dump
+   * itself and is kept, whatever date the catalogue gives it.
+   */
+  static void DropMatchesBeforePlatform(std::vector<struct GameScrapeCandidate>& candidates,
+                                        const PlatformInfo& platform);
+
+  /*!
    * \brief Take from a scraped platform only what the catalogue does not already say
    *
    * The catalogue is curated; a provider answers with whatever it happens to call
